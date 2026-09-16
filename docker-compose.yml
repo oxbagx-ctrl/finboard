@@ -24,7 +24,7 @@ services:
     container_name: finboard-web
     restart: unless-stopped
     ports:
-      - "${FORWARD_DB_PORT:-8080}:80"
+      - "${FORWARD_HTTP_PORT:-8080}:80"
     volumes:
       - ./:/var/www/html:ro
       - ./docker/nginx/conf.d:/etc/nginx/conf.d:ro
