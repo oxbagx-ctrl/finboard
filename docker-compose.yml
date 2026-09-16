@@ -1,0 +1,80 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+      args:
+        UID: ${DOCKER_UID:-1000}
+        GID: ${DOCKER_GID:-1000}
+    container_name: finboard-app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    networks:
+      - finboard-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  web:
+    image: nginx:1.25-alpine
+    container_name: finboard-web
+    restart: unless-stopped
+    ports:
+      - "${FORWARD_DB_PORT:-8080}:80"
+    volumes:
+      - ./:/var/www/html:ro
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d:ro
+    networks:
+      - finboard-network
+    depends_on:
+      - app
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: finboard-postgres
+    restart: unless-stopped
+    ports:
+      - "${FORWARD_PG_PORT:-5432}:5432"
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-finboard}
+      POSTGRES_USER: ${DB_USERNAME:-finboard_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-finboard_secret}
+    volumes:
+      - finboard-pgdata:/var/lib/postgresql/data
+    networks:
+      - finboard-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-finboard_user} -d ${DB_DATABASE:-finboard}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: finboard-redis
+    restart: unless-stopped
+    ports:
+      - "${FORWARD_REDIS_PORT:-6379}:6379"
+    volumes:
+      - finboard-redisdata:/data
+    networks:
+      - finboard-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+networks:
+  finboard-network:
+    driver: bridge
+
+volumes:
+  finboard-pgdata:
+    driver: local
+  finboard-redisdata:
+    driver: local
