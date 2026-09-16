@@ -1,0 +1,48 @@
+# Laravel & Composer
+/vendor
+composer.phar
+composer.lock
+.env
+.env.backup
+.env.*.php
+.env.production
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
+
+# Laravel Storage & Cache
+/storage/*.key
+/storage/app/*
+!/storage/app/public/.gitignore
+!/storage/app/.gitignore
+/storage/framework/cache/data/*
+!/storage/framework/cache/data/.gitignore
+/storage/framework/sessions/*
+!/storage/framework/sessions/.gitignore
+/storage/framework/testing/*
+!/storage/framework/testing/.gitignore
+/storage/framework/views/*
+!/storage/framework/views/.gitignore
+/storage/logs/*
+!/storage/logs/.gitignore
+
+# Node & Frontend Build
+/node_modules
+/public/hot
+/public/storage
+/public/build
+dist
+
+# Docker & Local Data
+docker/data/
+docker-compose.override.yml
+
+# IDE & OS
+.DS_Store
+Thumbs.db
+*.sublime-project
+*.sublime-workspace
+.vscode/
+.idea/
