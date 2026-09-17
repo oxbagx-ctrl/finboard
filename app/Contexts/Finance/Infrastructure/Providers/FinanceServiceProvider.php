@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Contexts\Finance\Infrastructure\Providers;
 
+use App\Contexts\Finance\Domain\Repositories\CategoryRepositoryInterface;
 use App\Contexts\Finance\Domain\Repositories\FinancialRecordRepositoryInterface;
 use App\Contexts\Finance\Domain\Services\FinancialCalculator;
+use App\Contexts\Finance\Infrastructure\Repositories\EloquentCategoryRepository;
 use App\Contexts\Finance\Infrastructure\Repositories\EloquentFinancialRecordRepository;
 use Illuminate\Support\ServiceProvider;
 
@@ -16,6 +18,11 @@ final class FinanceServiceProvider extends ServiceProvider
         $this->app->bind(
             FinancialRecordRepositoryInterface::class,
             EloquentFinancialRecordRepository::class
+        );
+
+        $this->app->bind(
+            CategoryRepositoryInterface::class,
+            EloquentCategoryRepository::class
         );
 
         $this->app->singleton(FinancialCalculator::class, function () {
