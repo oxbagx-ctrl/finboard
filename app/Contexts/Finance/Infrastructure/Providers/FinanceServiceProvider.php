@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Contexts\Finance\Infrastructure\Providers;
 
+use App\Contexts\Finance\Application\Services\CsvFinancialDataParser;
 use App\Contexts\Finance\Domain\Repositories\CategoryRepositoryInterface;
 use App\Contexts\Finance\Domain\Repositories\FinancialRecordRepositoryInterface;
 use App\Contexts\Finance\Domain\Services\FinancialCalculator;
@@ -27,6 +28,10 @@ final class FinanceServiceProvider extends ServiceProvider
 
         $this->app->singleton(FinancialCalculator::class, function () {
             return new FinancialCalculator();
+        });
+
+        $this->app->singleton(CsvFinancialDataParser::class, function ($app) {
+            return new CsvFinancialDataParser($app->make(CategoryRepositoryInterface::class));
         });
     }
 
