@@ -27,4 +27,12 @@ class Company extends Model
     {
         return $this->hasMany(User::class, 'company_id');
     }
+
+    /**
+     * @return HasMany<FinancialRecord>
+     */
+    public function financialRecords(): HasMany
+    {
+        return $this->hasMany(FinancialRecord::class, 'company_id');
+    }
 }
