@@ -35,4 +35,12 @@ class Company extends Model
     {
         return $this->hasMany(FinancialRecord::class, 'company_id');
     }
+
+    /**
+     * @return HasMany<Document>
+     */
+    public function documents(): HasMany
+    {
+        return $this->hasMany(Document::class, 'company_id');
+    }
 }
