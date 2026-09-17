@@ -46,3 +46,6 @@ Thumbs.db
 *.sublime-workspace
 .vscode/
 .idea/
+
+# Local Changelog
+/changelog/
