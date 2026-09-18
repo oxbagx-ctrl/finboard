@@ -1,0 +1,8 @@
+kategoria,kwota,data,waluta,opis
+cat-revenue,15000.00,2026-07-01,PLN,Prawidłowy wiersz 1 - Przychody ze sprzedaży
+cat-crypto-speculation,5000.00,2026-07-02,PLN,Błąd 1 - Nieistniejąca kategoria w słowniku systemu
+cat-opex,-8500.00,2026-07-03,PLN,Błąd 2 - Wartość ujemna kwoty transakcji
+cat-opex,4200.00,niepoprawna-data,PLN,Błąd 3 - Błędny format daty księgowania
+cat-cogs,6000.00,2026-07-05,PLN,
+cat-revenue,20000.00,2026-07-06,BITCOIN,Błąd 5 - Nieobsługiwany kod waluty
+cat-opex,3100.00,2026-07-07,PLN,Prawidłowy wiersz 2 - Koszty usług telekomunikacyjnych

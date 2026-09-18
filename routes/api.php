@@ -45,15 +45,26 @@ Route::prefix('v1')->group(function () {
             Route::delete('/records/{id}', [FinancialRecordController::class, 'destroy'])
                 ->name('api.finance.records.destroy');
 
-            // CSV Import
+            // CSV Import (canonical and plural REST routes)
             Route::post('/import/csv', [FinancialImportController::class, 'store'])
                 ->name('api.finance.import.store');
+            Route::post('/imports', [FinancialImportController::class, 'store'])
+                ->name('api.finance.imports.store');
+
             Route::post('/import/preview', [FinancialImportController::class, 'preview'])
                 ->name('api.finance.import.preview');
+            Route::post('/imports/preview', [FinancialImportController::class, 'preview'])
+                ->name('api.finance.imports.preview');
+
             Route::get('/import/history', [FinancialImportController::class, 'history'])
                 ->name('api.finance.import.history');
+            Route::get('/imports/history', [FinancialImportController::class, 'history'])
+                ->name('api.finance.imports.history');
+
             Route::get('/import/csv/{id}', [FinancialImportController::class, 'show'])
                 ->name('api.finance.import.show');
+            Route::get('/imports/{id}', [FinancialImportController::class, 'show'])
+                ->name('api.finance.imports.show');
 
             // Analytics, KPIs and Chart Data
             Route::prefix('analytics')->group(function () {
