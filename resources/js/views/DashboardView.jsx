@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import apiClient from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import { useDeal } from '../context/DealContext';
@@ -8,6 +8,9 @@ import { Badge } from '../components/ui/Badge';
 import { FinancialTable } from '../components/ui/FinancialTable';
 import { FinancialMultiplesStrip } from '../components/ui/FinancialMultiplesStrip';
 import { AuditTrailSnippet } from '../components/ui/AuditTrailSnippet';
+import { PnlTrendChart } from '../components/charts/PnlTrendChart';
+import { CostBreakdownChart } from '../components/charts/CostBreakdownChart';
+import { LiquidityTrendChart } from '../components/charts/LiquidityTrendChart';
 import {
     DollarSign,
     TrendingUp,
@@ -16,7 +19,9 @@ import {
     Building2,
     Calendar,
     Coins,
-    Cpu
+    Cpu,
+    BarChart3,
+    Activity
 } from 'lucide-react';
 
 export const DashboardView = () => {
@@ -25,35 +30,44 @@ export const DashboardView = () => {
     const { error } = useNotification();
 
     const [metrics, setMetrics] = useState(null);
-    const [breakdown, setBreakdown] = useState(null);
+    const [trends, setTrends] = useState([]);
+    const [breakdown, setBreakdown] = useState([]);
+    const [liquidityTrends, setLiquidityTrends] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [chartMode, setChartMode] = useState('pnl'); // 'pnl' | 'liquidity'
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         setLoading(true);
         try {
             const params = {};
             if (dateRange.startDate) params.start_date = dateRange.startDate;
             if (dateRange.endDate) params.end_date = dateRange.endDate;
 
-            const [metricsRes, breakdownRes] = await Promise.all([
+            const [metricsRes, trendsRes, breakdownRes, liquidityRes] = await Promise.all([
                 apiClient.get('/finance/analytics/metrics', { params }),
-                apiClient.get('/finance/analytics/breakdown', { params: { ...params, type: 'expense' } }).catch(() => null),
+                apiClient.get('/finance/analytics/trends', { params }).catch(() => ({ data: { data: [] } })),
+                apiClient.get('/finance/analytics/breakdown', { params: { ...params, record_type: 'EXPENSE' } }).catch(() => ({ data: { data: [] } })),
+                apiClient.get('/finance/analytics/liquidity', { params }).catch(() => ({ data: { data: [] } })),
             ]);
 
             setMetrics(metricsRes.data.data);
-            if (breakdownRes?.data?.data) {
-                setBreakdown(breakdownRes.data.data);
-            }
+            setTrends(trendsRes.data.data || []);
+            setBreakdown(breakdownRes.data.data || []);
+            setLiquidityTrends(liquidityRes.data.data || []);
         } catch (err) {
-            error('Nie udało się pobrać danych analitycznych.');
+            error('Nie udało się pobrać danych analitycznych z serwera.');
         } finally {
             setLoading(false);
         }
-    };
+    }, [activeCompany?.id, dateRange.startDate, dateRange.endDate]);
 
     useEffect(() => {
         fetchData();
-    }, [activeCompany?.id, dateRange.startDate, dateRange.endDate]);
+
+        const handleCompanyChange = () => fetchData();
+        window.addEventListener('finboard:company-changed', handleCompanyChange);
+        return () => window.removeEventListener('finboard:company-changed', handleCompanyChange);
+    }, [fetchData]);
 
     const rawRevenue = Number(metrics?.pnl?.revenue?.amount || 0);
     const rawGrossProfit = Number(metrics?.pnl?.gross_profit?.amount || (rawRevenue * 0.45));
@@ -64,7 +78,7 @@ export const DashboardView = () => {
     const rawNetProfit = Number(metrics?.pnl?.net_profit?.amount || 0);
     const rawOpex = Number(metrics?.pnl?.opex?.amount || 0);
 
-    // Converted amounts
+    // Converted amounts based on active currency
     const revenueVal = convertAmount(rawRevenue);
     const cogsVal = convertAmount(rawCogs);
     const grossProfitVal = convertAmount(rawGrossProfit);
@@ -81,6 +95,25 @@ export const DashboardView = () => {
     const operatingMargin = metrics?.pnl?.operating_margin ? Number(metrics.pnl.operating_margin) : 0.142;
     const grossMargin = metrics?.pnl?.gross_margin ? Number(metrics.pnl.gross_margin) : 0.326;
     const netMargin = rawRevenue > 0 ? rawNetProfit / rawRevenue : 0.118;
+
+    // Converted Trends Data for Charts
+    const convertedTrends = useMemo(() => {
+        return trends.map((item) => ({
+            ...item,
+            revenue: convertAmount(item.revenue),
+            opex: convertAmount(item.opex),
+            ebitda: convertAmount(item.ebitda),
+            net_profit: convertAmount(item.net_profit),
+        }));
+    }, [trends, convertAmount]);
+
+    // Converted Breakdown Data for Charts
+    const convertedBreakdown = useMemo(() => {
+        return breakdown.map((item) => ({
+            ...item,
+            amount: convertAmount(item.amount),
+        }));
+    }, [breakdown, convertAmount]);
 
     // Structured P&L Table Rows
     const pnlRows = useMemo(() => {
@@ -190,7 +223,7 @@ export const DashboardView = () => {
                             <span>{activeCompany?.name || 'Spółka Portfelowa'}</span>
                             <Badge variant="default" size="sm">{activeCompany?.code || 'PODMIOT'}</Badge>
                             <span className="text-zinc-600 font-normal">|</span>
-                            <span className="text-zinc-400 font-normal text-[11px]">NIP: 525-24-11-980</span>
+                            <span className="text-zinc-400 font-normal text-[11px]">NIP: {activeCompany?.tax_id || '525-24-11-980'}</span>
                         </div>
                         <div className="text-[10px] text-zinc-500 flex items-center gap-1.5 mt-0.5 font-mono">
                             <Calendar className="w-3 h-3 text-zinc-600" />
@@ -262,6 +295,81 @@ export const DashboardView = () => {
                 netMargin={netMargin}
                 debtRatio={0.38}
             />
+
+            {/* Charts Section (Recharts) */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                {/* Main Trend Chart (2 Cols on lg) */}
+                <div className="lg:col-span-2 bg-zinc-900 border border-zinc-800 rounded-lg p-4 flex flex-col">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-800 pb-3 mb-3">
+                        <div>
+                            <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-100 flex items-center gap-2">
+                                <BarChart3 className="w-3.5 h-3.5 text-zinc-400" />
+                                {chartMode === 'pnl' ? 'DYNAMIKA WYNIKOWA P&L (PRZYCHODY / EBITDA / OPEX)' : 'EWOLUCJA WSKAŹNIKÓW PŁYNNOŚCI (CR / QR)'}
+                            </h3>
+                            <p className="text-[10px] font-mono text-zinc-500 mt-0.5">
+                                Horyzont miesięczny skonsolidowany | Seria czasowa PSR
+                            </p>
+                        </div>
+
+                        {/* Chart View Switcher */}
+                        <div className="flex items-center gap-1 bg-zinc-950 p-1 rounded border border-zinc-800 text-[10px] font-mono">
+                            <button
+                                onClick={() => setChartMode('pnl')}
+                                className={`px-2.5 py-1 rounded transition-colors ${
+                                    chartMode === 'pnl'
+                                        ? 'bg-zinc-800 text-zinc-100 font-bold'
+                                        : 'text-zinc-500 hover:text-zinc-300'
+                                }`}
+                            >
+                                TREND P&L
+                            </button>
+                            <button
+                                onClick={() => setChartMode('liquidity')}
+                                className={`px-2.5 py-1 rounded transition-colors ${
+                                    chartMode === 'liquidity'
+                                        ? 'bg-zinc-800 text-zinc-100 font-bold'
+                                        : 'text-zinc-500 hover:text-zinc-300'
+                                }`}
+                            >
+                                PŁYNNOŚĆ CR/QR
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="flex-1 min-h-[300px]">
+                        {chartMode === 'pnl' ? (
+                            <PnlTrendChart
+                                data={convertedTrends}
+                                currency={currency}
+                            />
+                        ) : (
+                            <LiquidityTrendChart
+                                data={liquidityTrends}
+                            />
+                        )}
+                    </div>
+                </div>
+
+                {/* Cost Breakdown Donut Chart (1 Col on lg) */}
+                <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 flex flex-col">
+                    <div className="border-b border-zinc-800 pb-3 mb-3">
+                        <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-100 flex items-center gap-2">
+                            <Activity className="w-3.5 h-3.5 text-zinc-400" />
+                            Struktura Kosztów Operacyjnych
+                        </h3>
+                        <p className="text-[10px] font-mono text-zinc-500 mt-0.5">
+                            Rozbicie według kategorii rodzajowych
+                        </p>
+                    </div>
+
+                    <div className="flex-1 min-h-[300px]">
+                        <CostBreakdownChart
+                            data={convertedBreakdown}
+                            currency={currency}
+                        />
+                    </div>
+                </div>
+            </div>
 
             {/* High-Density P&L Breakdown Table */}
             <FinancialTable

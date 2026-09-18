@@ -10,4 +10,15 @@ export default defineConfig({
         }),
         react(),
     ],
+    build: {
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    vendor: ['react', 'react-dom', 'axios', 'clsx', 'tailwind-merge'],
+                    charts: ['recharts'],
+                    icons: ['lucide-react'],
+                },
+            },
+        },
+    },
 });
