@@ -5,7 +5,7 @@
 [![PostgreSQL](https://img.shields.io/badge/postgresql-16-blue.svg)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/redis-alpine-red.svg)](https://redis.io/)
 [![Architecture](https://img.shields.io/badge/architecture-DDD%20%2F%20CQRS-brightgreen.svg)]()
-[![Tests](https://img.shields.io/badge/tests-142%20backend%20%7C%2057%20frontend%20passed-success.svg)]()
+[![Tests](https://img.shields.io/badge/tests-155%20backend%20%7C%2057%20frontend%20passed-success.svg)]()
 
 FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakcyjnego (M&A, Due Diligence, Corporate Finance) oraz ich klientom (CFO, Zarządy). Aplikacja łączy w sobie zaawansowaną analitykę finansową w ujęciu wielo-najemcowym (Multi-Tenant) z bezpiecznym repozytorium dokumentów Virtual Data Room (VDR).
 
@@ -22,6 +22,7 @@ FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakc
     - Pełna separacja danych pomiędzy firmami (Tenant Isolation).
     - Hierarchiczny model uprawnień: **Super Admin** (Partner z globalnym zarządzaniem), **Doradca** (Advisor przypisany do wybranych spółek portfela) oraz **Klient** (Client ze ścisłym dostępem wyłącznie do własnej spółki).
     - Wielo-stronne relacje doradca-spółka (`CompanyAdvisorAssignment`) z audytem przypisań i zdarzeniami domenowymi.
+    - Przypadki użycia aplikacyjne (`AssignAdvisorToCompanyUseCase`, `RevokeAdvisorFromCompanyUseCase`) ze ścisłą autoryzacją ról i uprawnień.
     - Kompleksowy audyt bezpieczeństwa weryfikujący odporność na próby odczytu, mutacji, usuwania cudzych rekordów oraz manipulacji nagłówkami `X-Company-Id`.
 - **Asynchroniczny Import Danych Finansowych (CSV)**:
     - Automatyczne wykrywanie delimiterów (przecinek, średnik, tabulator).
@@ -69,9 +70,9 @@ app/
 │   │   └── Infrastructure/       # EloquentUserRepository, Sanctum Provider
 │   │
 │   ├── Tenant/                   # Bounded Context: Zarządzanie firmami i relacjami doradców
-│   │   ├── Domain/               # CompanyAdvisorAssignment Entity, CompanyId VO, Domain Events
-│   │   ├── Application/          # Use cases przypisań i porty repozytoriów
-│   │   └── Infrastructure/       # EloquentCompanyAdvisorRepository, TenantServiceProvider
+│   │   ├── Domain/               # CompanyAdvisorAssignment Entity, CompanyId VO, Domain Events, Repository Interfaces
+│   │   ├── Application/          # Use cases przypisań i odwołań (AssignAdvisorToCompanyUseCase, RevokeAdvisorFromCompanyUseCase), wyjątki domenowe
+│   │   └── Infrastructure/       # EloquentCompanyAdvisorRepository, EloquentCompanyRepository, TenantServiceProvider
 │   │
 │   ├── Finance/                  # Bounded Context: Finanse, Raportowanie i Analityka
 │   │   ├── Domain/               # FinancialRecord Aggregate, Category, Money VO (bcmath), DateRange VO, FinancialCalculator
@@ -264,10 +265,8 @@ Baza danych zasilona jest danymi demonstracyjnymi (21 miesięcy historii finanso
   - [x] Aktualizacja encji `Role` i enumów dla trójpoziomowej hierarchii uprawnień (SuperAdmin, Advisor, Client).
   - [x] Implementacja logiki domenowej relacji przypisania doradcy do firmy (`CompanyAdvisorAssignment`, `CompanyAdvisorRepositoryInterface`).
   - [x] Migracja bazy danych dla tabeli pośredniej `advisor_company` i aktualizacja powiązań.
-  - [ ] Implementacja przypadku użycia `AssignAdvisorToCompanyUseCase` ze ścisłą weryfikacją autoryzacji.
+  - [x] Implementacja przypadku użycia `AssignAdvisorToCompanyUseCase` ze ścisłą weryfikacją autoryzacji.
   - [ ] Testy jednostkowe i integracyjne weryfikujące dostęp doradców wyłącznie do przypisanych spółek.
-
-Szczegółowa dokumentacja zrealizowanych zmian znajduje się w katalogu [`changelog/`](changelog/README.md).
 
 ---
 

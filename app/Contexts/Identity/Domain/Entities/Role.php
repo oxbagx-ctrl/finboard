@@ -10,6 +10,21 @@ use InvalidArgumentException;
 
 final class Role extends Entity
 {
+    public const PERM_MANAGE_ADVISORS = 'manage_advisors';
+    public const PERM_ASSIGN_ADVISORS = 'assign_advisors';
+    public const PERM_VIEW_ALL_COMPANIES = 'view_all_companies';
+    public const PERM_VIEW_ASSIGNED_COMPANIES = 'view_assigned_companies';
+    public const PERM_MANAGE_COMPANIES = 'manage_companies';
+    public const PERM_MANAGE_FINANCES = 'manage_finances';
+    public const PERM_UPLOAD_FINANCIAL_DATA = 'upload_financial_data';
+    public const PERM_MANAGE_DOCUMENTS = 'manage_documents';
+    public const PERM_VIEW_KPI = 'view_kpi';
+    public const PERM_INVITE_USERS = 'invite_users';
+    public const PERM_INVITE_CLIENTS = 'invite_clients';
+    public const PERM_MANAGE_USERS = 'manage_users';
+    public const PERM_VIEW_DOCUMENTS = 'view_documents';
+    public const PERM_DOWNLOAD_DOCUMENTS = 'download_documents';
+
     /**
      * @param array<string> $permissions
      */
@@ -28,16 +43,16 @@ final class Role extends Entity
             name: RoleType::SUPER_ADMIN,
             description: 'Super Administrator / Partner z globalnymi uprawnieniami zarządzania doradcami i spółkami',
             permissions: [
-                'manage_advisors',
-                'assign_advisors',
-                'view_all_companies',
-                'manage_companies',
-                'manage_finances',
-                'upload_financial_data',
-                'manage_documents',
-                'view_kpi',
-                'invite_users',
-                'manage_users',
+                self::PERM_MANAGE_ADVISORS,
+                self::PERM_ASSIGN_ADVISORS,
+                self::PERM_VIEW_ALL_COMPANIES,
+                self::PERM_MANAGE_COMPANIES,
+                self::PERM_MANAGE_FINANCES,
+                self::PERM_UPLOAD_FINANCIAL_DATA,
+                self::PERM_MANAGE_DOCUMENTS,
+                self::PERM_VIEW_KPI,
+                self::PERM_INVITE_USERS,
+                self::PERM_MANAGE_USERS,
             ]
         );
     }
@@ -49,14 +64,14 @@ final class Role extends Entity
             name: RoleType::ADVISOR,
             description: 'Doradca Transakcyjny z dostępem do przypisanych spółek portfela oraz zapraszania klientów',
             permissions: [
-                'view_assigned_companies',
-                'manage_finances',
-                'upload_financial_data',
-                'manage_documents',
-                'view_kpi',
-                'invite_clients',
-                'view_documents',
-                'download_documents',
+                self::PERM_VIEW_ASSIGNED_COMPANIES,
+                self::PERM_MANAGE_FINANCES,
+                self::PERM_UPLOAD_FINANCIAL_DATA,
+                self::PERM_MANAGE_DOCUMENTS,
+                self::PERM_VIEW_KPI,
+                self::PERM_INVITE_CLIENTS,
+                self::PERM_VIEW_DOCUMENTS,
+                self::PERM_DOWNLOAD_DOCUMENTS,
             ]
         );
     }
@@ -68,9 +83,9 @@ final class Role extends Entity
             name: RoleType::CLIENT,
             description: 'Użytkownik Klienta z dostępem wyłącznie do dedykowanego dashboardu KPI oraz Data Room swojej spółki',
             permissions: [
-                'view_kpi',
-                'view_documents',
-                'download_documents',
+                self::PERM_VIEW_KPI,
+                self::PERM_VIEW_DOCUMENTS,
+                self::PERM_DOWNLOAD_DOCUMENTS,
             ]
         );
     }
@@ -85,13 +100,15 @@ final class Role extends Entity
             name: RoleType::ADMIN,
             description: 'Administrator / Doradca z pełnymi uprawnieniami transakcyjnymi',
             permissions: [
-                'manage_finances',
-                'upload_financial_data',
-                'view_all_companies',
-                'manage_documents',
-                'view_kpi',
-                'invite_users',
-                'manage_users',
+                self::PERM_MANAGE_ADVISORS,
+                self::PERM_ASSIGN_ADVISORS,
+                self::PERM_MANAGE_FINANCES,
+                self::PERM_UPLOAD_FINANCIAL_DATA,
+                self::PERM_VIEW_ALL_COMPANIES,
+                self::PERM_MANAGE_DOCUMENTS,
+                self::PERM_VIEW_KPI,
+                self::PERM_INVITE_USERS,
+                self::PERM_MANAGE_USERS,
             ]
         );
     }

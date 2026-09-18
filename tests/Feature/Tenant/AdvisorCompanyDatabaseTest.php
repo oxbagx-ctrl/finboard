@@ -11,13 +11,13 @@ use App\Contexts\Tenant\Domain\Repositories\CompanyAdvisorRepositoryInterface;
 use App\Contexts\Tenant\Domain\ValueObjects\CompanyId;
 use App\Models\Company;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 final class AdvisorCompanyDatabaseTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     private User $superAdmin;
     private User $advisor;
@@ -30,32 +30,32 @@ final class AdvisorCompanyDatabaseTest extends TestCase
         parent::setUp();
 
         $this->companyA = Company::create([
-            'id' => '11111111-1111-1111-1111-111111111111',
-            'name' => 'Company Alpha',
-            'code' => 'ALPHA',
-            'tax_id' => 'PL1111111111',
+            'id' => '11111111-1111-1111-1111-111111111119',
+            'name' => 'Company Alpha Test',
+            'code' => 'ALPHA_TEST',
+            'tax_id' => 'PL1111111119',
         ]);
 
         $this->companyB = Company::create([
-            'id' => '22222222-2222-2222-2222-222222222222',
-            'name' => 'Company Beta',
-            'code' => 'BETA',
-            'tax_id' => 'PL2222222222',
+            'id' => '22222222-2222-2222-2222-222222222229',
+            'name' => 'Company Beta Test',
+            'code' => 'BETA_TEST',
+            'tax_id' => 'PL2222222229',
         ]);
 
         $this->superAdmin = User::create([
-            'id' => '33333333-3333-3333-3333-333333333333',
-            'name' => 'Super Admin',
-            'email' => 'super@finboard.local',
+            'id' => '33333333-3333-3333-3333-333333333339',
+            'name' => 'Super Admin Test',
+            'email' => 'super_test@finboard.local',
             'password' => Hash::make('secret123'),
             'role' => RoleType::SUPER_ADMIN->value,
             'is_active' => true,
         ]);
 
         $this->advisor = User::create([
-            'id' => '44444444-4444-4444-4444-444444444444',
-            'name' => 'Advisor One',
-            'email' => 'advisor@finboard.local',
+            'id' => '44444444-4444-4444-4444-444444444449',
+            'name' => 'Advisor One Test',
+            'email' => 'advisor_test@finboard.local',
             'password' => Hash::make('secret123'),
             'role' => RoleType::ADVISOR->value,
             'is_active' => true,
@@ -117,11 +117,11 @@ final class AdvisorCompanyDatabaseTest extends TestCase
         $refreshedCompany = Company::find($this->companyA->id);
 
         $this->assertCount(1, $refreshedAdvisor->assignedCompanies);
-        $this->assertSame('Company Alpha', $refreshedAdvisor->assignedCompanies->first()->name);
+        $this->assertSame('Company Alpha Test', $refreshedAdvisor->assignedCompanies->first()->name);
         $this->assertSame($this->superAdmin->id, $refreshedAdvisor->assignedCompanies->first()->pivot->assigned_by);
 
         $this->assertCount(1, $refreshedCompany->assignedAdvisors);
-        $this->assertSame('Advisor One', $refreshedCompany->assignedAdvisors->first()->name);
+        $this->assertSame('Advisor One Test', $refreshedCompany->assignedAdvisors->first()->name);
     }
 
     public function test_cascading_delete_on_advisor_removal(): void
