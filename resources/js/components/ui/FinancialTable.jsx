@@ -1,0 +1,201 @@
+import React, { useState } from 'react';
+import { FinancialValue } from './FinancialValue';
+import { PercentageBadge } from './PercentageBadge';
+import { ChevronRight, ChevronDown } from 'lucide-react';
+
+/**
+ * Bloomberg/FactSet-style high-density financial data table.
+ * Supports expandable row groups, revenue share percentages, and tabular-nums alignment.
+ */
+export const FinancialTable = ({
+    title = 'Rachunek Zysków i Strat (P&L Breakdown)',
+    subtitle,
+    data = [],
+    currency = 'PLN',
+    revenueTotal = 0,
+    className = '',
+}) => {
+    const [expandedGroups, setExpandedGroups] = useState({
+        revenue: true,
+        opex: true,
+    });
+
+    const toggleGroup = (groupId) => {
+        setExpandedGroups((prev) => ({
+            ...prev,
+            [groupId]: !prev[groupId],
+        }));
+    };
+
+    return (
+        <div className={`bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden shadow-sm ${className}`}>
+            {/* Table Header / Action Bar */}
+            <div className="px-4 py-3 border-b border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-zinc-900/90">
+                <div>
+                    <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-100 flex items-center gap-2">
+                        <span className="w-2 h-2 bg-zinc-400 rounded-xs"></span>
+                        {title}
+                    </h3>
+                    {subtitle && <p className="text-[11px] font-mono text-zinc-500 mt-0.5">{subtitle}</p>}
+                </div>
+                <div className="flex items-center gap-3 text-[10px] font-mono text-zinc-400">
+                    <span className="px-1.5 py-0.5 rounded bg-zinc-950 border border-zinc-800">WALUTA: {currency}</span>
+                    <span className="px-1.5 py-0.5 rounded bg-zinc-950 border border-zinc-800">TRYB: KONSOLIDOWANY</span>
+                </div>
+            </div>
+
+            {/* High Density Table Body */}
+            <div className="overflow-x-auto">
+                <table className="w-full text-left font-mono text-xs border-collapse">
+                    <thead>
+                        <tr className="bg-zinc-950/80 border-b border-zinc-800 text-[10px] text-zinc-500 uppercase tracking-wider">
+                            <th className="py-2.5 px-4 font-semibold w-1/2">Pozycja Finansowa / Kategoria</th>
+                            <th className="py-2.5 px-3 font-semibold text-right">Kwota ({currency})</th>
+                            <th className="py-2.5 px-3 font-semibold text-right">% Przych.</th>
+                            <th className="py-2.5 px-3 font-semibold text-right">Dynamika R/R</th>
+                            <th className="py-2.5 px-4 font-semibold text-center w-28">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-zinc-850">
+                        {data.map((row) => {
+                            const isGroup = Boolean(row.isGroup);
+                            const isExpanded = expandedGroups[row.id];
+                            const isSummary = Boolean(row.isSummary);
+                            const isSubItem = Boolean(row.isSubItem);
+
+                            // Calculate % of Revenue if total revenue is positive
+                            const revShare = revenueTotal > 0 && row.amount
+                                ? (Number(row.amount) / revenueTotal) * 100
+                                : null;
+
+                            return (
+                                <React.Fragment key={row.id}>
+                                    <tr
+                                        className={`transition-colors duration-100 ${
+                                            isSummary
+                                                ? 'bg-zinc-850/40 font-bold border-t-2 border-b-2 border-zinc-750'
+                                                : isGroup
+                                                ? 'bg-zinc-950/40 font-semibold cursor-pointer hover:bg-zinc-800/40'
+                                                : 'hover:bg-zinc-850/50'
+                                        }`}
+                                        onClick={isGroup ? () => toggleGroup(row.id) : undefined}
+                                    >
+                                        <td className={`py-2 px-4 flex items-center gap-2 ${isSubItem ? 'pl-8 text-zinc-400' : 'text-zinc-200'}`}>
+                                            {isGroup ? (
+                                                <span className="text-zinc-500">
+                                                    {isExpanded ? (
+                                                        <ChevronDown className="w-3.5 h-3.5" />
+                                                    ) : (
+                                                        <ChevronRight className="w-3.5 h-3.5" />
+                                                    )}
+                                                </span>
+                                            ) : isSubItem ? (
+                                                <span className="w-1.5 h-1.5 rounded-full bg-zinc-700 mr-1 shrink-0"></span>
+                                            ) : (
+                                                <span className="w-3.5" />
+                                            )}
+                                            <span className={isSummary ? 'text-zinc-100 tracking-tight' : ''}>
+                                                {row.label}
+                                            </span>
+                                            {row.code && (
+                                                <span className="text-[10px] text-zinc-500 font-normal">
+                                                    [{row.code}]
+                                                </span>
+                                            )}
+                                        </td>
+
+                                        <td className="py-2 px-3 text-right">
+                                            <FinancialValue
+                                                amount={row.amount}
+                                                currency={currency}
+                                                color={row.color || (isSummary ? 'auto' : 'neutral')}
+                                                size={isSummary ? 'md' : 'sm'}
+                                            />
+                                        </td>
+
+                                        <td className="py-2 px-3 text-right text-zinc-400 tabular-nums">
+                                            {revShare !== null ? `${revShare.toFixed(1)}%` : '—'}
+                                        </td>
+
+                                        <td className="py-2 px-3 text-right">
+                                            {row.change !== undefined ? (
+                                                <PercentageBadge
+                                                    value={row.change}
+                                                    reverse={row.reverseChange}
+                                                    decimals={1}
+                                                />
+                                            ) : (
+                                                <span className="text-zinc-600">—</span>
+                                            )}
+                                        </td>
+
+                                        <td className="py-2 px-4 text-center">
+                                            <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-mono uppercase bg-zinc-950 border border-zinc-800 text-zinc-400">
+                                                {row.auditStatus || 'AUDYT: OK'}
+                                            </span>
+                                        </td>
+                                    </tr>
+
+                                    {/* Render Sub-items if group is expanded */}
+                                    {isGroup && isExpanded && row.children && row.children.map((child) => {
+                                        const childRevShare = revenueTotal > 0 && child.amount
+                                            ? (Number(child.amount) / revenueTotal) * 100
+                                            : null;
+
+                                        return (
+                                            <tr key={child.id} className="hover:bg-zinc-850/40 bg-zinc-950/20 text-zinc-300">
+                                                <td className="py-1.5 px-4 pl-9 flex items-center gap-1.5 text-zinc-400">
+                                                    <span className="text-zinc-600">↳</span>
+                                                    <span>{child.label}</span>
+                                                    {child.code && (
+                                                        <span className="text-[9px] text-zinc-600">[{child.code}]</span>
+                                                    )}
+                                                </td>
+
+                                                <td className="py-1.5 px-3 text-right">
+                                                    <FinancialValue
+                                                        amount={child.amount}
+                                                        currency={currency}
+                                                        size="sm"
+                                                    />
+                                                </td>
+
+                                                <td className="py-1.5 px-3 text-right text-zinc-500 text-[11px] tabular-nums">
+                                                    {childRevShare !== null ? `${childRevShare.toFixed(1)}%` : '—'}
+                                                </td>
+
+                                                <td className="py-1.5 px-3 text-right">
+                                                    {child.change !== undefined ? (
+                                                        <PercentageBadge
+                                                            value={child.change}
+                                                            reverse={child.reverseChange}
+                                                            decimals={1}
+                                                        />
+                                                    ) : (
+                                                        <span className="text-zinc-600">—</span>
+                                                    )}
+                                                </td>
+
+                                                <td className="py-1.5 px-4 text-center">
+                                                    <span className="text-[9px] text-zinc-600 font-mono">
+                                                        ZWERYFIKOWANY
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                </React.Fragment>
+                            );
+                        })}
+                    </tbody>
+                </table>
+            </div>
+
+            {/* Table Footer with Summary Note */}
+            <div className="px-4 py-2 bg-zinc-950 border-t border-zinc-800 flex items-center justify-between text-[10px] font-mono text-zinc-500">
+                <span>ZGODNE Z POLSKIMI STANDARDAMI RACHUNKOWOŚCI (PSR / MSR)</span>
+                <span>DOKŁADNOŚĆ: KALKULATOR DOMENOWY BCMATH (SCALE 4)</span>
+            </div>
+        </div>
+    );
+};

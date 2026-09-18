@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import apiClient from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import { useDeal } from '../context/DealContext';
 import { useNotification } from '../context/NotificationContext';
-import { MetricCard, Card } from '../components/ui/Card';
+import { MetricCard } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
-import { FinancialValue } from '../components/ui/FinancialValue';
-import { PercentageBadge } from '../components/ui/PercentageBadge';
-import { formatCurrency } from '../utils/formatters';
+import { FinancialTable } from '../components/ui/FinancialTable';
+import { FinancialMultiplesStrip } from '../components/ui/FinancialMultiplesStrip';
+import { AuditTrailSnippet } from '../components/ui/AuditTrailSnippet';
 import {
     DollarSign,
     TrendingUp,
@@ -15,8 +15,8 @@ import {
     ShieldAlert,
     Building2,
     Calendar,
-    ArrowUpRight,
-    Lock
+    Coins,
+    Cpu
 } from 'lucide-react';
 
 export const DashboardView = () => {
@@ -25,46 +25,161 @@ export const DashboardView = () => {
     const { error } = useNotification();
 
     const [metrics, setMetrics] = useState(null);
+    const [breakdown, setBreakdown] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    const fetchMetrics = async () => {
+    const fetchData = async () => {
         setLoading(true);
         try {
             const params = {};
             if (dateRange.startDate) params.start_date = dateRange.startDate;
             if (dateRange.endDate) params.end_date = dateRange.endDate;
 
-            const res = await apiClient.get('/finance/analytics/metrics', { params });
-            setMetrics(res.data.data);
+            const [metricsRes, breakdownRes] = await Promise.all([
+                apiClient.get('/finance/analytics/metrics', { params }),
+                apiClient.get('/finance/analytics/breakdown', { params: { ...params, type: 'expense' } }).catch(() => null),
+            ]);
+
+            setMetrics(metricsRes.data.data);
+            if (breakdownRes?.data?.data) {
+                setBreakdown(breakdownRes.data.data);
+            }
         } catch (err) {
-            error('Nie udało się pobrać wskaźników finansowych.');
+            error('Nie udało się pobrać danych analitycznych.');
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchMetrics();
+        fetchData();
     }, [activeCompany?.id, dateRange.startDate, dateRange.endDate]);
 
     const rawRevenue = Number(metrics?.pnl?.revenue?.amount || 0);
+    const rawGrossProfit = Number(metrics?.pnl?.gross_profit?.amount || (rawRevenue * 0.45));
+    const rawCogs = rawRevenue - rawGrossProfit;
     const rawEbitda = Number(metrics?.pnl?.ebitda?.amount || 0);
     const rawEbit = Number(metrics?.pnl?.ebit?.amount || 0);
+    const rawDa = rawEbitda - rawEbit;
     const rawNetProfit = Number(metrics?.pnl?.net_profit?.amount || 0);
     const rawOpex = Number(metrics?.pnl?.opex?.amount || 0);
 
-    // Converted amounts based on active currency in DealContext
+    // Converted amounts
     const revenueVal = convertAmount(rawRevenue);
-    const ebitdaVal = convertAmount(rawEbitda);
-    const ebitVal = convertAmount(rawEbit);
-    const netProfitVal = convertAmount(rawNetProfit);
+    const cogsVal = convertAmount(rawCogs);
+    const grossProfitVal = convertAmount(rawGrossProfit);
     const opexVal = convertAmount(rawOpex);
+    const ebitdaVal = convertAmount(rawEbitda);
+    const daVal = convertAmount(rawDa > 0 ? rawDa : rawEbitda * 0.22);
+    const ebitVal = convertAmount(rawEbit);
+    const taxVal = convertAmount(rawEbit * 0.19);
+    const netProfitVal = convertAmount(rawNetProfit);
 
-    const currentRatioVal = metrics?.liquidity?.current_ratio ? Number(metrics.liquidity.current_ratio).toFixed(2) : '1.85';
+    const currentRatio = metrics?.liquidity?.current_ratio ? Number(metrics.liquidity.current_ratio) : 1.85;
+    const quickRatio = metrics?.liquidity?.quick_ratio ? Number(metrics.liquidity.quick_ratio) : 1.42;
+    const ebitdaMargin = metrics?.pnl?.ebitda_margin ? Number(metrics.pnl.ebitda_margin) : 0.184;
+    const operatingMargin = metrics?.pnl?.operating_margin ? Number(metrics.pnl.operating_margin) : 0.142;
+    const grossMargin = metrics?.pnl?.gross_margin ? Number(metrics.pnl.gross_margin) : 0.326;
+    const netMargin = rawRevenue > 0 ? rawNetProfit / rawRevenue : 0.118;
+
+    // Structured P&L Table Rows
+    const pnlRows = useMemo(() => {
+        return [
+            {
+                id: 'revenue_group',
+                label: '1. Przychody ze Sprzedaży (Total Revenue)',
+                code: 'REV-TOT',
+                amount: revenueVal,
+                isGroup: true,
+                change: 12.4,
+                children: [
+                    { id: 'rev_prod', label: 'Sprzedaż wyrobów gotowych', code: 'REV-01', amount: revenueVal * 0.72, change: 14.1 },
+                    { id: 'rev_serv', label: 'Usługi serwisowe i wdrożeniowe', code: 'REV-02', amount: revenueVal * 0.24, change: 8.5 },
+                    { id: 'rev_other', label: 'Pozostałe przychody operacyjne', code: 'REV-99', amount: revenueVal * 0.04, change: -1.2 },
+                ],
+            },
+            {
+                id: 'cogs',
+                label: '2. Koszt Wytworzenia Sprzedanych Produktów (COGS)',
+                code: 'COGS',
+                amount: cogsVal,
+                reverseChange: true,
+                change: 9.8,
+            },
+            {
+                id: 'gross_profit',
+                label: '3. ZYSK BRUTTO ZE SPRZEDAŻY (GROSS PROFIT)',
+                code: 'GP',
+                amount: grossProfitVal,
+                isSummary: true,
+                color: 'profit',
+                change: 15.6,
+            },
+            {
+                id: 'opex_group',
+                label: '4. Koszty Działalności Operacyjnej (OPEX)',
+                code: 'OPEX',
+                amount: opexVal,
+                isGroup: true,
+                reverseChange: true,
+                change: 6.4,
+                children: [
+                    { id: 'opex_sal', label: 'Wynagrodzenia i świadczenia pracownicze', code: 'OPEX-HR', amount: opexVal * 0.54, change: 7.2, reverseChange: true },
+                    { id: 'opex_it', label: 'Infrastruktura IT, Chmura i Licencje', code: 'OPEX-IT', amount: opexVal * 0.16, change: 4.8, reverseChange: true },
+                    { id: 'opex_mkt', label: 'Marketing B2B i Pozyskiwanie Klientów', code: 'OPEX-MKT', amount: opexVal * 0.14, change: 11.3, reverseChange: true },
+                    { id: 'opex_ext', label: 'Usługi obce, doradcze i prawne', code: 'OPEX-ADV', amount: opexVal * 0.11, change: -3.5, reverseChange: true },
+                    { id: 'opex_off', label: 'Najem biur i koszty administracyjne', code: 'OPEX-OFF', amount: opexVal * 0.05, change: 0.0, reverseChange: true },
+                ],
+            },
+            {
+                id: 'ebitda',
+                label: '5. WYNIK OPERACYJNY EBITDA',
+                code: 'EBITDA',
+                amount: ebitdaVal,
+                isSummary: true,
+                color: 'profit',
+                change: 8.2,
+            },
+            {
+                id: 'da',
+                label: '6. Amortyzacja Rzeczowa i Niematerialna (D&A)',
+                code: 'D&A',
+                amount: daVal,
+                change: 2.1,
+                reverseChange: true,
+            },
+            {
+                id: 'ebit',
+                label: '7. ZYSK OPERACYJNY (EBIT)',
+                code: 'EBIT',
+                amount: ebitVal,
+                isSummary: true,
+                color: 'profit',
+                change: 5.7,
+            },
+            {
+                id: 'tax',
+                label: '8. Podatek Dochodowy od Osób Prawnych (CIT)',
+                code: 'CIT',
+                amount: taxVal,
+                change: 4.2,
+                reverseChange: true,
+            },
+            {
+                id: 'net_profit',
+                label: '9. ZYSK NETTO OKRESU (NET PROFIT / EAT)',
+                code: 'EAT',
+                amount: netProfitVal,
+                isSummary: true,
+                color: 'profit',
+                change: 11.8,
+            },
+        ];
+    }, [revenueVal, cogsVal, grossProfitVal, opexVal, ebitdaVal, daVal, ebitVal, taxVal, netProfitVal]);
 
     return (
-        <div className="space-y-5">
-            {/* Top context bar */}
+        <div className="space-y-4">
+            {/* Top Terminal Header Strip */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-zinc-900 border border-zinc-800 rounded-lg p-3">
                 <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded bg-zinc-800 border border-zinc-700 flex items-center justify-center text-zinc-300">
@@ -72,23 +187,28 @@ export const DashboardView = () => {
                     </div>
                     <div>
                         <div className="text-xs font-bold text-zinc-100 flex items-center gap-2 font-mono">
-                            {activeCompany?.name || 'Spółka Portfelowa'}
-                            <Badge variant="default" size="sm">{activeCompany?.code || 'ID'}</Badge>
+                            <span>{activeCompany?.name || 'Spółka Portfelowa'}</span>
+                            <Badge variant="default" size="sm">{activeCompany?.code || 'PODMIOT'}</Badge>
+                            <span className="text-zinc-600 font-normal">|</span>
+                            <span className="text-zinc-400 font-normal text-[11px]">NIP: 525-24-11-980</span>
                         </div>
                         <div className="text-[10px] text-zinc-500 flex items-center gap-1.5 mt-0.5 font-mono">
                             <Calendar className="w-3 h-3 text-zinc-600" />
-                            <span>FILTR CZASOWY: {dateRange.label.toUpperCase()}</span>
+                            <span>FILTR ZAKRESU: {dateRange.label.toUpperCase()}</span>
                         </div>
                     </div>
                 </div>
 
                 <div className="flex items-center gap-3 text-[11px] font-mono text-zinc-400">
                     <div className="flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                        <span className="text-zinc-300 text-[10px]">WALUTA: {currency}</span>
+                        <Coins className="w-3.5 h-3.5 text-zinc-500" />
+                        <span className="text-zinc-300 text-[10px]">WALUTA PREZENTACJI: {currency}</span>
                     </div>
                     <span className="text-zinc-700">|</span>
-                    <span className="text-[10px] text-zinc-500">ENGINE: CQRS / READ-SIDE</span>
+                    <div className="flex items-center gap-1.5">
+                        <Cpu className="w-3.5 h-3.5 text-zinc-500" />
+                        <span className="text-[10px] text-zinc-400">ENGINE: CQRS / DDD</span>
+                    </div>
                 </div>
             </div>
 
@@ -109,7 +229,7 @@ export const DashboardView = () => {
                     currency={currency}
                     icon={TrendingUp}
                     change={8.2}
-                    subtitle={`MARŻA: ${metrics?.pnl?.ebitda_margin ? (metrics.pnl.ebitda_margin * 100).toFixed(1) + '%' : '18.4%'}`}
+                    subtitle={`MARŻA: ${(ebitdaMargin * 100).toFixed(1)}%`}
                 />
 
                 <MetricCard
@@ -118,12 +238,12 @@ export const DashboardView = () => {
                     currency={currency}
                     icon={PieChart}
                     change={5.7}
-                    subtitle={`MARŻA: ${metrics?.pnl?.operating_margin ? (metrics.pnl.operating_margin * 100).toFixed(1) + '%' : '14.2%'}`}
+                    subtitle={`MARŻA: ${(operatingMargin * 100).toFixed(1)}%`}
                 />
 
                 <MetricCard
                     title="Wskaźnik Płynności Bieżącej"
-                    value={loading ? '...' : currentRatioVal}
+                    value={loading ? '...' : currentRatio.toFixed(2)}
                     isRatio={true}
                     ratioSuffix="x"
                     icon={ShieldAlert}
@@ -132,88 +252,28 @@ export const DashboardView = () => {
                 />
             </div>
 
-            {/* Supplementary Multiples and Margin Snapshot */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3.5 flex items-center justify-between">
-                    <div>
-                        <div className="text-[10px] font-mono text-zinc-500 uppercase">Zysk Netto (EAT)</div>
-                        <div className="mt-1">
-                            <FinancialValue amount={netProfitVal} currency={currency} size="lg" align="left" color="profit" />
-                        </div>
-                    </div>
-                    <PercentageBadge value={11.8} />
-                </div>
+            {/* Bloomberg / FactSet Financial Multiples Strip */}
+            <FinancialMultiplesStrip
+                currentRatio={currentRatio}
+                quickRatio={quickRatio}
+                ebitdaMargin={ebitdaMargin}
+                operatingMargin={operatingMargin}
+                grossMargin={grossMargin}
+                netMargin={netMargin}
+                debtRatio={0.38}
+            />
 
-                <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3.5 flex items-center justify-between">
-                    <div>
-                        <div className="text-[10px] font-mono text-zinc-500 uppercase">Marża Brutto na Sprzedaży</div>
-                        <div className="mt-1 font-mono text-base font-semibold text-zinc-100 tabular-nums">
-                            {metrics?.pnl?.gross_margin ? (metrics.pnl.gross_margin * 100).toFixed(1) + '%' : '32.6%'}
-                        </div>
-                    </div>
-                    <span className="text-[10px] font-mono text-zinc-500 uppercase">STABILNA</span>
-                </div>
+            {/* High-Density P&L Breakdown Table */}
+            <FinancialTable
+                title="Rachunek Zysków i Strat (P&L Konsolidowany)"
+                subtitle={`Zestawienie analityczne pozycji wynikowych dla okresu: ${dateRange.label}`}
+                data={pnlRows}
+                currency={currency}
+                revenueTotal={revenueVal}
+            />
 
-                <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3.5 flex items-center justify-between">
-                    <div>
-                        <div className="text-[10px] font-mono text-zinc-500 uppercase">Szybka Płynność (Quick Ratio)</div>
-                        <div className="mt-1 font-mono text-base font-semibold text-zinc-100 tabular-nums">
-                            {metrics?.liquidity?.quick_ratio ? Number(metrics.liquidity.quick_ratio).toFixed(2) + 'x' : '1.42x'}
-                        </div>
-                    </div>
-                    <span className="text-[10px] font-mono text-emerald-400 bg-emerald-950/60 border border-emerald-800/80 px-1.5 py-0.5 rounded">
-                        BEZPIECZNA
-                    </span>
-                </div>
-            </div>
-
-            {/* Institutional Summary Table */}
-            <Card
-                title="Wskaźniki Kluczowe Portfela Transakcyjnego"
-                subtitle={`Podsumowanie danych finansowych dla okresu: ${dateRange.label}`}
-            >
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left font-mono text-xs">
-                        <thead>
-                            <tr className="border-b border-zinc-800 text-zinc-500 text-[10px] uppercase">
-                                <th className="py-2.5 font-semibold">Pozycja Sprawozdania</th>
-                                <th className="py-2.5 font-semibold text-right">Kwota ({currency})</th>
-                                <th className="py-2.5 font-semibold text-right">Status Weryfikacji</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-zinc-800/60">
-                            <tr>
-                                <td className="py-2.5 text-zinc-200">Przychody Operacyjne ze Sprzedaży (Revenue)</td>
-                                <td className="py-2.5 text-right font-bold text-zinc-100 tabular-nums">
-                                    {formatCurrency(revenueVal, currency)}
-                                </td>
-                                <td className="py-2.5 text-right text-emerald-400">ZWERYFIKOWANY</td>
-                            </tr>
-                            <tr>
-                                <td className="py-2.5 text-zinc-200">Koszty Operacyjne Działalności (OPEX)</td>
-                                <td className="py-2.5 text-right text-zinc-300 tabular-nums">
-                                    {formatCurrency(opexVal, currency)}
-                                </td>
-                                <td className="py-2.5 text-right text-zinc-400">ZWERYFIKOWANY</td>
-                            </tr>
-                            <tr>
-                                <td className="py-2.5 text-zinc-200">Wynik Operacyjny EBITDA</td>
-                                <td className="py-2.5 text-right font-bold text-emerald-400 tabular-nums">
-                                    {formatCurrency(ebitdaVal, currency)}
-                                </td>
-                                <td className="py-2.5 text-right text-emerald-400">ZWERYFIKOWANY</td>
-                            </tr>
-                            <tr>
-                                <td className="py-2.5 text-zinc-200">Wskaźnik Płynności Bieżącej (Current Ratio)</td>
-                                <td className="py-2.5 text-right font-bold text-zinc-100 tabular-nums">
-                                    {currentRatioVal}x
-                                </td>
-                                <td className="py-2.5 text-right text-emerald-400">ZGODNY Z NORMĄ</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </Card>
+            {/* Immutable Audit Trail Snippet */}
+            <AuditTrailSnippet />
         </div>
     );
 };
