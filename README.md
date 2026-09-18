@@ -5,7 +5,7 @@
 [![PostgreSQL](https://img.shields.io/badge/postgresql-16-blue.svg)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/redis-alpine-red.svg)](https://redis.io/)
 [![Architecture](https://img.shields.io/badge/architecture-DDD%20%2F%20CQRS-brightgreen.svg)]()
-[![Tests](https://img.shields.io/badge/tests-190%20backend%20%7C%2057%20frontend%20passed-success.svg)]()
+[![Tests](https://img.shields.io/badge/tests-204%20backend%20%7C%2057%20frontend%20passed-success.svg)]()
 
 FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakcyjnego (M&A, Due Diligence, Corporate Finance) oraz ich klientom (CFO, Zarządy). Aplikacja łączy w sobie zaawansowaną analitykę finansową w ujęciu wielo-najemcowym (Multi-Tenant) z bezpiecznym repozytorium dokumentów Virtual Data Room (VDR).
 
@@ -67,7 +67,7 @@ app/
 ├── Contexts/
 │   ├── Identity/                 # Bounded Context: Zarządzanie tożsamością i uprawnieniami
 │   │   ├── Domain/               # User Aggregate Root, Invitation Entity, Role Entity, Value Objects (UserId, Email, HashedPassword, RoleType, Token, InvitationId), Domain Events
-│   │   ├── Application/          # Serwisy aplikacyjne (UserRegistrationService) i interfejsy repozytoriów (InvitationRepositoryInterface, UserRepositoryInterface)
+│   │   ├── Application/          # Use cases (InviteUserUseCase), Commands (InviteUserCommand), Exceptions, Repositories interfaces
 │   │   └── Infrastructure/       # EloquentUserRepository, EloquentInvitationRepository, Sanctum Provider
 │   │
 │   ├── Tenant/                   # Bounded Context: Zarządzanie firmami i relacjami doradców
@@ -263,15 +263,15 @@ Baza danych zasilona jest danymi demonstracyjnymi (21 miesięcy historii finanso
   - Testy E2E, audyt bezpieczeństwa izolacji multi-tenant i endpoint diagnostyczny Health Check.
   - Produkcyjny hardening środowiska Docker/Nginx, skrypt automatycznego wdrożenia zero-downtime oraz Runbook operacyjny.
 - [x] **Faza 8: Rozbudowa Autoryzacji i Struktury Firm**
-  - [x] Aktualizacja encji `Role` i enumów dla trójpoziomowej hierarchii uprawnień (SuperAdmin, Advisor, Client).
-  - [x] Implementacja logiki domenowej relacji przypisania doradcy do firmy (`CompanyAdvisorAssignment`, `CompanyAdvisorRepositoryInterface`).
-  - [x] Migracja bazy danych dla tabeli pośredniej `advisor_company` i aktualizacja powiązań.
-  - [x] Implementacja przypadku użycia `AssignAdvisorToCompanyUseCase` ze ścisłą weryfikacją autoryzacji.
-  - [x] Testy jednostkowe i integracyjne weryfikujące dostęp doradców wyłącznie do przypisanych spółek.
+  - Aktualizacja encji `Role` i enumów dla trójpoziomowej hierarchii uprawnień (SuperAdmin, Advisor, Client).
+  - Implementacja logiki domenowej relacji przypisania doradcy do firmy (`CompanyAdvisorAssignment`, `CompanyAdvisorRepositoryInterface`).
+  - Migracja bazy danych dla tabeli pośredniej `advisor_company` i aktualizacja powiązań.
+  - Implementacja przypadku użycia `AssignAdvisorToCompanyUseCase` ze ścisłą weryfikacją autoryzacji.
+  - Testy jednostkowe i integracyjne weryfikujące dostęp doradców wyłącznie do przypisanych spółek.
 - [ ] **Faza 9: Bezpieczny System Zaproszeń (Invitation System)**
   - [x] Encja `Invitation` i obiekt wartości `Token` z logiką wygasania (Identity).
   - [x] Migracja bazy danych i repozytorium dla zaproszeń.
-  - [ ] Przypadek użycia `InviteUserUseCase` z emisją zdarzenia domenowego `UserInvited`.
+  - [x] Przypadek użycia `InviteUserUseCase` z emisją zdarzenia domenowego `UserInvited`.
   - [ ] Klasy Mailable i listenery zdarzeń do asynchronicznej wysyłki e-maili z zaproszeniami.
   - [ ] Przypadek użycia `AcceptInvitationUseCase` z walidacją tokenu i bezpiecznym ustawieniem hasła.
 - [ ] **Faza 10: API i Frontend dla Zarządzania Użytkownikami**
