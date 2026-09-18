@@ -12,6 +12,7 @@ export default {
         extend: {
             fontFamily: {
                 sans: ['Inter', 'Figtree', ...defaultTheme.fontFamily.sans],
+                mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
             },
             colors: {
                 brand: {
@@ -26,6 +27,10 @@ export default {
                     800: '#064b84',
                     900: '#0b3f6e',
                     950: '#072849',
+                },
+                zinc: {
+                    750: '#303036',
+                    850: '#1f1f23',
                 },
             },
         },
