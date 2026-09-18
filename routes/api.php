@@ -1,5 +1,6 @@
 <?php
 
+use App\Presentation\Api\Controllers\AdvisorManagementController;
 use App\Presentation\Api\Controllers\AuthController;
 use App\Presentation\Api\Controllers\DocumentController;
 use App\Presentation\Api\Controllers\FinancialAnalyticsController;
@@ -29,11 +30,22 @@ Route::prefix('v1')->group(function () {
         // RBAC Verification probe endpoints
         Route::get('/admin/probe', function () {
             return response()->json(['status' => 'ok', 'message' => 'Admin authorized access confirmed']);
-        })->middleware('role:admin');
+        })->middleware('role:admin,super_admin');
 
         Route::get('/client/probe', function () {
             return response()->json(['status' => 'ok', 'message' => 'Client authorized access confirmed']);
-        })->middleware('role:client,admin');
+        })->middleware('role:client,admin,super_admin');
+
+        // SuperAdmin / Admin Advisor & Company Management Endpoints
+        Route::middleware('role:super_admin,admin')->prefix('admin')->group(function () {
+            Route::get('/advisors', [AdvisorManagementController::class, 'index'])->name('api.admin.advisors.index');
+            Route::get('/advisors/{id}', [AdvisorManagementController::class, 'show'])->name('api.admin.advisors.show');
+            Route::post('/advisors/{id}/companies', [AdvisorManagementController::class, 'assignCompany'])->name('api.admin.advisors.assign-company');
+            Route::delete('/advisors/{id}/companies/{companyId}', [AdvisorManagementController::class, 'revokeCompany'])->name('api.admin.advisors.revoke-company');
+            Route::put('/advisors/{id}/companies', [AdvisorManagementController::class, 'syncCompanies'])->name('api.admin.advisors.sync-companies');
+            Route::patch('/advisors/{id}/toggle-status', [AdvisorManagementController::class, 'toggleStatus'])->name('api.admin.advisors.toggle-status');
+            Route::get('/companies', [AdvisorManagementController::class, 'companies'])->name('api.admin.companies.index');
+        });
 
         // Invitation Management Endpoints
         Route::prefix('invitations')->group(function () {
