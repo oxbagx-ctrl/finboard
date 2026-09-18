@@ -6,9 +6,13 @@ use App\Presentation\Api\Controllers\FinancialAnalyticsController;
 use App\Presentation\Api\Controllers\FinancialCategoryController;
 use App\Presentation\Api\Controllers\FinancialImportController;
 use App\Presentation\Api\Controllers\FinancialRecordController;
+use App\Presentation\Api\Controllers\HealthController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
+    // System Health & Liveness Probe
+    Route::get('/health', HealthController::class)->name('api.health');
+
     // Public Authentication Endpoints
     Route::post('/auth/login', [AuthController::class, 'login'])->name('api.auth.login');
 

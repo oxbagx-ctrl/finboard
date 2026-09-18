@@ -5,7 +5,7 @@
 [![PostgreSQL](https://img.shields.io/badge/postgresql-16-blue.svg)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/redis-alpine-red.svg)](https://redis.io/)
 [![Architecture](https://img.shields.io/badge/architecture-DDD%20%2F%20CQRS-brightgreen.svg)]()
-[![Tests](https://img.shields.io/badge/tests-118%20backend%20%7C%2055%20frontend%20passed-success.svg)]()
+[![Tests](https://img.shields.io/badge/tests-129%20backend%20%7C%2057%20frontend%20passed-success.svg)]()
 
 FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakcyjnego (M&A, Due Diligence, Corporate Finance) oraz ich klientom (CFO, Zarządy). Aplikacja łączy w sobie zaawansowaną analitykę finansową w ujęciu wielo-najemcowym (Multi-Tenant) z bezpiecznym repozytorium dokumentów Virtual Data Room (VDR).
 
@@ -21,6 +21,7 @@ FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakc
 - **Bezpieczeństwo i Izolacja Multi-Tenant**:
     - Pełna separacja danych pomiędzy firmami (Tenant Isolation).
     - RBAC (Role-Based Access Control) oparty na Laravel Sanctum z rolami `admin` (doradca Helvest z dostępem do portfela spółek) oraz `client` (klient / CFO spółki ze ścisłym dostępem wyłącznie do własnych danych).
+    - Kompleksowy audyt bezpieczeństwa weryfikujący odporność na próby odczytu, mutacji, usuwania cudzych rekordów oraz manipulacji nagłówkami `X-Company-Id`.
 - **Asynchroniczny Import Danych Finansowych (CSV)**:
     - Automatyczne wykrywanie delimiterów (przecinek, średnik, tabulator).
     - Obsługa wielojęzycznych nagłówków (PL/EN) i polskich formatów liczbowych (np. `15 000,50 zł`).
@@ -44,7 +45,9 @@ FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakc
     - Pełny moduł księgi operacji (General Ledger) z filtrami i paginacją serwerową.
     - Widok importu CSV z podglądem walidacji dry-run i animowanym monitorem kolejki Redis.
     - Moduł VDR oraz globalny rejestr ścieżki audytowej (Audit Trail).
-    - Zestaw 55 testów jednostkowych i integracyjnych Vitest (formatery, silnik walutowy, formularze, blokady Dry-Run, eksplorator VDR, raporty PDF).
+    - Zestaw 57 testów jednostkowych i integracyjnych Vitest (formatery, silnik walutowy, formularze, blokady Dry-Run, eksplorator VDR, raporty PDF, E2E workflow).
+- **Monitoring Produkcyjny i Health Check**:
+    - Dedykowany endpoint `/api/v1/health` badający stan bazy PostgreSQL, klastra Redis, uprawnień magazynu plików oraz zużycia zasobów.
 
 ---
 
@@ -74,7 +77,7 @@ app/
 ├── Models/                       # Modele Eloquent (User, Company, FinancialRecord, FinancialCategory, Document, DocumentAccessLog, CsvImport)
 ├── Presentation/                 # Warstwa Prezentacji i Komunikacji API
 │   └── Api/
-│       ├── Controllers/          # Kontrolery REST API (Auth, FinancialRecord, FinancialCategory, FinancialImport, FinancialAnalytics, Document)
+│       ├── Controllers/          # Kontrolery REST API (Auth, FinancialRecord, FinancialCategory, FinancialImport, FinancialAnalytics, Document, Health)
 │       ├── Middleware/           # RoleMiddleware, RequireCompanyAccessMiddleware (Tenant Isolation Guard)
 │       ├── Requests/             # FormRequests z walidacją danych wejściowych
 │       ├── Resources/            # API Resources (JSON serialization)
@@ -96,7 +99,7 @@ resources/js/
 │   ├── reports/                  # ReportConfigurator (parametryzacja, waluty, okresy), ExecutivePdfReport (układ memorandumu A4, SHA-256)
 │   └── ui/                       # Badge, Button, Card, MultiplesStrip (wskaźniki EV/EBITDA, P/E), FinancialTable
 ├── context/                      # AuthContext (tożsamość, role, kontekst spółki), DealContext (FX, okres), NotificationContext (toasty)
-├── tests/                        # Vitest setup, unit tests (formatters, dealContext) & component integration tests (CsvPreviewTable, FinancialRecordModal, DataRoom, ExecutiveReports)
+├── tests/                        # Vitest setup, unit tests (formatters, dealContext) & component integration tests (CsvPreviewTable, FinancialRecordModal, DataRoom, ExecutiveReports, DealAdvisoryE2E)
 ├── utils/                        # formatters.js (liczby tabelaryczne tabular-nums, waluty PLN/EUR/USD/GBP, formatowanie wskaźników, formatFileSize, formatDateTime)
 └── views/                        # DashboardView, RecordsView, ImportView, DataRoomView, AuditLogsView, ReportsView, AnalyticsView, LoginView
 ```
@@ -160,6 +163,9 @@ Baza danych zasilona jest danymi demonstracyjnymi (21 miesięcy historii finanso
 ---
 
 ## 📡 Przegląd Endpointów REST API (`/api/v1`)
+
+### Diagnostyka i Monitoring Platformy
+- `GET /api/v1/health` – Status zdrowia platformy (PostgreSQL, Redis, Storage disk, pamięć RAM, wersja środowiska)
 
 ### Autoryzacja i Profil
 - `POST /api/v1/auth/login` – Logowanie i generowanie tokenu Sanctum
@@ -235,10 +241,10 @@ Baza danych zasilona jest danymi demonstracyjnymi (21 miesięcy historii finanso
   - Interfejs importu plików CSV z podglądem na żywo i paskiem postępu.
   - Środowisko testowe Vitest i testy jednostkowe reguł matematycznych oraz formatowania walutowego.
   - Testy integracyjne komponentów: walidacja podglądu dry-run CSV oraz formularzy księgi głównej.
-- [ ] **Faza 7: Data Room UI, Raporty PDF i Wdrożenie Końcowe**
-  - [x] Interfejs Virtual Data Room (VDR) – przeglądarka dokumentów z kategoryzacją, sumami kontrolnymi SHA-256, audytem pobrań i drag & drop uploadem.
-  - [x] Generator podsumowań i raportów zarządczych PDF z certyfikatem integralności SHA-256 i formatem A4.
-  - Testy E2E, audyt bezpieczeństwa i finalna weryfikacja.
+- [x] **Faza 7: Data Room UI, Raporty PDF i Wdrożenie Końcowe**
+  - Interfejs Virtual Data Room (VDR) – przeglądarka dokumentów z kategoryzacją, sumami kontrolnymi SHA-256, audytem pobrań i drag & drop uploadem.
+  - Generator podsumowań i raportów zarządczych PDF z certyfikatem integralności SHA-256 i formatem A4.
+  - Testy E2E, audyt bezpieczeństwa izolacji multi-tenant, endpoint diagnostyczny Health Check i weryfikacja produkcyjna.
 
 Szczegółowa dokumentacja zrealizowanych zmian znajduje się w katalogu [`changelog/`](changelog/README.md).
 
