@@ -5,7 +5,7 @@
 [![PostgreSQL](https://img.shields.io/badge/postgresql-16-blue.svg)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/redis-alpine-red.svg)](https://redis.io/)
 [![Architecture](https://img.shields.io/badge/architecture-DDD%20%2F%20CQRS-brightgreen.svg)]()
-[![Tests](https://img.shields.io/badge/tests-155%20backend%20%7C%2057%20frontend%20passed-success.svg)]()
+[![Tests](https://img.shields.io/badge/tests-166%20backend%20%7C%2057%20frontend%20passed-success.svg)]()
 
 FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakcyjnego (M&A, Due Diligence, Corporate Finance) oraz ich klientom (CFO, Zarządy). Aplikacja łączy w sobie zaawansowaną analitykę finansową w ujęciu wielo-najemcowym (Multi-Tenant) z bezpiecznym repozytorium dokumentów Virtual Data Room (VDR).
 
@@ -23,6 +23,7 @@ FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakc
     - Hierarchiczny model uprawnień: **Super Admin** (Partner z globalnym zarządzaniem), **Doradca** (Advisor przypisany do wybranych spółek portfela) oraz **Klient** (Client ze ścisłym dostępem wyłącznie do własnej spółki).
     - Wielo-stronne relacje doradca-spółka (`CompanyAdvisorAssignment`) z audytem przypisań i zdarzeniami domenowymi.
     - Przypadki użycia aplikacyjne (`AssignAdvisorToCompanyUseCase`, `RevokeAdvisorFromCompanyUseCase`) ze ścisłą autoryzacją ról i uprawnień.
+    - Ścisła izolacja doradców: doradca ma dostęp i widzi w przełączniku wyłącznie przypisane sobie podmioty gospodarcze.
     - Kompleksowy audyt bezpieczeństwa weryfikujący odporność na próby odczytu, mutacji, usuwania cudzych rekordów oraz manipulacji nagłówkami `X-Company-Id`.
 - **Asynchroniczny Import Danych Finansowych (CSV)**:
     - Automatyczne wykrywanie delimiterów (przecinek, średnik, tabulator).
@@ -261,12 +262,24 @@ Baza danych zasilona jest danymi demonstracyjnymi (21 miesięcy historii finanso
   - Generator podsumowań i raportów zarządczych PDF z certyfikatem integralności SHA-256 i formatem A4.
   - Testy E2E, audyt bezpieczeństwa izolacji multi-tenant i endpoint diagnostyczny Health Check.
   - Produkcyjny hardening środowiska Docker/Nginx, skrypt automatycznego wdrożenia zero-downtime oraz Runbook operacyjny.
-- [ ] **Faza 8: Rozbudowa Autoryzacji i Struktury Firm**
+- [x] **Faza 8: Rozbudowa Autoryzacji i Struktury Firm**
   - [x] Aktualizacja encji `Role` i enumów dla trójpoziomowej hierarchii uprawnień (SuperAdmin, Advisor, Client).
   - [x] Implementacja logiki domenowej relacji przypisania doradcy do firmy (`CompanyAdvisorAssignment`, `CompanyAdvisorRepositoryInterface`).
   - [x] Migracja bazy danych dla tabeli pośredniej `advisor_company` i aktualizacja powiązań.
   - [x] Implementacja przypadku użycia `AssignAdvisorToCompanyUseCase` ze ścisłą weryfikacją autoryzacji.
-  - [ ] Testy jednostkowe i integracyjne weryfikujące dostęp doradców wyłącznie do przypisanych spółek.
+  - [x] Testy jednostkowe i integracyjne weryfikujące dostęp doradców wyłącznie do przypisanych spółek.
+- [ ] **Faza 9: Bezpieczny System Zaproszeń (Invitation System)**
+  - [ ] Encja `Invitation` i obiekt wartości `Token` z logiką wygasania (Identity).
+  - [ ] Migracja bazy danych i repozytorium dla zaproszeń.
+  - [ ] Przypadek użycia `InviteUserUseCase` z emisją zdarzenia domenowego `UserInvited`.
+  - [ ] Klasy Mailable i listenery zdarzeń do asynchronicznej wysyłki e-maili z zaproszeniami.
+  - [ ] Przypadek użycia `AcceptInvitationUseCase` z walidacją tokenu i bezpiecznym ustawieniem hasła.
+- [ ] **Faza 10: API i Frontend dla Zarządzania Użytkownikami**
+  - [ ] Kontroler `InvitationController` mapujący endpointy REST dla zaproszeń.
+  - [ ] Kontroler `AdvisorManagementController` dla SuperAdmina do zarządzania doradcami i przypisaniami.
+  - [ ] Widok dashboardu SuperAdmina do zarządzania doradcami i przypisaniami spółek.
+  - [ ] Modal zapraszania użytkownika z wyborem roli i przypisaniem firm dla doradców.
+  - [ ] Bezpieczna strona aktywacji konta / ustawienia hasła na podstawie tokenu z linku e-mail.
 
 ---
 

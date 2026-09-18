@@ -195,17 +195,24 @@ final class User extends AggregateRoot
 
     /**
      * Multi-tenant security check:
-     * - Admins (SuperAdmin, Advisor) have broader advisory access.
+     * - SuperAdmin / Admin have universal multi-tenant access.
+     * - Advisors are granted access ONLY to explicitly assigned companies.
      * - Clients are strictly restricted to their designated tenant company.
+     *
+     * @param array<string> $assignedCompanyIds Company IDs explicitly assigned to this advisor
      */
-    public function canAccessCompany(string $companyId): bool
+    public function canAccessCompany(string $companyId, array $assignedCompanyIds = []): bool
     {
         if (!$this->isActive) {
             return false;
         }
 
-        if ($this->isAdmin()) {
+        if ($this->isSuperAdmin() || $this->isAdmin()) {
             return true;
+        }
+
+        if ($this->isAdvisor()) {
+            return in_array($companyId, $assignedCompanyIds, true);
         }
 
         return $this->companyId !== null && $this->companyId === $companyId;

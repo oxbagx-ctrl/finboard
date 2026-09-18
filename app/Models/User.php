@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
@@ -75,5 +76,52 @@ class User extends Authenticatable
         return $this->belongsToMany(Company::class, 'advisor_company', 'advisor_id', 'company_id')
             ->withPivot(['assigned_by'])
             ->withTimestamps();
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === 'super_admin';
+    }
+
+    public function isAdvisor(): bool
+    {
+        return $this->role === 'advisor';
+    }
+
+    public function isClient(): bool
+    {
+        return $this->role === 'client';
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'super_admin' || $this->role === 'admin';
+    }
+
+    /**
+     * Multi-tenant security check:
+     * - SuperAdmin / Admin has global access to all companies.
+     * - Advisor can only access explicitly assigned companies.
+     * - Client can only access their designated company_id.
+     */
+    public function canAccessCompany(string $companyId): bool
+    {
+        if (!$this->is_active) {
+            return false;
+        }
+
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        if (!Str::isUuid($companyId)) {
+            return false;
+        }
+
+        if ($this->isAdvisor()) {
+            return $this->assignedCompanies()->where('companies.id', $companyId)->exists();
+        }
+
+        return $this->company_id !== null && (string) $this->company_id === (string) $companyId;
     }
 }

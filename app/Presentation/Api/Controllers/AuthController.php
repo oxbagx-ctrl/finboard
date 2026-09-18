@@ -37,16 +37,7 @@ final class AuthController extends Controller
 
         $token = $user->createToken('finboard-api-token')->plainTextToken;
 
-        $availableCompanies = $user->role === 'admin'
-            ? Company::orderBy('name')->get(['id', 'name', 'code', 'tax_id'])->values()
-            : ($user->company ? [
-                [
-                    'id' => $user->company->id,
-                    'name' => $user->company->name,
-                    'code' => $user->company->code,
-                    'tax_id' => $user->company->tax_id,
-                ]
-            ] : []);
+        $availableCompanies = $this->resolveAvailableCompanies($user);
 
         return new JsonResponse([
             'token' => $token,
@@ -72,16 +63,7 @@ final class AuthController extends Controller
         /** @var User $user */
         $user = $request->user()->load('company');
 
-        $availableCompanies = $user->role === 'admin'
-            ? Company::orderBy('name')->get(['id', 'name', 'code', 'tax_id'])->values()
-            : ($user->company ? [
-                [
-                    'id' => $user->company->id,
-                    'name' => $user->company->name,
-                    'code' => $user->company->code,
-                    'tax_id' => $user->company->tax_id,
-                ]
-            ] : []);
+        $availableCompanies = $this->resolveAvailableCompanies($user);
 
         return new JsonResponse([
             'user' => [
@@ -155,5 +137,28 @@ final class AuthController extends Controller
         return new JsonResponse([
             'message' => 'Wylogowano pomyślnie.',
         ]);
+    }
+
+    private function resolveAvailableCompanies(User $user): mixed
+    {
+        if ($user->isAdmin()) {
+            return Company::orderBy('name')->get(['id', 'name', 'code', 'tax_id'])->values();
+        }
+
+        if ($user->isAdvisor()) {
+            return $user->assignedCompanies()
+                ->orderBy('name')
+                ->get(['companies.id', 'companies.name', 'companies.code', 'companies.tax_id'])
+                ->values();
+        }
+
+        return $user->company ? [
+            [
+                'id' => $user->company->id,
+                'name' => $user->company->name,
+                'code' => $user->company->code,
+                'tax_id' => $user->company->tax_id,
+            ]
+        ] : [];
     }
 }

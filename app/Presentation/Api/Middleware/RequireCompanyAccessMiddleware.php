@@ -26,8 +26,8 @@ final class RequireCompanyAccessMiddleware
             ], Response::HTTP_UNAUTHORIZED);
         }
 
-        // Admins have universal multi-tenant oversight
-        if ($user->role === 'admin') {
+        // Admins and SuperAdmins have universal multi-tenant oversight
+        if ($user->isAdmin()) {
             return $next($request);
         }
 
@@ -35,7 +35,7 @@ final class RequireCompanyAccessMiddleware
             ?? $request->input('company_id')
             ?? $request->header('X-Company-Id');
 
-        if ($companyId !== null && (string) $user->company_id !== (string) $companyId) {
+        if ($companyId !== null && !$user->canAccessCompany((string) $companyId)) {
             return new JsonResponse([
                 'message' => 'Brak uprawnień do przeglądania danych wskazanej firmy.',
             ], Response::HTTP_FORBIDDEN);
