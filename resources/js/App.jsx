@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
+import { DealProvider } from './context/DealContext';
 import { AppLayout } from './components/layout/AppLayout';
 import { LoginView } from './views/LoginView';
 import { DashboardView } from './views/DashboardView';
@@ -17,11 +18,11 @@ const MainRouter = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-brand-600 to-indigo-500 flex items-center justify-center text-white font-extrabold text-xl shadow-xl shadow-brand-600/30 animate-pulse mb-4">
-                    F
+            <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center font-mono">
+                <div className="w-10 h-10 rounded bg-zinc-900 border border-zinc-700 flex items-center justify-center text-zinc-100 font-bold text-base mb-3 shadow-sm">
+                    FB
                 </div>
-                <div className="text-sm font-medium text-slate-400">Ładowanie środowiska FinBoard...</div>
+                <div className="text-xs text-zinc-400">INICJALIZACJA ŚRODOWISKA DEAL ADVISORY...</div>
             </div>
         );
     }
@@ -64,7 +65,9 @@ export const App = () => {
     return (
         <NotificationProvider>
             <AuthProvider>
-                <MainRouter />
+                <DealProvider>
+                    <MainRouter />
+                </DealProvider>
             </AuthProvider>
         </NotificationProvider>
     );

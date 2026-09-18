@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import apiClient from '../api/client';
 import { useAuth } from '../context/AuthContext';
+import { useDeal } from '../context/DealContext';
 import { useNotification } from '../context/NotificationContext';
 import { MetricCard, Card } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
 import { FinancialValue } from '../components/ui/FinancialValue';
 import { PercentageBadge } from '../components/ui/PercentageBadge';
-import { formatCurrency, formatPercent, formatRatio } from '../utils/formatters';
+import { formatCurrency } from '../utils/formatters';
 import {
     DollarSign,
     TrendingUp,
@@ -15,13 +16,12 @@ import {
     Building2,
     Calendar,
     ArrowUpRight,
-    Lock,
-    Percent,
-    Layers
+    Lock
 } from 'lucide-react';
 
 export const DashboardView = () => {
     const { activeCompany } = useAuth();
+    const { dateRange, currency, convertAmount } = useDeal();
     const { error } = useNotification();
 
     const [metrics, setMetrics] = useState(null);
@@ -30,7 +30,11 @@ export const DashboardView = () => {
     const fetchMetrics = async () => {
         setLoading(true);
         try {
-            const res = await apiClient.get('/finance/analytics/metrics');
+            const params = {};
+            if (dateRange.startDate) params.start_date = dateRange.startDate;
+            if (dateRange.endDate) params.end_date = dateRange.endDate;
+
+            const res = await apiClient.get('/finance/analytics/metrics', { params });
             setMetrics(res.data.data);
         } catch (err) {
             error('Nie udało się pobrać wskaźników finansowych.');
@@ -41,12 +45,21 @@ export const DashboardView = () => {
 
     useEffect(() => {
         fetchMetrics();
-    }, [activeCompany?.id]);
+    }, [activeCompany?.id, dateRange.startDate, dateRange.endDate]);
 
-    const revenueVal = Number(metrics?.pnl?.revenue?.amount || 0);
-    const ebitdaVal = Number(metrics?.pnl?.ebitda?.amount || 0);
-    const ebitVal = Number(metrics?.pnl?.ebit?.amount || 0);
-    const netProfitVal = Number(metrics?.pnl?.net_profit?.amount || 0);
+    const rawRevenue = Number(metrics?.pnl?.revenue?.amount || 0);
+    const rawEbitda = Number(metrics?.pnl?.ebitda?.amount || 0);
+    const rawEbit = Number(metrics?.pnl?.ebit?.amount || 0);
+    const rawNetProfit = Number(metrics?.pnl?.net_profit?.amount || 0);
+    const rawOpex = Number(metrics?.pnl?.opex?.amount || 0);
+
+    // Converted amounts based on active currency in DealContext
+    const revenueVal = convertAmount(rawRevenue);
+    const ebitdaVal = convertAmount(rawEbitda);
+    const ebitVal = convertAmount(rawEbit);
+    const netProfitVal = convertAmount(rawNetProfit);
+    const opexVal = convertAmount(rawOpex);
+
     const currentRatioVal = metrics?.liquidity?.current_ratio ? Number(metrics.liquidity.current_ratio).toFixed(2) : '1.85';
 
     return (
@@ -64,7 +77,7 @@ export const DashboardView = () => {
                         </div>
                         <div className="text-[10px] text-zinc-500 flex items-center gap-1.5 mt-0.5 font-mono">
                             <Calendar className="w-3 h-3 text-zinc-600" />
-                            HISTORIA: 2025.01 – 2026.09 (21 OKRESÓW OBRACHUNKOWYCH)
+                            <span>FILTR CZASOWY: {dateRange.label.toUpperCase()}</span>
                         </div>
                     </div>
                 </div>
@@ -72,10 +85,10 @@ export const DashboardView = () => {
                 <div className="flex items-center gap-3 text-[11px] font-mono text-zinc-400">
                     <div className="flex items-center gap-1.5">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                        <span className="text-zinc-300 text-[10px]">SYNC: ACTIVE</span>
+                        <span className="text-zinc-300 text-[10px]">WALUTA: {currency}</span>
                     </div>
                     <span className="text-zinc-700">|</span>
-                    <span className="text-[10px] text-zinc-500">BCMATH: SCALE 4</span>
+                    <span className="text-[10px] text-zinc-500">ENGINE: CQRS / READ-SIDE</span>
                 </div>
             </div>
 
@@ -84,7 +97,7 @@ export const DashboardView = () => {
                 <MetricCard
                     title="Przychody ze Sprzedaży"
                     value={loading ? '...' : revenueVal}
-                    currency="PLN"
+                    currency={currency}
                     icon={DollarSign}
                     change={12.4}
                     subtitle="DYNAMIKA R/R"
@@ -93,7 +106,7 @@ export const DashboardView = () => {
                 <MetricCard
                     title="Wynik EBITDA"
                     value={loading ? '...' : ebitdaVal}
-                    currency="PLN"
+                    currency={currency}
                     icon={TrendingUp}
                     change={8.2}
                     subtitle={`MARŻA: ${metrics?.pnl?.ebitda_margin ? (metrics.pnl.ebitda_margin * 100).toFixed(1) + '%' : '18.4%'}`}
@@ -102,7 +115,7 @@ export const DashboardView = () => {
                 <MetricCard
                     title="Zysk Operacyjny (EBIT)"
                     value={loading ? '...' : ebitVal}
-                    currency="PLN"
+                    currency={currency}
                     icon={PieChart}
                     change={5.7}
                     subtitle={`MARŻA: ${metrics?.pnl?.operating_margin ? (metrics.pnl.operating_margin * 100).toFixed(1) + '%' : '14.2%'}`}
@@ -125,7 +138,7 @@ export const DashboardView = () => {
                     <div>
                         <div className="text-[10px] font-mono text-zinc-500 uppercase">Zysk Netto (EAT)</div>
                         <div className="mt-1">
-                            <FinancialValue amount={netProfitVal} currency="PLN" size="lg" align="left" color="profit" />
+                            <FinancialValue amount={netProfitVal} currency={currency} size="lg" align="left" color="profit" />
                         </div>
                     </div>
                     <PercentageBadge value={11.8} />
@@ -157,49 +170,44 @@ export const DashboardView = () => {
             {/* Institutional Summary Table */}
             <Card
                 title="Wskaźniki Kluczowe Portfela Transakcyjnego"
-                subtitle="Podsumowanie wyliczeń wykonanych przez domenowy kalkulator FinancialCalculator"
+                subtitle={`Podsumowanie danych finansowych dla okresu: ${dateRange.label}`}
             >
                 <div className="overflow-x-auto">
                     <table className="w-full text-left font-mono text-xs">
                         <thead>
                             <tr className="border-b border-zinc-800 text-zinc-500 text-[10px] uppercase">
-                                <th className="py-2.5 font-semibold">Wskaźnik Finansowy</th>
-                                <th className="py-2.5 font-semibold text-right">Wartość Wyliczona</th>
-                                <th className="py-2.5 font-semibold text-right">Jednostka / Waluta</th>
+                                <th className="py-2.5 font-semibold">Pozycja Sprawozdania</th>
+                                <th className="py-2.5 font-semibold text-right">Kwota ({currency})</th>
                                 <th className="py-2.5 font-semibold text-right">Status Weryfikacji</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-zinc-800/60">
                             <tr>
-                                <td className="py-2.5 text-zinc-200">Przychody Operacyjne (Revenue)</td>
+                                <td className="py-2.5 text-zinc-200">Przychody Operacyjne ze Sprzedaży (Revenue)</td>
                                 <td className="py-2.5 text-right font-bold text-zinc-100 tabular-nums">
-                                    {formatCurrency(revenueVal, 'PLN')}
+                                    {formatCurrency(revenueVal, currency)}
                                 </td>
-                                <td className="py-2.5 text-right text-zinc-500">PLN</td>
                                 <td className="py-2.5 text-right text-emerald-400">ZWERYFIKOWANY</td>
                             </tr>
                             <tr>
-                                <td className="py-2.5 text-zinc-200">Koszty Operacyjne (OPEX)</td>
+                                <td className="py-2.5 text-zinc-200">Koszty Operacyjne Działalności (OPEX)</td>
                                 <td className="py-2.5 text-right text-zinc-300 tabular-nums">
-                                    {formatCurrency(metrics?.pnl?.opex?.amount || 0, 'PLN')}
+                                    {formatCurrency(opexVal, currency)}
                                 </td>
-                                <td className="py-2.5 text-right text-zinc-500">PLN</td>
                                 <td className="py-2.5 text-right text-zinc-400">ZWERYFIKOWANY</td>
                             </tr>
                             <tr>
-                                <td className="py-2.5 text-zinc-200">Wynik EBITDA</td>
+                                <td className="py-2.5 text-zinc-200">Wynik Operacyjny EBITDA</td>
                                 <td className="py-2.5 text-right font-bold text-emerald-400 tabular-nums">
-                                    {formatCurrency(ebitdaVal, 'PLN')}
+                                    {formatCurrency(ebitdaVal, currency)}
                                 </td>
-                                <td className="py-2.5 text-right text-zinc-500">PLN</td>
                                 <td className="py-2.5 text-right text-emerald-400">ZWERYFIKOWANY</td>
                             </tr>
                             <tr>
-                                <td className="py-2.5 text-zinc-200">Wskaźnik Płynności Bieżącej (CR)</td>
+                                <td className="py-2.5 text-zinc-200">Wskaźnik Płynności Bieżącej (Current Ratio)</td>
                                 <td className="py-2.5 text-right font-bold text-zinc-100 tabular-nums">
                                     {currentRatioVal}x
                                 </td>
-                                <td className="py-2.5 text-right text-zinc-500">Mnożnik</td>
                                 <td className="py-2.5 text-right text-emerald-400">ZGODNY Z NORMĄ</td>
                             </tr>
                         </tbody>

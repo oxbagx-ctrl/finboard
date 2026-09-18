@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
+import { DealContextBar } from './DealContextBar';
 
 export const AppLayout = ({ currentRoute, onRouteChange, onRefreshData, refreshing, children }) => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -23,6 +24,9 @@ export const AppLayout = ({ currentRoute, onRouteChange, onRefreshData, refreshi
                     onRefreshData={onRefreshData}
                     refreshing={refreshing}
                 />
+
+                {/* Sub-header Deal Advisory Context Bar */}
+                <DealContextBar />
 
                 <main className="flex-1 p-4 sm:p-6 max-w-7xl w-full mx-auto space-y-6">
                     {children}

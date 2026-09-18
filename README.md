@@ -7,7 +7,7 @@
   - [x] Konfiguracja SPA React z Tailwind CSS, Lucide Icons, klientem API Axios oraz szkieletem layoutu.
   - [x] Refaktoryzacja wizualna: stylistyka terminala instytucjonalnego Deal Advisory (wysoki kontrast Zinc/Slate, precyzyjne kąty inżynieryjne, statusy bezpieczeństwa).
   - [x] Typografia finansowa oraz liczby tabelaryczne (tabular-nums, font-mono dla kwot, wskaźników i dat).
-  - [ ] Pasek kontekstu transakcyjnego Deal Advisory (poufność, wybór waluty raportowania, selektor okresu).
+  - [x] Pasek kontekstu transakcyjnego Deal Advisory (poufność, wybór waluty raportowania, selektor okresu).
   - [ ] Zwarte tabele i komponenty analityczne w stylu narzędzi Bloomberg / FactSet / Ramp.
   - [ ] Moduł uwierzytelniania i przełącznik kontekstu firmy dla doradcy.
   - [ ] Główny Dashboard ze wskaźnikami KPI i wykresami Recharts (trendy, struktura kosztów, płynność).
