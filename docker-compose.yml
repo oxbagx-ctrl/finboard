@@ -43,7 +43,7 @@ services:
     container_name: finboard-worker
     restart: unless-stopped
     working_dir: /var/www/html
-    command: php artisan queue:work --verbose --tries=3 --timeout=180
+    command: php artisan queue:work --queue=financial-imports,default --verbose --tries=3 --timeout=180
     volumes:
       - ./:/var/www/html
     networks:
