@@ -1,0 +1,22 @@
+import React from 'react';
+import { Card } from '../components/ui/Card';
+import { ShieldCheck } from 'lucide-react';
+
+export const AuditLogsView = () => {
+    return (
+        <div className="space-y-6">
+            <Card
+                title="Dziennik Audytowy (Audit Log)"
+                subtitle="Rejestr zdarzeń i pobrań dokumentów w Pokoju Danych"
+            >
+                <div className="py-12 text-center text-slate-400">
+                    <ShieldCheck className="w-12 h-12 mx-auto text-brand-400 mb-3 opacity-80" />
+                    <h4 className="text-base font-semibold text-slate-200">Rejestr Ścieżki Audytowej</h4>
+                    <p className="text-xs text-slate-400 max-w-md mx-auto mt-1">
+                        Zdarzenia pobrań i inspekcji dokumentów z identyfikacją adresów IP i użytkowników.
+                    </p>
+                </div>
+            </Card>
+        </div>
+    );
+};
