@@ -5,7 +5,7 @@
 [![PostgreSQL](https://img.shields.io/badge/postgresql-16-blue.svg)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/redis-alpine-red.svg)](https://redis.io/)
 [![Architecture](https://img.shields.io/badge/architecture-DDD%20%2F%20CQRS-brightgreen.svg)]()
-[![Tests](https://img.shields.io/badge/tests-118%20backend%20%7C%2027%20frontend%20passed-success.svg)]()
+[![Tests](https://img.shields.io/badge/tests-118%20backend%20%7C%2038%20frontend%20passed-success.svg)]()
 
 FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakcyjnego (M&A, Due Diligence, Corporate Finance) oraz ich klientom (CFO, Zarządy). Aplikacja łączy w sobie zaawansowaną analitykę finansową w ujęciu wielo-najemcowym (Multi-Tenant) z bezpiecznym repozytorium dokumentów Virtual Data Room (VDR).
 
@@ -37,7 +37,7 @@ FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakc
     - Interaktywne wykresy Recharts (trendy P&L, struktura kosztów OPEX, wskaźniki płynności z benchmarkami branżowymi).
     - Pełny moduł księgi operacji (General Ledger) z filtrami i paginacją serwerową.
     - Widok importu CSV z podglądem walidacji dry-run i animowanym monitorem kolejki Redis.
-    - Zestaw testów jednostkowych i integracyjnych Vitest dla formaterów matematycznych i reguł decyzyjnych interfejsu.
+    - Zestaw testów jednostkowych i integracyjnych Vitest (formatery, silnik walutowy, formularze, blokady Dry-Run).
 
 ---
 
@@ -87,7 +87,7 @@ resources/js/
 │   ├── layout/                   # DealContextBar (waluta, poufność, okres), Header, Sidebar, Layout
 │   └── ui/                       # Badge, Button, Card, MultiplesStrip (wskaźniki EV/EBITDA, P/E), FinancialTable
 ├── context/                      # AuthContext (tożsamość, role, kontekst spółki), DealContext (FX, okres), NotificationContext (toasty)
-├── tests/                        # Setup Vitest, testy jednostkowe formatters.test.js i dealContext.test.jsx
+├── tests/                        # Vitest setup, unit tests (formatters, dealContext) & component integration tests (CsvPreviewTable, FinancialRecordModal)
 ├── utils/                        # formatters.js (liczby tabelaryczne tabular-nums, waluty PLN/EUR/USD/GBP, formatowanie wskaźników)
 └── views/                        # DashboardView, RecordsView, ImportView, DataRoomView, ReportsView, LoginView
 ```
@@ -215,16 +215,17 @@ Baza danych zasilona jest danymi demonstracyjnymi (21 miesięcy historii finanso
   - Endpointy REST API dla Wirtualnego Pokoju Danych (Virtual Data Room) z logiem pobrań.
   - Kompleksowe testy integracyjne API dla izolacji multi-tenant i uprawnień Sanctum.
 - [x] **Faza 6: Frontend React & Dashboard Finansowy**
-  - Konfiguracja SPA React z Tailwind CSS, Lucide Icons, klientem API Axios oraz szkieletem layoutu.
-  - Refaktoryzacja wizualna: stylistyka terminala instytucjonalnego Deal Advisory (wysoki kontrast Zinc/Slate, precyzyjne kąty inżynieryjne, statusy bezpieczeństwa).
-  - Typografia finansowa oraz liczby tabelaryczne (tabular-nums, font-mono dla kwot, wskaźników i dat).
-  - Pasek kontekstu transakcyjnego Deal Advisory (poufność, wybór waluty raportowania, selektor okresu).
-  - Zwarte tabele i komponenty analityczne w stylu narzędzi Bloomberg / FactSet / Ramp.
-  - Moduł uwierzytelniania i przełącznik kontekstu firmy dla doradcy.
-  - Główny Dashboard ze wskaźnikami KPI i wykresami Recharts (trendy, struktura kosztów, płynność).
-  - Moduł tabeli transakcji finansowych z filtrami i kreatorem dodawania.
-  - Interfejs importu plików CSV z podglądem na żywo i paskiem postępu.
-  - Środowisko testowe Vitest i testy jednostkowe reguł matematycznych oraz formatowania walutowego.
+  - [x] Konfiguracja SPA React z Tailwind CSS, Lucide Icons, klientem API Axios oraz szkieletem layoutu.
+  - [x] Refaktoryzacja wizualna: stylistyka terminala instytucjonalnego Deal Advisory (wysoki kontrast Zinc/Slate, precyzyjne kąty inżynieryjne, statusy bezpieczeństwa).
+  - [x] Typografia finansowa oraz liczby tabelaryczne (tabular-nums, font-mono dla kwot, wskaźników i dat).
+  - [x] Pasek kontekstu transakcyjnego Deal Advisory (poufność, wybór waluty raportowania, selektor okresu).
+  - [x] Zwarte tabele i komponenty analityczne w stylu narzędzi Bloomberg / FactSet / Ramp.
+  - [x] Moduł uwierzytelniania i przełącznik kontekstu firmy dla doradcy.
+  - [x] Główny Dashboard ze wskaźnikami KPI i wykresami Recharts (trendy, struktura kosztów, płynność).
+  - [x] Moduł tabeli transakcji finansowych z filtrami i kreatorem dodawania.
+  - [x] Interfejs importu plików CSV z podglądem na żywo i paskiem postępu.
+  - [x] Środowisko testowe Vitest i testy jednostkowe reguł matematycznych oraz formatowania walutowego.
+  - [x] Testy integracyjne komponentów: walidacja podglądu dry-run CSV oraz formularzy księgi głównej.
 - [ ] **Faza 7: Data Room UI, Raporty PDF i Wdrożenie Końcowe**
   - Interfejs Virtual Data Room (VDR) – przeglądarka dokumentów z kategoryzacją i pobieraniem.
   - Generator podsumowań i raportów zarządczych PDF.
