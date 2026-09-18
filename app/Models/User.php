@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
@@ -76,6 +77,16 @@ class User extends Authenticatable
         return $this->belongsToMany(Company::class, 'advisor_company', 'advisor_id', 'company_id')
             ->withPivot(['assigned_by'])
             ->withTimestamps();
+    }
+
+    /**
+     * Invitations sent by this user.
+     *
+     * @return HasMany<Invitation>
+     */
+    public function sentInvitations(): HasMany
+    {
+        return $this->hasMany(Invitation::class, 'invited_by');
     }
 
     public function isSuperAdmin(): bool

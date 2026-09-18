@@ -56,4 +56,14 @@ class Company extends Model
             ->withPivot(['assigned_by'])
             ->withTimestamps();
     }
+
+    /**
+     * Invitations for this company.
+     *
+     * @return HasMany<Invitation>
+     */
+    public function invitations(): HasMany
+    {
+        return $this->hasMany(Invitation::class, 'company_id');
+    }
 }
