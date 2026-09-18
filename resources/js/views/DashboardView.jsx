@@ -11,11 +11,12 @@ import {
     ShieldAlert,
     Building2,
     Calendar,
-    ArrowUpRight
+    ArrowUpRight,
+    Lock
 } from 'lucide-react';
 
 export const DashboardView = () => {
-    const { activeCompany, isAdmin } = useAuth();
+    const { activeCompany } = useAuth();
     const { error } = useNotification();
 
     const [metrics, setMetrics] = useState(null);
@@ -43,40 +44,40 @@ export const DashboardView = () => {
     };
 
     return (
-        <div className="space-y-6">
-            {/* Context bar */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900/60 border border-slate-800 rounded-2xl p-4">
+        <div className="space-y-5">
+            {/* Top context bar */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-zinc-900 border border-zinc-800 rounded-lg p-3.5">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-400">
-                        <Building2 className="w-5 h-5" />
+                    <div className="w-8 h-8 rounded bg-zinc-800 border border-zinc-700 flex items-center justify-center text-zinc-300">
+                        <Building2 className="w-4 h-4" />
                     </div>
                     <div>
-                        <div className="text-sm font-bold text-slate-100 flex items-center gap-2">
+                        <div className="text-xs font-bold text-zinc-100 flex items-center gap-2 font-mono">
                             {activeCompany?.name || 'Spółka'}
-                            <Badge variant="brand" size="sm">{activeCompany?.code}</Badge>
+                            <Badge variant="default" size="sm">{activeCompany?.code}</Badge>
                         </div>
-                        <div className="text-xs text-slate-400 flex items-center gap-1 mt-0.5">
-                            <Calendar className="w-3.5 h-3.5" />
-                            Okres analizy: 2025 - 2026 (21 miesięcy historii finansowej)
+                        <div className="text-[11px] text-zinc-500 flex items-center gap-1.5 mt-0.5 font-mono">
+                            <Calendar className="w-3 h-3" />
+                            OKRES TRANSAKCYJNY: 2025.01 - 2026.09 (21 MIESIĘCY)
                         </div>
                     </div>
                 </div>
 
-                <div className="flex items-center gap-2 text-xs text-slate-400">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    API & Baza danych połączone
+                <div className="flex items-center gap-2 text-[11px] font-mono text-zinc-400">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    <span>ONLINE / DATA SYNC OK</span>
                 </div>
             </div>
 
-            {/* KPI Metric Cards Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* KPI Metrics Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
                 <MetricCard
                     title="Przychody ze Sprzedaży"
                     value={loading ? 'Ładowanie...' : formatCurrency(metrics?.pnl?.revenue?.amount)}
                     icon={DollarSign}
                     trend="up"
                     change={12.4}
-                    subtitle="vs poprzedni okres"
+                    subtitle="YTD vs BAZA"
                 />
 
                 <MetricCard
@@ -85,7 +86,7 @@ export const DashboardView = () => {
                     icon={TrendingUp}
                     trend="up"
                     change={8.2}
-                    subtitle={`Marża: ${metrics?.pnl?.ebitda_margin ? (metrics.pnl.ebitda_margin * 100).toFixed(1) + '%' : '-'}`}
+                    subtitle={`MARŻA: ${metrics?.pnl?.ebitda_margin ? (metrics.pnl.ebitda_margin * 100).toFixed(1) + '%' : '-'}`}
                 />
 
                 <MetricCard
@@ -93,7 +94,7 @@ export const DashboardView = () => {
                     value={loading ? 'Ładowanie...' : formatCurrency(metrics?.pnl?.ebit?.amount)}
                     icon={PieChart}
                     trend="neutral"
-                    subtitle={`Marża: ${metrics?.pnl?.operating_margin ? (metrics.pnl.operating_margin * 100).toFixed(1) + '%' : '-'}`}
+                    subtitle={`MARŻA: ${metrics?.pnl?.operating_margin ? (metrics.pnl.operating_margin * 100).toFixed(1) + '%' : '-'}`}
                 />
 
                 <MetricCard
@@ -101,47 +102,48 @@ export const DashboardView = () => {
                     value={loading ? '...' : (metrics?.liquidity?.current_ratio ? Number(metrics.liquidity.current_ratio).toFixed(2) : '1.85')}
                     icon={ShieldAlert}
                     trend="up"
-                    subtitle="Wskaźnik bieżący (norma: > 1.2)"
+                    subtitle="WSKAŹNIK BIEŻĄCY (NORMA: > 1.20)"
                 />
             </div>
 
-            {/* Information panel */}
+            {/* Institutional Information & Security Panel */}
             <Card
-                title="Wprowadzenie do Platformy FinBoard"
-                subtitle="Zarządzanie finansami i transakcjami doradczymi w czasie rzeczywistym"
+                title="Status Projektu Transakcyjnego & Due Diligence"
+                subtitle="Podsumowanie integralności danych finansowych i repozytorium VDR"
             >
-                <div className="text-sm text-slate-300 space-y-3">
-                    <p>
-                        Witaj w systemie <strong>FinBoard</strong>. Aplikacja łączy zaawansowaną analizę wskaźnikową (P&L, bilans, płynność) opartą o domenowy silnik DDD i architekturę CQRS z bezpiecznym Wirtualnym Pokojem Danych (Virtual Data Room).
+                <div className="text-xs text-zinc-400 space-y-3 font-mono">
+                    <p className="leading-relaxed">
+                        Dane finansowe podmiotu <strong className="text-zinc-200">{activeCompany?.name}</strong> są agregowane w oparciu o silnik domenowy DDD z precyzją bcmath (scale 4) oraz asynchroniczne kolejki Redis.
                     </p>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-                        <div className="p-4 rounded-xl bg-slate-800/50 border border-slate-700/60">
-                            <div className="font-semibold text-slate-100 text-sm mb-1 flex items-center gap-1.5">
-                                <ArrowUpRight className="w-4 h-4 text-brand-400" />
-                                Analityka & Wykresy
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+                        <div className="p-3 rounded bg-zinc-950 border border-zinc-800">
+                            <div className="font-semibold text-zinc-200 mb-1 flex items-center justify-between text-[11px]">
+                                <span>SERIE CZASOWE & TRENDY</span>
+                                <ArrowUpRight className="w-3.5 h-3.5 text-zinc-500" />
                             </div>
-                            <p className="text-xs text-slate-400">
-                                Dostęp do miesięcznych serii czasowych, struktury kosztów OPEX i wskaźników płynności.
+                            <p className="text-[11px] text-zinc-500 leading-normal">
+                                Raporty P&L, rozbicie OPEX i dynamika wskaźników płynności.
                             </p>
                         </div>
 
-                        <div className="p-4 rounded-xl bg-slate-800/50 border border-slate-700/60">
-                            <div className="font-semibold text-slate-100 text-sm mb-1 flex items-center gap-1.5">
-                                <ArrowUpRight className="w-4 h-4 text-brand-400" />
-                                Asynchroniczny Import CSV
+                        <div className="p-3 rounded bg-zinc-950 border border-zinc-800">
+                            <div className="font-semibold text-zinc-200 mb-1 flex items-center justify-between text-[11px]">
+                                <span>IMPORT ASYNCHRONICZNY</span>
+                                <ArrowUpRight className="w-3.5 h-3.5 text-zinc-500" />
                             </div>
-                            <p className="text-xs text-slate-400">
-                                Szybki import wyciągów i zestawień z kolejkowaniem zadań w Redis i podglądem na żywo.
+                            <p className="text-[11px] text-zinc-500 leading-normal">
+                                Automatyczne wykrywanie delimiterów i walidacja nagłówków PL/EN.
                             </p>
                         </div>
 
-                        <div className="p-4 rounded-xl bg-slate-800/50 border border-slate-700/60">
-                            <div className="font-semibold text-slate-100 text-sm mb-1 flex items-center gap-1.5">
-                                <ArrowUpRight className="w-4 h-4 text-brand-400" />
-                                Virtual Data Room (VDR)
+                        <div className="p-3 rounded bg-zinc-950 border border-zinc-800">
+                            <div className="font-semibold text-zinc-200 mb-1 flex items-center justify-between text-[11px]">
+                                <span>POKÓJ DANYCH (VDR)</span>
+                                <Lock className="w-3.5 h-3.5 text-zinc-500" />
                             </div>
-                            <p className="text-xs text-slate-400">
-                                Bezpieczne repozytorium dokumentów transakcyjnych ze ścisłym rejestrem audytowym operacji.
+                            <p className="text-[11px] text-zinc-500 leading-normal">
+                                Sumy kontrolne SHA-256 oraz rejestr każdego pobrania pliku.
                             </p>
                         </div>
                     </div>

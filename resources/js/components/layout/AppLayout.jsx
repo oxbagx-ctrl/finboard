@@ -6,8 +6,8 @@ export const AppLayout = ({ currentRoute, onRouteChange, onRefreshData, refreshi
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     return (
-        <div className="min-h-screen bg-slate-950 text-slate-100 flex">
-            {/* Sidebar */}
+        <div className="min-h-screen bg-zinc-950 text-zinc-100 flex font-sans antialiased selection:bg-zinc-700 selection:text-white">
+            {/* Sidebar Navigation */}
             <Sidebar
                 currentRoute={currentRoute}
                 onRouteChange={onRouteChange}
@@ -15,8 +15,8 @@ export const AppLayout = ({ currentRoute, onRouteChange, onRefreshData, refreshi
                 onClose={() => setSidebarOpen(false)}
             />
 
-            {/* Main Content wrapper */}
-            <div className="flex-1 flex flex-col min-w-0 lg:pl-72">
+            {/* Main Content Area */}
+            <div className="flex-1 flex flex-col min-w-0 lg:pl-64">
                 <Header
                     currentRoute={currentRoute}
                     onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
@@ -24,7 +24,7 @@ export const AppLayout = ({ currentRoute, onRouteChange, onRefreshData, refreshi
                     refreshing={refreshing}
                 />
 
-                <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
+                <main className="flex-1 p-4 sm:p-6 max-w-7xl w-full mx-auto space-y-6">
                     {children}
                 </main>
             </div>

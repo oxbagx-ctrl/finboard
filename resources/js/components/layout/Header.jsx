@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, Building2, Shield, RefreshCw } from 'lucide-react';
+import { Menu, Building2, Shield, RefreshCw, Lock } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { Badge } from '../ui/Badge';
 
@@ -7,12 +7,12 @@ export const Header = ({ currentRoute, onToggleSidebar, onRefreshData, refreshin
     const { user, activeCompany, isAdmin, switchCompany } = useAuth();
 
     const titles = {
-        'dashboard': 'Dashboard Główny FinBoard',
-        'analytics': 'Zaawansowana Analityka Finansowa & Wskaźniki',
-        'records': 'Transakcje i Rekordy Finansowe',
-        'import': 'Asynchroniczny Import Danych CSV',
-        'data-room': 'Wirtualny Pokój Danych (VDR)',
-        'audit-logs': 'Dziennik Audytowy Dokumentów',
+        'dashboard': 'Pulpit Zarządczy (Executive Overview)',
+        'analytics': 'Analityka P&L, Marże i Wskaźniki Płynności',
+        'records': 'Księga Transakcji Finansowych',
+        'import': 'Moduł Importu Wyciągów i Zbiorów CSV',
+        'data-room': 'Virtual Data Room (VDR) – Dokumentacja Transakcyjna',
+        'audit-logs': 'Rejestr Nadzoru i Ścieżka Audytowa',
     };
 
     const demoCompanies = [
@@ -21,64 +21,69 @@ export const Header = ({ currentRoute, onToggleSidebar, onRefreshData, refreshin
     ];
 
     return (
-        <header className="h-16 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 sticky top-0 z-30 flex items-center justify-between px-4 sm:px-6 lg:px-8">
+        <header className="h-14 bg-zinc-950 border-b border-zinc-800 sticky top-0 z-30 flex items-center justify-between px-4 sm:px-6">
             <div className="flex items-center gap-3">
                 <button
                     onClick={onToggleSidebar}
-                    className="p-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-800 lg:hidden"
+                    className="p-1.5 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900 lg:hidden"
                 >
                     <Menu className="w-5 h-5" />
                 </button>
-                <div>
-                    <h1 className="text-base sm:text-lg font-bold text-slate-100 tracking-tight">
+                <div className="flex items-center gap-3">
+                    <h1 className="text-xs sm:text-sm font-semibold text-zinc-100 uppercase tracking-wide font-mono">
                         {titles[currentRoute] || 'FinBoard'}
                     </h1>
                 </div>
             </div>
 
-            <div className="flex items-center gap-3 sm:gap-4">
+            <div className="flex items-center gap-2.5 sm:gap-3">
+                {/* Confidentiality indicator */}
+                <div className="hidden md:flex items-center gap-1.5 px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-[10px] font-mono text-zinc-400">
+                    <Lock className="w-3 h-3 text-amber-500" />
+                    <span>STRICTLY CONFIDENTIAL</span>
+                </div>
+
                 {/* Refresh button */}
                 {onRefreshData && (
                     <button
                         onClick={onRefreshData}
                         disabled={refreshing}
-                        title="Odśwież dane"
-                        className="p-2 rounded-xl text-slate-400 hover:text-brand-400 hover:bg-slate-800/80 transition-colors disabled:opacity-50"
+                        title="Odśwież dane z serwera"
+                        className="p-1.5 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900 transition-colors disabled:opacity-50"
                     >
-                        <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin text-brand-400' : ''}`} />
+                        <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin text-zinc-200' : ''}`} />
                     </button>
                 )}
 
-                {/* Tenant Switcher for Admin */}
+                {/* Tenant Switcher for Advisor */}
                 {isAdmin ? (
-                    <div className="flex items-center gap-2 bg-slate-800/80 border border-slate-700/80 rounded-xl px-2.5 py-1.5 shadow-sm">
-                        <Building2 className="w-4 h-4 text-brand-400 shrink-0" />
+                    <div className="flex items-center gap-1.5 bg-zinc-900 border border-zinc-750 rounded px-2 py-1">
+                        <Building2 className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
                         <select
                             value={activeCompany?.id || ''}
                             onChange={(e) => {
                                 const selected = demoCompanies.find(c => c.id === e.target.value);
                                 if (selected) switchCompany(selected);
                             }}
-                            className="bg-transparent text-xs font-semibold text-slate-200 focus:outline-none cursor-pointer pr-1"
+                            className="bg-transparent text-xs font-medium text-zinc-200 focus:outline-none cursor-pointer pr-1"
                         >
                             {demoCompanies.map(comp => (
-                                <option key={comp.id} value={comp.id} className="bg-slate-800 text-slate-200">
-                                    {comp.name}
+                                <option key={comp.id} value={comp.id} className="bg-zinc-900 text-zinc-200">
+                                    {comp.code} – {comp.name}
                                 </option>
                             ))}
                         </select>
                     </div>
                 ) : (
-                    <div className="hidden sm:flex items-center gap-2 bg-slate-800/60 border border-slate-700/50 rounded-xl px-3 py-1.5">
-                        <Building2 className="w-4 h-4 text-slate-400" />
-                        <span className="text-xs font-medium text-slate-300">{activeCompany?.name}</span>
+                    <div className="hidden sm:flex items-center gap-1.5 bg-zinc-900 border border-zinc-800 rounded px-2.5 py-1">
+                        <Building2 className="w-3.5 h-3.5 text-zinc-500" />
+                        <span className="text-xs font-medium text-zinc-300 font-mono">{activeCompany?.name}</span>
                     </div>
                 )}
 
-                {/* Role Badge */}
-                <Badge variant={isAdmin ? 'brand' : 'purple'} size="sm" className="hidden md:inline-flex">
-                    <Shield className="w-3 h-3 mr-1" />
-                    {isAdmin ? 'Doradca M&A' : 'Klient CFO'}
+                {/* Role badge */}
+                <Badge variant={isAdmin ? 'default' : 'brand'} size="sm">
+                    {isAdmin ? 'ADMIN' : 'CLIENT'}
                 </Badge>
             </div>
         </header>
