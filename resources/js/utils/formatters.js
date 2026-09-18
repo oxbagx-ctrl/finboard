@@ -61,7 +61,7 @@ export const formatRatio = (ratio, decimals = 2, suffix = 'x') => {
         return `0.00${suffix}`;
     }
 
-    return `${Number(ratio).toFixed(decimals)}${suffix}`;
+    return `${Number(ratio).toFixed(decimals)}${suffix}` ?? '0.00x';
 };
 
 /**
@@ -104,4 +104,40 @@ export const formatFinancialDate = (dateString, format = 'date') => {
     const day = String(d.getDate()).padStart(2, '0');
     const month = String(d.getMonth() + 1).padStart(2, '0');
     return `${day}.${month}.${d.getFullYear()}`;
+};
+
+/**
+ * Formats bytes into human-readable institutional storage notation (KB, MB, GB).
+ */
+export const formatFileSize = (bytes) => {
+    if (bytes === undefined || bytes === null || isNaN(Number(bytes)) || Number(bytes) <= 0) {
+        return '0 B';
+    }
+    const num = Number(bytes);
+    if (num >= 1_073_741_824) {
+        return `${(num / 1_073_741_824).toFixed(2)} GB`;
+    }
+    if (num >= 1_048_576) {
+        return `${(num / 1_048_576).toFixed(2)} MB`;
+    }
+    if (num >= 1024) {
+        return `${(num / 1024).toFixed(1)} KB`;
+    }
+    return `${num} B`;
+};
+
+/**
+ * Formats an ISO timestamp into full audit timestamp notation: DD.MM.YYYY HH:MM:SS
+ */
+export const formatDateTime = (dateString) => {
+    if (!dateString) return '—';
+    const d = new Date(dateString);
+    if (isNaN(d.getTime())) return dateString;
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    const hours = String(d.getHours()).padStart(2, '0');
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+    const seconds = String(d.getSeconds()).padStart(2, '0');
+    return `${day}.${month}.${year} ${hours}:${minutes}:${seconds}`;
 };

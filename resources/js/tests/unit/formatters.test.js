@@ -5,6 +5,8 @@ import {
     formatRatio,
     formatDelta,
     formatFinancialDate,
+    formatFileSize,
+    formatDateTime,
 } from '../../utils/formatters';
 
 describe('formatCurrency', () => {
@@ -150,5 +152,35 @@ describe('formatFinancialDate', () => {
         expect(formatFinancialDate('')).toBe('—');
         expect(formatFinancialDate(null)).toBe('—');
         expect(formatFinancialDate('not-a-valid-date')).toBe('not-a-valid-date');
+    });
+});
+
+describe('formatFileSize', () => {
+    it('formats bytes, kilobytes, megabytes, and gigabytes', () => {
+        expect(formatFileSize(512)).toBe('512 B');
+        expect(formatFileSize(2048)).toBe('2.0 KB');
+        expect(formatFileSize(1572864)).toBe('1.50 MB');
+        expect(formatFileSize(2147483648)).toBe('2.00 GB');
+    });
+
+    it('handles zero, negative, and invalid values gracefully', () => {
+        expect(formatFileSize(0)).toBe('0 B');
+        expect(formatFileSize(-100)).toBe('0 B');
+        expect(formatFileSize(null)).toBe('0 B');
+        expect(formatFileSize(undefined)).toBe('0 B');
+        expect(formatFileSize('abc')).toBe('0 B');
+    });
+});
+
+describe('formatDateTime', () => {
+    it('formats ISO timestamps to DD.MM.YYYY HH:MM:SS', () => {
+        const result = formatDateTime('2026-09-18T14:30:15Z');
+        expect(result).toMatch(/\d{2}\.\d{2}\.2026 \d{2}:\d{2}:\d{2}/);
+    });
+
+    it('handles empty and invalid timestamps', () => {
+        expect(formatDateTime('')).toBe('—');
+        expect(formatDateTime(null)).toBe('—');
+        expect(formatDateTime('invalid-date')).toBe('invalid-date');
     });
 });
