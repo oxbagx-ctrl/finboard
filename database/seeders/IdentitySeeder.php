@@ -8,6 +8,7 @@ use App\Contexts\Identity\Domain\ValueObjects\RoleType;
 use App\Models\Company;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class IdentitySeeder extends Seeder
@@ -15,6 +16,8 @@ class IdentitySeeder extends Seeder
     public const HELVEST_COMPANY_ID = '11111111-1111-1111-1111-111111111111';
     public const ACME_COMPANY_ID = '22222222-2222-2222-2222-222222222222';
 
+    public const SUPERADMIN_USER_ID = '00000000-0000-0000-0000-000000000001';
+    public const ADVISOR_USER_ID = '00000000-0000-0000-0000-000000000002';
     public const ADMIN_USER_ID = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
     public const CLIENT_USER_ID = 'cccccccc-cccc-cccc-cccc-cccccccccccc';
 
@@ -40,7 +43,35 @@ class IdentitySeeder extends Seeder
             ]
         );
 
-        // 3. Seed Mock Admin / Financial Analyst
+        // 3. Seed Super Admin (Partner)
+        $superAdmin = User::updateOrCreate(
+            ['email' => 'superadmin@helvest.com'],
+            [
+                'id' => self::SUPERADMIN_USER_ID,
+                'name' => 'Partner Zarządzający (Helvest)',
+                'email' => 'superadmin@helvest.com',
+                'password' => Hash::make('password123'),
+                'role' => RoleType::SUPER_ADMIN->value,
+                'company_id' => $helvest->id,
+                'is_active' => true,
+            ]
+        );
+
+        // 4. Seed Advisor (Doradca Transakcyjny)
+        $advisor = User::updateOrCreate(
+            ['email' => 'advisor@helvest.com'],
+            [
+                'id' => self::ADVISOR_USER_ID,
+                'name' => 'Doradca Transakcyjny (Helvest)',
+                'email' => 'advisor@helvest.com',
+                'password' => Hash::make('password123'),
+                'role' => RoleType::ADVISOR->value,
+                'company_id' => $helvest->id,
+                'is_active' => true,
+            ]
+        );
+
+        // 5. Seed Mock Admin / Financial Analyst (Legacy / full access)
         User::updateOrCreate(
             ['email' => 'admin@helvest.com'],
             [
@@ -54,7 +85,7 @@ class IdentitySeeder extends Seeder
             ]
         );
 
-        // 4. Seed Mock Client / CFO
+        // 6. Seed Mock Client / CFO
         User::updateOrCreate(
             ['email' => 'klient@acme.com'],
             [
@@ -65,6 +96,19 @@ class IdentitySeeder extends Seeder
                 'role' => RoleType::CLIENT->value,
                 'company_id' => $acme->id,
                 'is_active' => true,
+            ]
+        );
+
+        // 7. Seed Advisor Company Assignment (Advisor assigned to Acme)
+        DB::table('advisor_company')->updateOrInsert(
+            [
+                'advisor_id' => $advisor->id,
+                'company_id' => $acme->id,
+            ],
+            [
+                'assigned_by' => $superAdmin->id,
+                'created_at' => now(),
+                'updated_at' => now(),
             ]
         );
     }

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -62,5 +63,17 @@ class User extends Authenticatable
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class, 'company_id');
+    }
+
+    /**
+     * Companies assigned to this advisor.
+     *
+     * @return BelongsToMany<Company>
+     */
+    public function assignedCompanies(): BelongsToMany
+    {
+        return $this->belongsToMany(Company::class, 'advisor_company', 'advisor_id', 'company_id')
+            ->withPivot(['assigned_by'])
+            ->withTimestamps();
     }
 }

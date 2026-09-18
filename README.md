@@ -1,10 +1,11 @@
 # FinBoard – Financial Analytics & Virtual Data Room Platform
 
-[![PHP Version](https://img.shields.io/badge/php-8.2%2B-blue.svg)](https://www.php.net/)\n[![Laravel](https://img.shields.io/badge/laravel-11.x-red.svg)](https://laravel.com/)
+[![PHP Version](https://img.shields.io/badge/php-8.2%2B-blue.svg)](https://www.php.net/)
+[![Laravel](https://img.shields.io/badge/laravel-11.x-red.svg)](https://laravel.com/)
 [![PostgreSQL](https://img.shields.io/badge/postgresql-16-blue.svg)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/redis-alpine-red.svg)](https://redis.io/)
 [![Architecture](https://img.shields.io/badge/architecture-DDD%20%2F%20CQRS-brightgreen.svg)]()
-[![Tests](https://img.shields.io/badge/tests-139%20backend%20%7C%2057%20frontend%20passed-success.svg)]()
+[![Tests](https://img.shields.io/badge/tests-142%20backend%20%7C%2057%20frontend%20passed-success.svg)]()
 
 FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakcyjnego (M&A, Due Diligence, Corporate Finance) oraz ich klientom (CFO, Zarządy). Aplikacja łączy w sobie zaawansowaną analitykę finansową w ujęciu wielo-najemcowym (Multi-Tenant) z bezpiecznym repozytorium dokumentów Virtual Data Room (VDR).
 
@@ -262,7 +263,7 @@ Baza danych zasilona jest danymi demonstracyjnymi (21 miesięcy historii finanso
 - [ ] **Faza 8: Rozbudowa Autoryzacji i Struktury Firm**
   - [x] Aktualizacja encji `Role` i enumów dla trójpoziomowej hierarchii uprawnień (SuperAdmin, Advisor, Client).
   - [x] Implementacja logiki domenowej relacji przypisania doradcy do firmy (`CompanyAdvisorAssignment`, `CompanyAdvisorRepositoryInterface`).
-  - [ ] Migracja bazy danych dla tabeli pośredniej `advisor_company` i aktualizacja powiązań.
+  - [x] Migracja bazy danych dla tabeli pośredniej `advisor_company` i aktualizacja powiązań.
   - [ ] Implementacja przypadku użycia `AssignAdvisorToCompanyUseCase` ze ścisłą weryfikacją autoryzacji.
   - [ ] Testy jednostkowe i integracyjne weryfikujące dostęp doradców wyłącznie do przypisanych spółek.
 
