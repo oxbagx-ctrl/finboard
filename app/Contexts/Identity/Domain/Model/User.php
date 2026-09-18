@@ -164,6 +164,16 @@ final class User extends AggregateRoot
         $this->updatedAt = new DateTimeImmutable();
     }
 
+    public function isSuperAdmin(): bool
+    {
+        return $this->role->isSuperAdmin();
+    }
+
+    public function isAdvisor(): bool
+    {
+        return $this->role->isAdvisor();
+    }
+
     public function isAdmin(): bool
     {
         return $this->role->isAdmin();
@@ -185,7 +195,7 @@ final class User extends AggregateRoot
 
     /**
      * Multi-tenant security check:
-     * - Admins (Analysts) have unrestricted access across all client companies.
+     * - Admins (SuperAdmin, Advisor) have broader advisory access.
      * - Clients are strictly restricted to their designated tenant company.
      */
     public function canAccessCompany(string $companyId): bool

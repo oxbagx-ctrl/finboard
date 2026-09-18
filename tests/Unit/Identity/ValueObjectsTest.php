@@ -94,7 +94,69 @@ final class ValueObjectsTest extends TestCase
 
     // --- Role Tests ---
 
-    public function test_role_properties_and_permissions(): void
+    public function test_super_admin_role_properties_and_permissions(): void
+    {
+        $superAdmin = Role::superAdmin();
+
+        $this->assertSame(RoleType::SUPER_ADMIN, $superAdmin->name());
+        $this->assertTrue($superAdmin->isSuperAdmin());
+        $this->assertTrue($superAdmin->isAdmin());
+        $this->assertFalse($superAdmin->isAdvisor());
+        $this->assertFalse($superAdmin->isClient());
+        $this->assertTrue($superAdmin->can('manage_advisors'));
+        $this->assertTrue($superAdmin->can('assign_advisors'));
+        $this->assertTrue($superAdmin->can('view_all_companies'));
+        $this->assertTrue($superAdmin->can('invite_users'));
+    }
+
+    public function test_advisor_role_properties_and_permissions(): void
+    {
+        $advisor = Role::advisor();
+
+        $this->assertSame(RoleType::ADVISOR, $advisor->name());
+        $this->assertTrue($advisor->isAdvisor());
+        $this->assertFalse($advisor->isSuperAdmin());
+        $this->assertFalse($advisor->isClient());
+        $this->assertTrue($advisor->can('view_assigned_companies'));
+        $this->assertTrue($advisor->can('manage_finances'));
+        $this->assertTrue($advisor->can('invite_clients'));
+        $this->assertFalse($advisor->can('manage_advisors'));
+    }
+
+    public function test_client_role_properties_and_permissions(): void
+    {
+        $client = Role::client();
+
+        $this->assertSame(RoleType::CLIENT, $client->name());
+        $this->assertTrue($client->isClient());
+        $this->assertFalse($client->isAdvisor());
+        $this->assertFalse($client->isSuperAdmin());
+        $this->assertFalse($client->isAdmin());
+        $this->assertTrue($client->can('view_kpi'));
+        $this->assertTrue($client->can('download_documents'));
+        $this->assertFalse($client->can('manage_finances'));
+        $this->assertFalse($client->can('invite_clients'));
+    }
+
+    public function test_role_from_string_factory(): void
+    {
+        $superAdmin = Role::fromString('super_admin');
+        $this->assertTrue($superAdmin->isSuperAdmin());
+
+        $advisor = Role::fromString('advisor');
+        $this->assertTrue($advisor->isAdvisor());
+
+        $client = Role::fromString('client');
+        $this->assertTrue($client->isClient());
+
+        $admin = Role::fromString('admin');
+        $this->assertTrue($admin->isAdmin());
+
+        $this->expectException(InvalidArgumentException::class);
+        Role::fromString('invalid_role');
+    }
+
+    public function test_role_properties_and_permissions_legacy(): void
     {
         $adminRole = Role::admin();
         $clientRole = Role::client();
@@ -104,12 +166,6 @@ final class ValueObjectsTest extends TestCase
         $this->assertFalse($adminRole->isClient());
         $this->assertTrue($adminRole->can('manage_finances'));
         $this->assertTrue($adminRole->can('upload_financial_data'));
-
-        $this->assertSame(RoleType::CLIENT, $clientRole->name());
-        $this->assertTrue($clientRole->isClient());
-        $this->assertFalse($clientRole->isAdmin());
-        $this->assertTrue($clientRole->can('view_kpi'));
-        $this->assertFalse($clientRole->can('manage_finances'));
 
         $this->assertFalse($adminRole->equals($clientRole));
         $this->assertTrue($adminRole->equals(Role::admin()));

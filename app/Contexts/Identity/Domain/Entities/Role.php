@@ -6,6 +6,7 @@ namespace App\Contexts\Identity\Domain\Entities;
 
 use App\Contexts\Identity\Domain\ValueObjects\RoleType;
 use App\Shared\Domain\Entity;
+use InvalidArgumentException;
 
 final class Role extends Entity
 {
@@ -20,18 +21,42 @@ final class Role extends Entity
     ) {
     }
 
-    public static function admin(): self
+    public static function superAdmin(): self
     {
         return new self(
-            id: 'role-admin',
-            name: RoleType::ADMIN,
-            description: 'Doradca / Analityk finansowy z pełnymi uprawnieniami do danych i importów',
+            id: 'role-super-admin',
+            name: RoleType::SUPER_ADMIN,
+            description: 'Super Administrator / Partner z globalnymi uprawnieniami zarządzania doradcami i spółkami',
             permissions: [
+                'manage_advisors',
+                'assign_advisors',
+                'view_all_companies',
+                'manage_companies',
                 'manage_finances',
                 'upload_financial_data',
-                'view_all_companies',
                 'manage_documents',
                 'view_kpi',
+                'invite_users',
+                'manage_users',
+            ]
+        );
+    }
+
+    public static function advisor(): self
+    {
+        return new self(
+            id: 'role-advisor',
+            name: RoleType::ADVISOR,
+            description: 'Doradca Transakcyjny z dostępem do przypisanych spółek portfela oraz zapraszania klientów',
+            permissions: [
+                'view_assigned_companies',
+                'manage_finances',
+                'upload_financial_data',
+                'manage_documents',
+                'view_kpi',
+                'invite_clients',
+                'view_documents',
+                'download_documents',
             ]
         );
     }
@@ -41,13 +66,45 @@ final class Role extends Entity
         return new self(
             id: 'role-client',
             name: RoleType::CLIENT,
-            description: 'Klient z dostępem do dedykowanego dashboardu KPI oraz Data Room',
+            description: 'Użytkownik Klienta z dostępem wyłącznie do dedykowanego dashboardu KPI oraz Data Room swojej spółki',
             permissions: [
                 'view_kpi',
                 'view_documents',
                 'download_documents',
             ]
         );
+    }
+
+    /**
+     * Legacy admin factory mapping to full administrative capabilities.
+     */
+    public static function admin(): self
+    {
+        return new self(
+            id: 'role-admin',
+            name: RoleType::ADMIN,
+            description: 'Administrator / Doradca z pełnymi uprawnieniami transakcyjnymi',
+            permissions: [
+                'manage_finances',
+                'upload_financial_data',
+                'view_all_companies',
+                'manage_documents',
+                'view_kpi',
+                'invite_users',
+                'manage_users',
+            ]
+        );
+    }
+
+    public static function fromString(string $role): self
+    {
+        return match (strtolower(trim($role))) {
+            'super_admin', 'superadmin', 'partner' => self::superAdmin(),
+            'advisor', 'doradca' => self::advisor(),
+            'client', 'klient' => self::client(),
+            'admin', 'administrator' => self::admin(),
+            default => throw new InvalidArgumentException("Unknown role string: {$role}"),
+        };
     }
 
     public function id(): string
@@ -73,14 +130,24 @@ final class Role extends Entity
         return $this->permissions;
     }
 
-    public function isAdmin(): bool
+    public function isSuperAdmin(): bool
     {
-        return $this->name === RoleType::ADMIN;
+        return $this->name === RoleType::SUPER_ADMIN || $this->name === RoleType::ADMIN;
+    }
+
+    public function isAdvisor(): bool
+    {
+        return $this->name === RoleType::ADVISOR;
     }
 
     public function isClient(): bool
     {
         return $this->name === RoleType::CLIENT;
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->name === RoleType::SUPER_ADMIN || $this->name === RoleType::ADMIN;
     }
 
     public function can(string $permission): bool

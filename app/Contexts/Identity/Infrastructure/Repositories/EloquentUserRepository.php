@@ -88,7 +88,7 @@ final class EloquentUserRepository implements UserRepositoryInterface
 
     private function toDomain(UserModel $model): User
     {
-        $role = $model->role === 'admin' ? Role::admin() : Role::client();
+        $role = Role::fromString((string) $model->role);
 
         return new User(
             id: UserId::fromString((string) $model->id),

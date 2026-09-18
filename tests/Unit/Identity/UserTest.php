@@ -41,6 +41,8 @@ final class UserTest extends TestCase
         $this->assertTrue($user->password()->verify('SecurePass123!'));
         $this->assertTrue($user->isClient());
         $this->assertFalse($user->isAdmin());
+        $this->assertFalse($user->isAdvisor());
+        $this->assertFalse($user->isSuperAdmin());
         $this->assertSame(self::COMPANY_A, $user->companyId());
         $this->assertTrue($user->isActive());
         $this->assertTrue($user->hasEvents());
@@ -58,6 +60,41 @@ final class UserTest extends TestCase
         $this->assertEmpty($user->releaseEvents());
     }
 
+    public function test_super_admin_and_advisor_registration_and_predicates(): void
+    {
+        $superAdmin = User::register(
+            id: UserId::generate(),
+            name: 'Partner Zarządzający',
+            email: Email::fromString('partner@helvest.com'),
+            password: HashedPassword::fromPlainText('SuperSecret123!'),
+            role: Role::superAdmin(),
+            companyId: null
+        );
+
+        $this->assertTrue($superAdmin->isSuperAdmin());
+        $this->assertTrue($superAdmin->isAdmin());
+        $this->assertFalse($superAdmin->isAdvisor());
+        $this->assertFalse($superAdmin->isClient());
+        $this->assertTrue($superAdmin->can('manage_advisors'));
+        $this->assertTrue($superAdmin->can('assign_advisors'));
+
+        $advisor = User::register(
+            id: UserId::generate(),
+            name: 'Doradca M&A',
+            email: Email::fromString('advisor@helvest.com'),
+            password: HashedPassword::fromPlainText('AdvisorPass123!'),
+            role: Role::advisor(),
+            companyId: null
+        );
+
+        $this->assertTrue($advisor->isAdvisor());
+        $this->assertFalse($advisor->isSuperAdmin());
+        $this->assertFalse($advisor->isClient());
+        $this->assertTrue($advisor->can('view_assigned_companies'));
+        $this->assertTrue($advisor->can('invite_clients'));
+        $this->assertFalse($advisor->can('manage_advisors'));
+    }
+
     public function test_user_role_can_be_changed_and_records_event(): void
     {
         $user = $this->createClientUser();
@@ -65,8 +102,9 @@ final class UserTest extends TestCase
         $this->assertTrue($user->isClient());
         $this->assertFalse($user->isAdmin());
 
-        $user->changeRole(Role::admin());
+        $user->changeRole(Role::superAdmin());
 
+        $this->assertTrue($user->isSuperAdmin());
         $this->assertTrue($user->isAdmin());
         $this->assertFalse($user->isClient());
 
@@ -74,7 +112,7 @@ final class UserTest extends TestCase
         $this->assertCount(1, $events);
         $this->assertInstanceOf(UserRoleAssigned::class, $events[0]);
         $this->assertSame('client', $events[0]->previousRole());
-        $this->assertSame('admin', $events[0]->newRole());
+        $this->assertSame('super_admin', $events[0]->newRole());
     }
 
     public function test_changing_to_same_role_does_not_record_event(): void
