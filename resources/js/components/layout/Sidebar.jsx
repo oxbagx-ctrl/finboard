@@ -10,18 +10,19 @@ import {
     Building2,
     LogOut,
     User,
-    ChevronRight
+    ChevronRight,
+    Users
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { UserProfileModal } from '../auth/UserProfileModal';
 import { CompanySwitcherModal } from './CompanySwitcherModal';
 
 export const Sidebar = ({ currentRoute, onRouteChange, isOpen, onClose }) => {
-    const { user, activeCompany, isAdmin, logout } = useAuth();
+    const { user, activeCompany, isAdmin, isSuperAdmin, logout } = useAuth();
     const [profileModalOpen, setProfileModalOpen] = useState(false);
     const [switcherModalOpen, setSwitcherModalOpen] = useState(false);
 
-    const navItems = [
+    const baseNavItems = [
         { id: 'dashboard', label: 'Executive Dashboard', code: 'DSH', icon: LayoutDashboard },
         { id: 'analytics', label: 'Analiza P&L i Wskaźniki', code: 'ANL', icon: TrendingUp },
         { id: 'records', label: 'Ewidencja Operacji', code: 'REC', icon: TableProperties },
@@ -30,6 +31,19 @@ export const Sidebar = ({ currentRoute, onRouteChange, isOpen, onClose }) => {
         { id: 'reports', label: 'Raporty Zarządcze & PDF', code: 'REP', icon: FileText },
         { id: 'audit-logs', label: 'Dziennik Nadzoru & Audyt', code: 'AUD', icon: ShieldCheck },
     ];
+
+    const adminNavItems = isAdmin ? [
+        { id: 'advisors', label: 'Doradcy & Przypisania', code: 'ADV', icon: Users },
+    ] : [];
+
+    const navItems = [...baseNavItems, ...adminNavItems];
+
+    const getRoleLabel = () => {
+        if (user?.role === 'super_admin') return 'ROLA: SUPER ADMIN';
+        if (user?.role === 'advisor') return 'ROLA: DORADCA M&A';
+        if (user?.role === 'admin') return 'ROLA: ADMIN / DORADCA';
+        return 'ROLA: KLIENT / CFO';
+    };
 
     return (
         <>
@@ -137,7 +151,7 @@ export const Sidebar = ({ currentRoute, onRouteChange, isOpen, onClose }) => {
                                 <span className="truncate">{user?.name}</span>
                             </div>
                             <div className="text-[10px] font-mono text-zinc-500 truncate">
-                                {isAdmin ? 'ROLA: DORADCA M&A' : 'ROLA: KLIENT / CFO'}
+                                {getRoleLabel()}
                             </div>
                         </button>
                         <button

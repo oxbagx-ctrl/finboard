@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import apiClient from '../api/client';
 
-const AuthContext = createContext(null);
+export const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
@@ -141,8 +141,10 @@ export const AuthProvider = ({ children }) => {
         return response.data;
     };
 
-    const isAdmin = user?.role === 'admin';
+    const isSuperAdmin = user?.role === 'super_admin';
+    const isAdvisor = user?.role === 'advisor';
     const isClient = user?.role === 'client';
+    const isAdmin = user?.role === 'admin' || user?.role === 'super_admin';
 
     return (
         <AuthContext.Provider
@@ -152,6 +154,8 @@ export const AuthProvider = ({ children }) => {
                 activeCompany,
                 availableCompanies,
                 isAdmin,
+                isSuperAdmin,
+                isAdvisor,
                 isClient,
                 loading,
                 login,

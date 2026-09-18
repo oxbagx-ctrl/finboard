@@ -11,6 +11,7 @@ import { ImportView } from './views/ImportView';
 import { DataRoomView } from './views/DataRoomView';
 import { ReportsView } from './views/ReportsView';
 import { AuditLogsView } from './views/AuditLogsView';
+import { AdvisorsManagementView } from './views/AdvisorsManagementView';
 
 const MainRouter = () => {
     const { isAuthenticated, loading } = useAuth();
@@ -48,6 +49,8 @@ const MainRouter = () => {
                 return <ReportsView key={refreshKey} />;
             case 'audit-logs':
                 return <AuditLogsView key={refreshKey} />;
+            case 'advisors':
+                return <AdvisorsManagementView key={refreshKey} />;
             default:
                 return <DashboardView key={refreshKey} />;
         }
