@@ -5,7 +5,7 @@
 [![PostgreSQL](https://img.shields.io/badge/postgresql-16-blue.svg)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/redis-alpine-red.svg)](https://redis.io/)
 [![Architecture](https://img.shields.io/badge/architecture-DDD%20%2F%20CQRS-brightgreen.svg)]()
-[![Tests](https://img.shields.io/badge/tests-102%20passed%20%28932%20assertions%29-success.svg)]()
+[![Tests](https://img.shields.io/badge/tests-113%20passed%20%281063%20assertions%29-success.svg)]()
 
 FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakcyjnego (M&A, Due Diligence, Corporate Finance) oraz ich klientom (CFO, Zarządy). Aplikacja łączy w sobie zaawansowaną analitykę finansową w ujęciu wielo-najemcowym (Multi-Tenant) z bezpiecznym repozytorium dokumentów Virtual Data Room (VDR).
 
@@ -167,11 +167,11 @@ Baza danych zasilona jest danymi demonstracyjnymi (21 miesięcy historii finanso
   - Asynchroniczny proces importu `ProcessFinancialCsvJob` oparty na kolejce Redis.
   - Utworzenie kontekstu `DocumentManagement` (Agregat `Document`, adapter magazynu plików, log audytowy).
   - Implementacja zapytań odczytu CQRS (Queries & Handlers) dla KPI, trendów P&L, struktury kosztów i płynności.
-- [ ] **Faza 5: Warstwa Prezentacji i REST API** *(W trakcie)*
-  - [x] Endpointy REST API dla transakcji finansowych i asynchronicznego importu CSV.
-  - [x] Endpointy REST API analityki finansowej, wskaźników KPI i serii danych pod wykresy.
-  - [x] Endpointy REST API dla Wirtualnego Pokoju Danych (Virtual Data Room) z logiem pobrań.
-  - [ ] Kompleksowe testy integracyjne API dla izolacji multi-tenant i uprawnień Sanctum.
+- [x] **Faza 5: Warstwa Prezentacji i REST API**
+  - Endpointy REST API dla transakcji finansowych i asynchronicznego importu CSV.
+  - Endpointy REST API analityki finansowej, wskaźników KPI i serii danych pod wykresy.
+  - Endpointy REST API dla Wirtualnego Pokoju Danych (Virtual Data Room) z logiem pobrań.
+  - Kompleksowe testy integracyjne API dla izolacji multi-tenant i uprawnień Sanctum.
 - [ ] **Faza 6: Frontend React & Dashboard Finansowy**
   - Konfiguracja SPA / Inertia React z Tailwind CSS i Lucide Icons.
   - Moduł uwierzytelniania i przełącznik kontekstu firmy dla doradcy.
