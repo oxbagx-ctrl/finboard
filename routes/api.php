@@ -7,14 +7,18 @@ use App\Presentation\Api\Controllers\FinancialCategoryController;
 use App\Presentation\Api\Controllers\FinancialImportController;
 use App\Presentation\Api\Controllers\FinancialRecordController;
 use App\Presentation\Api\Controllers\HealthController;
+use App\Presentation\Api\Controllers\InvitationController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
     // System Health & Liveness Probe
     Route::get('/health', HealthController::class)->name('api.health');
 
-    // Public Authentication Endpoints
+    // Public Authentication & Activation Endpoints
     Route::post('/auth/login', [AuthController::class, 'login'])->name('api.auth.login');
+    Route::get('/invitations/verify', [InvitationController::class, 'verify'])->name('api.invitations.verify');
+    Route::get('/invitations/tokens/{token}', [InvitationController::class, 'verify'])->name('api.invitations.tokens.verify');
+    Route::post('/invitations/accept', [InvitationController::class, 'accept'])->name('api.invitations.accept');
 
     // Authenticated Endpoints (Sanctum)
     Route::middleware('auth:sanctum')->group(function () {
@@ -30,6 +34,14 @@ Route::prefix('v1')->group(function () {
         Route::get('/client/probe', function () {
             return response()->json(['status' => 'ok', 'message' => 'Client authorized access confirmed']);
         })->middleware('role:client,admin');
+
+        // Invitation Management Endpoints
+        Route::prefix('invitations')->group(function () {
+            Route::get('/', [InvitationController::class, 'index'])->name('api.invitations.index');
+            Route::post('/', [InvitationController::class, 'store'])->name('api.invitations.store');
+            Route::post('/{id}/resend', [InvitationController::class, 'resend'])->name('api.invitations.resend');
+            Route::delete('/{id}', [InvitationController::class, 'destroy'])->name('api.invitations.destroy');
+        });
 
         // Finance Module Endpoints
         Route::prefix('finance')->group(function () {
@@ -85,8 +97,8 @@ Route::prefix('v1')->group(function () {
 
         // Virtual Data Room (VDR) Endpoints
         Route::prefix('documents')->group(function () {
-            Route::get('/audit-logs', [DocumentController::class, 'allAuditLogs'])
-                ->name('api.documents.all-audit-logs');
+            Route::get('/audit-logs', [DocumentController::class, 'allAuditLogs']
+                )->name('api.documents.all-audit-logs');
             Route::get('/', [DocumentController::class, 'index'])
                 ->name('api.documents.index');
             Route::post('/', [DocumentController::class, 'store'])

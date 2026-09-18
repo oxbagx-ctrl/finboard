@@ -5,7 +5,7 @@
 [![PostgreSQL](https://img.shields.io/badge/postgresql-16-blue.svg)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/redis-alpine-red.svg)](https://redis.io/)
 [![Architecture](https://img.shields.io/badge/architecture-DDD%20%2F%20CQRS-brightgreen.svg)]()
-[![Tests](https://img.shields.io/badge/tests-221%20backend%20%7C%2057%20frontend%20passed-success.svg)]()
+[![Tests](https://img.shields.io/badge/tests-229%20backend%20%7C%2057%20frontend%20passed-success.svg)]()
 
 FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakcyjnego (M&A, Due Diligence, Corporate Finance) oraz ich klientom (CFO, Zarządy). Aplikacja łączy w sobie zaawansowaną analitykę finansową w ujęciu wielo-najemcowym (Multi-Tenant) z bezpiecznym repozytorium dokumentów Virtual Data Room (VDR).
 
@@ -88,10 +88,10 @@ app/
 ├── Models/                       # Modele Eloquent (User, Company, FinancialRecord, FinancialCategory, Document, DocumentAccessLog, CsvImport, Invitation)
 ├── Presentation/                 # Warstwa Prezentacji i Komunikacji API
 │   └── Api/
-│       ├── Controllers/          # Kontrolery REST API (Auth, FinancialRecord, FinancialCategory, FinancialImport, FinancialAnalytics, Document, Health)
+│       ├── Controllers/          # Kontrolery REST API (Auth, FinancialRecord, FinancialCategory, FinancialImport, FinancialAnalytics, Document, Health, Invitation)
 │       ├── Middleware/           # RoleMiddleware, RequireCompanyAccessMiddleware (Tenant Isolation Guard)
-│       ├── Requests/             # FormRequests z walidacją danych wejściowych
-│       ├── Resources/            # API Resources (JSON serialization)
+│       ├── Requests/             # FormRequests z walidacją danych wejściowych (StoreInvitationRequest, AcceptInvitationRequest)
+│       ├── Resources/            # API Resources (InvitationResource, FinancialRecordResource, DocumentResource)
 │       └── Traits/               # ResolvesCompanyContext (Multi-Tenant Context Resolver)
 └── Shared/                       # Klasy bazowe architektury (ValueObject, AggregateRoot, DomainEvent, Entity)
 ```
@@ -189,6 +189,15 @@ Baza danych zasilona jest danymi demonstracyjnymi (21 miesięcy historii finanso
 - `PUT /api/v1/auth/profile` – Aktualizacja danych profilu oraz zmiana hasła z weryfikacją dotychczasowego
 - `POST /api/v1/auth/logout` – Unieważnienie tokenu sesji
 
+### Zarządzanie Zaproszeniami i Aktywacja Konta (Invitation System)
+- `POST /api/v1/invitations` – Utworzenie i wysyłka nowego zaproszenia użytkownika (SuperAdmin, Advisor)
+- `GET /api/v1/invitations` – Lista zaproszeń z filtrami statusu i izolacją dla doradców
+- `GET /api/v1/invitations/verify?token=...` – Publiczna weryfikacja tokenu zaproszenia przed aktywacją
+- `GET /api/v1/invitations/tokens/{token}` – Publiczny odczyt parametrów zaproszenia na podstawie tokenu
+- `POST /api/v1/invitations/accept` – Publiczna aktywacja konta, bezpieczne ustawienie hasła i wydanie tokenu Sanctum
+- `POST /api/v1/invitations/{id}/resend` – Ponowne przesłanie zaproszenia z nowym 48-godzinnym tokenem
+- `DELETE /api/v1/invitations/{id}` – Anulowanie i unieważnienie oczekującego zaproszenia
+
 ### Finanse – Kategorie i Transakcje (CRUD)
 - `GET /api/v1/finance/categories` – Lista kategorii analitycznych
 - `GET /api/v1/finance/records` – Lista rekordów z wyszukiwaniem (`search`), filtrowaniem i paginacją
@@ -269,13 +278,13 @@ Baza danych zasilona jest danymi demonstracyjnymi (21 miesięcy historii finanso
   - Implementacja przypadku użycia `AssignAdvisorToCompanyUseCase` ze ścisłą weryfikacją autoryzacji.
   - Testy jednostkowe i integracyjne weryfikujące dostęp doradców wyłącznie do przypisanych spółek.
 - [x] **Faza 9: Bezpieczny System Zaproszeń (Invitation System)**
-  - [x] Encja `Invitation` i obiekt wartości `Token` z logiką wygasania (Identity).
-  - [x] Migracja bazy danych i repozytorium dla zaproszeń.
-  - [x] Przypadek użycia `InviteUserUseCase` z emisją zdarzenia domenowego `UserInvited`.
-  - [x] Klasy Mailable i listenery zdarzeń do asynchronicznej wysyłki e-maili z zaproszeniami.
-  - [x] Przypadek użycia `AcceptInvitationUseCase` z walidacją tokenu i bezpiecznym ustawieniem hasła.
+  - Encja `Invitation` i obiekt wartości `Token` z logiką wygasania (Identity).
+  - Migracja bazy danych i repozytorium dla zaproszeń.
+  - Przypadek użycia `InviteUserUseCase` z emisją zdarzenia domenowego `UserInvited`.
+  - Klasy Mailable i listenery zdarzeń do asynchronicznej wysyłki e-maili z zaproszeniami.
+  - Przypadek użycia `AcceptInvitationUseCase` z walidacją tokenu i bezpiecznym ustawieniem hasła.
 - [ ] **Faza 10: API i Frontend dla Zarządzania Użytkownikami**
-  - [ ] Kontroler `InvitationController` mapujący endpointy REST dla zaproszeń.
+  - [x] Kontroler `InvitationController` mapujący endpointy REST dla zaproszeń.
   - [ ] Kontroler `AdvisorManagementController` dla SuperAdmina do zarządzania doradcami i przypisaniami.
   - [ ] Widok dashboardu SuperAdmina do zarządzania doradcami i przypisaniami spółek.
   - [ ] Modal zapraszania użytkownika z wyborem roli i przypisaniem firm dla doradców.

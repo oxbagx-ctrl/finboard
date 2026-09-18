@@ -255,7 +255,7 @@ final class Invitation extends AggregateRoot
     /**
      * Renew an expired or pending invitation with a new token and extended expiration.
      */
-    public function renewToken(Token $newToken): void
+    public function renewToken(Token $newToken, ?DateTimeImmutable $now = null): void
     {
         if ($this->isAccepted()) {
             throw new DomainException('Nie można odnowić tokenu dla zaakceptowanego zaproszenia.');
@@ -267,5 +267,18 @@ final class Invitation extends AggregateRoot
 
         $this->token = $newToken;
         $this->status = InvitationStatus::PENDING;
+
+        $reference = $now ?? new DateTimeImmutable();
+        $this->recordThat(new UserInvited(
+            invitationId: $this->id,
+            email: $this->email->value(),
+            role: $this->role->name()->value,
+            companyId: $this->companyId,
+            assignedCompanyIds: $this->assignedCompanyIds,
+            invitedBy: $this->invitedBy,
+            token: $newToken->value(),
+            expiresAt: $newToken->expiresAt(),
+            occurredAt: $reference
+        ));
     }
 }
