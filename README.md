@@ -1,11 +1,10 @@
 # FinBoard – Financial Analytics & Virtual Data Room Platform
 
-[![PHP Version](https://img.shields.io/badge/php-8.2%2B-blue.svg)](https://www.php.net/)
-[![Laravel](https://img.shields.io/badge/laravel-11.x-red.svg)](https://laravel.com/)
+[![PHP Version](https://img.shields.io/badge/php-8.2%2B-blue.svg)](https://www.php.net/)\n[![Laravel](https://img.shields.io/badge/laravel-11.x-red.svg)](https://laravel.com/)
 [![PostgreSQL](https://img.shields.io/badge/postgresql-16-blue.svg)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/redis-alpine-red.svg)](https://redis.io/)
 [![Architecture](https://img.shields.io/badge/architecture-DDD%20%2F%20CQRS-brightgreen.svg)]()
-[![Tests](https://img.shields.io/badge/tests-129%20backend%20%7C%2057%20frontend%20passed-success.svg)]()
+[![Tests](https://img.shields.io/badge/tests-139%20backend%20%7C%2057%20frontend%20passed-success.svg)]()
 
 FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakcyjnego (M&A, Due Diligence, Corporate Finance) oraz ich klientom (CFO, Zarządy). Aplikacja łączy w sobie zaawansowaną analitykę finansową w ujęciu wielo-najemcowym (Multi-Tenant) z bezpiecznym repozytorium dokumentów Virtual Data Room (VDR).
 
@@ -14,13 +13,14 @@ FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakc
 ## 📌 Kluczowe Funkcjonalności
 
 - **Architektura DDD (Domain-Driven Design) & CQRS**:
-    - Wyraźny podział na Bounded Contexts: `Identity`, `Finance`, `DocumentManagement`.
+    - Wyraźny podział na Bounded Contexts: `Identity`, `Finance`, `DocumentManagement`, `Tenant`.
     - Rozdzielenie ścieżki zapisu (Commands) i odczytu (Queries).
-    - Domenowe Value Objects (`Money` z precyzją `bcmath` do 4 miejsc po przecinku, `DateRange`, `FileMetadata`).
+    - Domenowe Value Objects (`Money` z precyzją `bcmath` do 4 miejsc po przecinku, `DateRange`, `FileMetadata`, `CompanyId`, `RoleType`).
     - Domenowy kalkulator finansowy (`FinancialCalculator`) wyliczający wskaźniki P&L (Gross Profit, OPEX, EBIT, EBITDA, Zysk Netto, marże) oraz bilansu i płynności (Current Ratio, Quick Ratio).
 - **Bezpieczeństwo i Izolacja Multi-Tenant**:
     - Pełna separacja danych pomiędzy firmami (Tenant Isolation).
-    - RBAC (Role-Based Access Control) oparty na Laravel Sanctum z rolami `admin` (doradca Helvest z dostępem do portfela spółek) oraz `client` (klient / CFO spółki ze ścisłym dostępem wyłącznie do własnych danych).
+    - Hierarchiczny model uprawnień: **Super Admin** (Partner z globalnym zarządzaniem), **Doradca** (Advisor przypisany do wybranych spółek portfela) oraz **Klient** (Client ze ścisłym dostępem wyłącznie do własnej spółki).
+    - Wielo-stronne relacje doradca-spółka (`CompanyAdvisorAssignment`) z audytem przypisań i zdarzeniami domenowymi.
     - Kompleksowy audyt bezpieczeństwa weryfikujący odporność na próby odczytu, mutacji, usuwania cudzych rekordów oraz manipulacji nagłówkami `X-Company-Id`.
 - **Asynchroniczny Import Danych Finansowych (CSV)**:
     - Automatyczne wykrywanie delimiterów (przecinek, średnik, tabulator).
@@ -63,9 +63,14 @@ Platforma została zaprojektowana zgodnie z pryncypiami **Domain-Driven Design (
 app/
 ├── Contexts/
 │   ├── Identity/                 # Bounded Context: Zarządzanie tożsamością i uprawnieniami
-│   │   ├── Domain/               # User Aggregate Root, Role Entity, Value Objects (UserId, Email, HashedPassword), Domain Events
+│   │   ├── Domain/               # User Aggregate Root, Role Entity, Value Objects (UserId, Email, HashedPassword, RoleType), Domain Events
 │   │   ├── Application/          # Serwisy aplikacyjne (UserRegistrationService) i interfejsy repozytoriów
 │   │   └── Infrastructure/       # EloquentUserRepository, Sanctum Provider
+│   │
+│   ├── Tenant/                   # Bounded Context: Zarządzanie firmami i relacjami doradców
+│   │   ├── Domain/               # CompanyAdvisorAssignment Entity, CompanyId VO, Domain Events
+│   │   ├── Application/          # Use cases przypisań i porty repozytoriów
+│   │   └── Infrastructure/       # EloquentCompanyAdvisorRepository, TenantServiceProvider
 │   │
 │   ├── Finance/                  # Bounded Context: Finanse, Raportowanie i Analityka
 │   │   ├── Domain/               # FinancialRecord Aggregate, Category, Money VO (bcmath), DateRange VO, FinancialCalculator
@@ -254,6 +259,12 @@ Baza danych zasilona jest danymi demonstracyjnymi (21 miesięcy historii finanso
   - Generator podsumowań i raportów zarządczych PDF z certyfikatem integralności SHA-256 i formatem A4.
   - Testy E2E, audyt bezpieczeństwa izolacji multi-tenant i endpoint diagnostyczny Health Check.
   - Produkcyjny hardening środowiska Docker/Nginx, skrypt automatycznego wdrożenia zero-downtime oraz Runbook operacyjny.
+- [ ] **Faza 8: Rozbudowa Autoryzacji i Struktury Firm**
+  - [x] Aktualizacja encji `Role` i enumów dla trójpoziomowej hierarchii uprawnień (SuperAdmin, Advisor, Client).
+  - [x] Implementacja logiki domenowej relacji przypisania doradcy do firmy (`CompanyAdvisorAssignment`, `CompanyAdvisorRepositoryInterface`).
+  - [ ] Migracja bazy danych dla tabeli pośredniej `advisor_company` i aktualizacja powiązań.
+  - [ ] Implementacja przypadku użycia `AssignAdvisorToCompanyUseCase` ze ścisłą weryfikacją autoryzacji.
+  - [ ] Testy jednostkowe i integracyjne weryfikujące dostęp doradców wyłącznie do przypisanych spółek.
 
 Szczegółowa dokumentacja zrealizowanych zmian znajduje się w katalogu [`changelog/`](changelog/README.md).
 
