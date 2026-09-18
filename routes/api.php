@@ -1,6 +1,7 @@
 <?php
 
 use App\Presentation\Api\Controllers\AuthController;
+use App\Presentation\Api\Controllers\FinancialAnalyticsController;
 use App\Presentation\Api\Controllers\FinancialCategoryController;
 use App\Presentation\Api\Controllers\FinancialImportController;
 use App\Presentation\Api\Controllers\FinancialRecordController;
@@ -51,6 +52,18 @@ Route::prefix('v1')->group(function () {
                 ->name('api.finance.import.history');
             Route::get('/import/csv/{id}', [FinancialImportController::class, 'show'])
                 ->name('api.finance.import.show');
+
+            // Analytics, KPIs and Chart Data
+            Route::prefix('analytics')->group(function () {
+                Route::get('/metrics', [FinancialAnalyticsController::class, 'metrics'])
+                    ->name('api.finance.analytics.metrics');
+                Route::get('/trends', [FinancialAnalyticsController::class, 'trends'])
+                    ->name('api.finance.analytics.trends');
+                Route::get('/breakdown', [FinancialAnalyticsController::class, 'breakdown'])
+                    ->name('api.finance.analytics.breakdown');
+                Route::get('/liquidity', [FinancialAnalyticsController::class, 'liquidity'])
+                    ->name('api.finance.analytics.liquidity');
+            });
         });
     });
 });

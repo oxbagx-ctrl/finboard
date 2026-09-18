@@ -1,0 +1,250 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tests\Feature\Api;
+
+use App\Models\Company;
+use App\Models\User;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Laravel\Sanctum\Sanctum;
+use Tests\TestCase;
+
+final class FinancialAnalyticsApiTest extends TestCase
+{
+    use DatabaseTransactions;
+
+    private User $adminUser;
+    private User $clientUser;
+    private Company $acmeCompany;
+    private Company $helvestCompany;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->helvestCompany = Company::firstOrCreate(
+            ['code' => 'HELVEST'],
+            ['name' => 'Helvest Advisory Sp. z o.o.', 'tax_id' => 'PL5252525252']
+        );
+
+        $this->acmeCompany = Company::firstOrCreate(
+            ['code' => 'ACME'],
+            ['name' => 'Acme Manufacturing S.A.', 'tax_id' => 'PL7010101010']
+        );
+
+        $this->adminUser = User::firstOrCreate(
+            ['email' => 'admin@helvest.com'],
+            [
+                'name' => 'Admin Helvest',
+                'password' => bcrypt('password123'),
+                'role' => 'admin',
+                'company_id' => $this->helvestCompany->id,
+                'is_active' => true,
+            ]
+        );
+
+        $this->clientUser = User::firstOrCreate(
+            ['email' => 'klient@acme.com'],
+            [
+                'name' => 'Jan Kowalski (CFO Acme)',
+                'password' => bcrypt('password123'),
+                'role' => 'client',
+                'company_id' => $this->acmeCompany->id,
+                'is_active' => true,
+            ]
+        );
+    }
+
+    public function test_unauthenticated_request_is_rejected(): void
+    {
+        $response = $this->getJson('/api/v1/finance/analytics/metrics');
+        $response->assertStatus(401);
+    }
+
+    public function test_get_financial_metrics_returns_pnl_and_balance_ratios(): void
+    {
+        Sanctum::actingAs($this->clientUser);
+
+        $response = $this->getJson('/api/v1/finance/analytics/metrics');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('status', 'success')
+            ->assertJsonPath('company_id', $this->acmeCompany->id)
+            ->assertJsonStructure([
+                'status',
+                'company_id',
+                'data' => [
+                    'pnl' => [
+                        'revenue' => ['amount', 'formatted'],
+                        'cogs' => ['amount', 'formatted'],
+                        'gross_profit' => ['amount', 'formatted'],
+                        'gross_margin_pct',
+                        'opex' => ['amount', 'formatted'],
+                        'ebitda' => ['amount', 'formatted'],
+                        'ebitda_margin_pct',
+                        'net_profit' => ['amount', 'formatted'],
+                        'net_margin_pct',
+                    ],
+                    'balance_sheet' => [
+                        'current_assets',
+                        'inventory',
+                        'quick_assets',
+                        'current_liabilities',
+                    ],
+                    'ratios' => [
+                        'current_ratio',
+                        'quick_ratio',
+                    ],
+                ],
+            ]);
+
+        $this->assertGreaterThan(0, (float) $response->json('data.pnl.revenue.amount'));
+        $this->assertGreaterThan(0, (float) $response->json('data.pnl.ebitda.amount'));
+    }
+
+    public function test_get_financial_metrics_with_date_range_filter(): void
+    {
+        Sanctum::actingAs($this->clientUser);
+
+        $response = $this->getJson('/api/v1/finance/analytics/metrics?start_date=2026-01-01&end_date=2026-03-31');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('status', 'success')
+            ->assertJsonPath('data.period.start', '2026-01-01')
+            ->assertJsonPath('data.period.end', '2026-03-31');
+    }
+
+    public function test_get_monthly_trends_returns_chronological_data_points(): void
+    {
+        Sanctum::actingAs($this->clientUser);
+
+        $response = $this->getJson('/api/v1/finance/analytics/trends?start_date=2026-01-01&end_date=2026-06-30');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('status', 'success')
+            ->assertJsonPath('count', 6)
+            ->assertJsonStructure([
+                'status',
+                'company_id',
+                'count',
+                'data' => [
+                    '*' => [
+                        'month',
+                        'label',
+                        'revenue',
+                        'cogs',
+                        'gross_profit',
+                        'opex',
+                        'ebitda',
+                        'ebit',
+                        'net_profit',
+                        'gross_margin_percent',
+                        'ebitda_margin_percent',
+                        'net_margin_percent',
+                    ],
+                ],
+            ]);
+
+        $this->assertSame('2026-01', $response->json('data.0.month'));
+        $this->assertSame('Sty 2026', $response->json('data.0.label'));
+    }
+
+    public function test_get_category_breakdown_returns_percentage_distribution(): void
+    {
+        Sanctum::actingAs($this->clientUser);
+
+        $response = $this->getJson('/api/v1/finance/analytics/breakdown?record_type=EXPENSE&start_date=2026-01-01&end_date=2026-03-31');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('status', 'success')
+            ->assertJsonPath('record_type', 'EXPENSE')
+            ->assertJsonStructure([
+                'status',
+                'company_id',
+                'record_type',
+                'data' => [
+                    '*' => [
+                        'category_id',
+                        'category_name',
+                        'category_code',
+                        'amount',
+                        'formatted_amount',
+                        'percentage',
+                    ],
+                ],
+            ]);
+
+        $data = $response->json('data');
+        $this->assertNotEmpty($data);
+
+        $totalPercentage = 0.0;
+        foreach ($data as $item) {
+            $totalPercentage += $item['percentage'];
+        }
+        $this->assertEqualsWithDelta(100.0, $totalPercentage, 0.5);
+    }
+
+    public function test_get_liquidity_trends_returns_solvency_ratios(): void
+    {
+        Sanctum::actingAs($this->clientUser);
+
+        $response = $this->getJson('/api/v1/finance/analytics/liquidity?start_date=2026-01-01&end_date=2026-03-31');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('status', 'success')
+            ->assertJsonPath('count', 3)
+            ->assertJsonStructure([
+                'status',
+                'company_id',
+                'count',
+                'data' => [
+                    '*' => [
+                        'month',
+                        'label',
+                        'current_ratio',
+                        'quick_ratio',
+                        'current_assets',
+                        'inventory',
+                        'quick_assets',
+                        'current_liabilities',
+                    ],
+                ],
+            ]);
+
+        $this->assertGreaterThan(1.0, (float) $response->json('data.0.current_ratio'));
+        $this->assertGreaterThan(0.5, (float) $response->json('data.0.quick_ratio'));
+    }
+
+    public function test_admin_can_query_metrics_for_any_company(): void
+    {
+        Sanctum::actingAs($this->adminUser);
+
+        // Admin queries Acme
+        $response = $this->getJson('/api/v1/finance/analytics/metrics?company_id=' . $this->acmeCompany->id);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('company_id', $this->acmeCompany->id);
+    }
+
+    public function test_client_cannot_query_metrics_for_another_company(): void
+    {
+        Sanctum::actingAs($this->clientUser);
+
+        // Client from Acme tries to query Helvest
+        $response = $this->getJson('/api/v1/finance/analytics/metrics?company_id=' . $this->helvestCompany->id);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_invalid_date_range_validation(): void
+    {
+        Sanctum::actingAs($this->clientUser);
+
+        // end_date before start_date
+        $response = $this->getJson('/api/v1/finance/analytics/metrics?start_date=2026-06-01&end_date=2026-01-01');
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['end_date']);
+    }
+}
