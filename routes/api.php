@@ -1,6 +1,7 @@
 <?php
 
 use App\Presentation\Api\Controllers\AuthController;
+use App\Presentation\Api\Controllers\DocumentController;
 use App\Presentation\Api\Controllers\FinancialAnalyticsController;
 use App\Presentation\Api\Controllers\FinancialCategoryController;
 use App\Presentation\Api\Controllers\FinancialImportController;
@@ -64,6 +65,28 @@ Route::prefix('v1')->group(function () {
                 Route::get('/liquidity', [FinancialAnalyticsController::class, 'liquidity'])
                     ->name('api.finance.analytics.liquidity');
             });
+        });
+
+        // Virtual Data Room (VDR) Endpoints
+        Route::prefix('documents')->group(function () {
+            Route::get('/audit-logs', [DocumentController::class, 'allAuditLogs'])
+                ->name('api.documents.all-audit-logs');
+            Route::get('/', [DocumentController::class, 'index'])
+                ->name('api.documents.index');
+            Route::post('/', [DocumentController::class, 'store'])
+                ->name('api.documents.store');
+            Route::get('/{id}', [DocumentController::class, 'show'])
+                ->name('api.documents.show');
+            Route::put('/{id}', [DocumentController::class, 'update'])
+                ->name('api.documents.update');
+            Route::delete('/{id}', [DocumentController::class, 'destroy'])
+                ->name('api.documents.destroy');
+            Route::get('/{id}/download', [DocumentController::class, 'download'])
+                ->name('api.documents.download');
+            Route::patch('/{id}/archive', [DocumentController::class, 'archive'])
+                ->name('api.documents.archive');
+            Route::get('/{id}/audit-logs', [DocumentController::class, 'auditLogs'])
+                ->name('api.documents.audit-logs');
         });
     });
 });
