@@ -5,6 +5,7 @@ import {
     TableProperties,
     FileSpreadsheet,
     FolderLock,
+    FileText,
     ShieldCheck,
     Building2,
     LogOut,
@@ -26,6 +27,7 @@ export const Sidebar = ({ currentRoute, onRouteChange, isOpen, onClose }) => {
         { id: 'records', label: 'Ewidencja Operacji', code: 'REC', icon: TableProperties },
         { id: 'import', label: 'Import Danych Finansowych', code: 'IMP', icon: FileSpreadsheet },
         { id: 'data-room', label: 'Virtual Data Room (VDR)', code: 'VDR', icon: FolderLock },
+        { id: 'reports', label: 'Raporty Zarządcze & PDF', code: 'REP', icon: FileText },
         { id: 'audit-logs', label: 'Dziennik Nadzoru & Audyt', code: 'AUD', icon: ShieldCheck },
     ];
 
@@ -34,12 +36,12 @@ export const Sidebar = ({ currentRoute, onRouteChange, isOpen, onClose }) => {
             {isOpen && (
                 <div
                     onClick={onClose}
-                    className="fixed inset-0 z-40 bg-zinc-950/80 lg:hidden"
+                    className="fixed inset-0 z-40 bg-zinc-950/80 lg:hidden print:hidden"
                 />
             )}
 
             <aside
-                className={`fixed top-0 left-0 bottom-0 z-50 w-64 bg-zinc-950 border-r border-zinc-800 flex flex-col transition-transform duration-200 ease-in-out lg:translate-x-0 ${
+                className={`fixed top-0 left-0 bottom-0 z-50 w-64 bg-zinc-950 border-r border-zinc-800 flex flex-col transition-transform duration-200 ease-in-out lg:translate-x-0 print:hidden ${
                     isOpen ? 'translate-x-0' : '-translate-x-full'
                 }`}
             >
@@ -62,7 +64,7 @@ export const Sidebar = ({ currentRoute, onRouteChange, isOpen, onClose }) => {
                 </div>
 
                 {/* Target Company Box (Interactive for Admin) */}
-                <div className="p-3 border-b border-zinc-850 bg-zinc-900/30">
+                <div className="p-3 border-b border-zinc-855 bg-zinc-900/30">
                     <button
                         type="button"
                         onClick={isAdmin ? () => setSwitcherModalOpen(true) : undefined}

@@ -5,7 +5,7 @@
 [![PostgreSQL](https://img.shields.io/badge/postgresql-16-blue.svg)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/redis-alpine-red.svg)](https://redis.io/)
 [![Architecture](https://img.shields.io/badge/architecture-DDD%20%2F%20CQRS-brightgreen.svg)]()
-[![Tests](https://img.shields.io/badge/tests-118%20backend%20%7C%2050%20frontend%20passed-success.svg)]()
+[![Tests](https://img.shields.io/badge/tests-118%20backend%20%7C%2055%20frontend%20passed-success.svg)]()
 
 FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakcyjnego (M&A, Due Diligence, Corporate Finance) oraz ich klientom (CFO, Zarządy). Aplikacja łączy w sobie zaawansowaną analitykę finansową w ujęciu wielo-najemcowym (Multi-Tenant) z bezpiecznym repozytorium dokumentów Virtual Data Room (VDR).
 
@@ -31,6 +31,11 @@ FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakc
     - Szyfrowanie spoczynkowe AES-256 oraz weryfikacja sum kontrolnych SHA-256 plików.
     - Pełny, niezmienny rejestr audytowy zdarzeń (upload, download, archive, unarchive) w dzienniku `DocumentAccessLog` z rejestracją IP i User-Agent.
     - Dedykowany interfejs drag & drop, kategoryzacja taksonomiczna M&A oraz natychmiastowe pobieranie plików.
+- **Generator Raportów Zarządczych i Memorandów M&A (PDF)**:
+    - Dedykowany konfigurator parametrów raportu (okresy LTM/FY, waluta przeliczeniowa, klauzule poufności, komentarz analityczny doradcy).
+    - Układ formalnego memorandumu transakcyjnego: karta wyników KPI, pełny rachunek zysków i strat (P&L), analiza płynności i kapitału obrotowego, struktura OPEX.
+    - Cyfrowy certyfikat integralności danych ze skrótem kryptograficznym SHA-256 oraz blokiem podpisów partnerskich.
+    - Zoptymalizowany wektorowy druk A4 w standardzie `@media print` (czysta biel, wysoki kontrast, brak elementów nawigacji).
 - **Frontend SPA w Stylu Terminala Deal Advisory (Bloomberg / FactSet)**:
     - Estetyka o wysokim kontraście (Zinc 950/900), inżynieryjne krawędzie, brak sztucznych ozdobników AI.
     - Liczby tabelaryczne (`tabular-nums`, `font-mono`) dla kwot, marż i dat.
@@ -39,7 +44,7 @@ FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakc
     - Pełny moduł księgi operacji (General Ledger) z filtrami i paginacją serwerową.
     - Widok importu CSV z podglądem walidacji dry-run i animowanym monitorem kolejki Redis.
     - Moduł VDR oraz globalny rejestr ścieżki audytowej (Audit Trail).
-    - Zestaw 50 testów jednostkowych i integracyjnych Vitest (formatery, silnik walutowy, formularze, blokady Dry-Run, eksplorator VDR).
+    - Zestaw 55 testów jednostkowych i integracyjnych Vitest (formatery, silnik walutowy, formularze, blokady Dry-Run, eksplorator VDR, raporty PDF).
 
 ---
 
@@ -88,11 +93,12 @@ resources/js/
 │   ├── finance/                  # FinancialRecordModal (kreator/edycja wpisu księgi), DeleteRecordConfirmationModal
 │   ├── import/                   # CsvDropzone (strefa drag & drop), CsvPreviewTable (dry-run), ImportJobProgress (polling Redis), ImportHistoryTable
 │   ├── layout/                   # DealContextBar (waluta, poufność, okres), Header, Sidebar, Layout
+│   ├── reports/                  # ReportConfigurator (parametryzacja, waluty, okresy), ExecutivePdfReport (układ memorandumu A4, SHA-256)
 │   └── ui/                       # Badge, Button, Card, MultiplesStrip (wskaźniki EV/EBITDA, P/E), FinancialTable
 ├── context/                      # AuthContext (tożsamość, role, kontekst spółki), DealContext (FX, okres), NotificationContext (toasty)
-├── tests/                        # Vitest setup, unit tests (formatters, dealContext) & component integration tests (CsvPreviewTable, FinancialRecordModal, DataRoom)
+├── tests/                        # Vitest setup, unit tests (formatters, dealContext) & component integration tests (CsvPreviewTable, FinancialRecordModal, DataRoom, ExecutiveReports)
 ├── utils/                        # formatters.js (liczby tabelaryczne tabular-nums, waluty PLN/EUR/USD/GBP, formatowanie wskaźników, formatFileSize, formatDateTime)
-└── views/                        # DashboardView, RecordsView, ImportView, DataRoomView, AuditLogsView, AnalyticsView, ReportsView, LoginView
+└── views/                        # DashboardView, RecordsView, ImportView, DataRoomView, AuditLogsView, ReportsView, AnalyticsView, LoginView
 ```
 
 ### Dane Testowe i Szablony Importu
@@ -231,7 +237,7 @@ Baza danych zasilona jest danymi demonstracyjnymi (21 miesięcy historii finanso
   - Testy integracyjne komponentów: walidacja podglądu dry-run CSV oraz formularzy księgi głównej.
 - [ ] **Faza 7: Data Room UI, Raporty PDF i Wdrożenie Końcowe**
   - [x] Interfejs Virtual Data Room (VDR) – przeglądarka dokumentów z kategoryzacją, sumami kontrolnymi SHA-256, audytem pobrań i drag & drop uploadem.
-  - Generator podsumowań i raportów zarządczych PDF.
+  - [x] Generator podsumowań i raportów zarządczych PDF z certyfikatem integralności SHA-256 i formatem A4.
   - Testy E2E, audyt bezpieczeństwa i finalna weryfikacja.
 
 Szczegółowa dokumentacja zrealizowanych zmian znajduje się w katalogu [`changelog/`](changelog/README.md).

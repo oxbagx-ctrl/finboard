@@ -9,6 +9,7 @@ import { AnalyticsView } from './views/AnalyticsView';
 import { RecordsView } from './views/RecordsView';
 import { ImportView } from './views/ImportView';
 import { DataRoomView } from './views/DataRoomView';
+import { ReportsView } from './views/ReportsView';
 import { AuditLogsView } from './views/AuditLogsView';
 
 const MainRouter = () => {
@@ -19,7 +20,7 @@ const MainRouter = () => {
     if (loading) {
         return (
             <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center font-mono">
-                <div className="w-10 h-10 rounded bg-zinc-900 border border-zinc-700 flex items-center justify-center text-zinc-100 font-bold text-base mb-3 shadow-sm">
+                <div className="w-10 h-10 rounded bg-zinc-900 border border-zinc-750 flex items-center justify-center text-zinc-100 font-bold text-base mb-3 shadow-sm">
                     FB
                 </div>
                 <div className="text-xs text-zinc-400">INICJALIZACJA ŚRODOWISKA DEAL ADVISORY...</div>
@@ -43,6 +44,8 @@ const MainRouter = () => {
                 return <ImportView key={refreshKey} />;
             case 'data-room':
                 return <DataRoomView key={refreshKey} />;
+            case 'reports':
+                return <ReportsView key={refreshKey} />;
             case 'audit-logs':
                 return <AuditLogsView key={refreshKey} />;
             default:

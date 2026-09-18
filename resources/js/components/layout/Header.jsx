@@ -16,12 +16,13 @@ export const Header = ({ currentRoute, onToggleSidebar, onRefreshData, refreshin
         'records': 'Księga Transakcji Finansowych',
         'import': 'Moduł Importu Wyciągów i Zbiorów CSV',
         'data-room': 'Virtual Data Room (VDR) – Dokumentacja Transakcyjna',
+        'reports': 'Raporty Zarządcze & Generator PDF',
         'audit-logs': 'Rejestr Nadzoru i Ścieżka Audytowa',
     };
 
     return (
         <>
-            <header className="h-14 bg-zinc-950 border-b border-zinc-800 sticky top-0 z-30 flex items-center justify-between px-4 sm:px-6 font-mono">
+            <header className="h-14 bg-zinc-950 border-b border-zinc-800 sticky top-0 z-30 flex items-center justify-between px-4 sm:px-6 font-mono print:hidden">
                 <div className="flex items-center gap-3">
                     <button
                         onClick={onToggleSidebar}

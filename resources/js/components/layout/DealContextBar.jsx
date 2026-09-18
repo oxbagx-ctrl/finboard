@@ -18,7 +18,7 @@ export const DealContextBar = () => {
     const isFiltered = selectedYear !== 'all' || selectedQuarter !== 'all' || currency !== 'PLN';
 
     return (
-        <div className="w-full bg-zinc-950 border-b border-zinc-800/80 px-4 sm:px-6 py-2">
+        <div className="w-full bg-zinc-950 border-b border-zinc-800/80 px-4 sm:px-6 py-2 print:hidden">
             <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs font-mono">
                 {/* Confidentiality and Project Code pill */}
                 <div className="flex items-center gap-2.5 flex-wrap">
