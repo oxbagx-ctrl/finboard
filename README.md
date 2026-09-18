@@ -5,7 +5,7 @@
 [![PostgreSQL](https://img.shields.io/badge/postgresql-16-blue.svg)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/redis-alpine-red.svg)](https://redis.io/)
 [![Architecture](https://img.shields.io/badge/architecture-DDD%20%2F%20CQRS-brightgreen.svg)]()
-[![Tests](https://img.shields.io/badge/tests-204%20backend%20%7C%2057%20frontend%20passed-success.svg)]()
+[![Tests](https://img.shields.io/badge/tests-209%20backend%20%7C%2057%20frontend%20passed-success.svg)]()
 
 FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakcyjnego (M&A, Due Diligence, Corporate Finance) oraz ich klientom (CFO, Zarządy). Aplikacja łączy w sobie zaawansowaną analitykę finansową w ujęciu wielo-najemcowym (Multi-Tenant) z bezpiecznym repozytorium dokumentów Virtual Data Room (VDR).
 
@@ -68,7 +68,7 @@ app/
 │   ├── Identity/                 # Bounded Context: Zarządzanie tożsamością i uprawnieniami
 │   │   ├── Domain/               # User Aggregate Root, Invitation Entity, Role Entity, Value Objects (UserId, Email, HashedPassword, RoleType, Token, InvitationId), Domain Events
 │   │   ├── Application/          # Use cases (InviteUserUseCase), Commands (InviteUserCommand), Exceptions, Repositories interfaces
-│   │   └── Infrastructure/       # EloquentUserRepository, EloquentInvitationRepository, Sanctum Provider
+│   │   └── Infrastructure/       # EloquentUserRepository, EloquentInvitationRepository, Mailables (UserInvitationMail), Listeners (SendInvitationEmailListener), Sanctum Provider
 │   │
 │   ├── Tenant/                   # Bounded Context: Zarządzanie firmami i relacjami doradców
 │   │   ├── Domain/               # CompanyAdvisorAssignment Entity, CompanyId VO, Domain Events, Repository Interfaces
@@ -272,7 +272,7 @@ Baza danych zasilona jest danymi demonstracyjnymi (21 miesięcy historii finanso
   - [x] Encja `Invitation` i obiekt wartości `Token` z logiką wygasania (Identity).
   - [x] Migracja bazy danych i repozytorium dla zaproszeń.
   - [x] Przypadek użycia `InviteUserUseCase` z emisją zdarzenia domenowego `UserInvited`.
-  - [ ] Klasy Mailable i listenery zdarzeń do asynchronicznej wysyłki e-maili z zaproszeniami.
+  - [x] Klasy Mailable i listenery zdarzeń do asynchronicznej wysyłki e-maili z zaproszeniami.
   - [ ] Przypadek użycia `AcceptInvitationUseCase` z walidacją tokenu i bezpiecznym ustawieniem hasła.
 - [ ] **Faza 10: API i Frontend dla Zarządzania Użytkownikami**
   - [ ] Kontroler `InvitationController` mapujący endpointy REST dla zaproszeń.

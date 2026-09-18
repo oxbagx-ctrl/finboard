@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace App\Contexts\Identity\Infrastructure\Providers;
 
+use App\Contexts\Identity\Domain\Events\UserInvited;
 use App\Contexts\Identity\Domain\Repositories\InvitationRepositoryInterface;
 use App\Contexts\Identity\Domain\Repositories\UserRepositoryInterface;
+use App\Contexts\Identity\Infrastructure\Listeners\SendInvitationEmailListener;
 use App\Contexts\Identity\Infrastructure\Repositories\EloquentInvitationRepository;
 use App\Contexts\Identity\Infrastructure\Repositories\EloquentUserRepository;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 
 final class IdentityServiceProvider extends ServiceProvider
@@ -26,5 +29,10 @@ final class IdentityServiceProvider extends ServiceProvider
     {
         $this->app->bind(UserRepositoryInterface::class, EloquentUserRepository::class);
         $this->app->bind(InvitationRepositoryInterface::class, EloquentInvitationRepository::class);
+    }
+
+    public function boot(): void
+    {
+        Event::listen(UserInvited::class, SendInvitationEmailListener::class);
     }
 }
