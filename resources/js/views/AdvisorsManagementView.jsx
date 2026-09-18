@@ -6,6 +6,7 @@ import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { MetricCard } from '../components/ui/Card';
 import { AdvisorAssignmentModal } from '../components/advisors/AdvisorAssignmentModal';
+import { InviteUserModal } from '../components/advisors/InviteUserModal';
 import {
     Users,
     Building2,
@@ -13,40 +14,50 @@ import {
     ShieldAlert,
     ShieldCheck,
     Search,
-    Filter,
     RefreshCw,
     UserCheck,
     UserX,
     Briefcase,
-    Plus,
-    CheckCircle2,
+    UserPlus,
+    Clock,
+    RotateCw,
     XCircle,
-    SlidersHorizontal,
-    ChevronRight,
-    Lock
+    Mail,
+    Lock,
+    Send
 } from 'lucide-react';
 
 export const AdvisorsManagementView = () => {
-    const { user: currentUser } = useAuth();
+    const { user: currentUser, isSuperAdmin, isAdvisor } = useAuth();
     const { success, error } = useNotification();
 
-    const [activeTab, setActiveTab] = useState('advisors'); // 'advisors' | 'companies'
+    // Default tab: Advisors see invitations by default, Admins see advisors list
+    const [activeTab, setActiveTab] = useState(isAdvisor ? 'invitations' : 'advisors'); // 'advisors' | 'companies' | 'invitations'
     const [advisors, setAdvisors] = useState([]);
     const [companies, setCompanies] = useState([]);
+    const [invitations, setInvitations] = useState([]);
+
     const [loadingAdvisors, setLoadingAdvisors] = useState(true);
     const [loadingCompanies, setLoadingCompanies] = useState(true);
+    const [loadingInvitations, setLoadingInvitations] = useState(false);
 
-    // Filters
+    // Filters for Advisors
     const [searchQuery, setSearchQuery] = useState('');
     const [roleFilter, setRoleFilter] = useState('all');
     const [statusFilter, setStatusFilter] = useState('all');
 
+    // Filters for Invitations
+    const [invitationSearch, setInvitationSearch] = useState('');
+    const [invitationStatusFilter, setInvitationStatusFilter] = useState('all');
+
     // Modals
     const [selectedAdvisorForAssignment, setSelectedAdvisorForAssignment] = useState(null);
     const [assignmentModalOpen, setAssignmentModalOpen] = useState(false);
+    const [inviteModalOpen, setInviteModalOpen] = useState(false);
     const [actionInProgressId, setActionInProgressId] = useState(null);
 
     const fetchAdvisors = useCallback(async () => {
+        if (isAdvisor) return; // Advisors do not list other advisors
         setLoadingAdvisors(true);
         try {
             const params = {};
@@ -61,7 +72,7 @@ export const AdvisorsManagementView = () => {
         } finally {
             setLoadingAdvisors(false);
         }
-    }, [searchQuery, roleFilter, statusFilter, error]);
+    }, [searchQuery, roleFilter, statusFilter, isAdvisor, error]);
 
     const fetchCompanies = useCallback(async () => {
         setLoadingCompanies(true);
@@ -69,19 +80,43 @@ export const AdvisorsManagementView = () => {
             const res = await apiClient.get('/admin/companies');
             setCompanies(res.data.data || []);
         } catch (err) {
-            error('Nie udało się pobrać listy spółek z serwera.');
+            // If advisor doesn't have permission to global admin/companies, ignore or set empty
         } finally {
             setLoadingCompanies(false);
         }
-    }, [error]);
+    }, []);
+
+    const fetchInvitations = useCallback(async () => {
+        setLoadingInvitations(true);
+        try {
+            const params = {};
+            if (invitationSearch.trim()) params.search = invitationSearch.trim();
+            if (invitationStatusFilter !== 'all') params.status = invitationStatusFilter;
+
+            const res = await apiClient.get('/invitations', { params });
+            setInvitations(res.data.data || []);
+        } catch (err) {
+            error('Nie udało się pobrać rejestru zaproszeń.');
+        } finally {
+            setLoadingInvitations(false);
+        }
+    }, [invitationSearch, invitationStatusFilter, error]);
 
     useEffect(() => {
-        fetchAdvisors();
-    }, [fetchAdvisors]);
+        if (!isAdvisor) {
+            fetchAdvisors();
+        }
+    }, [fetchAdvisors, isAdvisor]);
 
     useEffect(() => {
-        fetchCompanies();
-    }, [fetchCompanies]);
+        if (!isAdvisor) {
+            fetchCompanies();
+        }
+    }, [fetchCompanies, isAdvisor]);
+
+    useEffect(() => {
+        fetchInvitations();
+    }, [fetchInvitations]);
 
     const handleToggleStatus = async (advisor) => {
         if (advisor.id === currentUser?.id) {
@@ -93,7 +128,6 @@ export const AdvisorsManagementView = () => {
         try {
             const res = await apiClient.patch(`/admin/advisors/${advisor.id}/toggle-status`);
             success(res.data.message || 'Status konta doradcy został pomyślnie zaktualizowany.');
-            // Update in local state
             setAdvisors(prev => prev.map(a => a.id === advisor.id ? res.data.data : a));
         } catch (err) {
             const msg = err.response?.data?.message || 'Nie udało się zmienić statusu konta.';
@@ -110,7 +144,35 @@ export const AdvisorsManagementView = () => {
 
     const handleAdvisorSaved = (updatedAdvisor) => {
         setAdvisors(prev => prev.map(a => a.id === updatedAdvisor.id ? updatedAdvisor : a));
-        fetchCompanies(); // Refresh counts in companies matrix
+        fetchCompanies();
+    };
+
+    const handleResendInvitation = async (inv) => {
+        setActionInProgressId(inv.id);
+        try {
+            const res = await apiClient.post(`/invitations/${inv.id}/resend`);
+            success(res.data.message || 'Nowe zaproszenie zostało pomyślnie wysłane.');
+            fetchInvitations();
+        } catch (err) {
+            const msg = err.response?.data?.message || 'Nie udało się ponownie wysłać zaproszenia.';
+            error(msg);
+        } finally {
+            setActionInProgressId(null);
+        }
+    };
+
+    const handleRevokeInvitation = async (inv) => {
+        setActionInProgressId(inv.id);
+        try {
+            const res = await apiClient.delete(`/invitations/${inv.id}`);
+            success(res.data.message || 'Zaproszenie zostało pomyślnie anulowane.');
+            fetchInvitations();
+        } catch (err) {
+            const msg = err.response?.data?.message || 'Nie udało się unieważnić zaproszenia.';
+            error(msg);
+        } finally {
+            setActionInProgressId(null);
+        }
     };
 
     // Derived statistics
@@ -118,16 +180,32 @@ export const AdvisorsManagementView = () => {
         const totalAdvisors = advisors.length;
         const activeAdvisors = advisors.filter(a => a.is_active).length;
         const totalCompanies = companies.length;
-        const totalAssignments = advisors.reduce((acc, a) => acc + (a.assigned_companies_count || 0), 0);
-        const avgAssignments = totalAdvisors > 0 ? (totalAssignments / totalAdvisors).toFixed(1) : '0.0';
+        const pendingInvitations = invitations.filter(i => i.status === 'pending').length;
+        const acceptedInvitations = invitations.filter(i => i.status === 'accepted').length;
 
         return {
             totalAdvisors,
             activeAdvisors,
             totalCompanies,
-            avgAssignments,
+            pendingInvitations,
+            acceptedInvitations,
         };
-    }, [advisors, companies]);
+    }, [advisors, companies, invitations]);
+
+    const getStatusBadge = (status) => {
+        switch (status) {
+            case 'pending':
+                return <Badge variant="warning" size="sm">OCZEKUJE</Badge>;
+            case 'accepted':
+                return <Badge variant="success" size="sm">ZAAKCEPTOWANE</Badge>;
+            case 'revoked':
+                return <Badge variant="danger" size="sm">ANULOWANE</Badge>;
+            case 'expired':
+                return <Badge variant="default" size="sm">WYGASŁE</Badge>;
+            default:
+                return <Badge variant="default" size="sm">{status.toUpperCase()}</Badge>;
+        }
+    };
 
     return (
         <div className="space-y-4 font-mono">
@@ -139,24 +217,44 @@ export const AdvisorsManagementView = () => {
                     </div>
                     <div>
                         <div className="text-xs font-bold text-zinc-100 flex items-center gap-2">
-                            <span>Zarządzanie Doradcami & Uprawnieniami Portfela</span>
-                            <Badge variant="purple" size="sm">SUPER ADMIN ACCESS</Badge>
+                            <span>
+                                {isAdvisor
+                                    ? 'Panel Zarządzania Zaproszeniami i Zespołem Klienta'
+                                    : 'Zarządzanie Doradcami & Uprawnieniami Portfela'}
+                            </span>
+                            <Badge variant={isSuperAdmin ? 'purple' : 'brand'} size="sm">
+                                {isSuperAdmin ? 'SUPER ADMIN' : isAdvisor ? 'DORADCA M&A' : 'ADMIN'}
+                            </Badge>
                             <span className="text-zinc-600 font-normal">|</span>
-                            <span className="text-zinc-400 font-normal text-[11px]">MATRYCA TENANT</span>
+                            <span className="text-zinc-400 font-normal text-[11px]">MULTI-TENANT RBAC</span>
                         </div>
                         <p className="text-[10px] text-zinc-500 mt-0.5">
-                            Konfiguracja relacji doradca-spółka oraz kontrola dostępu do danych Due Diligence
+                            Rejestracja użytkowników przez bezpieczne tokeny oraz konfiguracja relacji doradca-spółka
                         </p>
                     </div>
                 </div>
 
                 <div className="flex items-center gap-2">
                     <Button
+                        variant="primary"
+                        size="sm"
+                        icon={UserPlus}
+                        onClick={() => setInviteModalOpen(true)}
+                    >
+                        Zaproś Użytkownika
+                    </Button>
+                    <Button
                         variant="outline"
                         size="sm"
                         icon={RefreshCw}
-                        onClick={() => { fetchAdvisors(); fetchCompanies(); }}
-                        disabled={loadingAdvisors || loadingCompanies}
+                        onClick={() => {
+                            if (!isAdvisor) {
+                                fetchAdvisors();
+                                fetchCompanies();
+                            }
+                            fetchInvitations();
+                        }}
+                        disabled={loadingAdvisors || loadingCompanies || loadingInvitations}
                     >
                         Odśwież
                     </Button>
@@ -165,66 +263,103 @@ export const AdvisorsManagementView = () => {
 
             {/* Metric KPI Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                {!isAdvisor ? (
+                    <>
+                        <MetricCard
+                            title="Doradcy & Partnerzy"
+                            value={stats.totalAdvisors}
+                            icon={Users}
+                            subtitle={`AKTYWNI W SYSTEMIE: ${stats.activeAdvisors}`}
+                            isRatio={true}
+                        />
+                        <MetricCard
+                            title="Spółki w Portfelu"
+                            value={stats.totalCompanies}
+                            icon={Building2}
+                            subtitle="PODMIOTY GOSPODARCZE"
+                            isRatio={true}
+                        />
+                    </>
+                ) : (
+                    <>
+                        <MetricCard
+                            title="Twoja Rola"
+                            value="DORADCA"
+                            icon={Briefcase}
+                            subtitle="DEAL ADVISORY"
+                            isRatio={true}
+                        />
+                        <MetricCard
+                            title="Izolacja Najemcy"
+                            value="STRICT"
+                            icon={ShieldCheck}
+                            subtitle="DOSTĘP DO PRZYPISANYCH"
+                            isRatio={true}
+                        />
+                    </>
+                )}
                 <MetricCard
-                    title="Doradcy & Partnerzy"
-                    value={stats.totalAdvisors}
-                    icon={Users}
-                    subtitle={`AKTYWNI W SYSTEMIE: ${stats.activeAdvisors}`}
+                    title="Oczekujące Zaproszenia"
+                    value={stats.pendingInvitations}
+                    icon={Mail}
+                    subtitle="WYGASAJĄ PO 48 GODZINACH"
                     isRatio={true}
                 />
                 <MetricCard
-                    title="Spółki w Portfelu"
-                    value={stats.totalCompanies}
-                    icon={Building2}
-                    subtitle="PODMIOTY GOSPODARCZE"
-                    isRatio={true}
-                />
-                <MetricCard
-                    title="Śr. Przypisań / Doradcę"
-                    value={`${stats.avgAssignments}x`}
-                    icon={Briefcase}
-                    subtitle="POKRYCIE PORTFELA"
-                    isRatio={true}
-                />
-                <MetricCard
-                    title="Izolacja Danych"
-                    value="STRICT"
-                    icon={ShieldCheck}
-                    subtitle="MULTI-TENANT RBAC"
+                    title="Aktywowane Konta"
+                    value={stats.acceptedInvitations}
+                    icon={UserCheck}
+                    subtitle="ZAPROSZENIA ZAAKCEPTOWANE"
                     isRatio={true}
                 />
             </div>
 
             {/* Navigation Tabs */}
             <div className="flex items-center gap-2 border-b border-zinc-800 pb-2">
+                {!isAdvisor && (
+                    <>
+                        <button
+                            type="button"
+                            onClick={() => setActiveTab('advisors')}
+                            className={`flex items-center gap-2 px-3 py-1.5 rounded text-xs font-bold transition-colors cursor-pointer ${
+                                activeTab === 'advisors'
+                                    ? 'bg-zinc-100 text-zinc-950 shadow-xs'
+                                    : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
+                            }`}
+                        >
+                            <Users className="w-3.5 h-3.5" />
+                            <span>Rejestr Doradców ({advisors.length})</span>
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setActiveTab('companies')}
+                            className={`flex items-center gap-2 px-3 py-1.5 rounded text-xs font-bold transition-colors cursor-pointer ${
+                                activeTab === 'companies'
+                                    ? 'bg-zinc-100 text-zinc-950 shadow-xs'
+                                    : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
+                            }`}
+                        >
+                            <Building2 className="w-3.5 h-3.5" />
+                            <span>Matryca Spółek Portfelowych ({companies.length})</span>
+                        </button>
+                    </>
+                )}
                 <button
                     type="button"
-                    onClick={() => setActiveTab('advisors')}
+                    onClick={() => setActiveTab('invitations')}
                     className={`flex items-center gap-2 px-3 py-1.5 rounded text-xs font-bold transition-colors cursor-pointer ${
-                        activeTab === 'advisors'
+                        activeTab === 'invitations'
                             ? 'bg-zinc-100 text-zinc-950 shadow-xs'
                             : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
                     }`}
                 >
-                    <Users className="w-3.5 h-3.5" />
-                    <span>Rejestr Doradców ({advisors.length})</span>
-                </button>
-                <button
-                    type="button"
-                    onClick={() => setActiveTab('companies')}
-                    className={`flex items-center gap-2 px-3 py-1.5 rounded text-xs font-bold transition-colors cursor-pointer ${
-                        activeTab === 'companies'
-                            ? 'bg-zinc-100 text-zinc-950 shadow-xs'
-                            : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
-                    }`}
-                >
-                    <Building2 className="w-3.5 h-3.5" />
-                    <span>Matryca Spółek Portfelowych ({companies.length})</span>
+                    <Mail className="w-3.5 h-3.5" />
+                    <span>Wysłane Zaproszenia ({invitations.length})</span>
                 </button>
             </div>
 
             {/* Tab 1: Advisors List */}
-            {activeTab === 'advisors' && (
+            {activeTab === 'advisors' && !isAdvisor && (
                 <div className="space-y-3">
                     {/* Filters Bar */}
                     <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3 flex flex-col md:flex-row md:items-center justify-between gap-3">
@@ -304,7 +439,7 @@ export const AdvisorsManagementView = () => {
                                                 <tr key={adv.id} className="hover:bg-zinc-850/40 transition-colors">
                                                     <td className="py-3 px-4">
                                                         <div className="flex items-center gap-2.5">
-                                                            <div className="w-7 h-7 rounded bg-zinc-800 border border-zinc-700 flex items-center justify-center font-bold text-zinc-300 text-xs shrink-0">
+                                                            <div className="w-7 h-7 rounded bg-zinc-850 border border-zinc-750 flex items-center justify-center font-bold text-zinc-300 text-xs shrink-0">
                                                                 {adv.name.charAt(0).toUpperCase()}
                                                             </div>
                                                             <div className="min-w-0">
@@ -411,7 +546,7 @@ export const AdvisorsManagementView = () => {
             )}
 
             {/* Tab 2: Companies Portfolio Matrix */}
-            {activeTab === 'companies' && (
+            {activeTab === 'companies' && !isAdvisor && (
                 <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden shadow-sm">
                     <div className="p-3 bg-zinc-950/80 border-b border-zinc-800 flex items-center justify-between">
                         <div>
@@ -520,12 +655,191 @@ export const AdvisorsManagementView = () => {
                 </div>
             )}
 
+            {/* Tab 3: Invitations Register */}
+            {activeTab === 'invitations' && (
+                <div className="space-y-3">
+                    {/* Filters Bar */}
+                    <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                        <div className="relative flex-1 max-w-md">
+                            <Search className="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                            <input
+                                type="text"
+                                value={invitationSearch}
+                                onChange={(e) => setInvitationSearch(e.target.value)}
+                                placeholder="Szukaj zaproszenia po adresie email..."
+                                className="w-full bg-zinc-950 border border-zinc-750 rounded pl-9 pr-3 py-1.5 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
+                            />
+                        </div>
+
+                        <div className="flex items-center gap-2 text-xs">
+                            <span className="text-[11px] text-zinc-500">STATUS:</span>
+                            <select
+                                value={invitationStatusFilter}
+                                onChange={(e) => setInvitationStatusFilter(e.target.value)}
+                                className="bg-zinc-950 border border-zinc-750 rounded px-2 py-1 text-xs text-zinc-200 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
+                            >
+                                <option value="all">Wszystkie statusy</option>
+                                <option value="pending">Oczekujące (Pending)</option>
+                                <option value="accepted">Zaakceptowane (Accepted)</option>
+                                <option value="expired">Wygasłe (Expired)</option>
+                                <option value="revoked">Anulowane (Revoked)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    {/* Invitations Table */}
+                    <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden shadow-sm">
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left text-xs border-collapse">
+                                <thead>
+                                    <tr className="bg-zinc-950/80 border-b border-zinc-800 text-zinc-400 font-semibold uppercase text-[10px] tracking-wider">
+                                        <th className="py-2.5 px-4">Adres E-mail Odbiorcy</th>
+                                        <th className="py-2.5 px-3">Rola</th>
+                                        <th className="py-2.5 px-4">Spółka / Przypisania</th>
+                                        <th className="py-2.5 px-3">Status</th>
+                                        <th className="py-2.5 px-3">Wygasa</th>
+                                        <th className="py-2.5 px-3">Zapraszający</th>
+                                        <th className="py-2.5 px-4 text-right">Operacje</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-zinc-800/80">
+                                    {loadingInvitations ? (
+                                        <tr>
+                                            <td colSpan={7} className="py-12 text-center text-zinc-500">
+                                                Ładowanie rejestru zaproszeń...
+                                            </td>
+                                        </tr>
+                                    ) : invitations.length === 0 ? (
+                                        <tr>
+                                            <td colSpan={7} className="py-12 text-center text-zinc-500">
+                                                Brak zaproszeń spełniających wybrane kryteria.
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        invitations.map((inv) => {
+                                            const isPending = inv.status === 'pending';
+                                            const isExpired = inv.status === 'expired';
+                                            const isActionRunning = actionInProgressId === inv.id;
+
+                                            return (
+                                                <tr key={inv.id} className="hover:bg-zinc-850/40 transition-colors">
+                                                    <td className="py-3 px-4">
+                                                        <div className="font-semibold text-zinc-100 flex items-center gap-2">
+                                                            <Mail className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
+                                                            <span>{inv.email}</span>
+                                                        </div>
+                                                        <div className="text-[10px] text-zinc-500 mt-0.5">
+                                                            Utworzono: {inv.created_at ? inv.created_at.substring(0, 10) : 'N/A'}
+                                                        </div>
+                                                    </td>
+
+                                                    <td className="py-3 px-3">
+                                                        <Badge
+                                                            variant={
+                                                                inv.role === 'super_admin'
+                                                                    ? 'purple'
+                                                                    : inv.role === 'advisor'
+                                                                    ? 'brand'
+                                                                    : 'default'
+                                                            }
+                                                            size="sm"
+                                                        >
+                                                            {inv.role === 'super_admin' ? 'SUPER ADMIN' : inv.role === 'advisor' ? 'DORADCA' : 'KLIENT'}
+                                                        </Badge>
+                                                    </td>
+
+                                                    <td className="py-3 px-4">
+                                                        {inv.role === 'client' && inv.company ? (
+                                                            <div className="flex items-center gap-1.5">
+                                                                <Badge variant="default" size="sm">{inv.company.code}</Badge>
+                                                                <span className="text-zinc-300 truncate max-w-[160px]">{inv.company.name}</span>
+                                                            </div>
+                                                        ) : inv.role === 'advisor' ? (
+                                                            <span className="text-zinc-400 text-[11px]">
+                                                                {inv.assigned_companies_count > 0
+                                                                    ? `Przypisano do ${inv.assigned_companies_count} spółek`
+                                                                    : 'Bez początkowych spółek'}
+                                                            </span>
+                                                        ) : (
+                                                            <span className="text-zinc-500 text-[11px] italic">Dostęp globalny</span>
+                                                        )}
+                                                    </td>
+
+                                                    <td className="py-3 px-3">
+                                                        {getStatusBadge(inv.status)}
+                                                    </td>
+
+                                                    <td className="py-3 px-3 text-[11px] text-zinc-400 tabular-nums">
+                                                        {inv.expires_at ? (
+                                                            <div className="flex items-center gap-1">
+                                                                <Clock className="w-3 h-3 text-zinc-500" />
+                                                                <span>{inv.expires_at.replace('T', ' ').substring(0, 16)}</span>
+                                                            </div>
+                                                        ) : 'Brak limitu'}
+                                                    </td>
+
+                                                    <td className="py-3 px-3 text-[11px] text-zinc-400">
+                                                        {inv.inviter?.name || 'Administrator'}
+                                                    </td>
+
+                                                    <td className="py-3 px-4 text-right">
+                                                        <div className="flex items-center justify-end gap-1.5">
+                                                            {(isPending || isExpired) && (
+                                                                <Button
+                                                                    variant="outline"
+                                                                    size="sm"
+                                                                    icon={RotateCw}
+                                                                    onClick={() => handleResendInvitation(inv)}
+                                                                    disabled={isActionRunning}
+                                                                    loading={isActionRunning}
+                                                                    title="Wyślij ponownie z nowym 48h tokenem"
+                                                                >
+                                                                    Wyślij ponownie
+                                                                </Button>
+                                                            )}
+                                                            {isPending && (
+                                                                <Button
+                                                                    variant="danger"
+                                                                    size="sm"
+                                                                    icon={XCircle}
+                                                                    onClick={() => handleRevokeInvitation(inv)}
+                                                                    disabled={isActionRunning}
+                                                                    title="Unieważnij to zaproszenie"
+                                                                >
+                                                                    Anuluj
+                                                                </Button>
+                                                            )}
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Modal: Advisor Company Assignments */}
             <AdvisorAssignmentModal
                 isOpen={assignmentModalOpen}
                 onClose={() => setAssignmentModalOpen(false)}
                 advisor={selectedAdvisorForAssignment}
                 onSaved={handleAdvisorSaved}
+            />
+
+            {/* Modal: Invite User */}
+            <InviteUserModal
+                isOpen={inviteModalOpen}
+                onClose={() => setInviteModalOpen(false)}
+                onSuccess={() => {
+                    fetchInvitations();
+                    if (!isAdvisor) {
+                        fetchAdvisors();
+                    }
+                }}
             />
         </div>
     );

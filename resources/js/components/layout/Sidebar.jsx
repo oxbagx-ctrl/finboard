@@ -18,7 +18,7 @@ import { UserProfileModal } from '../auth/UserProfileModal';
 import { CompanySwitcherModal } from './CompanySwitcherModal';
 
 export const Sidebar = ({ currentRoute, onRouteChange, isOpen, onClose }) => {
-    const { user, activeCompany, isAdmin, isSuperAdmin, logout } = useAuth();
+    const { user, activeCompany, isAdmin, isSuperAdmin, isAdvisor, logout } = useAuth();
     const [profileModalOpen, setProfileModalOpen] = useState(false);
     const [switcherModalOpen, setSwitcherModalOpen] = useState(false);
 
@@ -32,8 +32,15 @@ export const Sidebar = ({ currentRoute, onRouteChange, isOpen, onClose }) => {
         { id: 'audit-logs', label: 'Dziennik Nadzoru & Audyt', code: 'AUD', icon: ShieldCheck },
     ];
 
-    const adminNavItems = isAdmin ? [
-        { id: 'advisors', label: 'Doradcy & Przypisania', code: 'ADV', icon: Users },
+    const canAccessUserManagement = isAdmin || isAdvisor;
+
+    const adminNavItems = canAccessUserManagement ? [
+        {
+            id: 'advisors',
+            label: isAdvisor ? 'Zaproszenia Klientów' : 'Doradcy & Przypisania',
+            code: isAdvisor ? 'INV' : 'ADV',
+            icon: Users
+        },
     ] : [];
 
     const navItems = [...baseNavItems, ...adminNavItems];
@@ -77,13 +84,13 @@ export const Sidebar = ({ currentRoute, onRouteChange, isOpen, onClose }) => {
                     </span>
                 </div>
 
-                {/* Target Company Box (Interactive for Admin) */}
+                {/* Target Company Box (Interactive for Admin / Advisor) */}
                 <div className="p-3 border-b border-zinc-855 bg-zinc-900/30">
                     <button
                         type="button"
-                        onClick={isAdmin ? () => setSwitcherModalOpen(true) : undefined}
+                        onClick={isAdmin || isAdvisor ? () => setSwitcherModalOpen(true) : undefined}
                         className={`w-full p-2.5 rounded-md text-left transition-all ${
-                            isAdmin
+                            isAdmin || isAdvisor
                                 ? 'bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 hover:border-zinc-700 cursor-pointer group'
                                 : 'bg-zinc-900 border border-zinc-800 cursor-default'
                         }`}
@@ -97,7 +104,7 @@ export const Sidebar = ({ currentRoute, onRouteChange, isOpen, onClose }) => {
                                 <Building2 className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
                                 <span className="truncate">{activeCompany?.name || 'Wybierz podmiot'}</span>
                             </div>
-                            {isAdmin && (
+                            {(isAdmin || isAdvisor) && (
                                 <ChevronRight className="w-3.5 h-3.5 text-zinc-600 group-hover:text-zinc-300 shrink-0" />
                             )}
                         </div>

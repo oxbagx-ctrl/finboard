@@ -13,6 +13,8 @@ vi.mock('../../api/client', () => ({
         get: vi.fn(),
         put: vi.fn(),
         patch: vi.fn(),
+        post: vi.fn(),
+        delete: vi.fn(),
     },
 }));
 
@@ -79,6 +81,29 @@ const mockCompanies = [
         clients_count: 1,
         assigned_advisors: [],
     },
+];
+
+const mockInvitations = [
+    {
+        id: 'inv-test-1',
+        email: 'cfo@acme.com',
+        role: 'client',
+        status: 'pending',
+        expires_at: '2026-09-22T10:00:00Z',
+        created_at: '2026-09-20T10:00:00Z',
+        company: { id: 'comp-acme-1', name: 'Acme Manufacturing S.A.', code: 'ACME' },
+        inviter: { id: 'user-admin-1', name: 'Super Partner Helvest', email: 'admin@helvest.com' },
+    },
+    {
+        id: 'inv-test-2',
+        email: 'nowy.doradca@helvest.com',
+        role: 'advisor',
+        status: 'accepted',
+        expires_at: '2026-09-21T08:00:00Z',
+        created_at: '2026-09-19T08:00:00Z',
+        assigned_companies_count: 2,
+        inviter: { id: 'user-admin-1', name: 'Super Partner Helvest', email: 'admin@helvest.com' },
+    }
 ];
 
 const renderWithContext = (ui, user = mockCurrentUser) => {
@@ -194,6 +219,9 @@ describe('AdvisorsManagementView (SuperAdmin Dashboard)', () => {
             if (url === '/admin/companies') {
                 return Promise.resolve({ data: { data: mockCompanies } });
             }
+            if (url === '/invitations') {
+                return Promise.resolve({ data: { data: mockInvitations } });
+            }
             return Promise.resolve({ data: { data: [] } });
         });
     });
@@ -204,11 +232,12 @@ describe('AdvisorsManagementView (SuperAdmin Dashboard)', () => {
         await waitFor(() => {
             expect(apiClient.get).toHaveBeenCalledWith('/admin/advisors', expect.any(Object));
             expect(apiClient.get).toHaveBeenCalledWith('/admin/companies');
+            expect(apiClient.get).toHaveBeenCalledWith('/invitations', expect.any(Object));
         });
 
         // Top titles and badges
         expect(screen.getByText('Zarządzanie Doradcami & Uprawnieniami Portfela')).toBeInTheDocument();
-        expect(screen.getByText('SUPER ADMIN ACCESS')).toBeInTheDocument();
+        expect(screen.getAllByText('SUPER ADMIN').length).toBeGreaterThan(0);
 
         // Check advisors rendered
         expect(screen.getByText('Super Partner Helvest')).toBeInTheDocument();
@@ -220,7 +249,7 @@ describe('AdvisorsManagementView (SuperAdmin Dashboard)', () => {
         expect(screen.getByText('NIEAKTYWNY')).toBeInTheDocument();
     });
 
-    it('switches between Advisors list and Companies matrix tabs', async () => {
+    it('switches between Advisors, Companies matrix, and Invitations tabs', async () => {
         renderWithContext(<AdvisorsManagementView />);
 
         await waitFor(() => {
@@ -233,6 +262,15 @@ describe('AdvisorsManagementView (SuperAdmin Dashboard)', () => {
 
         expect(screen.getByText('Matryca Pokrycia Spółek Przez Doradców')).toBeInTheDocument();
         expect(screen.getByText('Brak dedykowanego doradcy')).toBeInTheDocument();
+
+        // Switch to invitations tab
+        const invitationsTabBtn = screen.getByText(/Wysłane Zaproszenia/i);
+        fireEvent.click(invitationsTabBtn);
+
+        expect(screen.getByText('cfo@acme.com')).toBeInTheDocument();
+        expect(screen.getByText('OCZEKUJE')).toBeInTheDocument();
+        expect(screen.getByText('nowy.doradca@helvest.com')).toBeInTheDocument();
+        expect(screen.getByText('ZAAKCEPTOWANE')).toBeInTheDocument();
     });
 
     it('toggles advisor active status', async () => {
@@ -269,7 +307,6 @@ describe('AdvisorsManagementView (SuperAdmin Dashboard)', () => {
 
         // Current user row has disabled deactivate button
         const deactivateBtns = screen.getAllByRole('button', { name: /Dezaktywuj/i });
-        // The first advisor is Super Partner Helvest (currentUser), button should be disabled
         expect(deactivateBtns[0]).toBeDisabled();
     });
 
@@ -285,6 +322,46 @@ describe('AdvisorsManagementView (SuperAdmin Dashboard)', () => {
 
         await waitFor(() => {
             expect(screen.getByText('Przypisanie Spółek Portfelowych')).toBeInTheDocument();
+        });
+    });
+
+    it('opens invite user modal when clicking Zaproś Użytkownika button', async () => {
+        renderWithContext(<AdvisorsManagementView />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Zaproś Użytkownika')).toBeInTheDocument();
+        });
+
+        fireEvent.click(screen.getByText('Zaproś Użytkownika'));
+
+        await waitFor(() => {
+            expect(screen.getByText('Zaproś Nowego Użytkownika')).toBeInTheDocument();
+            expect(screen.getByText(/Zasada zerowego zaufania/i)).toBeInTheDocument();
+        });
+    });
+
+    it('resends pending invitation with new token', async () => {
+        apiClient.post.mockResolvedValueOnce({
+            data: { message: 'Nowy link aktywacyjny został wysłany.' }
+        });
+
+        renderWithContext(<AdvisorsManagementView />);
+
+        await waitFor(() => {
+            expect(screen.getByText(/Wysłane Zaproszenia/i)).toBeInTheDocument();
+        });
+
+        fireEvent.click(screen.getByText(/Wysłane Zaproszenia/i));
+
+        await waitFor(() => {
+            expect(screen.getByText('cfo@acme.com')).toBeInTheDocument();
+        });
+
+        const resendBtn = screen.getByRole('button', { name: /Wyślij ponownie/i });
+        fireEvent.click(resendBtn);
+
+        await waitFor(() => {
+            expect(apiClient.post).toHaveBeenCalledWith('/invitations/inv-test-1/resend');
         });
     });
 });

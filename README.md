@@ -5,7 +5,7 @@
 [![PostgreSQL](https://img.shields.io/badge/postgresql-16-blue.svg)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/redis-alpine-red.svg)](https://redis.io/)
 [![Architecture](https://img.shields.io/badge/architecture-DDD%20%2F%20CQRS-brightgreen.svg)]()
-[![Tests](https://img.shields.io/badge/tests-240%20backend%20%7C%2065%20frontend%20passed-success.svg)]()
+[![Tests](https://img.shields.io/badge/tests-240%20backend%20%7C%2075%20frontend%20passed-success.svg)]()
 
 FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakcyjnego (M&A, Due Diligence, Corporate Finance) oraz ich klientom (CFO, Zarządy). Aplikacja łączy w sobie zaawansowaną analitykę finansową w ujęciu wielo-najemcowym (Multi-Tenant) z bezpiecznym repozytorium dokumentów Virtual Data Room (VDR).
 
@@ -49,7 +49,8 @@ FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakc
     - Widok importu CSV z podglądem walidacji dry-run i animowanym monitorem kolejki Redis.
     - Moduł VDR oraz globalny rejestr ścieżki audytowej (Audit Trail).
     - Widok zarządzania doradcami i przypisaniami spółek (`AdvisorsManagementView`) wraz z matrycą pokrycia portfela i modalem przypisań (`AdvisorAssignmentModal`).
-    - Zestaw 65 testów jednostkowych i integracyjnych Vitest (formatery, silnik walutowy, formularze, blokady Dry-Run, eksplorator VDR, raporty PDF, E2E workflow, zarządzanie doradcami).
+    - Modal zapraszania nowych użytkowników (`InviteUserModal`) w paradygmacie Zero-Trust z podziałem ról i selekcją firm.
+    - Zestaw 75 testów jednostkowych i integracyjnych Vitest (formatery, silnik walutowy, formularze, blokady Dry-Run, eksplorator VDR, raporty PDF, E2E workflow, zarządzanie doradcami, zaproszenia).
 - **Monitoring Produkcyjny, Bezpieczeństwo Nginx i Automatyzacja Wdrożenia**:
     - Dedykowany endpoint `/api/v1/health` badający stan bazy PostgreSQL, klastra Redis, uprawnień magazynu plików oraz zużycia zasobów.
     - Reguły kompresji Gzip i instytucjonalne nagłówki bezpieczeństwa Nginx (`SAMEORIGIN`, `nosniff`, `strict-origin-when-cross-origin`).
@@ -102,7 +103,7 @@ app/
 resources/js/
 ├── api/                          # Klient Axios z automatyczną obsługą tokenów Bearer i nagłówków multi-tenant (X-Company-Id)
 ├── components/
-│   ├── advisors/                 # AdvisorAssignmentModal (zarządzanie przypisaniem spółek do doradców)
+│   ├── advisors/                 # AdvisorAssignmentModal (zarządzanie przypisaniem spółek), InviteUserModal (bezpieczne zapraszanie użytkowników)
 │   ├── auth/                     # CompanySwitcherModal (wyszukiwarka spółek portfela), UserProfileModal (dane, zmiana hasła)
 │   ├── charts/                   # PnlTrendChart, CostBreakdownChart, LiquidityTrendChart, CustomChartTooltip (ciemny monospace FactSet/Bloomberg)
 │   ├── dataroom/                 # DataRoomStats, DocumentTable, DocumentUploadModal, DocumentEditModal, DocumentAuditModal, DeleteDocumentModal
@@ -112,7 +113,7 @@ resources/js/
 │   ├── reports/                  # ReportConfigurator (parametryzacja, waluty, okresy), ExecutivePdfReport (układ memorandumu A4, SHA-256)
 │   └── ui/                       # Badge, Button, Card, MultiplesStrip (wskaźniki EV/EBITDA, P/E), FinancialTable
 ├── context/                      # AuthContext (tożsamość, role, kontekst spółki), DealContext (FX, okres), NotificationContext (toasty)
-├── tests/                        # Vitest setup, unit tests (formatters, dealContext) & component integration tests (CsvPreviewTable, FinancialRecordModal, DataRoom, ExecutiveReports, DealAdvisoryE2E, AdvisorsManagement)
+├── tests/                        # Vitest setup, unit tests (formatters, dealContext) & component integration tests (CsvPreviewTable, FinancialRecordModal, DataRoom, ExecutiveReports, DealAdvisoryE2E, AdvisorsManagement, InviteUserModal)
 ├── utils/                        # formatters.js (liczby tabelaryczne tabular-nums, waluty PLN/EUR/USD/GBP, formatowanie wskaźników, formatFileSize, formatDateTime)
 └── views/                        # DashboardView, RecordsView, ImportView, DataRoomView, AuditLogsView, ReportsView, AnalyticsView, LoginView, AdvisorsManagementView
 ```
@@ -298,7 +299,7 @@ Baza danych zasilona jest danymi demonstracyjnymi (21 miesięcy historii finanso
   - [x] Kontroler `InvitationController` mapujący endpointy REST dla zaproszeń.
   - [x] Kontroler `AdvisorManagementController` dla SuperAdmina do zarządzania doradcami i przypisaniami.
   - [x] Widok dashboardu SuperAdmina do zarządzania doradcami i przypisaniami spółek.
-  - [ ] Modal zapraszania użytkownika z wyborem roli i przypisaniem firm dla doradców.
+  - [x] Modal zapraszania użytkownika z wyborem roli i przypisaniem firm dla doradców.
   - [ ] Bezpieczna strona aktywacji konta / ustawienia hasła na podstawie tokenu z linku e-mail.
 
 ---
