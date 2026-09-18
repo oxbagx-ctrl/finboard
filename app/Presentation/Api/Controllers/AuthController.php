@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Presentation\Api\Controllers;
 
+use App\Models\Company;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -36,6 +37,17 @@ final class AuthController extends Controller
 
         $token = $user->createToken('finboard-api-token')->plainTextToken;
 
+        $availableCompanies = $user->role === 'admin'
+            ? Company::orderBy('name')->get(['id', 'name', 'code', 'tax_id'])->values()
+            : ($user->company ? [
+                [
+                    'id' => $user->company->id,
+                    'name' => $user->company->name,
+                    'code' => $user->company->code,
+                    'tax_id' => $user->company->tax_id,
+                ]
+            ] : []);
+
         return new JsonResponse([
             'token' => $token,
             'token_type' => 'Bearer',
@@ -48,8 +60,10 @@ final class AuthController extends Controller
                     'id' => $user->company->id,
                     'name' => $user->company->name,
                     'code' => $user->company->code,
+                    'tax_id' => $user->company->tax_id,
                 ] : null,
             ],
+            'available_companies' => $availableCompanies,
         ]);
     }
 
@@ -57,6 +71,17 @@ final class AuthController extends Controller
     {
         /** @var User $user */
         $user = $request->user()->load('company');
+
+        $availableCompanies = $user->role === 'admin'
+            ? Company::orderBy('name')->get(['id', 'name', 'code', 'tax_id'])->values()
+            : ($user->company ? [
+                [
+                    'id' => $user->company->id,
+                    'name' => $user->company->name,
+                    'code' => $user->company->code,
+                    'tax_id' => $user->company->tax_id,
+                ]
+            ] : []);
 
         return new JsonResponse([
             'user' => [
@@ -68,6 +93,56 @@ final class AuthController extends Controller
                     'id' => $user->company->id,
                     'name' => $user->company->name,
                     'code' => $user->company->code,
+                    'tax_id' => $user->company->tax_id,
+                ] : null,
+            ],
+            'available_companies' => $availableCompanies,
+        ]);
+    }
+
+    public function updateProfile(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'name' => ['sometimes', 'required', 'string', 'max:255'],
+            'current_password' => ['sometimes', 'required_with:new_password', 'string'],
+            'new_password' => ['sometimes', 'required_with:current_password', 'string', 'min:8'],
+        ]);
+
+        /** @var User $user */
+        $user = $request->user();
+
+        if (isset($validated['name'])) {
+            $user->name = trim($validated['name']);
+        }
+
+        if (isset($validated['new_password'])) {
+            if (!Hash::check($validated['current_password'], $user->password)) {
+                return new JsonResponse([
+                    'message' => 'Podane aktualne hasło jest niepoprawne.',
+                    'errors' => [
+                        'current_password' => ['Podane aktualne hasło jest niepoprawne.'],
+                    ],
+                ], Response::HTTP_UNPROCESSABLE_ENTITY);
+            }
+
+            $user->password = Hash::make($validated['new_password']);
+        }
+
+        $user->save();
+        $user->load('company');
+
+        return new JsonResponse([
+            'message' => 'Profil został zaktualizowany pomyślnie.',
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $user->role,
+                'company' => $user->company ? [
+                    'id' => $user->company->id,
+                    'name' => $user->company->name,
+                    'code' => $user->company->code,
+                    'tax_id' => $user->company->tax_id,
                 ] : null,
             ],
         ]);

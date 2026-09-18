@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import apiClient from '../api/client';
 
 const AuthContext = createContext(null);
@@ -13,6 +13,7 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         const storedUser = localStorage.getItem('finboard_user');
         const storedCompany = localStorage.getItem('finboard_active_company');
+        const storedAvailable = localStorage.getItem('finboard_available_companies');
 
         if (storedUser) {
             try {
@@ -24,8 +25,12 @@ export const AuthProvider = ({ children }) => {
                 } else if (parsedUser.company) {
                     setActiveCompany(parsedUser.company);
                 }
+
+                if (storedAvailable) {
+                    setAvailableCompanies(JSON.parse(storedAvailable));
+                }
             } catch (e) {
-                console.error('Failed to parse user from localStorage', e);
+                console.error('Failed to parse auth data from localStorage', e);
             }
         }
 
@@ -40,16 +45,27 @@ export const AuthProvider = ({ children }) => {
         try {
             const response = await apiClient.get('/auth/me');
             const userData = response.data.user;
+            const companies = response.data.available_companies || [];
+
             setUser(userData);
+            setAvailableCompanies(companies);
             localStorage.setItem('finboard_user', JSON.stringify(userData));
+            localStorage.setItem('finboard_available_companies', JSON.stringify(companies));
 
             const storedCompany = localStorage.getItem('finboard_active_company');
             if (storedCompany) {
-                setActiveCompany(JSON.parse(storedCompany));
+                const parsed = JSON.parse(storedCompany);
+                // Ensure the stored company is still valid in availableCompanies
+                const matched = companies.find(c => c.id === parsed.id) || parsed;
+                setActiveCompany(matched);
             } else if (userData.company) {
                 setActiveCompany(userData.company);
                 localStorage.setItem('finboard_active_company', JSON.stringify(userData.company));
                 localStorage.setItem('finboard_active_company_id', userData.company.id);
+            } else if (companies.length > 0) {
+                setActiveCompany(companies[0]);
+                localStorage.setItem('finboard_active_company', JSON.stringify(companies[0]));
+                localStorage.setItem('finboard_active_company_id', companies[0].id);
             }
         } catch (error) {
             logout();
@@ -58,16 +74,22 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const login = (authToken, userData) => {
+    const login = (authToken, userData, companies = []) => {
         localStorage.setItem('finboard_token', authToken);
         localStorage.setItem('finboard_user', JSON.stringify(userData));
+        localStorage.setItem('finboard_available_companies', JSON.stringify(companies));
         setToken(authToken);
         setUser(userData);
+        setAvailableCompanies(companies);
 
         if (userData.company) {
             setActiveCompany(userData.company);
             localStorage.setItem('finboard_active_company', JSON.stringify(userData.company));
             localStorage.setItem('finboard_active_company_id', userData.company.id);
+        } else if (companies.length > 0) {
+            setActiveCompany(companies[0]);
+            localStorage.setItem('finboard_active_company', JSON.stringify(companies[0]));
+            localStorage.setItem('finboard_active_company_id', companies[0].id);
         }
     };
 
@@ -83,13 +105,15 @@ export const AuthProvider = ({ children }) => {
             localStorage.removeItem('finboard_user');
             localStorage.removeItem('finboard_active_company');
             localStorage.removeItem('finboard_active_company_id');
+            localStorage.removeItem('finboard_available_companies');
             setToken(null);
             setUser(null);
             setActiveCompany(null);
+            setAvailableCompanies([]);
         }
     };
 
-    const switchCompany = (company) => {
+    const switchCompany = useCallback((company) => {
         setActiveCompany(company);
         if (company) {
             localStorage.setItem('finboard_active_company', JSON.stringify(company));
@@ -98,6 +122,23 @@ export const AuthProvider = ({ children }) => {
             localStorage.removeItem('finboard_active_company');
             localStorage.removeItem('finboard_active_company_id');
         }
+        // Dispatch custom DOM event for any reactive listener
+        window.dispatchEvent(new CustomEvent('finboard:company-changed', { detail: company }));
+    }, []);
+
+    const updateProfile = async ({ name, currentPassword, newPassword }) => {
+        const payload = {};
+        if (name) payload.name = name;
+        if (currentPassword && newPassword) {
+            payload.current_password = currentPassword;
+            payload.new_password = newPassword;
+        }
+
+        const response = await apiClient.put('/auth/profile', payload);
+        const updatedUser = response.data.user;
+        setUser(updatedUser);
+        localStorage.setItem('finboard_user', JSON.stringify(updatedUser));
+        return response.data;
     };
 
     const isAdmin = user?.role === 'admin';
@@ -109,12 +150,15 @@ export const AuthProvider = ({ children }) => {
                 user,
                 token,
                 activeCompany,
+                availableCompanies,
                 isAdmin,
                 isClient,
                 loading,
                 login,
                 logout,
                 switchCompany,
+                updateProfile,
+                refreshUser: fetchCurrentUser,
                 isAuthenticated: !!token && !!user,
             }}
         >

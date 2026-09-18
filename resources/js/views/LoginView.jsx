@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
 import apiClient from '../api/client';
 import { Button } from '../components/ui/Button';
-import { Lock, Mail, Shield, KeyRound, Server } from 'lucide-react';
+import { Lock, Mail, KeyRound } from 'lucide-react';
 
 export const LoginView = () => {
     const { login } = useAuth();
@@ -23,7 +23,11 @@ export const LoginView = () => {
                 password,
             });
 
-            login(response.data.token, response.data.user);
+            login(
+                response.data.token,
+                response.data.user,
+                response.data.available_companies || []
+            );
             success(`Zalogowano pomyślnie jako ${response.data.user.name}`);
         } catch (err) {
             const msg = err.response?.data?.message || 'Błąd uwierzytelniania. Nieprawidłowe poświadczenia.';

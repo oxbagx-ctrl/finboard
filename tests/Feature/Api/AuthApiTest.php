@@ -89,6 +89,7 @@ final class AuthApiTest extends TestCase
                         'code',
                     ],
                 ],
+                'available_companies',
             ])
             ->assertJsonPath('token_type', 'Bearer')
             ->assertJsonPath('user.email', 'klient@acme.com')
@@ -96,6 +97,21 @@ final class AuthApiTest extends TestCase
             ->assertJsonPath('user.company.code', 'ACME');
 
         $this->assertNotEmpty($response->json('token'));
+        $this->assertCount(1, $response->json('available_companies'));
+    }
+
+    public function test_admin_receives_all_available_companies_on_login(): void
+    {
+        $response = $this->postJson('/api/v1/auth/login', [
+            'email' => 'admin@helvest.com',
+            'password' => 'password123',
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJsonStructure(['token', 'user', 'available_companies']);
+
+        $companies = $response->json('available_companies');
+        $this->assertGreaterThanOrEqual(2, count($companies));
     }
 
     public function test_login_fails_with_invalid_password(): void
@@ -154,7 +170,73 @@ final class AuthApiTest extends TestCase
 
         $meResponse->assertStatus(200)
             ->assertJsonPath('user.email', 'klient@acme.com')
-            ->assertJsonPath('user.company.code', 'ACME');
+            ->assertJsonPath('user.company.code', 'ACME')
+            ->assertJsonStructure(['user', 'available_companies']);
+    }
+
+    public function test_user_can_update_profile_name(): void
+    {
+        $loginResponse = $this->postJson('/api/v1/auth/login', [
+            'email' => 'klient@acme.com',
+            'password' => 'password123',
+        ]);
+        $token = $loginResponse->json('token');
+
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->putJson('/api/v1/auth/profile', [
+                'name' => 'Jan Kowalski-Nowak (CFO)',
+            ]);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('user.name', 'Jan Kowalski-Nowak (CFO)');
+
+        $this->assertDatabaseHas('users', [
+            'email' => 'klient@acme.com',
+            'name' => 'Jan Kowalski-Nowak (CFO)',
+        ]);
+    }
+
+    public function test_user_can_update_password(): void
+    {
+        $loginResponse = $this->postJson('/api/v1/auth/login', [
+            'email' => 'klient@acme.com',
+            'password' => 'password123',
+        ]);
+        $token = $loginResponse->json('token');
+
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->putJson('/api/v1/auth/profile', [
+                'current_password' => 'password123',
+                'new_password' => 'newSecretPass2026!',
+            ]);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('message', 'Profil został zaktualizowany pomyślnie.');
+
+        // Verify login with new password succeeds
+        $retryLogin = $this->postJson('/api/v1/auth/login', [
+            'email' => 'klient@acme.com',
+            'password' => 'newSecretPass2026!',
+        ]);
+        $retryLogin->assertStatus(200);
+    }
+
+    public function test_user_cannot_update_password_with_incorrect_current_password(): void
+    {
+        $loginResponse = $this->postJson('/api/v1/auth/login', [
+            'email' => 'klient@acme.com',
+            'password' => 'password123',
+        ]);
+        $token = $loginResponse->json('token');
+
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->putJson('/api/v1/auth/profile', [
+                'current_password' => 'wrongCurrentPassword',
+                'new_password' => 'newSecretPass2026!',
+            ]);
+
+        $response->assertStatus(422)
+            ->assertJsonPath('message', 'Podane aktualne hasło jest niepoprawne.');
     }
 
     public function test_user_can_logout_and_revoke_token(): void

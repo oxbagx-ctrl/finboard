@@ -15,6 +15,7 @@ Route::prefix('v1')->group(function () {
     // Authenticated Endpoints (Sanctum)
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/auth/me', [AuthController::class, 'me'])->name('api.auth.me');
+        Route::put('/auth/profile', [AuthController::class, 'updateProfile'])->name('api.auth.profile');
         Route::post('/auth/logout', [AuthController::class, 'logout'])->name('api.auth.logout');
 
         // RBAC Verification probe endpoints

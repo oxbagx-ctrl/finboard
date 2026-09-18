@@ -1,10 +1,14 @@
-import React from 'react';
-import { Menu, Building2, Shield, RefreshCw, Lock } from 'lucide-react';
+import React, { useState } from 'react';
+import { Menu, Building2, RefreshCw, Lock, ChevronDown, User } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { Badge } from '../ui/Badge';
+import { UserProfileModal } from '../auth/UserProfileModal';
+import { CompanySwitcherModal } from './CompanySwitcherModal';
 
 export const Header = ({ currentRoute, onToggleSidebar, onRefreshData, refreshing = false }) => {
-    const { user, activeCompany, isAdmin, switchCompany } = useAuth();
+    const { user, activeCompany, isAdmin } = useAuth();
+    const [profileModalOpen, setProfileModalOpen] = useState(false);
+    const [switcherModalOpen, setSwitcherModalOpen] = useState(false);
 
     const titles = {
         'dashboard': 'Pulpit Zarządczy (Executive Overview)',
@@ -15,77 +19,93 @@ export const Header = ({ currentRoute, onToggleSidebar, onRefreshData, refreshin
         'audit-logs': 'Rejestr Nadzoru i Ścieżka Audytowa',
     };
 
-    const demoCompanies = [
-        { id: 'c0000000-0000-0000-0000-000000000002', name: 'Acme Manufacturing S.A.', code: 'ACME' },
-        { id: 'c0000000-0000-0000-0000-000000000001', name: 'Helvest Advisory Sp. z o.o.', code: 'HELVEST' },
-    ];
-
     return (
-        <header className="h-14 bg-zinc-950 border-b border-zinc-800 sticky top-0 z-30 flex items-center justify-between px-4 sm:px-6">
-            <div className="flex items-center gap-3">
-                <button
-                    onClick={onToggleSidebar}
-                    className="p-1.5 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900 lg:hidden"
-                >
-                    <Menu className="w-5 h-5" />
-                </button>
+        <>
+            <header className="h-14 bg-zinc-950 border-b border-zinc-800 sticky top-0 z-30 flex items-center justify-between px-4 sm:px-6 font-mono">
                 <div className="flex items-center gap-3">
-                    <h1 className="text-xs sm:text-sm font-semibold text-zinc-100 uppercase tracking-wide font-mono">
-                        {titles[currentRoute] || 'FinBoard'}
-                    </h1>
-                </div>
-            </div>
-
-            <div className="flex items-center gap-2.5 sm:gap-3">
-                {/* Confidentiality indicator */}
-                <div className="hidden md:flex items-center gap-1.5 px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-[10px] font-mono text-zinc-400">
-                    <Lock className="w-3 h-3 text-amber-500" />
-                    <span>STRICTLY CONFIDENTIAL</span>
-                </div>
-
-                {/* Refresh button */}
-                {onRefreshData && (
                     <button
-                        onClick={onRefreshData}
-                        disabled={refreshing}
-                        title="Odśwież dane z serwera"
-                        className="p-1.5 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900 transition-colors disabled:opacity-50"
+                        onClick={onToggleSidebar}
+                        className="p-1.5 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900 lg:hidden"
                     >
-                        <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin text-zinc-200' : ''}`} />
+                        <Menu className="w-5 h-5" />
                     </button>
-                )}
+                    <div className="flex items-center gap-3">
+                        <h1 className="text-xs sm:text-sm font-semibold text-zinc-100 uppercase tracking-wide">
+                            {titles[currentRoute] || 'FinBoard'}
+                        </h1>
+                    </div>
+                </div>
 
-                {/* Tenant Switcher for Advisor */}
-                {isAdmin ? (
-                    <div className="flex items-center gap-1.5 bg-zinc-900 border border-zinc-750 rounded px-2 py-1">
-                        <Building2 className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
-                        <select
-                            value={activeCompany?.id || ''}
-                            onChange={(e) => {
-                                const selected = demoCompanies.find(c => c.id === e.target.value);
-                                if (selected) switchCompany(selected);
-                            }}
-                            className="bg-transparent text-xs font-medium text-zinc-200 focus:outline-none cursor-pointer pr-1"
+                <div className="flex items-center gap-2 sm:gap-3">
+                    {/* Confidentiality indicator */}
+                    <div className="hidden md:flex items-center gap-1.5 px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-[10px] text-zinc-400">
+                        <Lock className="w-3 h-3 text-amber-500" />
+                        <span>STRICTLY CONFIDENTIAL</span>
+                    </div>
+
+                    {/* Refresh button */}
+                    {onRefreshData && (
+                        <button
+                            onClick={onRefreshData}
+                            disabled={refreshing}
+                            title="Odśwież dane z serwera"
+                            className="p-1.5 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900 transition-colors disabled:opacity-50"
                         >
-                            {demoCompanies.map(comp => (
-                                <option key={comp.id} value={comp.id} className="bg-zinc-900 text-zinc-200">
-                                    {comp.code} – {comp.name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                ) : (
-                    <div className="hidden sm:flex items-center gap-1.5 bg-zinc-900 border border-zinc-800 rounded px-2.5 py-1">
-                        <Building2 className="w-3.5 h-3.5 text-zinc-500" />
-                        <span className="text-xs font-medium text-zinc-300 font-mono">{activeCompany?.name}</span>
-                    </div>
-                )}
+                            <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin text-zinc-200' : ''}`} />
+                        </button>
+                    )}
 
-                {/* Role badge */}
-                <Badge variant={isAdmin ? 'default' : 'brand'} size="sm">
-                    {isAdmin ? 'ADMIN' : 'CLIENT'}
-                </Badge>
-            </div>
-        </header>
+                    {/* Company Switcher Trigger */}
+                    {isAdmin ? (
+                        <button
+                            onClick={() => setSwitcherModalOpen(true)}
+                            title="Kliknij, aby przełączyć spółkę portfelową"
+                            className="flex items-center gap-2 bg-zinc-900 hover:bg-zinc-850 border border-zinc-750 hover:border-zinc-700 rounded px-2.5 py-1 text-xs text-zinc-200 transition-all"
+                        >
+                            <Building2 className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+                            <span className="font-bold text-[11px] text-zinc-100">{activeCompany?.code || 'PODMIOT'}</span>
+                            <span className="hidden sm:inline text-zinc-500 text-[10px] truncate max-w-[120px]">
+                                {activeCompany?.name}
+                            </span>
+                            <ChevronDown className="w-3 h-3 text-zinc-500 shrink-0 ml-0.5" />
+                        </button>
+                    ) : (
+                        <div className="hidden sm:flex items-center gap-1.5 bg-zinc-900 border border-zinc-800 rounded px-2.5 py-1">
+                            <Building2 className="w-3.5 h-3.5 text-zinc-500" />
+                            <span className="text-xs font-medium text-zinc-300">{activeCompany?.name}</span>
+                        </div>
+                    )}
+
+                    {/* User Profile Trigger Button */}
+                    <button
+                        onClick={() => setProfileModalOpen(true)}
+                        title="Twój profil i ustawienia bezpieczeństwa"
+                        className="flex items-center gap-1.5 bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 hover:border-zinc-700 rounded px-2 py-1 transition-colors"
+                    >
+                        <div className="w-4 h-4 rounded bg-zinc-800 flex items-center justify-center text-zinc-300">
+                            <User className="w-3 h-3" />
+                        </div>
+                        <span className="hidden md:inline text-xs text-zinc-300 font-semibold max-w-[100px] truncate">
+                            {user?.name?.split(' ')[0] || 'Użytkownik'}
+                        </span>
+                        <Badge variant={isAdmin ? 'default' : 'brand'} size="sm">
+                            {isAdmin ? 'ADMIN' : 'CLIENT'}
+                        </Badge>
+                    </button>
+                </div>
+            </header>
+
+            {/* User Profile Modal */}
+            <UserProfileModal
+                isOpen={profileModalOpen}
+                onClose={() => setProfileModalOpen(false)}
+            />
+
+            {/* Company Switcher Modal */}
+            <CompanySwitcherModal
+                isOpen={switcherModalOpen}
+                onClose={() => setSwitcherModalOpen(false)}
+            />
+        </>
     );
 };

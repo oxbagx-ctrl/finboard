@@ -8,8 +8,8 @@
   - [x] Refaktoryzacja wizualna: stylistyka terminala instytucjonalnego Deal Advisory (wysoki kontrast Zinc/Slate, precyzyjne kąty inżynieryjne, statusy bezpieczeństwa).
   - [x] Typografia finansowa oraz liczby tabelaryczne (tabular-nums, font-mono dla kwot, wskaźników i dat).
   - [x] Pasek kontekstu transakcyjnego Deal Advisory (poufność, wybór waluty raportowania, selektor okresu).
-  - [ ] Zwarte tabele i komponenty analityczne w stylu narzędzi Bloomberg / FactSet / Ramp.
-  - [ ] Moduł uwierzytelniania i przełącznik kontekstu firmy dla doradcy.
+  - [x] Zwarte tabele i komponenty analityczne w stylu narzędzi Bloomberg / FactSet / Ramp.
+  - [x] Moduł uwierzytelniania i przełącznik kontekstu firmy dla doradcy.
   - [ ] Główny Dashboard ze wskaźnikami KPI i wykresami Recharts (trendy, struktura kosztów, płynność).
   - [ ] Moduł tabeli transakcji finansowych z filtrami i kreatorem dodawania.
   - [ ] Interfejs importu plików CSV z podglądem na żywo i paskiem postępu.

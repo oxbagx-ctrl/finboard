@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
     LayoutDashboard,
     TrendingUp,
@@ -8,12 +8,17 @@ import {
     ShieldCheck,
     Building2,
     LogOut,
-    ExternalLink
+    User,
+    ChevronRight
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { UserProfileModal } from '../auth/UserProfileModal';
+import { CompanySwitcherModal } from './CompanySwitcherModal';
 
 export const Sidebar = ({ currentRoute, onRouteChange, isOpen, onClose }) => {
     const { user, activeCompany, isAdmin, logout } = useAuth();
+    const [profileModalOpen, setProfileModalOpen] = useState(false);
+    const [switcherModalOpen, setSwitcherModalOpen] = useState(false);
 
     const navItems = [
         { id: 'dashboard', label: 'Executive Dashboard', code: 'DSH', icon: LayoutDashboard },
@@ -56,18 +61,31 @@ export const Sidebar = ({ currentRoute, onRouteChange, isOpen, onClose }) => {
                     </span>
                 </div>
 
-                {/* Target Company Box */}
+                {/* Target Company Box (Interactive for Admin) */}
                 <div className="p-3 border-b border-zinc-850 bg-zinc-900/30">
-                    <div className="p-2.5 rounded-md bg-zinc-900 border border-zinc-800">
+                    <button
+                        type="button"
+                        onClick={isAdmin ? () => setSwitcherModalOpen(true) : undefined}
+                        className={`w-full p-2.5 rounded-md text-left transition-all ${
+                            isAdmin
+                                ? 'bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 hover:border-zinc-700 cursor-pointer group'
+                                : 'bg-zinc-900 border border-zinc-800 cursor-default'
+                        }`}
+                    >
                         <div className="flex items-center justify-between text-[10px] font-mono text-zinc-500 uppercase mb-1">
                             <span>PODMIOT ANALIZOWANY</span>
                             <span className="text-zinc-400">{activeCompany?.code || 'N/A'}</span>
                         </div>
-                        <div className="text-xs font-semibold text-zinc-200 truncate flex items-center gap-1.5">
-                            <Building2 className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
-                            <span className="truncate">{activeCompany?.name || 'Wybierz podmiot'}</span>
+                        <div className="text-xs font-semibold text-zinc-200 truncate flex items-center justify-between gap-1.5">
+                            <div className="flex items-center gap-1.5 truncate">
+                                <Building2 className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+                                <span className="truncate">{activeCompany?.name || 'Wybierz podmiot'}</span>
+                            </div>
+                            {isAdmin && (
+                                <ChevronRight className="w-3.5 h-3.5 text-zinc-600 group-hover:text-zinc-300 shrink-0" />
+                            )}
                         </div>
-                    </div>
+                    </button>
                 </div>
 
                 {/* Navigation Items */}
@@ -107,12 +125,19 @@ export const Sidebar = ({ currentRoute, onRouteChange, isOpen, onClose }) => {
                 {/* Bottom User Bar */}
                 <div className="p-3 border-t border-zinc-800 bg-zinc-950">
                     <div className="flex items-center justify-between">
-                        <div className="min-w-0 pr-2">
-                            <div className="text-xs font-semibold text-zinc-200 truncate">{user?.name}</div>
+                        <button
+                            type="button"
+                            onClick={() => setProfileModalOpen(true)}
+                            className="min-w-0 pr-2 text-left hover:opacity-80 transition-opacity"
+                        >
+                            <div className="text-xs font-semibold text-zinc-200 truncate flex items-center gap-1.5">
+                                <User className="w-3 h-3 text-zinc-400 shrink-0" />
+                                <span className="truncate">{user?.name}</span>
+                            </div>
                             <div className="text-[10px] font-mono text-zinc-500 truncate">
                                 {isAdmin ? 'ROLA: DORADCA M&A' : 'ROLA: KLIENT / CFO'}
                             </div>
-                        </div>
+                        </button>
                         <button
                             onClick={logout}
                             title="Zakończ sesję"
@@ -123,6 +148,16 @@ export const Sidebar = ({ currentRoute, onRouteChange, isOpen, onClose }) => {
                     </div>
                 </div>
             </aside>
+
+            <UserProfileModal
+                isOpen={profileModalOpen}
+                onClose={() => setProfileModalOpen(false)}
+            />
+
+            <CompanySwitcherModal
+                isOpen={switcherModalOpen}
+                onClose={() => setSwitcherModalOpen(false)}
+            />
         </>
     );
 };
