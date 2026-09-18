@@ -46,8 +46,11 @@ FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakc
     - Widok importu CSV z podglądem walidacji dry-run i animowanym monitorem kolejki Redis.
     - Moduł VDR oraz globalny rejestr ścieżki audytowej (Audit Trail).
     - Zestaw 57 testów jednostkowych i integracyjnych Vitest (formatery, silnik walutowy, formularze, blokady Dry-Run, eksplorator VDR, raporty PDF, E2E workflow).
-- **Monitoring Produkcyjny i Health Check**:
+- **Monitoring Produkcyjny, Bezpieczeństwo Nginx i Automatyzacja Wdrożenia**:
     - Dedykowany endpoint `/api/v1/health` badający stan bazy PostgreSQL, klastra Redis, uprawnień magazynu plików oraz zużycia zasobów.
+    - Reguły kompresji Gzip i instytucjonalne nagłówki bezpieczeństwa Nginx (`SAMEORIGIN`, `nosniff`, `strict-origin-when-cross-origin`).
+    - Skrypt bezprzerwowego wdrożenia produkcyjnego `./scripts/deploy.sh` oraz automatycznych kopii zapasowych `./scripts/backup.sh`.
+    - Kompletny przewodnik wdrożeniowy i Runbook w [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
 
 ---
 
@@ -104,29 +107,26 @@ resources/js/
 └── views/                        # DashboardView, RecordsView, ImportView, DataRoomView, AuditLogsView, ReportsView, AnalyticsView, LoginView
 ```
 
-### Dane Testowe i Szablony Importu
+### Skrypty Wdrożeniowe i Operacyjne
 ```
-samples/import/
-├── 01_q3_2026_acme_manufacturing.csv         # Kompletne dane produkcyjne Q3 2026 (PLN, przecinek, 25 wierszy)
-├── 02_q3_2026_helvest_advisory_eur.csv        # Transakcje M&A i advisory (EUR, średnik, kody REV/COGS/OPEX, 20 wierszy)
-├── 03_monthly_batch_payroll_and_opex.csv      # Wsadowe pozycje OPEX i koszty płacowe (PLN, 12 wierszy)
-├── 04_invalid_dry_run_testing_with_errors.csv   # Zbiór z celowymi błędami do testowania walidacji Dry-Run w UI
-└── README.md                                  # Szczegółowy opis formatów i oczekiwanych wyników
+scripts/
+├── deploy.sh                     # Zautomatyzowany skrypt bezprzerwowego wdrożenia produkcyjnego (zero-downtime)
+└── backup.sh                     # Automatyczny zrzut bazy PostgreSQL i archiwizacja plików VDR z rotacją 30 dni
 ```
 
 ---
 
 ## 🚀 Środowisko Docker i Uruchomienie
 
-Środowisko developerskie oparte jest o Docker Compose:
+Środowisko developerskie i produkcyjne oparte jest o konteneryzację Docker Compose:
 - **`app`**: PHP-FPM 8.2 z rozszerzeniami `bcmath`, `pdo_pgsql`, `redis`, `gd`, `zip`
-- **`web` / `nginx`**: Serwer HTTP przekierowujący ruch do PHP-FPM (port `8080`)
-- **`postgres`**: PostgreSQL 16 (port `5432`)
+- **`web` / `nginx`**: Nginx 1.25 z kompresją Gzip i nagłówkami bezpieczeństwa (port `8080` / prod `80`/`443`)
+- **`postgres`**: PostgreSQL 16 (port `5432`) z wolumenem danych
 - **`redis`**: Redis Alpine jako broker kolejek i cache (port `6379`)
 - **`worker`**: Dedykowany kontener wykonujący zadania w tle (`php artisan queue:work --queue=financial-imports,default`)
 - **`scheduler`**: Kontener harmonogramu zadań cron (`php artisan schedule:work`)
 
-### Uruchomienie projektu
+### Uruchomienie Środowiska Developerskiego
 
 ```bash
 # 1. Start kontenerów
@@ -142,12 +142,20 @@ docker compose exec app php artisan migrate --seed
 # 4. Kompilacja assetów frontendu (React / Tailwind)
 npm run build
 
-# 5. Uruchomienie testów backendowych (PHPUnit) oraz frontendowych (Vitest)
+# 5. Uruchomienie pełnego zestawu testów
 docker compose exec app php artisan test
 npm test
 ```
 
-Aplikacja jest dostępna pod adresem: `http://localhost:8080`
+### Automatyczne Wdrożenie Produkcyjne (Zero-Downtime)
+
+Wdrożenie produkcyjne wraz z optymalizacją pamięci podręcznej i weryfikacją liveness probe:
+
+```bash
+./scripts/deploy.sh
+```
+
+Szczegółowy przewodnik operacyjny dla inżynierów DevOps i konfiguracja produkcyjna `docker-compose.prod.yml` znajdują się w dokumencie: [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
 
 ---
 
@@ -244,7 +252,8 @@ Baza danych zasilona jest danymi demonstracyjnymi (21 miesięcy historii finanso
 - [x] **Faza 7: Data Room UI, Raporty PDF i Wdrożenie Końcowe**
   - Interfejs Virtual Data Room (VDR) – przeglądarka dokumentów z kategoryzacją, sumami kontrolnymi SHA-256, audytem pobrań i drag & drop uploadem.
   - Generator podsumowań i raportów zarządczych PDF z certyfikatem integralności SHA-256 i formatem A4.
-  - Testy E2E, audyt bezpieczeństwa izolacji multi-tenant, endpoint diagnostyczny Health Check i weryfikacja produkcyjna.
+  - Testy E2E, audyt bezpieczeństwa izolacji multi-tenant i endpoint diagnostyczny Health Check.
+  - Produkcyjny hardening środowiska Docker/Nginx, skrypt automatycznego wdrożenia zero-downtime oraz Runbook operacyjny.
 
 Szczegółowa dokumentacja zrealizowanych zmian znajduje się w katalogu [`changelog/`](changelog/README.md).
 
