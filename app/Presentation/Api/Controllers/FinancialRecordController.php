@@ -54,6 +54,11 @@ final class FinancialRecordController
             $query->where('record_type', $request->query('record_type'));
         }
 
+        if ($request->filled('search')) {
+            $searchTerm = '%' . strtolower((string) $request->query('search')) . '%';
+            $query->whereRaw('LOWER(description) LIKE ?', [$searchTerm]);
+        }
+
         $records = $query
             ->orderBy('record_date', 'desc')
             ->orderBy('created_at', 'desc')

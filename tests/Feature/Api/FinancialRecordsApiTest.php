@@ -95,6 +95,29 @@ final class FinancialRecordsApiTest extends TestCase
         }
     }
 
+    public function test_filter_records_by_search_term_and_type(): void
+    {
+        Sanctum::actingAs($this->clientUser);
+
+        FinancialRecord::create([
+            'company_id' => $this->acmeCompany->id,
+            'category_id' => 'cat-revenue',
+            'record_type' => 'INCOME',
+            'amount' => 12345.67,
+            'currency' => 'PLN',
+            'record_date' => '2026-06-15',
+            'description' => 'Unikalna_Transakcja_Testowa_XYZ',
+            'source' => 'manual',
+        ]);
+
+        $response = $this->getJson('/api/v1/finance/records?search=Testowa_XYZ&record_type=INCOME');
+
+        $response->assertStatus(200);
+        $data = $response->json('data');
+        $this->assertNotEmpty($data);
+        $this->assertSame('Unikalna_Transakcja_Testowa_XYZ', $data[0]['description']);
+    }
+
     public function test_create_financial_record_via_api(): void
     {
         Sanctum::actingAs($this->clientUser);

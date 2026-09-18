@@ -11,7 +11,7 @@
   - [x] Zwarte tabele i komponenty analityczne w stylu narzędzi Bloomberg / FactSet / Ramp.
   - [x] Moduł uwierzytelniania i przełącznik kontekstu firmy dla doradcy.
   - [x] Główny Dashboard ze wskaźnikami KPI i wykresami Recharts (trendy, struktura kosztów, płynność).
-  - [ ] Moduł tabeli transakcji finansowych z filtrami i kreatorem dodawania.
+  - [x] Moduł tabeli transakcji finansowych z filtrami i kreatorem dodawania.
   - [ ] Interfejs importu plików CSV z podglądem na żywo i paskiem postępu.
 - [ ] **Faza 7: Data Room UI, Raporty PDF i Wdrożenie Końcowe**
   - Interfejs Virtual Data Room (VDR) – przeglądarka dokumentów z kategoryzacją i pobieraniem.
