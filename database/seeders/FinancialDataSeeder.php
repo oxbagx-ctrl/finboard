@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Contexts\Finance\Domain\ValueObjects\BenchmarkMetricType;
 use App\Models\Company;
+use App\Models\FinancialBenchmark;
 use App\Models\FinancialRecord;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
@@ -41,6 +43,7 @@ final class FinancialDataSeeder extends Seeder
 
         $this->seedAcmeManufacturing();
         $this->seedHelvestAdvisory();
+        $this->seedBenchmarks();
     }
 
     private function seedAcmeManufacturing(): void
@@ -136,6 +139,28 @@ final class FinancialDataSeeder extends Seeder
         }
 
         FinancialRecord::insert($records);
+    }
+
+    private function seedBenchmarks(): void
+    {
+        foreach ([self::ACME_ID, self::HELVEST_ID] as $companyId) {
+            foreach (BenchmarkMetricType::cases() as $metricType) {
+                FinancialBenchmark::firstOrCreate(
+                    [
+                        'company_id' => $companyId,
+                        'metric_type' => $metricType->value,
+                    ],
+                    [
+                        'id' => Str::uuid()->toString(),
+                        'target_value' => $metricType->defaultTarget(),
+                        'warning_threshold' => $metricType->defaultWarning(),
+                        'critical_threshold' => $metricType->defaultCritical(),
+                        'higher_is_better' => $metricType->higherIsBetter(),
+                        'description' => "Standardowy benchmark branżowy: {$metricType->label()}",
+                    ]
+                );
+            }
+        }
     }
 
     private function makeRecord(

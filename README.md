@@ -5,7 +5,7 @@
 [![PostgreSQL](https://img.shields.io/badge/postgresql-16-blue.svg)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/redis-alpine-red.svg)](https://redis.io/)
 [![Architecture](https://img.shields.io/badge/architecture-DDD%20%2F%20CQRS-brightgreen.svg)]()
-[![Tests](https://img.shields.io/badge/tests-285%20backend%20%7C%2099%20frontend%20passed-success.svg)]()
+[![Tests](https://img.shields.io/badge/tests-290%20backend%20%7C%2099%20frontend%20passed-success.svg)]()
 
 FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakcyjnego (M&A, Due Diligence, Corporate Finance) oraz ich klientom (CFO, Zarządy). Aplikacja łączy w sobie zaawansowaną analitykę finansową w ujęciu wielo-najemcowym (Multi-Tenant) z bezpiecznym repozytorium dokumentów Virtual Data Room (VDR).
 
@@ -18,7 +18,7 @@ FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakc
     - Rozdzielenie ścieżki zapisu (Commands) i odczytu (Queries).
     - Domenowe Value Objects (`Money` z precyzją `bcmath` do 4 miejsc po przecinku, `DateRange`, `FileMetadata`, `CompanyId`, `RoleType`, `Token`, `InvitationId`, `FinancialMetrics`, `FinancialBenchmarkId`, `BenchmarkStatus`, `BenchmarkMetricType`).
     - Domenowy kalkulator finansowy (`FinancialCalculator`) oraz metody domenowe `FinancialRecord` wyliczające wskaźniki P&L (Gross Profit, OPEX, EBIT, EBITDA, Zysk Netto, marże) oraz bilansu i płynności (Current Ratio, Quick Ratio, Debt-to-Assets).
-    - Encja domenowa `FinancialBenchmark` realizująca ewaluację wskaźników spółki z przypisaniem flag statusu (`OPT`, `WARN`, `CRIT`, `UNKNOWN`).
+    - Encja domenowa `FinancialBenchmark` realizująca ewaluację wskaźników spółki z przypisaniem flag statusu (`OPT`, `WARN`, `CRIT`, `UNKNOWN`) oraz repozytorium `FinancialBenchmarkRepositoryInterface` trwale zapisujące cele w PostgreSQL.
     - Serwis aplikacyjny `KpiCalculationService` kalkulujący dynamikę YoY oraz MoM na danych historycznych ze ścisłą ochroną przed dzieleniem przez zero.
     - Kontroler `KpiController` w warstwie prezentacji API serwujący dynamiczne wskaźniki P&L, bilansowe oraz wariancje okresowe YoY/MoM.
 - **Bezpieczeństwo i Izolacja Multi-Tenant**:
@@ -58,76 +58,66 @@ FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakc
     - Zestaw 99 testów jednostkowych i integracyjnych Vitest (formatery, silnik walutowy, formularze, blokady Dry-Run, eksplorator VDR, raporty PDF, E2E workflow, analityka finansowa i wskaźniki Recharts, zarządzanie doradcami, zaproszenia i aktywacja konta, reaktywne dodawanie spółek).
 - **Monitoring Produkcyjny, Bezpieczeństwo Nginx i Automatyzacja Wdrożenia**:
     - Dedykowany endpoint `/api/v1/health` badający stan bazy PostgreSQL, klastra Redis, uprawnień magazynu plików oraz zużycia zasobów.
-    - Reguły kompresji Gzip i instytucjonalne nagłówki bezpieczeństwa Nginx (`SAMEORIGIN`, `nosniff`, `strict-origin-when-cross-origin`).
-    - Skrypt bezprzerwowego wdrożenia produkcyjnego `./scripts/deploy.sh` oraz automatycznych kopii zapasowych `./scripts/backup.sh`.
-    - Kompletny przewodnik wdrożeniowy i Runbook w [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
+    - Automatyczne konteneryzowane skrypty backupu (`scripts/backup.sh`) z rotacją 30 dni oraz zero-downtime deployment (`scripts/deploy.sh`).
+    - Konfiguracja Nginx z certyfikatami SSL/TLS, nagłówkami bezpieczeństwa HSTS, Content-Security-Policy oraz blokadami exploitów.
 
 ---
 
-## 🏗️ Architektura Systemu
+## 🏗️ Architektura Systemu i Bounded Contexts
 
-Platforma została zaprojektowana zgodnie z pryncypiami **Domain-Driven Design (DDD)**, **CQRS (Command Query Responsibility Segregation)** oraz **Clean/Hexagonal Architecture** na backendzie, połączonymi z modułową architekturą **SPA React 18** na frontendzie:
+Platforma została zaprojektowana w oparciu o pryncypia Domain-Driven Design (DDD):
 
-### Backend (Laravel 11 / PHP 8.2 / DDD / CQRS)
 ```
 app/
 ├── Contexts/
-│   ├── Identity/                 # Bounded Context: Zarządzanie tożsamością i uprawnieniami
-│   │   ├── Domain/               # User Aggregate Root, Invitation Entity, Role Entity, Value Objects (UserId, Email, HashedPassword, RoleType, Token, InvitationId), Domain Events
-│   │   ├── Application/          # Use cases (InviteUserUseCase, AcceptInvitationUseCase), Commands (InviteUserCommand, AcceptInvitationCommand), Exceptions, Repositories interfaces
-│   │   └── Infrastructure/       # EloquentUserRepository, EloquentInvitationRepository, Mailables (UserInvitationMail), Listeners (SendInvitationEmailListener), Sanctum Provider
-│   │
-│   ├── Tenant/                   # Bounded Context: Zarządzanie firmami i relacjami doradców
-│   │   ├── Domain/               # CompanyAdvisorAssignment Entity, CompanyId VO, Domain Events, Repository Interfaces
-│   │   ├── Application/          # Use cases przypisań i odwołań (AssignAdvisorToCompanyUseCase, RevokeAdvisorFromCompanyUseCase), wyjątki domenowe
-│   │   └── Infrastructure/       # EloquentCompanyAdvisorRepository, EloquentCompanyRepository, TenantServiceProvider
-│   │
-│   ├── Finance/                  # Bounded Context: Finanse, Raportowanie i Analityka
-│   │   ├── Domain/               # FinancialRecord Aggregate, FinancialBenchmark Aggregate, Category, Value Objects (Money bcmath, DateRange, FinancialMetrics, BenchmarkStatus, BenchmarkMetricType, FinancialBenchmarkId), FinancialCalculator, Domain Events
-│   │   ├── Application/          # CQRS Commands & Handlers (CRUD transakcji), CQRS Queries & Handlers (KPI, Trends, Solvency), Parser CSV, Jobs, KpiCalculationService
-│   │   └── Infrastructure/       # EloquentFinancialRecordRepository, EloquentCategoryRepository
-│   │
-│   └── DocumentManagement/       # Bounded Context: Virtual Data Room (VDR)
-│       ├── Domain/               # Document Aggregate Root, FileMetadata, DocumentType, Domain Events
-│       ├── Application/          # Porty repozytorium (DocumentRepositoryInterface) i interfejs magazynu plików (DocumentStorageInterface)
-│       └── Infrastructure/       # EloquentDocumentRepository, LocalStorageDocumentStorage
-│
-├── Models/                       # Modele Eloquent (User, Company, FinancialRecord, FinancialCategory, Document, DocumentAccessLog, CsvImport, Invitation)
-├── Presentation/                 # Warstwa Prezentacji i Komunikacji API
-│   └── Api/
-│       ├── Controllers/          # Kontrolery REST API (Auth, FinancialRecord, FinancialCategory, FinancialImport, FinancialAnalytics, KpiController, Document, Health, Invitation, AdvisorManagement)
-│       ├── Middleware/           # RoleMiddleware, RequireCompanyAccessMiddleware (Tenant Isolation Guard)
-│       ├── Requests/             # FormRequests z walidacją (StoreInvitationRequest, AcceptInvitationRequest, AssignCompanyRequest, SyncAdvisorCompaniesRequest, StoreCompanyRequest)
-│       ├── Resources/            # API Resources (InvitationResource, AdvisorResource, CompanyAssignmentResource, FinancialRecordResource, DocumentResource)
-│       └── Traits/               # ResolvesCompanyContext (Multi-Tenant Context Resolver)
-└── Shared/                       # Klasy bazowe architektury (ValueObject, AggregateRoot, DomainEvent, Entity)
+│   ├── Identity/               # Bounded Context: Tożsamość, Konta, RBAC i Zaproszenia
+│   │   ├── Domain/             # Agregaty (User, Invitation), Value Objects (Role, Token), Eventy
+│   │   ├── Application/        # Use Cases (InviteUser, AcceptInvitation), DTOs, Listeners
+│   │   └── Infrastructure/     # Repozytoria Eloquent, Hashers, Providers
+│   ├── Finance/                # Bounded Context: Księgowość, Dynamiczne KPI, Importy, Benchmarki
+│   │   ├── Domain/             # Agregaty (FinancialRecord, FinancialBenchmark), Value Objects (Money, DateRange, BenchmarkStatus, BenchmarkMetricType)
+│   │   │                       # Serwis domenowy FinancialCalculator, kalkulacje P&L i wskaźników płynności
+│   │   ├── Application/        # Commands/Queries, KpiCalculationService (dynamika YoY/MoM), CsvFinancialDataParser, Jobs
+│   │   └── Infrastructure/     # EloquentFinancialRecordRepository, EloquentFinancialBenchmarkRepository, Providers
+│   ├── DocumentManagement/     # Bounded Context: Virtual Data Room (VDR)
+│   │   ├── Domain/             # Agregat Document, Logi audytowe, Value Objects (FileMetadata, Checksum)
+│   │   ├── Application/        # DTOs, Handlers, Zarządzanie wersjami i audytem
+│   │   └── Infrastructure/     # Dyskowe repozytorium szyfrowane, adaptery Storage
+│   └── Tenant/                 # Bounded Context: Multi-Tenancy & Portfolio Assignments
+│       ├── Domain/             # Agregat CompanyAdvisorAssignment, repozytoria powiązań
+│       ├── Application/        # Use Cases przypisywania doradców (AssignAdvisor, RevokeAdvisor)
+│       └── Infrastructure/     # EloquentCompanyAdvisorRepository
+├── Models/                     # Modele Eloquent (User, Company, FinancialRecord, FinancialBenchmark, Document, etc.)
+└── Presentation/
+    └── Api/Controllers/        # Kontrolery REST API (Auth, Kpi, FinancialRecords, Analytics, VDR, Invitations, Advisors)
 ```
 
-### Frontend (React 18 / Tailwind CSS / Recharts / Terminal Deal Advisory)
-```
-resources/js/
-├── api/                          # Klient Axios z automatyczną obsługą tokenów Bearer i nagłówków multi-tenant (X-Company-Id)
-├── components/
-│   ├── advisors/                 # AdvisorAssignmentModal (zarządzanie przypisaniem spółek), InviteUserModal (bezpieczne zapraszanie użytkowników), CreateCompanyModal
-│   ├── auth/                     # CompanySwitcherModal (wyszukiwarka spółek portfela), UserProfileModal (dane, zmiana hasła)
-│   ├── charts/                   # PnlTrendChart, CostBreakdownChart, LiquidityTrendChart, CustomChartTooltip (ciemny monospace FactSet/Bloomberg)
-│   ├── dataroom/                 # DataRoomStats, DocumentTable, DocumentUploadModal, DocumentEditModal, DocumentAuditModal, DeleteDocumentModal
-│   ├── finance/                  # FinancialRecordModal (kreator/edycja wpisu księgi), DeleteRecordConfirmationModal
-│   ├── import/                   # CsvDropzone (strefa drag & drop), CsvPreviewTable (dry-run), ImportJobProgress (polling Redis), ImportHistoryTable
-│   ├── layout/                   # DealContextBar (waluta, poufność, okres), Header, Sidebar, Layout
-│   ├── reports/                  # ReportConfigurator (parametryzacja, waluty, okresy), ExecutivePdfReport (układ memorandumu A4, SHA-256)
-│   └── ui/                       # Badge, Button, Card, MultiplesStrip (wskaźniki EV/EBITDA, P/E), FinancialTable
-├── context/                      # AuthContext (tożsamość, role, kontekst spółki), DealContext (FX, okres), NotificationContext (toasty)
-├── tests/                        # Vitest setup, unit tests (formatters, dealContext) & component integration tests (CsvPreviewTable, FinancialRecordModal, DataRoom, ExecutiveReports, DealAdvisoryE2E, AdvisorsManagement, InviteUserModal, AcceptInvitation, AnalyticsView, CreateCompanyModal)
-├── utils/                        # formatters.js (liczby tabelaryczne tabular-nums, waluty PLN/EUR/USD/GBP, formatowanie wskaźników, formatFileSize, formatDateTime)
-└── views/                        # DashboardView, RecordsView, ImportView, DataRoomView, AuditLogsView, ReportsView, AnalyticsView, LoginView, AdvisorsManagementView, AcceptInvitationView
-```
+---
 
-### Skrypty Wdrożeniowe i Operacyjne
+## 🛠️ Struktura Katalogów i Modułów
+
 ```
-scripts/
-├── deploy.sh                     # Zautomatyzowany skrypt bezprzerwowego wdrożenia produkcyjnego (zero-downtime)
-└── backup.sh                     # Automatyczny zrzut bazy PostgreSQL i archiwizacja plików VDR z rotacją 30 dni
+finboard/
+├── app/
+│   ├── Contexts/               # Domenowe Bounded Contexts (Identity, Finance, DocumentManagement, Tenant)
+│   ├── Models/                 # Modele bazodanowe Eloquent
+│   ├── Http/Middleware/        # Middleware autoryzacji Sanctum, RBAC, TenantContext
+│   └── Presentation/Api/       # Kontrolery API pogrupowane domenowo
+├── resources/
+│   └── js/
+│       ├── components/         # Komponenty UI (FinancialOverview, GeneralLedger, DataRoom, AnalyticsView, etc.)
+│       ├── context/            # DealContext (stan sesji, waluta bazowa, okres raportowy, tenant)
+│       └── tests/              # Testy jednostkowe i integracyjne Vitest
+├── routes/
+│   └── api.php                 # Definicje tras REST API (/api/v1/...)
+├── database/
+│   ├── migrations/             # Migracje schematu PostgreSQL
+│   └── seeders/                # Idempotentne seedery danych demo (Acme & Helvest)
+├── docker/                     # Konfiguracje Dockerfile, Nginx, PHP, php.ini
+├── changelog/                  # Historia commitów i ewolucji architektury projektu
+├── scripts/
+│   ├── deploy.sh               # Skrypt bezprzerwowego wdrożenia produkcyjnego (zero-downtime)
+│   └── backup.sh               # Automatyczny zrzut bazy PostgreSQL i archiwizacja plików VDR z rotacją 30 dni
 ```
 
 ---
@@ -330,7 +320,7 @@ Baza danych zasilona jest danymi demonstracyjnymi (21 miesięcy historii finanso
   - Aktualizacja kontrolera `KpiController` do zwracania dynamicznie wyliczonych wskaźników.
 - [ ] **Faza 13: Konfiguracja Benchmarków i Celów Finansowych (Finance)**
   - [x] Encja `FinancialBenchmark`, enumy `BenchmarkStatus`, `BenchmarkMetricType` oraz reguły ewaluacji statusów KPI.
-  - [ ] Migracja bazy danych, model Eloquent i repozytorium dla benchmarków spółek.
+  - [x] Migracja bazy danych, model Eloquent i repozytorium dla benchmarków spółek.
   - [ ] Serwis ewaluacji wskaźników z dynamicznym wyliczaniem flag statusów (OPT, WARN, CRIT).
   - [ ] Endpointy REST API do pobierania i konfiguracji benchmarków dla doradców.
   - [ ] Testy jednostkowe i integracyjne modułu benchmarków oraz weryfikacja uprawnień.
