@@ -8,6 +8,7 @@ import { Badge } from '../components/ui/Badge';
 import { FinancialTable } from '../components/ui/FinancialTable';
 import { FinancialMultiplesStrip } from '../components/ui/FinancialMultiplesStrip';
 import { AuditTrailSnippet } from '../components/ui/AuditTrailSnippet';
+import { BenchmarkConfigModal } from '../components/benchmarks/BenchmarkConfigModal';
 import { PnlTrendChart } from '../components/charts/PnlTrendChart';
 import { CostBreakdownChart } from '../components/charts/CostBreakdownChart';
 import { LiquidityTrendChart } from '../components/charts/LiquidityTrendChart';
@@ -21,11 +22,12 @@ import {
     Coins,
     Cpu,
     BarChart3,
-    Activity
+    Activity,
+    Sliders
 } from 'lucide-react';
 
 export const DashboardView = () => {
-    const { activeCompany } = useAuth();
+    const { activeCompany, isAdmin, isAdvisor } = useAuth();
     const { dateRange, currency, convertAmount } = useDeal();
     const { error } = useNotification();
 
@@ -37,6 +39,7 @@ export const DashboardView = () => {
     const [auditLogs, setAuditLogs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [chartMode, setChartMode] = useState('pnl'); // 'pnl' | 'liquidity'
+    const [isBenchmarkModalOpen, setIsBenchmarkModalOpen] = useState(false);
 
     const fetchData = useCallback(async () => {
         setLoading(true);
@@ -71,8 +74,15 @@ export const DashboardView = () => {
         fetchData();
 
         const handleCompanyChange = () => fetchData();
+        const handleBenchmarksUpdated = () => fetchData();
+
         window.addEventListener('finboard:company-changed', handleCompanyChange);
-        return () => window.removeEventListener('finboard:company-changed', handleCompanyChange);
+        window.addEventListener('finboard:benchmarks-updated', handleBenchmarksUpdated);
+
+        return () => {
+            window.removeEventListener('finboard:company-changed', handleCompanyChange);
+            window.removeEventListener('finboard:benchmarks-updated', handleBenchmarksUpdated);
+        };
     }, [fetchData]);
 
     const rawRevenue = Number(metrics?.pnl?.revenue?.amount || 0);
@@ -305,12 +315,23 @@ export const DashboardView = () => {
                 </div>
 
                 <div className="flex items-center gap-3 text-[11px] font-mono text-zinc-400">
+                    {(isAdmin || isAdvisor) && (
+                        <button
+                            type="button"
+                            onClick={() => setIsBenchmarkModalOpen(true)}
+                            className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-zinc-800 hover:bg-zinc-750 text-zinc-200 border border-zinc-700 hover:border-zinc-600 text-xs transition-colors"
+                            title="Konfiguracja celów benchmarkowych spółki"
+                        >
+                            <Sliders className="w-3.5 h-3.5 text-emerald-400" />
+                            <span>Cele Benchmarkowe (M&A)</span>
+                        </button>
+                    )}
                     <div className="flex items-center gap-1.5">
                         <Coins className="w-3.5 h-3.5 text-zinc-500" />
-                        <span className="text-zinc-300 text-[10px]">WALUTA PREZENTACJI: {currency}</span>
+                        <span className="text-zinc-300 text-[10px]">WALUTA: {currency}</span>
                     </div>
-                    <span className="text-zinc-700">|</span>
-                    <div className="flex items-center gap-1.5">
+                    <span className="text-zinc-700 hidden sm:inline">|</span>
+                    <div className="items-center gap-1.5 hidden sm:flex">
                         <Cpu className="w-3.5 h-3.5 text-zinc-500" />
                         <span className="text-[10px] text-zinc-400">ENGINE: CQRS / DDD</span>
                     </div>
@@ -367,6 +388,7 @@ export const DashboardView = () => {
                 netMargin={netMargin}
                 debtRatio={debtRatio}
                 benchmarks={metrics?.benchmarks}
+                onConfigure={isAdmin || isAdvisor ? () => setIsBenchmarkModalOpen(true) : null}
             />
 
             {/* Charts Section (Recharts) */}
@@ -455,6 +477,14 @@ export const DashboardView = () => {
 
             {/* Immutable Audit Trail Snippet with Live API Data */}
             <AuditTrailSnippet logs={auditLogs} />
+
+            {/* Modal Konfiguracji Celów i Benchmarków */}
+            <BenchmarkConfigModal
+                isOpen={isBenchmarkModalOpen}
+                onClose={() => setIsBenchmarkModalOpen(false)}
+                onSaved={fetchData}
+                currentMetrics={metrics}
+            />
         </div>
     );
 };

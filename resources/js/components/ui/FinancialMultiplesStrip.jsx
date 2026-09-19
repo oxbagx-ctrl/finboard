@@ -10,6 +10,7 @@ export const FinancialMultiplesStrip = ({
     netMargin = 0,
     debtRatio = 0,
     benchmarks = null,
+    onConfigure = null,
     className = '',
 }) => {
     const getStatusStyle = (status) => {
@@ -104,9 +105,20 @@ export const FinancialMultiplesStrip = ({
         <div className={`bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden shadow-sm ${className}`}>
             <div className="px-3.5 py-2 bg-zinc-950 border-b border-zinc-800 flex items-center justify-between text-[10px] font-mono text-zinc-400">
                 <span className="font-semibold uppercase text-zinc-300">WSKAŹNIKI PŁYNNOŚCI I RENTOWNOŚCI (MULTIPLE STRIP)</span>
-                <span className="text-zinc-500">
-                    {benchmarks ? 'BENCHMARKI DORADCY & STATUSY KPI' : 'BENCHMARK BRANŻOWY M&A'}
-                </span>
+                <div className="flex items-center gap-3">
+                    <span className="text-zinc-500">
+                        {benchmarks ? 'BENCHMARKI DORADCY & STATUSY KPI' : 'BENCHMARK BRANŻOWY M&A'}
+                    </span>
+                    {onConfigure && (
+                        <button
+                            type="button"
+                            onClick={onConfigure}
+                            className="text-emerald-400 hover:text-emerald-300 hover:underline font-semibold uppercase text-[10px] flex items-center gap-1 transition-colors"
+                        >
+                            Konfiguruj cele
+                        </button>
+                    )}
+                </div>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 divide-x divide-y sm:divide-y-0 divide-zinc-800 font-mono">
                 {multiples.map((item, idx) => {
