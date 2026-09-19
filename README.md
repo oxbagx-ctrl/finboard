@@ -5,7 +5,7 @@
 [![PostgreSQL](https://img.shields.io/badge/postgresql-16-blue.svg)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/redis-alpine-red.svg)](https://redis.io/)
 [![Architecture](https://img.shields.io/badge/architecture-DDD%20%2F%20CQRS-brightgreen.svg)]()
-[![Tests](https://img.shields.io/badge/tests-290%20backend%20%7C%2099%20frontend%20passed-success.svg)]()
+[![Tests](https://img.shields.io/badge/tests-297%20backend%20%7C%2099%20frontend%20passed-success.svg)]()
 
 FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakcyjnego (M&A, Due Diligence, Corporate Finance) oraz ich klientom (CFO, Zarządy). Aplikacja łączy w sobie zaawansowaną analitykę finansową w ujęciu wielo-najemcowym (Multi-Tenant) z bezpiecznym repozytorium dokumentów Virtual Data Room (VDR).
 
@@ -20,6 +20,7 @@ FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakc
     - Domenowy kalkulator finansowy (`FinancialCalculator`) oraz metody domenowe `FinancialRecord` wyliczające wskaźniki P&L (Gross Profit, OPEX, EBIT, EBITDA, Zysk Netto, marże) oraz bilansu i płynności (Current Ratio, Quick Ratio, Debt-to-Assets).
     - Encja domenowa `FinancialBenchmark` realizująca ewaluację wskaźników spółki z przypisaniem flag statusu (`OPT`, `WARN`, `CRIT`, `UNKNOWN`) oraz repozytorium `FinancialBenchmarkRepositoryInterface` trwale zapisujące cele w PostgreSQL.
     - Serwis aplikacyjny `KpiCalculationService` kalkulujący dynamikę YoY oraz MoM na danych historycznych ze ścisłą ochroną przed dzieleniem przez zero.
+    - Serwis aplikacyjny `KpiEvaluationService` ewaluujący dynamicznie metryki finansowe spółki wobec skonfigurowanych celów doradcy (lub rynkowych wartości domyślnych) wraz z wyznaczaniem statusów semaforowych (`OPT`, `WARN`, `CRIT`), syntetycznego wskaźnika `health_score` i zagregowanego stanu zdrowia finansowego.
     - Kontroler `KpiController` w warstwie prezentacji API serwujący dynamiczne wskaźniki P&L, bilansowe oraz wariancje okresowe YoY/MoM.
 - **Bezpieczeństwo i Izolacja Multi-Tenant**:
     - Pełna separacja danych pomiędzy firmami (Tenant Isolation).
@@ -77,7 +78,7 @@ app/
 │   ├── Finance/                # Bounded Context: Księgowość, Dynamiczne KPI, Importy, Benchmarki
 │   │   ├── Domain/             # Agregaty (FinancialRecord, FinancialBenchmark), Value Objects (Money, DateRange, BenchmarkStatus, BenchmarkMetricType)
 │   │   │                       # Serwis domenowy FinancialCalculator, kalkulacje P&L i wskaźników płynności
-│   │   ├── Application/        # Commands/Queries, KpiCalculationService (dynamika YoY/MoM), CsvFinancialDataParser, Jobs
+│   │   ├── Application/        # Commands/Queries, KpiCalculationService (dynamika YoY/MoM), KpiEvaluationService (flagi OPT/WARN/CRIT), CsvFinancialDataParser, Jobs
 │   │   └── Infrastructure/     # EloquentFinancialRecordRepository, EloquentFinancialBenchmarkRepository, Providers
 │   ├── DocumentManagement/     # Bounded Context: Virtual Data Room (VDR)
 │   │   ├── Domain/             # Agregat Document, Logi audytowe, Value Objects (FileMetadata, Checksum)
@@ -321,7 +322,7 @@ Baza danych zasilona jest danymi demonstracyjnymi (21 miesięcy historii finanso
 - [ ] **Faza 13: Konfiguracja Benchmarków i Celów Finansowych (Finance)**
   - [x] Encja `FinancialBenchmark`, enumy `BenchmarkStatus`, `BenchmarkMetricType` oraz reguły ewaluacji statusów KPI.
   - [x] Migracja bazy danych, model Eloquent i repozytorium dla benchmarków spółek.
-  - [ ] Serwis ewaluacji wskaźników z dynamicznym wyliczaniem flag statusów (OPT, WARN, CRIT).
+  - [x] Serwis ewaluacji wskaźników z dynamicznym wyliczaniem flag statusów (OPT, WARN, CRIT).
   - [ ] Endpointy REST API do pobierania i konfiguracji benchmarków dla doradców.
   - [ ] Testy jednostkowe i integracyjne modułu benchmarków oraz weryfikacja uprawnień.
 
