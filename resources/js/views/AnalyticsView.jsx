@@ -283,17 +283,24 @@ export const AnalyticsView = () => {
     const ebitVal = convertAmount(rawEbit);
     const netProfitVal = convertAmount(rawNetProfit);
 
-    const currentRatio = metrics?.liquidity?.current_ratio != null
-        ? Number(metrics.liquidity.current_ratio)
-        : (metrics?.benchmarks?.current_ratio?.current_value != null ? Number(metrics.benchmarks.current_ratio.current_value) : 0);
+    const ratios = metrics?.ratios || {};
+    const currentRatio = ratios?.current_ratio != null
+        ? Number(ratios.current_ratio)
+        : (metrics?.liquidity?.current_ratio != null
+            ? Number(metrics.liquidity.current_ratio)
+            : (metrics?.benchmarks?.current_ratio?.current_value != null ? Number(metrics.benchmarks.current_ratio.current_value) : 0));
 
-    const quickRatio = metrics?.liquidity?.quick_ratio != null
-        ? Number(metrics.liquidity.quick_ratio)
-        : (metrics?.benchmarks?.quick_ratio?.current_value != null ? Number(metrics.benchmarks.quick_ratio.current_value) : 0);
+    const quickRatio = ratios?.quick_ratio != null
+        ? Number(ratios.quick_ratio)
+        : (metrics?.liquidity?.quick_ratio != null
+            ? Number(metrics.liquidity.quick_ratio)
+            : (metrics?.benchmarks?.quick_ratio?.current_value != null ? Number(metrics.benchmarks.quick_ratio.current_value) : 0));
 
-    const debtRatio = metrics?.solvency?.debt_to_assets != null
-        ? Number(metrics.solvency.debt_to_assets)
-        : (metrics?.benchmarks?.debt_to_assets?.current_value != null ? Number(metrics.benchmarks.debt_to_assets.current_value) : 0);
+    const debtRatio = ratios?.debt_to_assets != null
+        ? Number(ratios.debt_to_assets)
+        : (metrics?.solvency?.debt_to_assets != null
+            ? Number(metrics.solvency.debt_to_assets)
+            : (metrics?.benchmarks?.debt_to_assets?.current_value != null ? Number(metrics.benchmarks.debt_to_assets.current_value) : 0));
 
     const rawWorkingCapital = metrics?.liquidity?.working_capital?.amount != null
         ? Number(metrics.liquidity.working_capital.amount)
@@ -508,6 +515,7 @@ export const AnalyticsView = () => {
 
                     {/* Bloomberg Multiples Strip */}
                     <FinancialMultiplesStrip
+                        ratios={metrics?.ratios}
                         currentRatio={currentRatio}
                         quickRatio={quickRatio}
                         ebitdaMargin={ebitdaMargin}

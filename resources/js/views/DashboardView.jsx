@@ -106,34 +106,70 @@ export const DashboardView = () => {
     const taxVal = convertAmount(rawTax);
     const netProfitVal = convertAmount(rawNetProfit);
 
-    // Dynamic Liquidity & Margins from API / Benchmarks
-    const currentRatio = metrics?.liquidity?.current_ratio != null
-        ? Number(metrics.liquidity.current_ratio)
-        : (metrics?.benchmarks?.current_ratio?.current_value != null ? Number(metrics.benchmarks.current_ratio.current_value) : 0);
+    // Dynamic Unified Ratios, Liquidity & Margins from API / Benchmarks
+    const ratios = metrics?.ratios || {};
 
-    const quickRatio = metrics?.liquidity?.quick_ratio != null
-        ? Number(metrics.liquidity.quick_ratio)
-        : (metrics?.benchmarks?.quick_ratio?.current_value != null ? Number(metrics.benchmarks.quick_ratio.current_value) : 0);
+    const currentRatio = ratios?.current_ratio != null
+        ? Number(ratios.current_ratio)
+        : (metrics?.liquidity?.current_ratio != null
+            ? Number(metrics.liquidity.current_ratio)
+            : (metrics?.benchmarks?.current_ratio?.actual_value != null
+                ? Number(metrics.benchmarks.current_ratio.actual_value)
+                : (metrics?.benchmarks?.current_ratio?.current_value != null
+                    ? Number(metrics.benchmarks.current_ratio.current_value)
+                    : 0)));
 
-    const debtRatio = metrics?.solvency?.debt_to_assets != null
-        ? Number(metrics.solvency.debt_to_assets)
-        : (metrics?.benchmarks?.debt_to_assets?.current_value != null ? Number(metrics.benchmarks.debt_to_assets.current_value) : 0);
+    const quickRatio = ratios?.quick_ratio != null
+        ? Number(ratios.quick_ratio)
+        : (metrics?.liquidity?.quick_ratio != null
+            ? Number(metrics.liquidity.quick_ratio)
+            : (metrics?.benchmarks?.quick_ratio?.actual_value != null
+                ? Number(metrics.benchmarks.quick_ratio.actual_value)
+                : (metrics?.benchmarks?.quick_ratio?.current_value != null
+                    ? Number(metrics.benchmarks.quick_ratio.current_value)
+                    : 0)));
 
-    const ebitdaMargin = metrics?.pnl?.ebitda_margin_pct != null
-        ? Number(metrics.pnl.ebitda_margin_pct) / 100
-        : (metrics?.pnl?.ebitda_margin != null ? Number(metrics.pnl.ebitda_margin) : (rawRevenue > 0 ? rawEbitda / rawRevenue : 0));
+    const debtRatio = ratios?.debt_to_assets != null
+        ? Number(ratios.debt_to_assets)
+        : (metrics?.solvency?.debt_to_assets != null
+            ? Number(metrics.solvency.debt_to_assets)
+            : (metrics?.benchmarks?.debt_to_assets?.actual_value != null
+                ? Number(metrics.benchmarks.debt_to_assets.actual_value)
+                : (metrics?.benchmarks?.debt_to_assets?.current_value != null
+                    ? Number(metrics.benchmarks.debt_to_assets.current_value)
+                    : 0)));
 
-    const operatingMargin = metrics?.pnl?.operating_margin_pct != null
-        ? Number(metrics.pnl.operating_margin_pct) / 100
-        : (metrics?.pnl?.operating_margin != null ? Number(metrics.pnl.operating_margin) : (rawRevenue > 0 ? rawEbit / rawRevenue : 0));
+    const ebitdaMargin = ratios?.ebitda_margin != null
+        ? Number(ratios.ebitda_margin)
+        : (metrics?.pnl?.ebitda_margin_pct != null
+            ? Number(metrics.pnl.ebitda_margin_pct) / 100
+            : (metrics?.pnl?.ebitda_margin != null
+                ? Number(metrics.pnl.ebitda_margin)
+                : (rawRevenue > 0 ? rawEbitda / rawRevenue : 0)));
 
-    const grossMargin = metrics?.pnl?.gross_margin_pct != null
-        ? Number(metrics.pnl.gross_margin_pct) / 100
-        : (metrics?.pnl?.gross_margin != null ? Number(metrics.pnl.gross_margin) : (rawRevenue > 0 ? rawGrossProfit / rawRevenue : 0));
+    const operatingMargin = ratios?.operating_margin != null
+        ? Number(ratios.operating_margin)
+        : (metrics?.pnl?.operating_margin_pct != null
+            ? Number(metrics.pnl.operating_margin_pct) / 100
+            : (metrics?.pnl?.operating_margin != null
+                ? Number(metrics.pnl.operating_margin)
+                : (rawRevenue > 0 ? rawEbit / rawRevenue : 0)));
 
-    const netMargin = metrics?.pnl?.net_margin_pct != null
-        ? Number(metrics.pnl.net_margin_pct) / 100
-        : (metrics?.pnl?.net_margin != null ? Number(metrics.pnl.net_margin) : (rawRevenue > 0 ? rawNetProfit / rawRevenue : 0));
+    const grossMargin = ratios?.gross_margin != null
+        ? Number(ratios.gross_margin)
+        : (metrics?.pnl?.gross_margin_pct != null
+            ? Number(metrics.pnl.gross_margin_pct) / 100
+            : (metrics?.pnl?.gross_margin != null
+                ? Number(metrics.pnl.gross_margin)
+                : (rawRevenue > 0 ? rawGrossProfit / rawRevenue : 0)));
+
+    const netMargin = ratios?.net_margin != null
+        ? Number(ratios.net_margin)
+        : (metrics?.pnl?.net_margin_pct != null
+            ? Number(metrics.pnl.net_margin_pct) / 100
+            : (metrics?.pnl?.net_margin != null
+                ? Number(metrics.pnl.net_margin)
+                : (rawRevenue > 0 ? rawNetProfit / rawRevenue : 0)));
 
     // Dynamic YoY / MoM changes from API
     const dynamics = metrics?.dynamics || {};
@@ -380,6 +416,7 @@ export const DashboardView = () => {
 
             {/* Bloomberg / FactSet Financial Multiples Strip */}
             <FinancialMultiplesStrip
+                ratios={metrics?.ratios}
                 currentRatio={currentRatio}
                 quickRatio={quickRatio}
                 ebitdaMargin={ebitdaMargin}

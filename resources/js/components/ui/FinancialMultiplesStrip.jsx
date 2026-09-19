@@ -2,18 +2,35 @@ import React from 'react';
 import { formatPercent, formatRatio } from '../../utils/formatters';
 
 export const FinancialMultiplesStrip = ({
-    currentRatio = 0,
-    quickRatio = 0,
-    ebitdaMargin = 0,
-    operatingMargin = 0,
-    grossMargin = 0,
-    netMargin = 0,
-    debtRatio = 0,
+    ratios = null,
+    currentRatio = null,
+    quickRatio = null,
+    ebitdaMargin = null,
+    operatingMargin = null,
+    grossMargin = null,
+    netMargin = null,
+    debtRatio = null,
     benchmarks = null,
     onConfigure = null,
     className = '',
 }) => {
-    const getStatusStyle = (status) => {
+    // Resolve values preferring unified ratios dictionary if available, falling back to direct props
+    const crVal = ratios?.current_ratio ?? currentRatio ?? 0;
+    const qrVal = ratios?.quick_ratio ?? quickRatio ?? 0;
+    const gmVal = ratios?.gross_margin ?? grossMargin ?? 0;
+    const emVal = ratios?.ebitda_margin ?? ebitdaMargin ?? 0;
+    const omVal = ratios?.operating_margin ?? operatingMargin ?? 0;
+    const nmVal = ratios?.net_margin ?? netMargin ?? 0;
+    const dtaVal = ratios?.debt_to_assets ?? debtRatio ?? 0;
+
+    const getStatusStyle = (status, hasData = true) => {
+        if (!hasData || status === 'UNKNOWN' || status === 'unknown' || status === 'NA' || status === 'N/A') {
+            return {
+                label: 'N/A',
+                className: 'text-zinc-500 bg-zinc-800/80 border-zinc-700/60',
+            };
+        }
+
         switch (status) {
             case 'OPT':
             case 'opt':
@@ -41,62 +58,100 @@ export const FinancialMultiplesStrip = ({
         }
     };
 
-    const crBench = benchmarks?.current_ratio;
-    const qrBench = benchmarks?.quick_ratio;
-    const gmBench = benchmarks?.gross_margin;
-    const emBench = benchmarks?.ebitda_margin;
-    const omBench = benchmarks?.operating_margin;
-    const nmBench = benchmarks?.net_margin;
-    const dtaBench = benchmarks?.debt_to_assets;
+    const crBench = benchmarks?.current_ratio ?? benchmarks?.CURRENT_RATIO;
+    const qrBench = benchmarks?.quick_ratio ?? benchmarks?.QUICK_RATIO;
+    const gmBench = benchmarks?.gross_margin ?? benchmarks?.GROSS_MARGIN;
+    const emBench = benchmarks?.ebitda_margin ?? benchmarks?.EBITDA_MARGIN;
+    const omBench = benchmarks?.operating_margin ?? benchmarks?.OPERATING_MARGIN;
+    const nmBench = benchmarks?.net_margin ?? benchmarks?.NET_MARGIN;
+    const dtaBench = benchmarks?.debt_to_assets ?? benchmarks?.DEBT_TO_ASSETS;
+
+    const resolveBenchmarkStatus = (bench, value, defaultRule) => {
+        if (bench?.has_data === false || bench?.is_unknown === true || bench?.status === 'UNKNOWN') {
+            return { status: 'UNKNOWN', hasData: false };
+        }
+        if (bench?.status) {
+            return { status: bench.status, hasData: true };
+        }
+        if (value == null || (value === 0 && !bench)) {
+            return { status: 'STD', hasData: true };
+        }
+        return { status: defaultRule(value), hasData: true };
+    };
+
+    const crStatus = resolveBenchmarkStatus(crBench, crVal, (v) => (v >= 1.2 ? 'OPT' : v > 0 ? 'WARN' : 'STD'));
+    const qrStatus = resolveBenchmarkStatus(qrBench, qrVal, (v) => (v >= 1.0 ? 'OPT' : v > 0 ? 'WARN' : 'STD'));
+    const gmStatus = resolveBenchmarkStatus(gmBench, gmVal, (v) => (v >= 0.3 ? 'OPT' : v > 0 ? 'WARN' : 'STD'));
+    const emStatus = resolveBenchmarkStatus(emBench, emVal, (v) => (v >= 0.15 ? 'OPT' : v > 0 ? 'WARN' : 'STD'));
+    const omStatus = resolveBenchmarkStatus(omBench, omVal, (v) => (v >= 0.10 ? 'OPT' : v > 0 ? 'WARN' : 'STD'));
+    const nmStatus = resolveBenchmarkStatus(nmBench, nmVal, (v) => (v >= 0.08 ? 'OPT' : v > 0 ? 'WARN' : 'STD'));
+    const dtaStatus = resolveBenchmarkStatus(dtaBench, dtaVal, (v) => (v > 0 ? (v <= 0.6 ? 'OPT' : 'WARN') : 'STD'));
+
+    const formatTarget = (bench, defaultStr, isPercent = false, isLowerBetter = false) => {
+        const targetVal = bench?.target ?? bench?.target_value;
+        if (targetVal == null) return defaultStr;
+        const prefix = isLowerBetter ? '<' : '>';
+        if (isPercent) {
+            return `Cel: ${prefix}${Number(targetVal).toFixed(0)}%`;
+        }
+        return `Cel: ${prefix}${targetVal}x`;
+    };
 
     const multiples = [
         {
             label: 'CURRENT RATIO',
-            value: formatRatio(currentRatio, 2),
-            target: crBench?.target ? `Cel: >${crBench.target}x` : '> 1.20x',
-            status: crBench?.status || (currentRatio >= 1.2 ? 'OPT' : currentRatio > 0 ? 'WARN' : 'STD'),
+            value: formatRatio(crVal, 2),
+            target: formatTarget(crBench, '> 1.20x'),
+            status: crStatus.status,
+            hasData: crStatus.hasData,
             note: 'Płynność bieżąca',
         },
         {
             label: 'QUICK RATIO',
-            value: formatRatio(quickRatio, 2),
-            target: qrBench?.target ? `Cel: >${qrBench.target}x` : '> 1.00x',
-            status: qrBench?.status || (quickRatio >= 1.0 ? 'OPT' : quickRatio > 0 ? 'WARN' : 'STD'),
+            value: formatRatio(qrVal, 2),
+            target: formatTarget(qrBench, '> 1.00x'),
+            status: qrStatus.status,
+            hasData: qrStatus.hasData,
             note: 'Płynność szybka',
         },
         {
             label: 'MARŻA BRUTTO',
-            value: formatPercent(grossMargin, 1, false),
-            target: gmBench?.target ? `Cel: >${Number(gmBench.target).toFixed(0)}%` : 'Cel: > 30%',
-            status: gmBench?.status || (grossMargin >= 0.3 ? 'OPT' : grossMargin > 0 ? 'WARN' : 'STD'),
+            value: formatPercent(gmVal, 1, false),
+            target: formatTarget(gmBench, 'Cel: > 30%', true),
+            status: gmStatus.status,
+            hasData: gmStatus.hasData,
             note: 'Gross Margin',
         },
         {
             label: 'MARŻA EBITDA',
-            value: formatPercent(ebitdaMargin, 1, false),
-            target: emBench?.target ? `Cel: >${Number(emBench.target).toFixed(0)}%` : 'Cel: > 15%',
-            status: emBench?.status || (ebitdaMargin >= 0.15 ? 'OPT' : ebitdaMargin > 0 ? 'WARN' : 'STD'),
+            value: formatPercent(emVal, 1, false),
+            target: formatTarget(emBench, 'Cel: > 15%', true),
+            status: emStatus.status,
+            hasData: emStatus.hasData,
             note: 'Rentowność operacyjna',
         },
         {
             label: 'MARŻA OPERACYJNA',
-            value: formatPercent(operatingMargin, 1, false),
-            target: omBench?.target ? `Cel: >${Number(omBench.target).toFixed(0)}%` : 'Cel: > 10%',
-            status: omBench?.status || (operatingMargin >= 0.10 ? 'OPT' : operatingMargin > 0 ? 'WARN' : 'STD'),
+            value: formatPercent(omVal, 1, false),
+            target: formatTarget(omBench, 'Cel: > 10%', true),
+            status: omStatus.status,
+            hasData: omStatus.hasData,
             note: 'EBIT Margin',
         },
         {
             label: 'MARŻA NETTO',
-            value: formatPercent(netMargin, 1, false),
-            target: nmBench?.target ? `Cel: >${Number(nmBench.target).toFixed(0)}%` : 'Cel: > 8%',
-            status: nmBench?.status || (netMargin >= 0.08 ? 'OPT' : netMargin > 0 ? 'WARN' : 'STD'),
+            value: formatPercent(nmVal, 1, false),
+            target: formatTarget(nmBench, 'Cel: > 8%', true),
+            status: nmStatus.status,
+            hasData: nmStatus.hasData,
             note: 'Zysk netto / Przychody',
         },
         {
             label: 'WSKAŹNIK ZADŁUŻENIA',
-            value: formatRatio(debtRatio, 2),
-            target: dtaBench?.target ? `Cel: <${dtaBench.target}x` : '< 0.60x',
-            status: dtaBench?.status || (debtRatio > 0 ? (debtRatio <= 0.6 ? 'OPT' : 'WARN') : 'STD'),
+            value: formatRatio(dtaVal, 2),
+            target: formatTarget(dtaBench, '< 0.60x', false, true),
+            status: dtaStatus.status,
+            hasData: dtaStatus.hasData,
             note: 'Debt-to-Assets',
         },
     ];
@@ -122,7 +177,7 @@ export const FinancialMultiplesStrip = ({
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 divide-x divide-y sm:divide-y-0 divide-zinc-800 font-mono">
                 {multiples.map((item, idx) => {
-                    const statusConfig = getStatusStyle(item.status);
+                    const statusConfig = getStatusStyle(item.status, item.hasData);
 
                     return (
                         <div key={idx} className="p-3 bg-zinc-900 hover:bg-zinc-850/60 transition-colors">

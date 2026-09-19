@@ -124,7 +124,7 @@ docker compose exec app ./vendor/bin/phpunit
 ```
 
 ### Testy Frontendowe (Vitest)
-Pakiet 118 testów jednostkowych i integracyjnych dla komponentów React, kontekstu transakcyjnego, walidacji danych, kalkulatorów walutowych oraz konfiguratora celów benchmarkowych:
+Pakiet 120 testów jednostkowych i integracyjnych dla komponentów React, kontekstu transakcyjnego, walidacji danych, kalkulatorów walutowych oraz konfiguratora celów benchmarkowych:
 ```bash
 npm test
 ```
@@ -276,7 +276,7 @@ npm test
   - [x] Standaryzacja struktury DTO `FinancialMetrics` (ujednolicenie struktur `ratios`, `liquidity` i `solvency`).
   - [x] Obsługa braku rekordów bilansowych w `KpiEvaluationService` (eliminacja fałszywych alarmów krytycznych).
   - [x] Testy jednostkowe serializacji `FinancialMetrics` i ewaluacji wskaźników brzegowych.
-  - [ ] Refaktoryzacja `DashboardView` i `FinancialMultiplesStrip` pod ujednolicony kontrakt wskaźników.
+  - [x] Refaktoryzacja `DashboardView` i `FinancialMultiplesStrip` pod ujednolicony kontrakt wskaźników.
   - [ ] Wprowadzenie estetycznych stanów fallback ("—") dla brakujących danych bilansowych.
 
 ---
