@@ -41,6 +41,19 @@ export const AuthProvider = ({ children }) => {
         }
     }, [token]);
 
+    useEffect(() => {
+        const handleCompanyCreated = () => {
+            if (token) {
+                fetchCurrentUser();
+            }
+        };
+
+        window.addEventListener('finboard:company-created', handleCompanyCreated);
+        return () => {
+            window.removeEventListener('finboard:company-created', handleCompanyCreated);
+        };
+    }, [token]);
+
     const fetchCurrentUser = async () => {
         try {
             const response = await apiClient.get('/auth/me');

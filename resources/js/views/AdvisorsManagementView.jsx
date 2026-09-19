@@ -29,7 +29,7 @@ import {
 } from 'lucide-react';
 
 export const AdvisorsManagementView = () => {
-    const { user: currentUser, isSuperAdmin, isAdvisor } = useAuth();
+    const { user: currentUser, isSuperAdmin, isAdvisor, refreshUser } = useAuth();
     const { success, error } = useNotification();
 
     // Default tab: Advisors see invitations by default, Admins see advisors list
@@ -849,6 +849,7 @@ export const AdvisorsManagementView = () => {
                 isOpen={assignmentModalOpen}
                 onClose={() => setAssignmentModalOpen(false)}
                 advisor={selectedAdvisorForAssignment}
+                companies={companies}
                 onSaved={handleAdvisorSaved}
             />
 
@@ -856,6 +857,7 @@ export const AdvisorsManagementView = () => {
             <InviteUserModal
                 isOpen={inviteModalOpen}
                 onClose={() => setInviteModalOpen(false)}
+                companies={companies}
                 onSuccess={() => {
                     fetchInvitations();
                     if (!isAdvisor) {
@@ -868,10 +870,19 @@ export const AdvisorsManagementView = () => {
             <CreateCompanyModal
                 isOpen={createCompanyModalOpen}
                 onClose={() => setCreateCompanyModalOpen(false)}
-                onSuccess={() => {
+                onSuccess={(newCompany) => {
+                    if (newCompany) {
+                        setCompanies(prev => {
+                            if (prev.some(c => c.id === newCompany.id)) return prev;
+                            return [newCompany, ...prev];
+                        });
+                    }
                     fetchCompanies();
                     if (!isAdvisor) {
                         fetchAdvisors();
+                    }
+                    if (refreshUser) {
+                        refreshUser();
                     }
                 }}
             />

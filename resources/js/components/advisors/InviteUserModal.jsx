@@ -24,8 +24,9 @@ export const InviteUserModal = ({
     onSuccess,
     defaultRole = 'client',
     defaultCompanyId = null,
+    companies: propCompanies = null,
 }) => {
-    const { user: currentUser, isSuperAdmin, isAdvisor, activeCompany, availableCompanies } = useAuth();
+    const { user: currentUser, isAdmin, isSuperAdmin, isAdvisor, activeCompany, availableCompanies } = useAuth();
     const { success, error } = useNotification();
 
     const [email, setEmail] = useState('');
@@ -39,39 +40,87 @@ export const InviteUserModal = ({
     const [submitting, setSubmitting] = useState(false);
     const [validationErrors, setValidationErrors] = useState({});
 
+    const canAccessAllCompanies = isSuperAdmin || isAdmin || !isAdvisor;
+
+    // Reactively update selectable companies when propCompanies changes
+    useEffect(() => {
+        if (propCompanies && propCompanies.length > 0) {
+            setAllCompanies(propCompanies);
+        }
+    }, [propCompanies]);
+
+    // Listen to global company-created event for instant cross-component updates
+    useEffect(() => {
+        const handleCompanyCreated = (e) => {
+            if (e?.detail) {
+                setAllCompanies(prev => {
+                    if (prev.some(c => c.id === e.detail.id)) return prev;
+                    return [e.detail, ...prev];
+                });
+            }
+            if (canAccessAllCompanies) {
+                fetchAllCompanies();
+            }
+        };
+
+        window.addEventListener("finboard:company-created", handleCompanyCreated);
+        return () => window.removeEventListener("finboard:company-created", handleCompanyCreated);
+    }, [canAccessAllCompanies]);
+
     // Determine selectable companies:
     // Advisors can only invite clients to their assigned companies.
-    // SuperAdmins can choose from all companies in the system.
+    // Admins and SuperAdmins can choose from all companies in the system.
     useEffect(() => {
         if (!isOpen) return;
 
-        setEmail('');
-        setRole(isAdvisor ? 'client' : defaultRole);
-        setCompanyId(defaultCompanyId || activeCompany?.id || (availableCompanies[0]?.id ?? ''));
+        setEmail("");
+        setRole(isAdvisor ? "client" : defaultRole);
+
+        const initialCompanies = (propCompanies && propCompanies.length > 0)
+            ? propCompanies
+            : (availableCompanies || []);
+
+        setCompanyId(
+            defaultCompanyId ||
+            activeCompany?.id ||
+            initialCompanies[0]?.id ||
+            ""
+        );
         setAssCompanyIds([]);
         setValidityHours(48);
-        setCompanySearch('');
+        setCompanySearch("");
         setValidationErrors({});
 
-        if (isSuperAdmin) {
+        if (initialCompanies.length > 0) {
+            setAllCompanies(initialCompanies);
+        }
+
+        if (canAccessAllCompanies) {
             fetchAllCompanies();
         } else {
-            setAllCompanies(availableCompanies || []);
+            setAllCompanies(initialCompanies);
         }
-    }, [isOpen, defaultRole, defaultCompanyId, activeCompany, availableCompanies, isAdvisor, isSuperAdmin]);
+    }, [isOpen, defaultRole, defaultCompanyId, activeCompany, availableCompanies, isAdvisor, canAccessAllCompanies, propCompanies]);
 
     const fetchAllCompanies = async () => {
         setLoadingCompanies(true);
         try {
-            const res = await apiClient.get('/admin/companies');
-            setAllCompanies(res.data.data || []);
+            const res = await apiClient.get("/admin/companies");
+            const fetched = res.data.data || [];
+            setAllCompanies(fetched);
+
+            setCompanyId(prev => {
+                if (defaultCompanyId) return defaultCompanyId;
+                if (prev && fetched.some(c => c.id === prev)) return prev;
+                if (activeCompany && fetched.some(c => c.id === activeCompany.id)) return activeCompany.id;
+                return fetched[0]?.id || "";
+            });
         } catch (err) {
-            setAllCompanies(availableCompanies || []);
+            setAllCompanies(propCompanies || availableCompanies || []);
         } finally {
             setLoadingCompanies(false);
         }
     };
-
     const filteredAssignedCompanies = useMemo(() => {
         const query = companySearch.toLowerCase().trim();
         if (!query) return allCompanies;

@@ -274,4 +274,26 @@ describe('InviteUserModal Component', () => {
             expect(screen.getByText('Użytkownik o tym adresie e-mail jest już zarejestrowany w systemie.')).toBeInTheDocument();
         });
     });
+    it('reactively updates company list when a new company is created or event dispatched', async () => {
+        renderModal({
+            companies: [mockCompanies[0]],
+        });
+
+        await waitFor(() => {
+            expect(screen.getByText(/\[ACME\] Acme Manufacturing S.A./i)).toBeInTheDocument();
+        });
+
+        const newCompany = {
+            id: 'comp-brand-new-99',
+            name: 'Delta Ventures Sp. z o.o.',
+            code: 'DELTA',
+            tax_id: 'PL9998887766',
+        };
+
+        fireEvent(window, new CustomEvent('finboard:company-created', { detail: newCompany }));
+
+        await waitFor(() => {
+            expect(screen.getByText(/\[DELTA\] Delta Ventures Sp. z o.o./i)).toBeInTheDocument();
+        });
+    });
 });

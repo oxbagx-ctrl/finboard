@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import apiClient from '../../api/client';
 import { useNotification } from '../../context/NotificationContext';
+import { useAuth } from '../../context/AuthContext';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 import {
@@ -23,6 +24,7 @@ export const CreateCompanyModal = ({
     onSuccess,
 }) => {
     const { success, error } = useNotification();
+    const { refreshUser } = useAuth();
 
     const [name, setName] = useState('');
     const [code, setCode] = useState('');
@@ -162,6 +164,16 @@ export const CreateCompanyModal = ({
 
             const response = await apiClient.post('/admin/companies', payload);
             const newCompany = response.data?.data;
+
+            if (refreshUser) {
+                try {
+                    await refreshUser();
+                } catch (e) {
+                    // non-blocking
+                }
+            }
+
+            window.dispatchEvent(new CustomEvent('finboard:company-created', { detail: newCompany }));
 
             success(`Spółka [${newCompany.code}] ${newCompany.name} została pomyślnie zarejestrowana.`);
             if (onSuccess) {

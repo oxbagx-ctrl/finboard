@@ -16,7 +16,7 @@ import {
     Square
 } from 'lucide-react';
 
-export const AdvisorAssignmentModal = ({ isOpen, onClose, advisor, onSaved }) => {
+export const AdvisorAssignmentModal = ({ isOpen, onClose, advisor, onSaved, companies: propCompanies = null }) => {
     const { success, error } = useNotification();
     const [companies, setCompanies] = useState([]);
     const [selectedCompanyIds, setSelectedCompanyIds] = useState([]);
@@ -28,9 +28,12 @@ export const AdvisorAssignmentModal = ({ isOpen, onClose, advisor, onSaved }) =>
         if (isOpen && advisor) {
             const initialIds = (advisor.assigned_companies || []).map(c => c.id);
             setSelectedCompanyIds(initialIds);
+            if (propCompanies && propCompanies.length > 0) {
+                setCompanies(propCompanies);
+            }
             fetchCompanies();
         }
-    }, [isOpen, advisor]);
+    }, [isOpen, advisor, propCompanies]);
 
     const fetchCompanies = async () => {
         setLoading(true);

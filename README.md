@@ -5,7 +5,7 @@
 [![PostgreSQL](https://img.shields.io/badge/postgresql-16-blue.svg)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/redis-alpine-red.svg)](https://redis.io/)
 [![Architecture](https://img.shields.io/badge/architecture-DDD%20%2F%20CQRS-brightgreen.svg)]()
-[![Tests](https://img.shields.io/badge/tests-243%20backend%20%7C%2097%20frontend%20passed-success.svg)]()
+[![Tests](https://img.shields.io/badge/tests-243%20backend%20%7C%2099%20frontend%20passed-success.svg)]()
 
 FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakcyjnego (M&A, Due Diligence, Corporate Finance) oraz ich klientom (CFO, Zarządy). Aplikacja łączy w sobie zaawansowaną analitykę finansową w ujęciu wielo-najemcowym (Multi-Tenant) z bezpiecznym repozytorium dokumentów Virtual Data Room (VDR).
 
@@ -310,6 +310,7 @@ Baza danych zasilona jest danymi demonstracyjnymi (21 miesięcy historii finanso
 - [x] **Faza 11: Zarządzanie Portfelem Spółek (Portfolio Management)**
   - [x] Endpoint rejestracji spółek portfelowych i walidacji danych (Backend API).
   - [x] Interfejs dodawania nowej spółki portfelowej z matrycy spółek (Frontend UI).
+  - [x] Reaktywna synchronizacja listy spółek w modalach zaproszeń i kontekstu bez przeładowania strony (Frontend UI).
 
 ---
 

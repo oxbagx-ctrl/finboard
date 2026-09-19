@@ -402,4 +402,75 @@ describe('AdvisorsManagementView (SuperAdmin Dashboard)', () => {
             expect(screen.getByText('Dodaj Nową Spółkę Portfelową')).toBeInTheDocument();
         });
     });
+    it('seamlessly updates selectable companies in InviteUserModal after adding a company', async () => {
+        const newCompany = {
+            id: 'comp-omega-99',
+            name: 'Omega Holdings S.A.',
+            code: 'OMEGA',
+            tax_id: 'PL1112223344',
+            assigned_advisors_count: 0,
+            clients_count: 0,
+            assigned_advisors: [],
+        };
+
+        apiClient.post.mockResolvedValueOnce({
+            data: {
+                message: 'Spółka została pomyślnie utworzona.',
+                data: newCompany,
+            },
+        });
+
+        apiClient.get.mockImplementation((url) => {
+            if (url === '/admin/advisors') {
+                return Promise.resolve({ data: { data: mockAdvisors } });
+            }
+            if (url === '/admin/companies') {
+                return Promise.resolve({ data: { data: [...mockCompanies, newCompany] } });
+            }
+            if (url === '/invitations') {
+                return Promise.resolve({ data: { data: mockInvitations } });
+            }
+            return Promise.resolve({ data: { data: [] } });
+        });
+
+        renderWithContext(<AdvisorsManagementView />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Super Partner Helvest')).toBeInTheDocument();
+        });
+
+        // Open create company modal
+        const addCompanyButtons = screen.getAllByRole('button', { name: /Dodaj Spółkę/i });
+        fireEvent.click(addCompanyButtons[0]);
+
+        await waitFor(() => {
+            expect(screen.getByText('Dodaj Nową Spółkę Portfelową')).toBeInTheDocument();
+        });
+
+        // Fill form and submit
+        fireEvent.change(screen.getByPlaceholderText('np. Acme Manufacturing S.A.'), {
+            target: { value: 'Omega Holdings S.A.' },
+        });
+        fireEvent.change(screen.getByPlaceholderText('np. ACME'), {
+            target: { value: 'OMEGA' },
+        });
+
+        fireEvent.click(screen.getByRole('button', { name: /Utwórz Spółkę/i }));
+
+        await waitFor(() => {
+            expect(screen.queryByText('Dodaj Nową Spółkę Portfelową')).not.toBeInTheDocument();
+        });
+
+        // Open Invite User modal without refreshing page
+        fireEvent.click(screen.getByRole('button', { name: /Zaproś Użytkownika/i }));
+
+        await waitFor(() => {
+            expect(screen.getByText('Zaproś Nowego Użytkownika')).toBeInTheDocument();
+        });
+
+        // Verify the newly created company is present in the select options!
+        await waitFor(() => {
+            expect(screen.getByRole("option", { name: /\[OMEGA\] Omega Holdings S.A./i })).toBeInTheDocument();
+        });
+    });
 });
