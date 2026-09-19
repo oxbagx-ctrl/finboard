@@ -5,7 +5,7 @@
 [![PostgreSQL](https://img.shields.io/badge/postgresql-16-blue.svg)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/redis-alpine-red.svg)](https://redis.io/)
 [![Architecture](https://img.shields.io/badge/architecture-DDD%20%2F%20CQRS-brightgreen.svg)]()
-[![Tests](https://img.shields.io/badge/tests-308%20backend%20%7C%2099%20frontend%20passed-success.svg)]()
+[![Tests](https://img.shields.io/badge/tests-312%20backend%20%7C%2099%20frontend%20passed-success.svg)]()
 
 FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakcyjnego (M&A, Due Diligence, Corporate Finance) oraz ich klientom (CFO, Zarządy). Aplikacja łączy w sobie zaawansowaną analitykę finansową w ujęciu wielo-najemcowym (Multi-Tenant) z bezpiecznym repozytorium dokumentów Virtual Data Room (VDR).
 
@@ -22,7 +22,7 @@ FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakc
     - Serwis aplikacyjny `KpiCalculationService` kalkulujący dynamikę YoY oraz MoM na danych historycznych ze ścisłą ochroną przed dzieleniem przez zero.
     - Serwis aplikacyjny `KpiEvaluationService` ewaluujący dynamicznie metryki finansowe spółki wobec skonfigurowanych celów doradcy (lub rynkowych wartości domyślnych) wraz z wyznaczaniem statusów semaforowych (`OPT`, `WARN`, `CRIT`), syntetycznego wskaźnika `health_score` i zagregowanego stanu zdrowia finansowego.
     - Kontroler `BenchmarkController` w warstwie prezentacji REST API obsługujący odczyt, konfigurację progów, masową aktualizację i resetowanie celów finansowych spółek portfelowych przez Doradców i Administratorów.
-    - Kontroler `KpiController` w warstwie prezentacji API serwujący dynamiczne wskaźniki P&L, bilansowe oraz wariancje okresowe YoY/MoM.
+    - Kontroler `KpiController` w warstwie prezentacji API serwujący dynamiczne wskaźniki P&L, bilansowe oraz wariancje okresowe YoY/MoM zintegrowany z serwisem ewaluacji progów branżowych.
 - **Bezpieczeństwo i Izolacja Multi-Tenant**:
     - Pełna separacja danych pomiędzy firmami (Tenant Isolation).
     - Hierarchiczny model uprawnień: **Super Admin** (Partner z globalnym zarządzaniem), **Doradca** (Advisor przypisany do wybranych spółek portfela) oraz **Klient** (Client ze ścisłym dostępem wyłącznie do własnej spółki).
@@ -327,12 +327,18 @@ Baza danych zasilona jest danymi demonstracyjnymi (21 miesięcy historii finanso
   - Serwis aplikacyjny `KpiCalculationService` z dynamiczną kalkulacją dynamiki YoY i MoM z danych historycznych.
   - Testy jednostkowe dla kalkulacji wskaźników i dynamiki z uwzględnieniem edge-cases.
   - Aktualizacja kontrolera `KpiController` do zwracania dynamicznie wyliczonych wskaźników.
-- [ ] **Faza 13: Konfiguracja Benchmarków i Celów Finansowych (Finance)**
+- [x] **Faza 13: Konfiguracja Benchmarków i Celów Finansowych (Finance)**
   - [x] Encja `FinancialBenchmark`, enumy `BenchmarkStatus`, `BenchmarkMetricType` oraz reguły ewaluacji statusów KPI.
   - [x] Migracja bazy danych, model Eloquent i repozytorium dla benchmarków spółek.
   - [x] Serwis ewaluacji wskaźników z dynamicznym wyliczaniem flag statusów (OPT, WARN, CRIT).
   - [x] Endpointy REST API do pobierania i konfiguracji benchmarków dla doradców.
-  - [ ] Testy jednostkowe i integracyjne modułu benchmarków oraz weryfikacja uprawnień.
+  - [x] Testy jednostkowe i integracyjne modułu benchmarków oraz weryfikacja uprawnień.
+- [ ] **Faza 14: Logi Audytowe i Dynamiczny Frontend (Finance & Deal Advisory)**
+  - [ ] Encja `AuditLog`, migracja bazy danych i repozytorium dla operacji finansowych i konfiguracji celów.
+  - [ ] Rejestracja listenerów zdarzeń domenowych utrwalających wpisy w dzienniku audytowym.
+  - [ ] Endpointy REST API do pobierania logów audytowych przypisanych do spółki.
+  - [ ] Zastąpienie statycznych wartości na Pulpicie Zarządczym i w Analityce P&L dynamicznymi danymi z API.
+  - [ ] Interfejs edycji celów finansowych dla Doradcy z dynamicznymi wskaźnikami statusów i semaforami (OPT, WARN, CRIT).
 
 ---
 

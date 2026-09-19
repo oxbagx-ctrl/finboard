@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Presentation\Api\Controllers;
 
 use App\Contexts\Finance\Application\Services\KpiCalculationService;
+use App\Contexts\Finance\Application\Services\KpiEvaluationService;
 use App\Contexts\Finance\Domain\Repositories\FinancialRecordRepositoryInterface;
 use App\Contexts\Finance\Domain\Services\FinancialCalculator;
 use App\Contexts\Finance\Domain\ValueObjects\Currency;
@@ -21,12 +22,13 @@ final class KpiController
     public function __construct(
         private readonly FinancialRecordRepositoryInterface $recordRepository,
         private readonly FinancialCalculator $calculator,
-        private readonly KpiCalculationService $kpiService
+        private readonly KpiCalculationService $kpiService,
+        private readonly KpiEvaluationService $evaluationService
     ) {
     }
 
     /**
-     * Get dynamically calculated KPI metrics and YoY/MoM dynamics.
+     * Get dynamically calculated KPI metrics, YoY/MoM dynamics, and benchmark evaluations.
      */
     public function metrics(FinancialAnalyticsQueryRequest $request): JsonResponse
     {
@@ -100,6 +102,12 @@ final class KpiController
                 ],
             ];
 
+        $yoyRevenueGrowth = isset($dynamics['yoy']['revenue_growth_pct']) && $dynamics['yoy']['revenue_growth_pct'] !== null
+            ? (float) $dynamics['yoy']['revenue_growth_pct']
+            : null;
+
+        $evaluation = $this->evaluationService->evaluateMetrics($companyId, $metrics, $yoyRevenueGrowth);
+
         $data = $metrics->toArray();
         $data['dynamics'] = [
             'yoy' => $dynamics['yoy'],
@@ -107,6 +115,8 @@ final class KpiController
         ];
         $data['previous_year'] = $dynamics['previous_year_metrics'];
         $data['previous_month'] = $dynamics['previous_month_metrics'];
+        $data['benchmarks'] = $evaluation['evaluations'];
+        $data['benchmark_summary'] = $evaluation['summary'];
 
         return new JsonResponse([
             'status' => 'success',
