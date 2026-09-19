@@ -5,7 +5,7 @@
 [![PostgreSQL](https://img.shields.io/badge/postgresql-16-blue.svg)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/redis-alpine-red.svg)](https://redis.io/)
 [![Architecture](https://img.shields.io/badge/architecture-DDD%20%2F%20CQRS-brightgreen.svg)]()
-[![Tests](https://img.shields.io/badge/tests-243%20backend%20%7C%2099%20frontend%20passed-success.svg)]()
+[![Tests](https://img.shields.io/badge/tests-245%20backend%20%7C%2099%20frontend%20passed-success.svg)]()
 
 FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakcyjnego (M&A, Due Diligence, Corporate Finance) oraz ich klientom (CFO, Zarządy). Aplikacja łączy w sobie zaawansowaną analitykę finansową w ujęciu wielo-najemcowym (Multi-Tenant) z bezpiecznym repozytorium dokumentów Virtual Data Room (VDR).
 
@@ -52,7 +52,7 @@ FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakc
     - Widok zarządzania doradcami i przypisaniami spółek (`AdvisorsManagementView`) wraz z matrycą pokrycia portfela i modalem przypisań (`AdvisorAssignmentModal`).
     - Modal zapraszania nowych użytkowników (`InviteUserModal`) w paradygmacie Zero-Trust z podziałem ról i selekcją firm.
     - Bezpieczna strona aktywacji konta i ustanawiania hasła (`AcceptInvitationView`) weryfikująca token kryptograficzny w URL.
-    - Zestaw 88 testów jednostkowych i integracyjnych Vitest (formatery, silnik walutowy, formularze, blokady Dry-Run, eksplorator VDR, raporty PDF, E2E workflow, analityka finansowa i wskaźniki Recharts, zarządzanie doradcami, zaproszenia i aktywacja konta).
+    - Zestaw 99 testów jednostkowych i integracyjnych Vitest (formatery, silnik walutowy, formularze, blokady Dry-Run, eksplorator VDR, raporty PDF, E2E workflow, analityka finansowa i wskaźniki Recharts, zarządzanie doradcami, zaproszenia i aktywacja konta, reaktywne dodawanie spółek).
 - **Monitoring Produkcyjny, Bezpieczeństwo Nginx i Automatyzacja Wdrożenia**:
     - Dedykowany endpoint `/api/v1/health` badający stan bazy PostgreSQL, klastra Redis, uprawnień magazynu plików oraz zużycia zasobów.
     - Reguły kompresji Gzip i instytucjonalne nagłówki bezpieczeństwa Nginx (`SAMEORIGIN`, `nosniff`, `strict-origin-when-cross-origin`).
@@ -105,7 +105,7 @@ app/
 resources/js/
 ├── api/                          # Klient Axios z automatyczną obsługą tokenów Bearer i nagłówków multi-tenant (X-Company-Id)
 ├── components/
-│   ├── advisors/                 # AdvisorAssignmentModal (zarządzanie przypisaniem spółek), InviteUserModal (bezpieczne zapraszanie użytkowników)
+│   ├── advisors/                 # AdvisorAssignmentModal (zarządzanie przypisaniem spółek), InviteUserModal (bezpieczne zapraszanie użytkowników), CreateCompanyModal
 │   ├── auth/                     # CompanySwitcherModal (wyszukiwarka spółek portfela), UserProfileModal (dane, zmiana hasła)
 │   ├── charts/                   # PnlTrendChart, CostBreakdownChart, LiquidityTrendChart, CustomChartTooltip (ciemny monospace FactSet/Bloomberg)
 │   ├── dataroom/                 # DataRoomStats, DocumentTable, DocumentUploadModal, DocumentEditModal, DocumentAuditModal, DeleteDocumentModal
@@ -115,7 +115,7 @@ resources/js/
 │   ├── reports/                  # ReportConfigurator (parametryzacja, waluty, okresy), ExecutivePdfReport (układ memorandumu A4, SHA-256)
 │   └── ui/                       # Badge, Button, Card, MultiplesStrip (wskaźniki EV/EBITDA, P/E), FinancialTable
 ├── context/                      # AuthContext (tożsamość, role, kontekst spółki), DealContext (FX, okres), NotificationContext (toasty)
-├── tests/                        # Vitest setup, unit tests (formatters, dealContext) & component integration tests (CsvPreviewTable, FinancialRecordModal, DataRoom, ExecutiveReports, DealAdvisoryE2E, AdvisorsManagement, InviteUserModal, AcceptInvitation, AnalyticsView)
+├── tests/                        # Vitest setup, unit tests (formatters, dealContext) & component integration tests (CsvPreviewTable, FinancialRecordModal, DataRoom, ExecutiveReports, DealAdvisoryE2E, AdvisorsManagement, InviteUserModal, AcceptInvitation, AnalyticsView, CreateCompanyModal)
 ├── utils/                        # formatters.js (liczby tabelaryczne tabular-nums, waluty PLN/EUR/USD/GBP, formatowanie wskaźników, formatFileSize, formatDateTime)
 └── views/                        # DashboardView, RecordsView, ImportView, DataRoomView, AuditLogsView, ReportsView, AnalyticsView, LoginView, AdvisorsManagementView, AcceptInvitationView
 ```
@@ -138,6 +138,7 @@ scripts/
 - **`redis`**: Redis Alpine jako broker kolejek i cache (port `6379`)
 - **`worker`**: Dedykowany kontener wykonujący zadania w tle (`php artisan queue:work --queue=financial-imports,default`)
 - **`scheduler`**: Kontener harmonogramu zadań cron (`php artisan schedule:work`)
+- **`mailpit`**: Serwer SMTP oraz webowy interfejs inspekcji e-maili (Mailcatcher) w środowisku dev (port SMTP `1025`, web dashboard: [http://localhost:8025](http://localhost:8025))
 
 ### Uruchomienie Środowiska Developerskiego
 
@@ -182,6 +183,11 @@ Baza danych zasilona jest danymi demonstracyjnymi (21 miesięcy historii finanso
 | **Doradca M&A** | Doradca Transakcyjny (Helvest) | `advisor@helvest.com` | `password123` | Helvest Advisory Sp. z o.o. *(Dostęp do przypisanych spółek portfela: Acme Manufacturing S.A., zapraszanie klientów)* |
 | **Analityk (Admin)** | Analityk Finansowy (Helvest) | `admin@helvest.com` | `password123` | Helvest Advisory Sp. z o.o. *(Pełny wgląd analityczny i finansowy do całego portfela)* |
 | **Klient / CFO** | Jan Kowalski (CFO Acme) | `klient@acme.com` | `password123` | Acme Manufacturing S.A. *(Ścisła izolacja multi-tenant: dostęp wyłącznie do Acme)* |
+
+### Narzędzia Deweloperskie i Podgląd E-maili
+- **Mailpit Web Dashboard**: [http://localhost:8025](http://localhost:8025)
+  - Przechwytuje wszystkie wiadomości wychodzące (zaproszenia `UserInvitationMail`, powiadomienia, linki aktywacyjne) w środowisku lokalnym.
+  - Port SMTP dla usług aplikacji: `1025` (host: `mailpit`).
 
 ---
 
@@ -311,6 +317,7 @@ Baza danych zasilona jest danymi demonstracyjnymi (21 miesięcy historii finanso
   - [x] Endpoint rejestracji spółek portfelowych i walidacji danych (Backend API).
   - [x] Interfejs dodawania nowej spółki portfelowej z matrycy spółek (Frontend UI).
   - [x] Reaktywna synchronizacja listy spółek w modalach zaproszeń i kontekstu bez przeładowania strony (Frontend UI).
+  - [x] Integracja kontenera Mailpit (Mailcatcher) dla testowania wysyłki e-maili i linków aktywacyjnych w środowisku lokalnym.
 
 ---
 
