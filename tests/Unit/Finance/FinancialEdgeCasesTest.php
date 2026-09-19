@@ -209,4 +209,47 @@ final class FinancialEdgeCasesTest extends TestCase
             description: 'Edge case test entry'
         );
     }
+
+    public function test_metrics_calculation_and_serialization_with_pnl_only_and_zero_balance(): void
+    {
+        // Only P&L entries: revenue and OPEX, no cash/receivables/liabilities
+        $records = [
+            $this->makeRecord(Category::revenue(), "250000.0000", "2026-03-10"),
+            $this->makeRecord(Category::opex(), "100000.0000", "2026-03-15"),
+        ];
+
+        $metrics = $this->calculator->calculateMetrics($records, Currency::PLN);
+
+        $this->assertNull($metrics->currentRatio());
+        $this->assertNull($metrics->quickRatio());
+        // Since both debt and assets are zero, debt to assets is null
+        $this->assertNull($metrics->debtToAssets());
+
+        $array = $metrics->toArray();
+        $this->assertNull($array["ratios"]["current_ratio"]);
+        $this->assertNull($array["ratios"]["quick_ratio"]);
+        $this->assertNull($array["ratios"]["debt_to_assets"]);
+        $this->assertNull($array["liquidity"]["current_ratio"]);
+        $this->assertNull($array["liquidity"]["quick_ratio"]);
+        $this->assertNull($array["solvency"]["debt_to_assets"]);
+    }
+
+    public function test_extreme_debt_to_assets_leverage_above_one(): void
+    {
+        $records = [
+            $this->makeRecord(Category::cash(), "50000.0000", "2026-03-01"),
+            $this->makeRecord(Category::currentLiabilities(), "80000.0000", "2026-03-05"),
+            $this->makeRecord(Category::longTermLiabilities(), "120000.0000", "2026-03-05"),
+        ];
+
+        $metrics = $this->calculator->calculateMetrics($records, Currency::PLN);
+
+        // Assets = 50k, Debt = 200k => Debt to Assets = 200k / 50k = 4.0
+        $this->assertSame(4.0, $metrics->debtToAssets());
+        $this->assertSame(4.0, $metrics->ratios()["debt_to_assets"]);
+        $this->assertSame(4.0, $metrics->solvency()["debt_to_assets"]);
+        // Current Ratio: 50k / 80k = 0.625 => rounded to 0.63 in liquidity/ratios
+        $this->assertSame(0.625, $metrics->currentRatio());
+        $this->assertSame(0.63, $metrics->ratios()["current_ratio"]);
+    }
 }
