@@ -120,8 +120,8 @@ final class DateRange implements ValueObject
         }
 
         return new self(
-            $this->startDate->modify('-1 year'),
-            $this->endDate->modify('-1 year')
+            $this->shiftDateYears($this->startDate, -1),
+            $this->shiftDateYears($this->endDate, -1)
         );
     }
 
@@ -162,5 +162,18 @@ final class DateRange implements ValueObject
     public function __toString(): string
     {
         return $this->toPeriodString();
+    }
+
+    private function shiftDateYears(DateTimeImmutable $date, int $years): DateTimeImmutable
+    {
+        $targetYear = (int) $date->format('Y') + $years;
+        $month = (int) $date->format('m');
+        $day = (int) $date->format('d');
+
+        if ($month === 2 && $day === 29 && !checkdate(2, 29, $targetYear)) {
+            $day = 28;
+        }
+
+        return $date->setDate($targetYear, $month, $day);
     }
 }
