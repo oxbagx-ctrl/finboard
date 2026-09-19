@@ -24,6 +24,7 @@ final class FinancialAnalyticsQueryRequest extends FormRequest
             'end_date' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:start_date'],
             'currency' => ['nullable', 'string', 'in:PLN,EUR,USD,GBP'],
             'record_type' => ['nullable', 'string', 'in:EXPENSE,expense,REVENUE,revenue,ASSET,asset,LIABILITY,liability'],
+            'category_type' => ['nullable', 'string'],
         ];
     }
 }

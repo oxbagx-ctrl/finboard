@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Contexts\Finance\Application\Queries\GetCategoryBreakdown;
 
 use App\Contexts\Finance\Domain\Repositories\FinancialRecordRepositoryInterface;
+use App\Contexts\Finance\Domain\ValueObjects\CategoryType;
 use App\Contexts\Finance\Domain\ValueObjects\Currency;
 use App\Contexts\Finance\Domain\ValueObjects\DateRange;
 use App\Contexts\Finance\Domain\ValueObjects\Money;
@@ -22,6 +23,7 @@ final class GetCategoryBreakdownHandler
      *     category_id: string,
      *     category_name: string,
      *     category_code: string,
+     *     category_type: string,
      *     amount: float,
      *     formatted_amount: string,
      *     percentage: float
@@ -31,6 +33,17 @@ final class GetCategoryBreakdownHandler
     {
         $currency = Currency::from($query->currency);
         $filterType = RecordType::tryFrom(strtoupper($query->recordType));
+
+        $allowedCategoryTypes = [];
+        if ($query->categoryType !== null && trim($query->categoryType) !== '') {
+            $types = array_map('trim', explode(',', strtolower($query->categoryType)));
+            foreach ($types as $t) {
+                $enumVal = CategoryType::tryFrom($t);
+                if ($enumVal !== null) {
+                    $allowedCategoryTypes[] = $enumVal;
+                }
+            }
+        }
 
         $period = null;
         if ($query->startDate !== null && $query->endDate !== null) {
@@ -52,12 +65,18 @@ final class GetCategoryBreakdownHandler
                 continue;
             }
 
+            // Match requested category types if provided
+            if (!empty($allowedCategoryTypes) && !in_array($category->type(), $allowedCategoryTypes, true)) {
+                continue;
+            }
+
             $catId = $category->id();
             if (!isset($totalsPerCategory[$catId])) {
                 $totalsPerCategory[$catId] = Money::zero($currency);
                 $categoryDetails[$catId] = [
                     'name' => $category->name(),
                     'code' => $category->code(),
+                    'type' => $category->type()->value,
                 ];
             }
 
@@ -79,6 +98,7 @@ final class GetCategoryBreakdownHandler
                 'category_id' => $catId,
                 'category_name' => $categoryDetails[$catId]['name'],
                 'category_code' => $categoryDetails[$catId]['code'],
+                'category_type' => $categoryDetails[$catId]['type'],
                 'amount' => $amountFloat,
                 'formatted_amount' => $categoryMoney->format(),
                 'percentage' => $percentage,

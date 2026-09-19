@@ -269,7 +269,7 @@ npm test
 - [ ] **Faza 15: Dynamiczne Lata Obrachunkowe i Precyzyjne Rozbicie OPEX**
   - [x] Implementacja zapytania domenowego `GetAvailableFiscalYearsQuery` oraz metody repozytorium do dynamicznego wyciągania aktywnych lat obrachunkowych spółki.
   - [x] Endpoint REST API `GET /api/v1/finance/analytics/years`.
-  - [ ] Rozszerzenie zapytania `GetCategoryBreakdownQuery` o filtrowanie `category_type` (OPEX vs COGS/TAX).
+  - [x] Rozszerzenie zapytania `GetCategoryBreakdownQuery` o filtrowanie `category_type` (OPEX vs COGS/TAX).
   - [ ] Testy jednostkowe i integracyjne dla dynamicznych lat i filtrowania kategorii.
   - [ ] Integracja `DealContext` z dynamiczną listą lat oraz zaktualizowanie wykresu struktury kosztów.
 

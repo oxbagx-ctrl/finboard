@@ -87,22 +87,31 @@ final class FinancialAnalyticsController
     ): JsonResponse {
         $companyId = $this->resolveCompanyId($request);
 
+        $categoryTypeParam = $request->query('category_type');
+
         $query = new GetCategoryBreakdownQuery(
             companyId: $companyId,
             startDate: $request->query('start_date'),
             endDate: $request->query('end_date'),
             recordType: (string) $request->query('record_type', 'EXPENSE'),
-            currency: (string) $request->query('currency', 'PLN')
+            currency: (string) $request->query('currency', 'PLN'),
+            categoryType: $categoryTypeParam !== null ? (string) $categoryTypeParam : null
         );
 
         $breakdown = $handler->handle($query);
 
-        return new JsonResponse([
+        $responsePayload = [
             'status' => 'success',
             'company_id' => $companyId,
             'record_type' => strtoupper((string) $request->query('record_type', 'EXPENSE')),
             'data' => $breakdown,
-        ], Response::HTTP_OK);
+        ];
+
+        if ($categoryTypeParam !== null) {
+            $responsePayload['category_type'] = strtoupper((string) $categoryTypeParam);
+        }
+
+        return new JsonResponse($responsePayload, Response::HTTP_OK);
     }
 
     /**
