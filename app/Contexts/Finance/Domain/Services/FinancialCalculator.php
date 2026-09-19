@@ -78,21 +78,18 @@ final class FinancialCalculator
             }
         }
 
-        // P&L core computations
-        $grossProfit = $revenue->subtract($cogs);
-        $grossMargin = $this->calculateMargin($grossProfit, $revenue);
+        // P&L core computations delegated to FinancialRecord domain logic
+        $grossProfit = FinancialRecord::calculateGrossProfit($revenue, $cogs);
+        $grossMargin = FinancialRecord::calculateGrossMargin($grossProfit, $revenue) ?? 0.0;
 
-        // EBIT = Gross Profit - OPEX - Depreciation
-        $ebit = $grossProfit->subtract($opex)->subtract($depreciation);
-        $operatingMargin = $this->calculateMargin($ebit, $revenue);
+        $ebit = FinancialRecord::calculateEbit($grossProfit, $opex, $depreciation);
+        $operatingMargin = FinancialRecord::calculateOperatingMargin($ebit, $revenue) ?? 0.0;
 
-        // EBITDA = EBIT + Depreciation
-        $ebitda = $ebit->add($depreciation);
-        $ebitdaMargin = $this->calculateMargin($ebitda, $revenue);
+        $ebitda = FinancialRecord::calculateEbitda($ebit, $depreciation);
+        $ebitdaMargin = FinancialRecord::calculateEbitdaMargin($ebitda, $revenue) ?? 0.0;
 
-        // Net Profit = EBIT - Financial Costs - Tax
-        $netProfit = $ebit->subtract($financialCosts)->subtract($tax);
-        $netMargin = $this->calculateMargin($netProfit, $revenue);
+        $netProfit = FinancialRecord::calculateNetProfit($ebit, $financialCosts, $tax);
+        $netMargin = FinancialRecord::calculateNetMargin($netProfit, $revenue) ?? 0.0;
 
         // Liquidity and Solvency computations delegating to FinancialRecord domain logic
         $quickAssets = $currentAssets->subtract($inventory);
@@ -132,12 +129,27 @@ final class FinancialCalculator
     }
 
     /**
-     * Calculate EBITDA: Earnings Before Interest, Taxes, Depreciation, and Amortization.
-     * EBITDA = EBIT + Depreciation
+     * Calculate Gross Profit: Revenue - COGS
      */
-    public function calculateEbitda(Money $ebit, Money $depreciation): Money
+    public function calculateGrossProfit(Money $revenue, Money $cogs): Money
     {
-        return $ebit->add($depreciation);
+        return FinancialRecord::calculateGrossProfit($revenue, $cogs);
+    }
+
+    /**
+     * Calculate Gross Margin percentage: Gross Profit / Revenue.
+     */
+    public function calculateGrossMargin(Money $grossProfit, Money $revenue): float
+    {
+        return FinancialRecord::calculateGrossMargin($grossProfit, $revenue) ?? 0.0;
+    }
+
+    /**
+     * Calculate EBIT (Operating Profit): Gross Profit - OPEX - Depreciation
+     */
+    public function calculateEbit(Money $grossProfit, Money $opex, Money $depreciation): Money
+    {
+        return FinancialRecord::calculateEbit($grossProfit, $opex, $depreciation);
     }
 
     /**
@@ -145,7 +157,48 @@ final class FinancialCalculator
      */
     public function calculateOperatingMargin(Money $ebit, Money $revenue): float
     {
-        return $this->calculateMargin($ebit, $revenue);
+        return FinancialRecord::calculateOperatingMargin($ebit, $revenue) ?? 0.0;
+    }
+
+    /**
+     * Calculate EBIT Margin percentage (alias of Operating Margin): EBIT / Revenue.
+     */
+    public function calculateEbitMargin(Money $ebit, Money $revenue): float
+    {
+        return FinancialRecord::calculateEbitMargin($ebit, $revenue) ?? 0.0;
+    }
+
+    /**
+     * Calculate EBITDA: Earnings Before Interest, Taxes, Depreciation, and Amortization.
+     * EBITDA = EBIT + Depreciation
+     */
+    public function calculateEbitda(Money $ebit, Money $depreciation): Money
+    {
+        return FinancialRecord::calculateEbitda($ebit, $depreciation);
+    }
+
+    /**
+     * Calculate EBITDA Margin percentage: EBITDA / Revenue.
+     */
+    public function calculateEbitdaMargin(Money $ebitda, Money $revenue): float
+    {
+        return FinancialRecord::calculateEbitdaMargin($ebitda, $revenue) ?? 0.0;
+    }
+
+    /**
+     * Calculate Net Profit: EBIT - Financial Costs - Tax.
+     */
+    public function calculateNetProfit(Money $ebit, Money $financialCosts, Money $tax): Money
+    {
+        return FinancialRecord::calculateNetProfit($ebit, $financialCosts, $tax);
+    }
+
+    /**
+     * Calculate Net Margin percentage: Net Profit / Revenue.
+     */
+    public function calculateNetMargin(Money $netProfit, Money $revenue): float
+    {
+        return FinancialRecord::calculateNetMargin($netProfit, $revenue) ?? 0.0;
     }
 
     /**
@@ -170,16 +223,5 @@ final class FinancialCalculator
     public function calculateDebtToAssets(Money $totalDebt, Money $totalAssets): ?float
     {
         return FinancialRecord::calculateDebtToAssets($totalDebt, $totalAssets);
-    }
-
-    private function calculateMargin(Money $numerator, Money $denominator): float
-    {
-        if ($denominator->isZero() || $denominator->isNegative()) {
-            return 0.0;
-        }
-
-        $result = bcdiv($numerator->amount(), $denominator->amount(), 6);
-
-        return (float) $result;
     }
 }

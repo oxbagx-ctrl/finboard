@@ -36,6 +36,36 @@ enum CategoryType: string
         };
     }
 
+    public function isRevenue(): bool
+    {
+        return $this === self::REVENUE;
+    }
+
+    public function isCogs(): bool
+    {
+        return $this === self::COGS;
+    }
+
+    public function isOpex(): bool
+    {
+        return $this === self::OPEX;
+    }
+
+    public function isDepreciation(): bool
+    {
+        return $this === self::DEPRECIATION;
+    }
+
+    public function isFinancial(): bool
+    {
+        return $this === self::FINANCIAL;
+    }
+
+    public function isTax(): bool
+    {
+        return $this === self::TAX;
+    }
+
     public function isCurrentAsset(): bool
     {
         return in_array($this, [

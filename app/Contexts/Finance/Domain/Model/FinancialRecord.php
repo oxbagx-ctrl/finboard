@@ -166,6 +166,31 @@ final class FinancialRecord extends AggregateRoot
         return $this->category->recordType() === RecordType::EXPENSE;
     }
 
+    public function isCogs(): bool
+    {
+        return $this->category->type()->isCogs();
+    }
+
+    public function isOpex(): bool
+    {
+        return $this->category->type()->isOpex();
+    }
+
+    public function isDepreciation(): bool
+    {
+        return $this->category->type()->isDepreciation();
+    }
+
+    public function isFinancial(): bool
+    {
+        return $this->category->type()->isFinancial();
+    }
+
+    public function isTax(): bool
+    {
+        return $this->category->type()->isTax();
+    }
+
     public function isAsset(): bool
     {
         return $this->category->recordType() === RecordType::ASSET;
@@ -206,10 +231,185 @@ final class FinancialRecord extends AggregateRoot
         return $this->category->type()->isDebt();
     }
 
-    public function isDepreciation(): bool
+    // ==========================================
+    // P&L Core Profit & Margin Calculations
+    // ==========================================
+
+    /**
+     * Calculate Gross Profit: Revenue - COGS
+     */
+    public static function calculateGrossProfit(Money $revenue, Money $cogs): Money
     {
-        return $this->category->type() === CategoryType::DEPRECIATION;
+        return $revenue->subtract($cogs);
     }
+
+    /**
+     * Calculate Gross Margin: Gross Profit / Revenue.
+     * Returns null if revenue <= 0 to prevent division by zero or nonsensical margins.
+     */
+    public static function calculateGrossMargin(Money $grossProfit, Money $revenue): ?float
+    {
+        return self::calculateMargin($grossProfit, $revenue);
+    }
+
+    /**
+     * Calculate EBIT (Operating Profit): Gross Profit - OPEX - Depreciation
+     */
+    public static function calculateEbit(Money $grossProfit, Money $opex, Money $depreciation): Money
+    {
+        return $grossProfit->subtract($opex)->subtract($depreciation);
+    }
+
+    /**
+     * Calculate Operating Margin (EBIT Margin): EBIT / Revenue.
+     * Returns null if revenue <= 0.
+     */
+    public static function calculateOperatingMargin(Money $ebit, Money $revenue): ?float
+    {
+        return self::calculateMargin($ebit, $revenue);
+    }
+
+    /**
+     * Calculate EBIT Margin alias.
+     */
+    public static function calculateEbitMargin(Money $ebit, Money $revenue): ?float
+    {
+        return self::calculateOperatingMargin($ebit, $revenue);
+    }
+
+    /**
+     * Calculate EBITDA: EBIT + Depreciation
+     */
+    public static function calculateEbitda(Money $ebit, Money $depreciation): Money
+    {
+        return $ebit->add($depreciation);
+    }
+
+    /**
+     * Calculate EBITDA Margin: EBITDA / Revenue.
+     * Returns null if revenue <= 0.
+     */
+    public static function calculateEbitdaMargin(Money $ebitda, Money $revenue): ?float
+    {
+        return self::calculateMargin($ebitda, $revenue);
+    }
+
+    /**
+     * Calculate Net Profit: EBIT - Financial Costs - Tax
+     */
+    public static function calculateNetProfit(Money $ebit, Money $financialCosts, Money $tax): Money
+    {
+        return $ebit->subtract($financialCosts)->subtract($tax);
+    }
+
+    /**
+     * Calculate Net Margin: Net Profit / Revenue.
+     * Returns null if revenue <= 0.
+     */
+    public static function calculateNetMargin(Money $netProfit, Money $revenue): ?float
+    {
+        return self::calculateMargin($netProfit, $revenue);
+    }
+
+    /**
+     * Calculate generic financial margin: Numerator / Denominator (Revenue).
+     * Returns null if denominator is zero or negative.
+     */
+    public static function calculateMargin(Money $numerator, Money $denominator): ?float
+    {
+        if ($denominator->isZero() || $denominator->isNegative()) {
+            return null;
+        }
+
+        $result = bcdiv($numerator->amount(), $denominator->amount(), 6);
+
+        return (float) $result;
+    }
+
+    /**
+     * Calculate P&L metrics directly from a collection of records.
+     *
+     * @param array<FinancialRecord> $records
+     * @return array{
+     *     revenue: Money,
+     *     cogs: Money,
+     *     gross_profit: Money,
+     *     gross_margin: ?float,
+     *     opex: Money,
+     *     depreciation: Money,
+     *     ebit: Money,
+     *     operating_margin: ?float,
+     *     ebitda: Money,
+     *     ebitda_margin: ?float,
+     *     financial_costs: Money,
+     *     tax: Money,
+     *     net_profit: Money,
+     *     net_margin: ?float
+     * }
+     */
+    public static function calculatePnlFromRecords(
+        array $records,
+        Currency $currency = Currency::PLN
+    ): array {
+        $revenue = Money::zero($currency);
+        $cogs = Money::zero($currency);
+        $opex = Money::zero($currency);
+        $depreciation = Money::zero($currency);
+        $financialCosts = Money::zero($currency);
+        $tax = Money::zero($currency);
+
+        foreach ($records as $record) {
+            if (!$record instanceof self) {
+                continue;
+            }
+
+            $amount = $record->amount();
+            $categoryType = $record->category()->type();
+
+            match ($categoryType) {
+                CategoryType::REVENUE => $revenue = $revenue->add($amount),
+                CategoryType::COGS => $cogs = $cogs->add($amount),
+                CategoryType::OPEX => $opex = $opex->add($amount),
+                CategoryType::DEPRECIATION => $depreciation = $depreciation->add($amount),
+                CategoryType::FINANCIAL => $financialCosts = $financialCosts->add($amount),
+                CategoryType::TAX => $tax = $tax->add($amount),
+                default => null,
+            };
+        }
+
+        $grossProfit = self::calculateGrossProfit($revenue, $cogs);
+        $grossMargin = self::calculateGrossMargin($grossProfit, $revenue);
+
+        $ebit = self::calculateEbit($grossProfit, $opex, $depreciation);
+        $operatingMargin = self::calculateOperatingMargin($ebit, $revenue);
+
+        $ebitda = self::calculateEbitda($ebit, $depreciation);
+        $ebitdaMargin = self::calculateEbitdaMargin($ebitda, $revenue);
+
+        $netProfit = self::calculateNetProfit($ebit, $financialCosts, $tax);
+        $netMargin = self::calculateNetMargin($netProfit, $revenue);
+
+        return [
+            'revenue' => $revenue,
+            'cogs' => $cogs,
+            'gross_profit' => $grossProfit,
+            'gross_margin' => $grossMargin,
+            'opex' => $opex,
+            'depreciation' => $depreciation,
+            'ebit' => $ebit,
+            'operating_margin' => $operatingMargin,
+            'ebitda' => $ebitda,
+            'ebitda_margin' => $ebitdaMargin,
+            'financial_costs' => $financialCosts,
+            'tax' => $tax,
+            'net_profit' => $netProfit,
+            'net_margin' => $netMargin,
+        ];
+    }
+
+    // ==========================================
+    // Balance Sheet & Liquidity Calculations
+    // ==========================================
 
     /**
      * Calculate Current Ratio: Current Assets / Current Liabilities.

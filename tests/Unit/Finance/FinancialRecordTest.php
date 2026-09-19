@@ -110,6 +110,26 @@ final class FinancialRecordTest extends TestCase
 
     public function test_category_classification_predicates(): void
     {
+        $revRecord = $this->makeRecord(Category::revenue(), '100000.0000');
+        $this->assertTrue($revRecord->isRevenue());
+        $this->assertFalse($revRecord->isExpense());
+
+        $cogsRecord = $this->makeRecord(Category::cogs(), '40000.0000');
+        $this->assertTrue($cogsRecord->isExpense());
+        $this->assertTrue($cogsRecord->isCogs());
+
+        $opexRecord = $this->makeRecord(Category::opex(), '20000.0000');
+        $this->assertTrue($opexRecord->isExpense());
+        $this->assertTrue($opexRecord->isOpex());
+
+        $finRecord = $this->makeRecord(Category::financialCost(), '5000.0000');
+        $this->assertTrue($finRecord->isExpense());
+        $this->assertTrue($finRecord->isFinancial());
+
+        $taxRecord = $this->makeRecord(Category::tax(), '12000.0000');
+        $this->assertTrue($taxRecord->isExpense());
+        $this->assertTrue($taxRecord->isTax());
+
         $cashRecord = $this->makeRecord(Category::cash(), '50000.0000');
         $this->assertTrue($cashRecord->isAsset());
         $this->assertTrue($cashRecord->isCurrentAsset());
@@ -141,6 +161,87 @@ final class FinancialRecordTest extends TestCase
         $depRecord = $this->makeRecord(Category::depreciation(), '4000.0000');
         $this->assertTrue($depRecord->isExpense());
         $this->assertTrue($depRecord->isDepreciation());
+    }
+
+    public function test_calculate_profit_and_margins_domain_logic(): void
+    {
+        $revenue = Money::fromDecimal('500000.0000', Currency::PLN);
+        $cogs = Money::fromDecimal('200000.0000', Currency::PLN);
+        $opex = Money::fromDecimal('100000.0000', Currency::PLN);
+        $depreciation = Money::fromDecimal('30000.0000', Currency::PLN);
+        $finCosts = Money::fromDecimal('10000.0000', Currency::PLN);
+        $tax = Money::fromDecimal('30000.0000', Currency::PLN);
+
+        // Gross Profit: 500k - 200k = 300k
+        $grossProfit = FinancialRecord::calculateGrossProfit($revenue, $cogs);
+        $this->assertSame('300000.0000', $grossProfit->amount());
+        $this->assertSame(0.6, FinancialRecord::calculateGrossMargin($grossProfit, $revenue));
+
+        // EBIT: 300k - 100k - 30k = 170k
+        $ebit = FinancialRecord::calculateEbit($grossProfit, $opex, $depreciation);
+        $this->assertSame('170000.0000', $ebit->amount());
+        $this->assertSame(0.34, FinancialRecord::calculateOperatingMargin($ebit, $revenue));
+        $this->assertSame(0.34, FinancialRecord::calculateEbitMargin($ebit, $revenue));
+
+        // EBITDA: 170k + 30k = 200k
+        $ebitda = FinancialRecord::calculateEbitda($ebit, $depreciation);
+        $this->assertSame('200000.0000', $ebitda->amount());
+        $this->assertSame(0.4, FinancialRecord::calculateEbitdaMargin($ebitda, $revenue));
+
+        // Net Profit: 170k - 10k - 30k = 130k
+        $netProfit = FinancialRecord::calculateNetProfit($ebit, $finCosts, $tax);
+        $this->assertSame('130000.0000', $netProfit->amount());
+        $this->assertSame(0.26, FinancialRecord::calculateNetMargin($netProfit, $revenue));
+    }
+
+    public function test_negative_margins_when_loss_incurred(): void
+    {
+        $revenue = Money::fromDecimal('100000.0000', Currency::PLN);
+        $cogs = Money::fromDecimal('120000.0000', Currency::PLN); // Gross loss of 20k
+
+        $grossProfit = FinancialRecord::calculateGrossProfit($revenue, $cogs);
+        $this->assertSame('-20000.0000', $grossProfit->amount());
+
+        $grossMargin = FinancialRecord::calculateGrossMargin($grossProfit, $revenue);
+        $this->assertSame(-0.2, $grossMargin);
+    }
+
+    public function test_zero_or_negative_revenue_returns_null_margin(): void
+    {
+        $profit = Money::fromDecimal('10000.0000', Currency::PLN);
+        $zeroRevenue = Money::zero(Currency::PLN);
+
+        $this->assertNull(FinancialRecord::calculateGrossMargin($profit, $zeroRevenue));
+        $this->assertNull(FinancialRecord::calculateOperatingMargin($profit, $zeroRevenue));
+        $this->assertNull(FinancialRecord::calculateEbitdaMargin($profit, $zeroRevenue));
+        $this->assertNull(FinancialRecord::calculateNetMargin($profit, $zeroRevenue));
+    }
+
+    public function test_calculate_pnl_from_records_collection(): void
+    {
+        $records = [
+            $this->makeRecord(Category::revenue(), '500000.0000'),
+            $this->makeRecord(Category::cogs(), '200000.0000'),
+            $this->makeRecord(Category::opex(), '100000.0000'),
+            $this->makeRecord(Category::depreciation(), '30000.0000'),
+            $this->makeRecord(Category::financialCost(), '10000.0000'),
+            $this->makeRecord(Category::tax(), '30000.0000'),
+        ];
+
+        $pnl = FinancialRecord::calculatePnlFromRecords($records, Currency::PLN);
+
+        $this->assertSame('500000.0000', $pnl['revenue']->amount());
+        $this->assertSame('200000.0000', $pnl['cogs']->amount());
+        $this->assertSame('300000.0000', $pnl['gross_profit']->amount());
+        $this->assertSame(0.6, $pnl['gross_margin']);
+        $this->assertSame('100000.0000', $pnl['opex']->amount());
+        $this->assertSame('30000.0000', $pnl['depreciation']->amount());
+        $this->assertSame('170000.0000', $pnl['ebit']->amount());
+        $this->assertSame(0.34, $pnl['operating_margin']);
+        $this->assertSame('200000.0000', $pnl['ebitda']->amount());
+        $this->assertSame(0.4, $pnl['ebitda_margin']);
+        $this->assertSame('130000.0000', $pnl['net_profit']->amount());
+        $this->assertSame(0.26, $pnl['net_margin']);
     }
 
     public function test_calculate_current_ratio_domain_logic(): void

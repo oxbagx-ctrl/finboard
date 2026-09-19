@@ -140,6 +140,44 @@ final class FinancialCalculatorTest extends TestCase
         $this->assertSame(0.3, $this->calculator->calculateDebtToAssets($totalDebt, $totalAssets));
     }
 
+    public function test_individual_margin_calculator_methods(): void
+    {
+        $revenue = Money::fromDecimal('1000000.0000', Currency::PLN);
+        $cogs = Money::fromDecimal('400000.0000', Currency::PLN);
+        $opex = Money::fromDecimal('200000.0000', Currency::PLN);
+        $dep = Money::fromDecimal('50000.0000', Currency::PLN);
+        $fin = Money::fromDecimal('20000.0000', Currency::PLN);
+        $tax = Money::fromDecimal('60000.0000', Currency::PLN);
+
+        $grossProfit = $this->calculator->calculateGrossProfit($revenue, $cogs);
+        $this->assertSame('600000.0000', $grossProfit->amount());
+        $this->assertSame(0.60, round($this->calculator->calculateGrossMargin($grossProfit, $revenue), 2));
+
+        $ebit = $this->calculator->calculateEbit($grossProfit, $opex, $dep);
+        $this->assertSame('350000.0000', $ebit->amount());
+        $this->assertSame(0.35, round($this->calculator->calculateOperatingMargin($ebit, $revenue), 2));
+        $this->assertSame(0.35, round($this->calculator->calculateEbitMargin($ebit, $revenue), 2));
+
+        $ebitda = $this->calculator->calculateEbitda($ebit, $dep);
+        $this->assertSame('400000.0000', $ebitda->amount());
+        $this->assertSame(0.40, round($this->calculator->calculateEbitdaMargin($ebitda, $revenue), 2));
+
+        $netProfit = $this->calculator->calculateNetProfit($ebit, $fin, $tax);
+        $this->assertSame('270000.0000', $netProfit->amount());
+        $this->assertSame(0.27, round($this->calculator->calculateNetMargin($netProfit, $revenue), 2));
+    }
+
+    public function test_zero_revenue_margins_return_zero_float(): void
+    {
+        $profit = Money::fromDecimal('50000.0000', Currency::PLN);
+        $zeroRevenue = Money::zero(Currency::PLN);
+
+        $this->assertSame(0.0, $this->calculator->calculateGrossMargin($profit, $zeroRevenue));
+        $this->assertSame(0.0, $this->calculator->calculateOperatingMargin($profit, $zeroRevenue));
+        $this->assertSame(0.0, $this->calculator->calculateEbitdaMargin($profit, $zeroRevenue));
+        $this->assertSame(0.0, $this->calculator->calculateNetMargin($profit, $zeroRevenue));
+    }
+
     private function createRecord(Category $category, string $amount): FinancialRecord
     {
         return FinancialRecord::create(
