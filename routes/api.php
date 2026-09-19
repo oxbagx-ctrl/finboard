@@ -1,6 +1,7 @@
 <?php
 
 use App\Presentation\Api\Controllers\AdvisorManagementController;
+use App\Presentation\Api\Controllers\AuditLogController;
 use App\Presentation\Api\Controllers\AuthController;
 use App\Presentation\Api\Controllers\BenchmarkController;
 use App\Presentation\Api\Controllers\DocumentController;
@@ -85,6 +86,13 @@ Route::prefix('v1')->group(function () {
                 Route::put('/{metricType}', [BenchmarkController::class, 'update'])->name('api.finance.benchmarks.update');
             });
 
+            // Financial Audit Trail Endpoints
+            Route::prefix('audit-logs')->group(function () {
+                Route::get('/', [AuditLogController::class, 'index'])->name('api.finance.audit-logs.index');
+                Route::get('/stats', [AuditLogController::class, 'stats'])->name('api.finance.audit-logs.stats');
+                Route::get('/{id}', [AuditLogController::class, 'show'])->name('api.finance.audit-logs.show');
+            });
+
             // CSV Import (canonical and plural REST routes)
             Route::post('/import/csv', [FinancialImportController::class, 'store']
                 )->name('api.finance.import.store');
@@ -121,6 +129,13 @@ Route::prefix('v1')->group(function () {
                 Route::get('/liquidity', [FinancialAnalyticsController::class, 'liquidity']
                     )->name('api.finance.analytics.liquidity');
             });
+        });
+
+        // Top-level Financial Audit Trail Aliases
+        Route::prefix('audit-logs')->group(function () {
+            Route::get('/', [AuditLogController::class, 'index'])->name('api.audit-logs.index');
+            Route::get('/stats', [AuditLogController::class, 'stats'])->name('api.audit-logs.stats');
+            Route::get('/{id}', [AuditLogController::class, 'show'])->name('api.audit-logs.show');
         });
 
         // Virtual Data Room (VDR) Endpoints

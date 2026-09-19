@@ -3,12 +3,15 @@
 [![PHP Version](https://img.shields.io/badge/php-8.2%2B-blue.svg)](https://www.php.net/)
 [![Laravel](https://img.shields.io/badge/laravel-11.x-red.svg)](https://laravel.com/)
 [![PostgreSQL](https://img.shields.io/badge/postgresql-16-blue.svg)](https://www.postgresql.org/)
-[![Redis](https://img.shields.io/badge/redis-alpine-red.svg)](https://redis.io/)\n[![Architecture](https://img.shields.io/badge/architecture-DDD%20%2F%20CQRS-brightgreen.svg)]()
-[![Tests](https://img.shields.io/badge/tests-330%20backend%20%7C%2099%20frontend%20passed-success.svg)]()
+[![Redis](https://img.shields.io/badge/redis-alpine-red.svg)](https://redis.io/)
+[![Architecture](https://img.shields.io/badge/architecture-DDD%20%2F%20CQRS-brightgreen.svg)]()
+[![Tests](https://img.shields.io/badge/tests-340%20backend%20%7C%2099%20frontend%20passed-success.svg)]()
 
 FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakcyjnego (M&A, Due Diligence, Corporate Finance) oraz ich klientom (CFO, Zarządy). Aplikacja łączy w sobie zaawansowaną analitykę finansową w ujęciu wielo-najemcowym (Multi-Tenant) z bezpiecznym repozytorium dokumentów Virtual Data Room (VDR).
 
----\n\n## 📌 Kluczowe Funkcjonalności
+---
+
+## 📌 Kluczowe Funkcjonalności
 
 - **Architektura DDD (Domain-Driven Design) & CQRS**:
     - Wyraźny podział na Bounded Contexts: `Identity`, `Finance`, `DocumentManagement`, `Tenant`.
@@ -18,6 +21,7 @@ FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakc
     - Encja domenowa `FinancialBenchmark` realizująca ewaluację wskaźników spółki z przypisaniem flag statusu (`OPT`, `WARN`, `CRIT`, `UNKNOWN`) oraz repozytorium `FinancialBenchmarkRepositoryInterface` trwale zapisujące cele w PostgreSQL.
     - Encja domenowa `FinancialAuditLog` i repozytorium `FinancialAuditLogRepositoryInterface` zapewniające niezmienny rejestr ścieżki audytowej (Audit Trail) dla operacji finansowych, konfiguracji celów i importów.
     - Reaktywne listenery zdarzeń domenowych (`LogFinancialRecordCreatedListener`, `LogFinancialRecordUpdatedListener`, `LogFinancialRecordDeletedListener`, `LogBenchmarkConfiguredListener`, `LogBenchmarkResetListener`, `LogCsvImportAuditListener`) automatycznie utrwalające zdarzenia w dzienniku audytowym z metadanymi żądania (IP, User-Agent, identyfikator użytkownika).
+    - Kontroler `AuditLogController` serwujący bezpieczny, wielonajemcowy rejestr ścieżki audytowej (`/api/v1/finance/audit-logs`) z filtrowaniem akcji, typów encji, użytkowników i zakresu dat oraz statystykami zagregowanymi (`stats`).
     - Serwis aplikacyjny `KpiCalculationService` kalkulujący dynamikę YoY oraz MoM na danych historycznych ze ścisłą ochroną przed dzieleniem przez zero.
     - Serwis aplikacyjny `KpiEvaluationService` ewaluujący dynamicznie metryki finansowe spółki wobec skonfigurowanych celów doradcy (lub rynkowych wartości domyślnych) wraz z wyznaczaniem statusów semaforowych (`OPT`, `WARN`, `CRIT`), syntetycznego wskaźnika `health_score` i zagregowanego stanu zdrowia finansowego.
     - Kontroler `BenchmarkController` w warstwie prezentacji REST API obsługujący odczyt, konfigurację progów, masową aktualizację i resetowanie celów finansowych spółek portfelowych przez Doradców i Administratorów.
@@ -133,7 +137,7 @@ Po zakończeniu seedowania w systemie dostępne są konta użytkowników:
 ```bash
 docker compose exec app ./vendor/bin/phpunit
 ```
-*Aktualny status: **330 testów** (2252 asercje), 100% zaliczonych.*
+*Aktualny status: **340 testów** (2298 asercji), 100% zaliczonych.*
 
 ### Testy Frontendowe (Vitest)
 ```bash
@@ -173,6 +177,11 @@ npm test
 - `PUT /api/v1/finance/benchmarks/{metricType}` – Aktualizacja lub utworzenie celów i progów ostrzegawczych
 - `PUT /api/v1/finance/benchmarks` – Zbiorcza (batch) aktualizacja celów wskaźników spółki
 - `POST /api/v1/finance/benchmarks/reset` – Przywrócenie domyślnych standardów rynkowych dla wskazanego lub wszystkich wskaźników
+
+### Finanse – Ścieżka Audytowa (Audit Trail)
+- `GET /api/v1/finance/audit-logs` – Stronicowana lista zdarzeń audytowych spółki z filtrami akcji, encji i dat (`AuditLogController`)
+- `GET /api/v1/finance/audit-logs/stats` – Zbiorcze wskaźniki i liczby operacji audytowych per akcja ze statusem semaforowym
+- `GET /api/v1/finance/audit-logs/{id}` – Szczegóły pojedynczego rekordu audytowego ze snapshotem zmian (old/new)
 
 ### Finanse – Analityka i Wykresy (CQRS Read Side & Dynamic KPI)
 - `GET /api/v1/finance/kpi` – Dedykowany endpoint KPI ze wskaźnikami P&L, bilansem, płynnością oraz dynamikami YoY i MoM (`KpiController`)
@@ -273,7 +282,7 @@ npm test
 - [ ] **Faza 14: Logi Audytowe i Dynamiczny Frontend (Finance & Deal Advisory)**
   - [x] Encja `FinancialAuditLog`, migracja bazy danych i repozytorium dla operacji finansowych i konfiguracji celów.
   - [x] Rejestracja listenerów zdarzeń domenowych utrwalających wpisy w dzienniku audytowym.
-  - [ ] Endpointy REST API do pobierania logów audytowych przypisanych do spółki.
+  - [x] Endpointy REST API do pobierania logów audytowych przypisanych do spółki.
   - [ ] Zastąpienie statycznych wartości na Pulpicie Zarządczym i w Analityce P&L dynamicznymi danymi z API.
   - [ ] Interfejs edycji celów finansowych dla Doradcy z dynamicznymi wskaźnikami statusów i semaforami (OPT, WARN, CRIT).
 
