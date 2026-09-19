@@ -1,4 +1,6 @@
-import React, { createContext, useContext, useState, useMemo, useCallback } from 'react';
+import React, { createContext, useContext, useState, useMemo, useCallback, useEffect } from 'react';
+import apiClient from '../api/client';
+import { AuthContext } from './AuthContext';
 
 const DealContext = createContext(null);
 
@@ -17,7 +19,12 @@ export const FISCAL_QUARTERS = [
     { id: 'Q4', label: 'Q4 (Paź - Gru)' },
 ];
 
-export const DealProvider = ({ children }) => {
+export const DealProvider = ({ children, initialYears = ['2026', '2025'] }) => {
+    const auth = useContext(AuthContext);
+    const activeCompanyId = auth?.activeCompany?.id;
+
+    const [availableYears, setAvailableYears] = useState(initialYears);
+    const [loadingYears, setLoadingYears] = useState(false);
     const [selectedYear, setSelectedYear] = useState('all');
     const [selectedQuarter, setSelectedQuarter] = useState('all');
     const [currency, setCurrency] = useState('PLN');
@@ -28,6 +35,48 @@ export const DealProvider = ({ children }) => {
         confidentialityClause: 'M&A Advisory Privilege // NDA Enforced',
     });
 
+    const fetchAvailableYears = useCallback(async () => {
+        try {
+            setLoadingYears(true);
+            const params = {};
+            if (activeCompanyId) {
+                params.company_id = activeCompanyId;
+            }
+            const res = await apiClient.get('/finance/analytics/years', { params });
+            if (res.data?.data && Array.isArray(res.data.data) && res.data.data.length > 0) {
+                const stringYears = res.data.data.map(y => String(y));
+                setAvailableYears(stringYears);
+            }
+        } catch (e) {
+            // Keep fallback
+        } finally {
+            setLoadingYears(false);
+        }
+    }, [activeCompanyId]);
+
+    useEffect(() => {
+        const hasToken = auth?.token || (typeof localStorage !== 'undefined' && localStorage.getItem('finboard_token'));
+        if (hasToken) {
+            fetchAvailableYears();
+        }
+    }, [activeCompanyId, fetchAvailableYears, auth?.token]);
+
+    useEffect(() => {
+        const handleCompanyChange = () => {
+            fetchAvailableYears();
+        };
+        window.addEventListener('finboard:company-changed', handleCompanyChange);
+        return () => window.removeEventListener('finboard:company-changed', handleCompanyChange);
+    }, [fetchAvailableYears]);
+
+    // If selectedYear is not 'all' and no longer present in availableYears, reset to 'all'
+    useEffect(() => {
+        if (selectedYear !== 'all' && availableYears.length > 0 && !availableYears.includes(selectedYear)) {
+            setSelectedYear('all');
+            setSelectedQuarter('all');
+        }
+    }, [availableYears, selectedYear]);
+
     const currentCurrencyObj = useMemo(() => {
         return CURRENCIES.find(c => c.code === currency) || CURRENCIES[0];
     }, [currency]);
@@ -35,7 +84,13 @@ export const DealProvider = ({ children }) => {
     // Calculate start_date and end_date based on year and quarter selection
     const dateRange = useMemo(() => {
         if (selectedYear === 'all') {
-            return { startDate: null, endDate: null, label: 'Pełna historia (2025 – 2026)' };
+            const minYear = availableYears.length > 0 ? availableYears[availableYears.length - 1] : '2025';
+            const maxYear = availableYears.length > 0 ? availableYears[0] : '2026';
+            const label = availableYears.length > 1
+                ? `Pełna historia (${minYear} – ${maxYear})`
+                : (availableYears.length === 1 ? `Rok obrachunkowy ${availableYears[0]}` : 'Pełna historia');
+
+            return { startDate: null, endDate: null, label };
         }
 
         const y = parseInt(selectedYear, 10);
@@ -56,11 +111,11 @@ export const DealProvider = ({ children }) => {
         };
 
         return {
-            startDate: quarters[selectedQuarter].start,
-            endDate: quarters[selectedQuarter].end,
-            label: quarters[selectedQuarter].label,
+            startDate: quarters[selectedQuarter]?.start || `${y}-01-01`,
+            endDate: quarters[selectedQuarter]?.end || `${y}-12-31`,
+            label: quarters[selectedQuarter]?.label || `Rok obrachunkowy ${y}`,
         };
-    }, [selectedYear, selectedQuarter]);
+    }, [selectedYear, selectedQuarter, availableYears]);
 
     // Converts monetary amount in PLN to selected currency
     const convertAmount = useCallback((amountInPln) => {
@@ -77,6 +132,10 @@ export const DealProvider = ({ children }) => {
     }, []);
 
     const value = useMemo(() => ({
+        availableYears,
+        setAvailableYears,
+        loadingYears,
+        refreshAvailableYears: fetchAvailableYears,
         selectedYear,
         setSelectedYear,
         selectedQuarter,
@@ -90,6 +149,9 @@ export const DealProvider = ({ children }) => {
         setDealMetadata,
         resetFilters,
     }), [
+        availableYears,
+        loadingYears,
+        fetchAvailableYears,
         selectedYear,
         selectedQuarter,
         currency,

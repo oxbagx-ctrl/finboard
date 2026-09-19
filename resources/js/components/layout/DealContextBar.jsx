@@ -1,6 +1,6 @@
 import React from 'react';
-import { useDeal, CURRENCIES, FISCAL_YEARS, FISCAL_QUARTERS } from '../../context/DealContext';
-import { Lock, Calendar, Coins, RotateCcw, ChevronDown } from 'lucide-react';
+import { useDeal, CURRENCIES, FISCAL_QUARTERS } from '../../context/DealContext';
+import { Lock, Calendar, Coins, RotateCcw } from 'lucide-react';
 
 export const DealContextBar = () => {
     const {
@@ -13,9 +13,14 @@ export const DealContextBar = () => {
         dateRange,
         dealMetadata,
         resetFilters,
+        availableYears = ['2026', '2025'],
     } = useDeal();
 
     const isFiltered = selectedYear !== 'all' || selectedQuarter !== 'all' || currency !== 'PLN';
+
+    const historyLabel = availableYears && availableYears.length > 1
+        ? `HISTORIA (${availableYears[availableYears.length - 1]}-${availableYears[0]})`
+        : 'HISTORIA';
 
     return (
         <div className="w-full bg-zinc-950 border-b border-zinc-800/80 px-4 sm:px-6 py-2 print:hidden">
@@ -73,9 +78,12 @@ export const DealContextBar = () => {
                             }}
                             className="bg-transparent text-[11px] font-semibold text-zinc-200 focus:outline-none cursor-pointer pr-1"
                         >
-                            <option value="all" className="bg-zinc-900 text-zinc-200">HISTORIA (2025-2026)</option>
-                            <option value="2026" className="bg-zinc-900 text-zinc-200">FY 2026</option>
-                            <option value="2025" className="bg-zinc-900 text-zinc-200">FY 2025</option>
+                            <option value="all" className="bg-zinc-900 text-zinc-200">{historyLabel}</option>
+                            {availableYears.map((yr) => (
+                                <option key={yr} value={yr} className="bg-zinc-900 text-zinc-200">
+                                    FY {yr}
+                                </option>
+                            ))}
                         </select>
                     </div>
 

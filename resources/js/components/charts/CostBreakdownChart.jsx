@@ -20,11 +20,11 @@ const PALETTE = [
     '#cbd5e1', // slate-300
 ];
 
-export const CostBreakdownChart = ({ data = [], currency = 'PLN', className = '' }) => {
+export const CostBreakdownChart = ({ data = [], currency = 'PLN', title = 'SUMA KOSZTÓW', className = '' }) => {
     if (!data || data.length === 0) {
         return (
             <div className="h-72 flex items-center justify-center text-xs font-mono text-zinc-500">
-                Brak danych struktury kosztów dla wybranego okresu.
+                Brak danych struktury kosztów operacyjnych (OPEX) dla wybranego okresu.
             </div>
         );
     }
@@ -68,7 +68,7 @@ export const CostBreakdownChart = ({ data = [], currency = 'PLN', className = ''
                 {/* Center Value Badge */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                     <span className="text-[9px] font-mono uppercase text-zinc-500 tracking-wider">
-                        SUMA KOSZTÓW
+                        {title}
                     </span>
                     <span className="text-xs font-bold font-mono text-zinc-100 tabular-nums mt-0.5">
                         {formatCurrency(total, currency)}

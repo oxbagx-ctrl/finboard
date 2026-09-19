@@ -51,7 +51,7 @@ export const DashboardView = () => {
             const [metricsRes, trendsRes, expensesRes, revenuesRes, liquidityRes, auditRes] = await Promise.all([
                 apiClient.get('/finance/analytics/metrics', { params }).catch(() => ({ data: { data: null } })),
                 apiClient.get('/finance/analytics/trends', { params }).catch(() => ({ data: { data: [] } })),
-                apiClient.get('/finance/analytics/breakdown', { params: { ...params, record_type: 'EXPENSE' } }).catch(() => ({ data: { data: [] } })),
+                apiClient.get('/finance/analytics/breakdown', { params: { ...params, record_type: 'EXPENSE', category_type: 'OPEX' } }).catch(() => ({ data: { data: [] } })),
                 apiClient.get('/finance/analytics/breakdown', { params: { ...params, record_type: 'REVENUE' } }).catch(() => ({ data: { data: [] } })),
                 apiClient.get('/finance/analytics/liquidity', { params }).catch(() => ({ data: { data: [] } })),
                 apiClient.get('/finance/audit-logs', { params: { per_page: 5 } }).catch(() => ({ data: { data: [] } })),

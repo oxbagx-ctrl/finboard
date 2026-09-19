@@ -1,11 +1,22 @@
 import React from 'react';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { DealProvider, useDeal, CURRENCIES } from '../../context/DealContext';
+import apiClient from '../../api/client';
+
+vi.mock('../../api/client', () => ({
+    default: {
+        get: vi.fn(),
+    },
+}));
 
 const wrapper = ({ children }) => <DealProvider>{children}</DealProvider>;
 
 describe('DealContext & Currency Engine', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
     it('initializes with default PLN currency and full history period', () => {
         const { result } = renderHook(() => useDeal(), { wrapper });
 
@@ -15,6 +26,7 @@ describe('DealContext & Currency Engine', () => {
         expect(result.current.selectedQuarter).toBe('all');
         expect(result.current.dateRange.startDate).toBeNull();
         expect(result.current.dateRange.endDate).toBeNull();
+        expect(result.current.availableYears).toEqual(['2026', '2025']);
     });
 
     it('converts amounts according to selected currency rates', () => {
@@ -84,5 +96,53 @@ describe('DealContext & Currency Engine', () => {
         expect(result.current.currency).toBe('PLN');
         expect(result.current.selectedYear).toBe('all');
         expect(result.current.selectedQuarter).toBe('all');
+    });
+
+    it('dynamically adapts history date range label to custom available fiscal years span', () => {
+        const customWrapper = ({ children }) => (
+            <DealProvider initialYears={['2026', '2025', '2024', '2023']}>
+                {children}
+            </DealProvider>
+        );
+
+        const { result } = renderHook(() => useDeal(), { wrapper: customWrapper });
+
+        expect(result.current.availableYears).toEqual(['2026', '2025', '2024', '2023']);
+        expect(result.current.dateRange.label).toBe('Pełna historia (2023 – 2026)');
+    });
+
+    it('fetches dynamic available years from API and updates state', async () => {
+        apiClient.get.mockResolvedValueOnce({
+            data: {
+                status: 'success',
+                count: 4,
+                data: [2026, 2025, 2024, 2023],
+            },
+        });
+
+        const { result } = renderHook(() => useDeal(), { wrapper });
+
+        await act(async () => {
+            await result.current.refreshAvailableYears();
+        });
+
+        expect(apiClient.get).toHaveBeenCalledWith('/finance/analytics/years', expect.any(Object));
+        expect(result.current.availableYears).toEqual(['2026', '2025', '2024', '2023']);
+        expect(result.current.dateRange.label).toBe('Pełna historia (2023 – 2026)');
+    });
+
+    it('resets selectedYear to all if active year is no longer in available years', () => {
+        const { result } = renderHook(() => useDeal(), { wrapper });
+
+        act(() => {
+            result.current.setSelectedYear('2025');
+        });
+        expect(result.current.selectedYear).toBe('2025');
+
+        act(() => {
+            result.current.setAvailableYears(['2026']);
+        });
+
+        expect(result.current.selectedYear).toBe('all');
     });
 });

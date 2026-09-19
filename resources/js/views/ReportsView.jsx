@@ -73,7 +73,7 @@ export const ReportsView = () => {
                 apiClient.get('/finance/analytics/metrics', { params }),
                 apiClient.get('/finance/analytics/trends', { params }).catch(() => ({ data: { data: [] } })),
                 apiClient.get('/finance/analytics/breakdown', {
-                    params: { ...params, record_type: 'EXPENSE' }
+                    params: { ...params, record_type: 'EXPENSE', category_type: 'OPEX' }
                 }).catch(() => ({ data: { data: [] } })),
             ]);
 
