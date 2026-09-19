@@ -6,14 +6,14 @@ namespace Tests\Unit\Finance;
 
 use App\Contexts\Finance\Application\Queries\GetAvailableFiscalYears\GetAvailableFiscalYearsHandler;
 use App\Contexts\Finance\Application\Queries\GetAvailableFiscalYears\GetAvailableFiscalYearsQuery;
-use App\Contexts\Finance\Application\Queries\GetCategoryBreakdown\GetCategoryBreakdownQuery;
 use App\Contexts\Finance\Application\Queries\GetCategoryBreakdown\GetCategoryBreakdownHandler;
-use App\Contexts\Finance\Application\Queries\GetFinancialMetrics\GetFinancialMetricsQuery;
+use App\Contexts\Finance\Application\Queries\GetCategoryBreakdown\GetCategoryBreakdownQuery;
 use App\Contexts\Finance\Application\Queries\GetFinancialMetrics\GetFinancialMetricsHandler;
-use App\Contexts\Finance\Application\Queries\GetLiquidityTrends\GetLiquidityTrendsQuery;
+use App\Contexts\Finance\Application\Queries\GetFinancialMetrics\GetFinancialMetricsQuery;
 use App\Contexts\Finance\Application\Queries\GetLiquidityTrends\GetLiquidityTrendsHandler;
-use App\Contexts\Finance\Application\Queries\GetMonthlyTrends\GetMonthlyTrendsQuery;
+use App\Contexts\Finance\Application\Queries\GetLiquidityTrends\GetLiquidityTrendsQuery;
 use App\Contexts\Finance\Application\Queries\GetMonthlyTrends\GetMonthlyTrendsHandler;
+use App\Contexts\Finance\Application\Queries\GetMonthlyTrends\GetMonthlyTrendsQuery;
 use App\Contexts\Finance\Domain\Repositories\FinancialRecordRepositoryInterface;
 use App\Contexts\Finance\Domain\Services\FinancialCalculator;
 use DateTimeImmutable;
@@ -94,6 +94,8 @@ final class QueriesTest extends TestCase
         foreach ($breakdown as $item) {
             $this->assertArrayHasKey('category_id', $item);
             $this->assertArrayHasKey('category_name', $item);
+            $this->assertArrayHasKey('category_code', $item);
+            $this->assertArrayHasKey('category_type', $item);
             $this->assertArrayHasKey('amount', $item);
             $this->assertArrayHasKey('percentage', $item);
             $this->assertGreaterThan(0, $item['amount']);
@@ -107,6 +109,56 @@ final class QueriesTest extends TestCase
         for ($i = 0; $i < count($breakdown) - 1; $i++) {
             $this->assertGreaterThanOrEqual($breakdown[$i + 1]['amount'], $breakdown[$i]['amount']);
         }
+    }
+
+    public function test_get_category_breakdown_handler_filters_by_single_category_type_opex(): void
+    {
+        $handler = new GetCategoryBreakdownHandler($this->repo);
+
+        $query = new GetCategoryBreakdownQuery(
+            companyId: self::ACME_COMPANY_ID,
+            startDate: '2026-01-01',
+            endDate: '2026-03-31',
+            recordType: 'EXPENSE',
+            categoryType: 'OPEX'
+        );
+
+        $breakdown = $handler->handle($query);
+
+        $this->assertNotEmpty($breakdown);
+        $totalPercentage = 0.0;
+        foreach ($breakdown as $item) {
+            $this->assertSame('opex', $item['category_type']);
+            $this->assertGreaterThan(0, $item['amount']);
+            $totalPercentage += $item['percentage'];
+        }
+
+        $this->assertEqualsWithDelta(100.0, $totalPercentage, 0.5);
+    }
+
+    public function test_get_category_breakdown_handler_filters_by_multiple_category_types(): void
+    {
+        $handler = new GetCategoryBreakdownHandler($this->repo);
+
+        $query = new GetCategoryBreakdownQuery(
+            companyId: self::ACME_COMPANY_ID,
+            startDate: '2026-01-01',
+            endDate: '2026-03-31',
+            recordType: 'EXPENSE',
+            categoryType: 'opex,cogs'
+        );
+
+        $breakdown = $handler->handle($query);
+
+        $this->assertNotEmpty($breakdown);
+        $totalPercentage = 0.0;
+        foreach ($breakdown as $item) {
+            $this->assertContains($item['category_type'], ['opex', 'cogs']);
+            $this->assertGreaterThan(0, $item['amount']);
+            $totalPercentage += $item['percentage'];
+        }
+
+        $this->assertEqualsWithDelta(100.0, $totalPercentage, 0.5);
     }
 
     public function test_get_liquidity_trends_handler(): void

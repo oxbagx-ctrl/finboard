@@ -5,7 +5,7 @@
 [![PostgreSQL](https://img.shields.io/badge/postgresql-16-blue.svg)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/redis-alpine-red.svg)](https://redis.io/)
 [![Architecture](https://img.shields.io/badge/architecture-DDD%20%2F%20CQRS-brightgreen.svg)]()
-[![Tests](https://img.shields.io/badge/tests-346%20backend%20%7C%20110%20frontend%20passed-success.svg)]()
+[![Tests](https://img.shields.io/badge/tests-351%20backend%20%7C%20110%20frontend%20passed-success.svg)]()
 
 FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakcyjnego (M&A, Due Diligence, Corporate Finance) oraz ich klientom (CFO, Zarządy). Aplikacja łączy w sobie zaawansowaną analitykę finansową w ujęciu wielo-najemcowym (Multi-Tenant) z bezpiecznym repozytorium dokumentów Virtual Data Room (VDR).
 
@@ -118,7 +118,7 @@ Pulpit Mailpit (podgląd e-maili deweloperskich): `http://localhost:8025`.
 ## 🧪 Uruchamianie Testów
 
 ### Testy Backendowe (PHPUnit)
-Pakiet 346 testów jednostkowych i integracyjnych pokrywających warstwę domenową (DDD), zapytania CQRS, repozytoria, kalkulacje matematyczne `Money`, importy CSV, autoryzację wielonajemcową, system zaproszeń, logi audytowe oraz API benchmarków i analityki:
+Pakiet 351 testów jednostkowych i integracyjnych pokrywających warstwę domenową (DDD), zapytania CQRS, repozytoria, kalkulacje matematyczne `Money`, importy CSV, autoryzację wielonajemcową, system zaproszeń, logi audytowe oraz API benchmarków i analityki:
 ```bash
 docker compose exec app ./vendor/bin/phpunit
 ```
@@ -270,7 +270,7 @@ npm test
   - [x] Implementacja zapytania domenowego `GetAvailableFiscalYearsQuery` oraz metody repozytorium do dynamicznego wyciągania aktywnych lat obrachunkowych spółki.
   - [x] Endpoint REST API `GET /api/v1/finance/analytics/years`.
   - [x] Rozszerzenie zapytania `GetCategoryBreakdownQuery` o filtrowanie `category_type` (OPEX vs COGS/TAX).
-  - [ ] Testy jednostkowe i integracyjne dla dynamicznych lat i filtrowania kategorii.
+  - [x] Testy jednostkowe i integracyjne dla dynamicznych lat i filtrowania kategorii.
   - [ ] Integracja `DealContext` z dynamiczną listą lat oraz zaktualizowanie wykresu struktury kosztów.
 
 ---

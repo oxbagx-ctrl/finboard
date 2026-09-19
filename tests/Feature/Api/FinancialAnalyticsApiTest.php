@@ -185,6 +185,62 @@ final class FinancialAnalyticsApiTest extends TestCase
         $this->assertEqualsWithDelta(100.0, $totalPercentage, 0.5);
     }
 
+    public function test_get_category_breakdown_with_category_type_opex_filter(): void
+    {
+        Sanctum::actingAs($this->clientUser);
+
+        $response = $this->getJson('/api/v1/finance/analytics/breakdown?category_type=OPEX&start_date=2026-01-01&end_date=2026-03-31');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('status', 'success')
+            ->assertJsonPath('record_type', 'EXPENSE')
+            ->assertJsonPath('category_type', 'OPEX')
+            ->assertJsonStructure([
+                'status',
+                'company_id',
+                'record_type',
+                'category_type',
+                'data' => [
+                    '*' => [
+                        'category_id',
+                        'category_name',
+                        'category_code',
+                        'category_type',
+                        'amount',
+                        'formatted_amount',
+                        'percentage',
+                    ],
+                ],
+            ]);
+
+        $data = $response->json('data');
+        $this->assertNotEmpty($data);
+
+        $totalPercentage = 0.0;
+        foreach ($data as $item) {
+            $this->assertSame('opex', $item['category_type']);
+            $totalPercentage += $item['percentage'];
+        }
+        $this->assertEqualsWithDelta(100.0, $totalPercentage, 0.5);
+    }
+
+    public function test_get_category_breakdown_with_category_type_cogs_filter(): void
+    {
+        Sanctum::actingAs($this->clientUser);
+
+        $response = $this->getJson('/api/v1/finance/analytics/breakdown?category_type=cogs&start_date=2026-01-01&end_date=2026-03-31');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('status', 'success')
+            ->assertJsonPath('category_type', 'COGS');
+
+        $data = $response->json('data');
+        $this->assertNotEmpty($data);
+        foreach ($data as $item) {
+            $this->assertSame('cogs', $item['category_type']);
+        }
+    }
+
     public function test_get_liquidity_trends_returns_solvency_ratios(): void
     {
         Sanctum::actingAs($this->clientUser);
@@ -236,6 +292,27 @@ final class FinancialAnalyticsApiTest extends TestCase
         $this->assertIsArray($years);
         $this->assertNotEmpty($years);
         $this->assertContains(2026, $years);
+    }
+
+    public function test_get_available_fiscal_years_for_empty_company_returns_fallback_current_year(): void
+    {
+        Sanctum::actingAs($this->adminUser);
+
+        $emptyCompany = Company::create([
+            'name' => 'Empty Shell Sp. z o.o.',
+            'code' => 'EMPTY',
+            'tax_id' => 'PL9999999999',
+        ]);
+
+        $response = $this->getJson('/api/v1/finance/analytics/years?company_id=' . $emptyCompany->id);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('status', 'success')
+            ->assertJsonPath('company_id', $emptyCompany->id)
+            ->assertJsonPath('count', 1);
+
+        $currentYear = (int) date('Y');
+        $this->assertSame([$currentYear], $response->json('data'));
     }
 
     public function test_admin_can_query_available_fiscal_years_for_any_company(): void
