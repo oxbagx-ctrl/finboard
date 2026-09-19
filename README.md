@@ -5,7 +5,7 @@
 [![PostgreSQL](https://img.shields.io/badge/postgresql-16-blue.svg)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/redis-alpine-red.svg)](https://redis.io/)
 [![Architecture](https://img.shields.io/badge/architecture-DDD%20%2F%20CQRS-brightgreen.svg)]()
-[![Tests](https://img.shields.io/badge/tests-240%20backend%20%7C%2075%20frontend%20passed-success.svg)]()
+[![Tests](https://img.shields.io/badge/tests-240%20backend%20%7C%2083%20frontend%20passed-success.svg)]()
 
 FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakcyjnego (M&A, Due Diligence, Corporate Finance) oraz ich klientom (CFO, Zarządy). Aplikacja łączy w sobie zaawansowaną analitykę finansową w ujęciu wielo-najemcowym (Multi-Tenant) z bezpiecznym repozytorium dokumentów Virtual Data Room (VDR).
 
@@ -50,7 +50,8 @@ FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakc
     - Moduł VDR oraz globalny rejestr ścieżki audytowej (Audit Trail).
     - Widok zarządzania doradcami i przypisaniami spółek (`AdvisorsManagementView`) wraz z matrycą pokrycia portfela i modalem przypisań (`AdvisorAssignmentModal`).
     - Modal zapraszania nowych użytkowników (`InviteUserModal`) w paradygmacie Zero-Trust z podziałem ról i selekcją firm.
-    - Zestaw 75 testów jednostkowych i integracyjnych Vitest (formatery, silnik walutowy, formularze, blokady Dry-Run, eksplorator VDR, raporty PDF, E2E workflow, zarządzanie doradcami, zaproszenia).
+    - Bezpieczna strona aktywacji konta i ustanawiania hasła (`AcceptInvitationView`) weryfikująca token kryptograficzny w URL.
+    - Zestaw 83 testów jednostkowych i integracyjnych Vitest (formatery, silnik walutowy, formularze, blokady Dry-Run, eksplorator VDR, raporty PDF, E2E workflow, zarządzanie doradcami, zaproszenia i aktywacja konta).
 - **Monitoring Produkcyjny, Bezpieczeństwo Nginx i Automatyzacja Wdrożenia**:
     - Dedykowany endpoint `/api/v1/health` badający stan bazy PostgreSQL, klastra Redis, uprawnień magazynu plików oraz zużycia zasobów.
     - Reguły kompresji Gzip i instytucjonalne nagłówki bezpieczeństwa Nginx (`SAMEORIGIN`, `nosniff`, `strict-origin-when-cross-origin`).
@@ -113,9 +114,9 @@ resources/js/
 │   ├── reports/                  # ReportConfigurator (parametryzacja, waluty, okresy), ExecutivePdfReport (układ memorandumu A4, SHA-256)
 │   └── ui/                       # Badge, Button, Card, MultiplesStrip (wskaźniki EV/EBITDA, P/E), FinancialTable
 ├── context/                      # AuthContext (tożsamość, role, kontekst spółki), DealContext (FX, okres), NotificationContext (toasty)
-├── tests/                        # Vitest setup, unit tests (formatters, dealContext) & component integration tests (CsvPreviewTable, FinancialRecordModal, DataRoom, ExecutiveReports, DealAdvisoryE2E, AdvisorsManagement, InviteUserModal)
+├── tests/                        # Vitest setup, unit tests (formatters, dealContext) & component integration tests (CsvPreviewTable, FinancialRecordModal, DataRoom, ExecutiveReports, DealAdvisoryE2E, AdvisorsManagement, InviteUserModal, AcceptInvitation)
 ├── utils/                        # formatters.js (liczby tabelaryczne tabular-nums, waluty PLN/EUR/USD/GBP, formatowanie wskaźników, formatFileSize, formatDateTime)
-└── views/                        # DashboardView, RecordsView, ImportView, DataRoomView, AuditLogsView, ReportsView, AnalyticsView, LoginView, AdvisorsManagementView
+└── views/                        # DashboardView, RecordsView, ImportView, DataRoomView, AuditLogsView, ReportsView, AnalyticsView, LoginView, AdvisorsManagementView, AcceptInvitationView
 ```
 
 ### Skrypty Wdrożeniowe i Operacyjne
@@ -172,12 +173,14 @@ Szczegółowy przewodnik operacyjny dla inżynierów DevOps i konfiguracja produ
 
 ## 🔑 Dane Dostępowe Środowiska Demo
 
-Baza danych zasilona jest danymi demonstracyjnymi (21 miesięcy historii finansowej od stycznia 2025 do września 2026 oraz repozytorium VDR ze ścieżką audytową):
+Baza danych zasilona jest danymi demonstracyjnymi (21 miesięcy historii finansowej od stycznia 2025 do września 2026, relacje wielo-najemcowe oraz repozytorium VDR ze ścieżką audytową):
 
-| Rola | Użytkownik | Email | Hasło | Spółka powiązana |
+| Rola w Systemie | Użytkownik | Email | Hasło | Zakres Dostępu i Spółka Powiązana |
 | :--- | :--- | :--- | :--- | :--- |
-| **Admin / Doradca M&A** | Analityk Finansowy (Helvest) | `admin@helvest.com` | `password123` | Helvest Advisory Sp. z o.o. *(Dostęp do wszystkich spółek)* |
-| **Klient / CFO** | Jan Kowalski (CFO Acme) | `klient@acme.com` | `password123` | Acme Manufacturing S.A. *(Dostęp wyłącznie do Acme)* |
+| **Super Admin** | Partner Zarządzający (Helvest) | `superadmin@helvest.com` | `password123` | Helvest Advisory Sp. z o.o. *(Dostęp globalny: zarządzanie doradcami, przypisywanie spółek, zapraszanie użytkowników)* |
+| **Doradca M&A** | Doradca Transakcyjny (Helvest) | `advisor@helvest.com` | `password123` | Helvest Advisory Sp. z o.o. *(Dostęp do przypisanych spółek portfela: Acme Manufacturing S.A., zapraszanie klientów)* |
+| **Analityk (Admin)** | Analityk Finansowy (Helvest) | `admin@helvest.com` | `password123` | Helvest Advisory Sp. z o.o. *(Pełny wgląd analityczny i finansowy do całego portfela)* |
+| **Klient / CFO** | Jan Kowalski (CFO Acme) | `klient@acme.com` | `password123` | Acme Manufacturing S.A. *(Ścisła izolacja multi-tenant: dostęp wyłącznie do Acme)* |
 
 ---
 
@@ -295,12 +298,12 @@ Baza danych zasilona jest danymi demonstracyjnymi (21 miesięcy historii finanso
   - Przypadek użycia `InviteUserUseCase` z emisją zdarzenia domenowego `UserInvited`.
   - Klasy Mailable i listenery zdarzeń do asynchronicznej wysyłki e-maili z zaproszeniami.
   - Przypadek użycia `AcceptInvitationUseCase` z walidacją tokenu i bezpiecznym ustawieniem hasła.
-- [ ] **Faza 10: API i Frontend dla Zarządzania Użytkownikami**
+- [x] **Faza 10: API i Frontend dla Zarządzania Użytkownikami**
   - [x] Kontroler `InvitationController` mapujący endpointy REST dla zaproszeń.
   - [x] Kontroler `AdvisorManagementController` dla SuperAdmina do zarządzania doradcami i przypisaniami.
   - [x] Widok dashboardu SuperAdmina do zarządzania doradcami i przypisaniami spółek.
   - [x] Modal zapraszania użytkownika z wyborem roli i przypisaniem firm dla doradców.
-  - [ ] Bezpieczna strona aktywacji konta / ustawienia hasła na podstawie tokenu z linku e-mail.
+  - [x] Bezpieczna strona aktywacji konta / ustawienia hasła na podstawie tokenu z linku e-mail.
 
 ---
 

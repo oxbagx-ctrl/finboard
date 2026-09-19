@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
 import { DealProvider } from './context/DealContext';
 import { AppLayout } from './components/layout/AppLayout';
 import { LoginView } from './views/LoginView';
+import { AcceptInvitationView } from './views/AcceptInvitationView';
 import { DashboardView } from './views/DashboardView';
 import { AnalyticsView } from './views/AnalyticsView';
 import { RecordsView } from './views/RecordsView';
@@ -13,10 +14,27 @@ import { ReportsView } from './views/ReportsView';
 import { AuditLogsView } from './views/AuditLogsView';
 import { AdvisorsManagementView } from './views/AdvisorsManagementView';
 
+const hasInvitationTokenInUrl = () => {
+    if (typeof window === 'undefined') return false;
+    const searchParams = new URLSearchParams(window.location.search);
+    const hasToken = !!searchParams.get('token');
+    const isInvitationPath = window.location.pathname.includes('/invitation') || window.location.pathname.includes('/accept-invitation');
+    return hasToken || isInvitationPath;
+};
+
 const MainRouter = () => {
     const { isAuthenticated, loading } = useAuth();
     const [currentRoute, setCurrentRoute] = useState('dashboard');
     const [refreshKey, setRefreshKey] = useState(0);
+    const [showInvitation, setShowInvitation] = useState(hasInvitationTokenInUrl);
+
+    useEffect(() => {
+        const handlePopState = () => {
+            setShowInvitation(hasInvitationTokenInUrl());
+        };
+        window.addEventListener('popstate', handlePopState);
+        return () => window.removeEventListener('popstate', handlePopState);
+    }, []);
 
     if (loading) {
         return (
@@ -30,6 +48,13 @@ const MainRouter = () => {
     }
 
     if (!isAuthenticated) {
+        if (showInvitation) {
+            return (
+                <AcceptInvitationView
+                    onNavigateLogin={() => setShowInvitation(false)}
+                />
+            );
+        }
         return <LoginView />;
     }
 
