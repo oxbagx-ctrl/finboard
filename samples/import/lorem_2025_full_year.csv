@@ -1,0 +1,193 @@
+kategoria,kwota,data,waluta,opis
+cat-revenue,278380.00,2025-01-04,PLN,Faktura FV/2025/01/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za styczeń 2025
+cat-revenue,170312.73,2025-01-12,PLN,Faktura FV/2025/01/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
+cat-revenue,116387.27,2025-01-22,PLN,Faktura FV/2025/01/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
+cat-cogs,156930.91,2025-01-08,PLN,Podwykonawstwo B2B: Zespół Senior Fullstack / Python / DevOps inżynierów kontraktowych za styczeń 2025
+cat-cogs,47650.91,2025-01-24,PLN,Dedykowane klastry Kubernetes AWS/GCP oraz licencje środowisk klienckich
+cat-opex,106645.45,2025-01-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za styczeń 2025"
+cat-opex,17954.55,2025-01-14,PLN,Czynsz i koszty eksploatacji biura i przestrzeni technologicznej LoremIpsumCODE Hub
+cat-opex,12363.64,2025-01-20,PLN,"Licencje i infrastruktura deweloperska: GitHub Enterprise, JetBrains, Datadog, Slack, Google Workspace"
+cat-opex,8323.64,2025-01-25,PLN,"Koszty procesów rekrutacyjnych IT, szkoleń certyfikacyjnych AWS/GCP i konferencji branżowych"
+cat-opex,5218.18,2025-01-27,PLN,"Obsługa księgowo-kadrowa, doradztwo podatkowe IP Box oraz audyt prawny umów ramowych"
+cat-depreciation,6701.82,2025-01-31,PLN,"Odpis amortyzacyjny stacji roboczych Apple MacBook Pro M-series, serwerów testowych i osprzętu sieciowego"
+cat-financial,1580.00,2025-01-31,PLN,"Prowizje bankowe, obsługa transakcji wielowalutowych i raty leasingu sprzętu"
+cat-tax,18153.98,2025-01-31,PLN,Zaliczka na podatek dochodowy CIT-8 (z uwzględnieniem preferencji B+R / IP Box) za styczeń 2025
+cat-cash,1580701.82,2025-01-31,PLN,Bilans: Stan środków pieniężnych na rachunkach bieżących PLN/EUR/USD oraz lokacie automatycznej
+cat-receivables,519873.60,2025-01-31,PLN,Bilans: Należności krótkoterminowe z tytułu zrealizowanych usług programistycznych
+cat-current-liabilities,230806.73,2025-01-31,PLN,"Bilans: Zobowiązania bieżące wobec podwykonawców B2B, podatkowe i ZUS"
+cat-revenue,285750.00,2025-02-04,PLN,Faktura FV/2025/02/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za luty 2025
+cat-revenue,168759.09,2025-02-12,PLN,Faktura FV/2025/02/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
+cat-revenue,119540.91,2025-02-22,PLN,Faktura FV/2025/02/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
+cat-cogs,161086.36,2025-02-08,PLN,Podwykonawstwo B2B: Zespół Senior Fullstack / Python / DevOps inżynierów kontraktowych za luty 2025
+cat-cogs,48986.36,2025-02-24,PLN,Dedykowane klastry Kubernetes AWS/GCP oraz licencje środowisk klienckich
+cat-opex,109468.18,2025-02-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za luty 2025"
+cat-opex,18181.82,2025-02-14,PLN,Czynsz i koszty eksploatacji biura i przestrzeni technologicznej LoremIpsumCODE Hub
+cat-opex,12595.45,2025-02-20,PLN,"Licencje i infrastruktura deweloperska: GitHub Enterprise, JetBrains, Datadog, Slack, Google Workspace"
+cat-opex,8495.45,2025-02-25,PLN,"Koszty procesów rekrutacyjnych IT, szkoleń certyfikacyjnych AWS/GCP i konferencji branżowych"
+cat-opex,5289.77,2025-02-27,PLN,"Obsługa księgowo-kadrowa, doradztwo podatkowe IP Box oraz audyt prawny umów ramowych"
+cat-depreciation,6822.73,2025-02-28,PLN,"Odpis amortyzacyjny stacji roboczych Apple MacBook Pro M-series, serwerów testowych i osprzętu sieciowego"
+cat-financial,1600.00,2025-02-28,PLN,"Prowizje bankowe, obsługa transakcji wielowalutowych i raty leasingu sprzętu"
+cat-tax,18137.15,2025-02-28,PLN,Zaliczka na podatek dochodowy CIT-8 (z uwzględnieniem preferencji B+R / IP Box) za luty 2025
+cat-cash,1635522.73,2025-02-28,PLN,Bilans: Stan środków pieniężnych na rachunkach bieżących PLN/EUR/USD oraz lokacie automatycznej
+cat-receivables,528126.00,2025-02-28,PLN,Bilans: Należności krótkoterminowe z tytułu zrealizowanych usług programistycznych
+cat-current-liabilities,236667.20,2025-02-28,PLN,"Bilans: Zobowiązania bieżące wobec podwykonawców B2B, podatkowe i ZUS"
+cat-revenue,293120.00,2025-03-04,PLN,Faktura FV/2025/03/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za marzec 2025
+cat-revenue,173405.45,2025-03-12,PLN,Faktura FV/2025/03/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
+cat-revenue,122694.55,2025-03-22,PLN,Faktura FV/2025/03/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
+cat-cogs,165241.82,2025-03-08,PLN,Podwykonawstwo B2B: Zespół Senior Fullstack / Python / DevOps inżynierów kontraktowych za marzec 2025
+cat-cogs,47921.82,2025-03-24,PLN,Dedykowane klastry Kubernetes AWS/GCP oraz licencje środowisk klienckich
+cat-opex,112290.91,2025-03-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za marzec 2025"
+cat-opex,18409.09,2025-03-14,PLN,Czynsz i koszty eksploatacji biura i przestrzeni technologicznej LoremIpsumCODE Hub
+cat-opex,12827.27,2025-03-20,PLN,"Licencje i infrastruktura deweloperska: GitHub Enterprise, JetBrains, Datadog, Slack, Google Workspace"
+cat-opex,8667.27,2025-03-25,PLN,"Koszty procesów rekrutacyjnych IT, szkoleń certyfikacyjnych AWS/GCP i konferencji branżowych"
+cat-opex,5361.36,2025-03-27,PLN,"Obsługa księgowo-kadrowa, doradztwo podatkowe IP Box oraz audyt prawny umów ramowych"
+cat-depreciation,6943.64,2025-03-31,PLN,"Odpis amortyzacyjny stacji roboczych Apple MacBook Pro M-series, serwerów testowych i osprzętu sieciowego"
+cat-financial,1620.00,2025-03-31,PLN,"Prowizje bankowe, obsługa transakcji wielowalutowych i raty leasingu sprzętu"
+cat-tax,18894.31,2025-03-31,PLN,Zaliczka na podatek dochodowy CIT-8 (z uwzględnieniem preferencji B+R / IP Box) za marzec 2025
+cat-cash,1690343.64,2025-03-31,PLN,Bilans: Stan środków pieniężnych na rachunkach bieżących PLN/EUR/USD oraz lokacie automatycznej
+cat-receivables,542082.40,2025-03-31,PLN,Bilans: Należności krótkoterminowe z tytułu zrealizowanych usług programistycznych
+cat-current-liabilities,240967.70,2025-03-31,PLN,"Bilans: Zobowiązania bieżące wobec podwykonawców B2B, podatkowe i ZUS"
+cat-revenue,300490.00,2025-04-04,PLN,Faktura FV/2025/04/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za kwiecień 2025
+cat-revenue,178051.82,2025-04-12,PLN,Faktura FV/2025/04/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
+cat-revenue,125848.18,2025-04-22,PLN,Faktura FV/2025/04/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
+cat-cogs,169397.27,2025-04-08,PLN,Podwykonawstwo B2B: Zespół Senior Fullstack / Python / DevOps inżynierów kontraktowych za kwiecień 2025
+cat-cogs,49257.27,2025-04-24,PLN,Dedykowane klastry Kubernetes AWS/GCP oraz licencje środowisk klienckich
+cat-opex,115113.64,2025-04-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za kwiecień 2025"
+cat-opex,18636.36,2025-04-14,PLN,Czynsz i koszty eksploatacji biura i przestrzeni technologicznej LoremIpsumCODE Hub
+cat-opex,13059.09,2025-04-20,PLN,"Licencje i infrastruktura deweloperska: GitHub Enterprise, JetBrains, Datadog, Slack, Google Workspace"
+cat-opex,8839.09,2025-04-25,PLN,"Koszty procesów rekrutacyjnych IT, szkoleń certyfikacyjnych AWS/GCP i konferencji branżowych"
+cat-opex,5432.95,2025-04-27,PLN,"Obsługa księgowo-kadrowa, doradztwo podatkowe IP Box oraz audyt prawny umów ramowych"
+cat-depreciation,7064.55,2025-04-30,PLN,"Odpis amortyzacyjny stacji roboczych Apple MacBook Pro M-series, serwerów testowych i osprzętu sieciowego"
+cat-financial,1640.00,2025-04-30,PLN,"Prowizje bankowe, obsługa transakcji wielowalutowych i raty leasingu sprzętu"
+cat-tax,19435.48,2025-04-30,PLN,Zaliczka na podatek dochodowy CIT-8 (z uwzględnieniem preferencji B+R / IP Box) za kwiecień 2025
+cat-cash,1745164.55,2025-04-30,PLN,Bilans: Stan środków pieniężnych na rachunkach bieżących PLN/EUR/USD oraz lokacie automatycznej
+cat-receivables,556038.80,2025-04-30,PLN,Bilans: Należności krótkoterminowe z tytułu zrealizowanych usług programistycznych
+cat-current-liabilities,246828.19,2025-04-30,PLN,"Bilans: Zobowiązania bieżące wobec podwykonawców B2B, podatkowe i ZUS"
+cat-revenue,307860.00,2025-05-04,PLN,Faktura FV/2025/05/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za maj 2025
+cat-revenue,182698.18,2025-05-12,PLN,Faktura FV/2025/05/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
+cat-revenue,129001.82,2025-05-22,PLN,Faktura FV/2025/05/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
+cat-cogs,173552.73,2025-05-08,PLN,Podwykonawstwo B2B: Zespół Senior Fullstack / Python / DevOps inżynierów kontraktowych za maj 2025
+cat-cogs,50592.73,2025-05-24,PLN,Dedykowane klastry Kubernetes AWS/GCP oraz licencje środowisk klienckich
+cat-opex,117936.36,2025-05-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za maj 2025"
+cat-opex,18863.64,2025-05-14,PLN,Czynsz i koszty eksploatacji biura i przestrzeni technologicznej LoremIpsumCODE Hub
+cat-opex,13290.91,2025-05-20,PLN,"Licencje i infrastruktura deweloperska: GitHub Enterprise, JetBrains, Datadog, Slack, Google Workspace"
+cat-opex,9010.91,2025-05-25,PLN,"Koszty procesów rekrutacyjnych IT, szkoleń certyfikacyjnych AWS/GCP i konferencji branżowych"
+cat-opex,5504.55,2025-05-27,PLN,"Obsługa księgowo-kadrowa, doradztwo podatkowe IP Box oraz audyt prawny umów ramowych"
+cat-depreciation,7185.45,2025-05-31,PLN,"Odpis amortyzacyjny stacji roboczych Apple MacBook Pro M-series, serwerów testowych i osprzętu sieciowego"
+cat-financial,1660.00,2025-05-31,PLN,"Prowizje bankowe, obsługa transakcji wielowalutowych i raty leasingu sprzętu"
+cat-tax,19976.64,2025-05-31,PLN,Zaliczka na podatek dochodowy CIT-8 (z uwzględnieniem preferencji B+R / IP Box) za maj 2025
+cat-cash,1799985.45,2025-05-31,PLN,Bilans: Stan środków pieniężnych na rachunkach bieżących PLN/EUR/USD oraz lokacie automatycznej
+cat-receivables,569995.20,2025-05-31,PLN,Bilans: Należności krótkoterminowe z tytułu zrealizowanych usług programistycznych
+cat-current-liabilities,252688.69,2025-05-31,PLN,"Bilans: Zobowiązania bieżące wobec podwykonawców B2B, podatkowe i ZUS"
+cat-revenue,315230.00,2025-06-04,PLN,Faktura FV/2025/06/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za czerwiec 2025
+cat-revenue,187344.55,2025-06-12,PLN,Faktura FV/2025/06/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
+cat-revenue,132155.45,2025-06-22,PLN,Faktura FV/2025/06/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
+cat-cogs,177708.18,2025-06-08,PLN,Podwykonawstwo B2B: Zespół Senior Fullstack / Python / DevOps inżynierów kontraktowych za czerwiec 2025
+cat-cogs,51928.18,2025-06-24,PLN,Dedykowane klastry Kubernetes AWS/GCP oraz licencje środowisk klienckich
+cat-opex,120759.09,2025-06-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za czerwiec 2025"
+cat-opex,19090.91,2025-06-14,PLN,Czynsz i koszty eksploatacji biura i przestrzeni technologicznej LoremIpsumCODE Hub
+cat-opex,13522.73,2025-06-20,PLN,"Licencje i infrastruktura deweloperska: GitHub Enterprise, JetBrains, Datadog, Slack, Google Workspace"
+cat-opex,9182.73,2025-06-25,PLN,"Koszty procesów rekrutacyjnych IT, szkoleń certyfikacyjnych AWS/GCP i konferencji branżowych"
+cat-opex,5576.14,2025-06-27,PLN,"Obsługa księgowo-kadrowa, doradztwo podatkowe IP Box oraz audyt prawny umów ramowych"
+cat-depreciation,7306.36,2025-06-30,PLN,"Odpis amortyzacyjny stacji roboczych Apple MacBook Pro M-series, serwerów testowych i osprzętu sieciowego"
+cat-financial,1680.00,2025-06-30,PLN,"Prowizje bankowe, obsługa transakcji wielowalutowych i raty leasingu sprzętu"
+cat-tax,20517.81,2025-06-30,PLN,Zaliczka na podatek dochodowy CIT-8 (z uwzględnieniem preferencji B+R / IP Box) za czerwiec 2025
+cat-cash,1854806.36,2025-06-30,PLN,Bilans: Stan środków pieniężnych na rachunkach bieżących PLN/EUR/USD oraz lokacie automatycznej
+cat-receivables,583951.60,2025-06-30,PLN,Bilans: Należności krótkoterminowe z tytułu zrealizowanych usług programistycznych
+cat-current-liabilities,258549.17,2025-06-30,PLN,"Bilans: Zobowiązania bieżące wobec podwykonawców B2B, podatkowe i ZUS"
+cat-revenue,322600.00,2025-07-04,PLN,Faktura FV/2025/07/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za lipiec 2025
+cat-revenue,191990.91,2025-07-12,PLN,Faktura FV/2025/07/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
+cat-revenue,131009.09,2025-07-22,PLN,Faktura FV/2025/07/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
+cat-cogs,181863.64,2025-07-08,PLN,Podwykonawstwo B2B: Zespół Senior Fullstack / Python / DevOps inżynierów kontraktowych za lipiec 2025
+cat-cogs,53263.64,2025-07-24,PLN,Dedykowane klastry Kubernetes AWS/GCP oraz licencje środowisk klienckich
+cat-opex,123581.82,2025-07-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za lipiec 2025"
+cat-opex,19318.18,2025-07-14,PLN,Czynsz i koszty eksploatacji biura i przestrzeni technologicznej LoremIpsumCODE Hub
+cat-opex,13754.55,2025-07-20,PLN,"Licencje i infrastruktura deweloperska: GitHub Enterprise, JetBrains, Datadog, Slack, Google Workspace"
+cat-opex,9354.55,2025-07-25,PLN,"Koszty procesów rekrutacyjnych IT, szkoleń certyfikacyjnych AWS/GCP i konferencji branżowych"
+cat-opex,5647.73,2025-07-27,PLN,"Obsługa księgowo-kadrowa, doradztwo podatkowe IP Box oraz audyt prawny umów ramowych"
+cat-depreciation,7427.27,2025-07-31,PLN,"Odpis amortyzacyjny stacji roboczych Apple MacBook Pro M-series, serwerów testowych i osprzętu sieciowego"
+cat-financial,1700.00,2025-07-31,PLN,"Prowizje bankowe, obsługa transakcji wielowalutowych i raty leasingu sprzętu"
+cat-tax,20671.98,2025-07-31,PLN,Zaliczka na podatek dochodowy CIT-8 (z uwzględnieniem preferencji B+R / IP Box) za lipiec 2025
+cat-cash,1909627.27,2025-07-31,PLN,Bilans: Stan środków pieniężnych na rachunkach bieżących PLN/EUR/USD oraz lokacie automatycznej
+cat-receivables,593952.00,2025-07-31,PLN,Bilans: Należności krótkoterminowe z tytułu zrealizowanych usług programistycznych
+cat-current-liabilities,264409.67,2025-07-31,PLN,"Bilans: Zobowiązania bieżące wobec podwykonawców B2B, podatkowe i ZUS"
+cat-revenue,329970.00,2025-08-04,PLN,Faktura FV/2025/08/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za sierpień 2025
+cat-revenue,196637.27,2025-08-12,PLN,Faktura FV/2025/08/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
+cat-revenue,134162.73,2025-08-22,PLN,Faktura FV/2025/08/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
+cat-cogs,186019.09,2025-08-08,PLN,Podwykonawstwo B2B: Zespół Senior Fullstack / Python / DevOps inżynierów kontraktowych za sierpień 2025
+cat-cogs,54599.09,2025-08-24,PLN,Dedykowane klastry Kubernetes AWS/GCP oraz licencje środowisk klienckich
+cat-opex,126404.55,2025-08-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za sierpień 2025"
+cat-opex,19545.45,2025-08-14,PLN,Czynsz i koszty eksploatacji biura i przestrzeni technologicznej LoremIpsumCODE Hub
+cat-opex,13986.36,2025-08-20,PLN,"Licencje i infrastruktura deweloperska: GitHub Enterprise, JetBrains, Datadog, Slack, Google Workspace"
+cat-opex,9526.36,2025-08-25,PLN,"Koszty procesów rekrutacyjnych IT, szkoleń certyfikacyjnych AWS/GCP i konferencji branżowych"
+cat-opex,5719.32,2025-08-27,PLN,"Obsługa księgowo-kadrowa, doradztwo podatkowe IP Box oraz audyt prawny umów ramowych"
+cat-depreciation,7548.18,2025-08-31,PLN,"Odpis amortyzacyjny stacji roboczych Apple MacBook Pro M-series, serwerów testowych i osprzętu sieciowego"
+cat-financial,1720.00,2025-08-31,PLN,"Prowizje bankowe, obsługa transakcji wielowalutowych i raty leasingu sprzętu"
+cat-tax,21213.14,2025-08-31,PLN,Zaliczka na podatek dochodowy CIT-8 (z uwzględnieniem preferencji B+R / IP Box) za sierpień 2025
+cat-cash,1964448.18,2025-08-31,PLN,Bilans: Stan środków pieniężnych na rachunkach bieżących PLN/EUR/USD oraz lokacie automatycznej
+cat-receivables,607908.40,2025-08-31,PLN,Bilans: Należności krótkoterminowe z tytułu zrealizowanych usług programistycznych
+cat-current-liabilities,270270.14,2025-08-31,PLN,"Bilans: Zobowiązania bieżące wobec podwykonawców B2B, podatkowe i ZUS"
+cat-revenue,337340.00,2025-09-04,PLN,Faktura FV/2025/09/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za wrzesień 2025
+cat-revenue,201283.64,2025-09-12,PLN,Faktura FV/2025/09/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
+cat-revenue,137316.36,2025-09-22,PLN,Faktura FV/2025/09/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
+cat-cogs,190174.55,2025-09-08,PLN,Podwykonawstwo B2B: Zespół Senior Fullstack / Python / DevOps inżynierów kontraktowych za wrzesień 2025
+cat-cogs,55934.55,2025-09-24,PLN,Dedykowane klastry Kubernetes AWS/GCP oraz licencje środowisk klienckich
+cat-opex,129227.27,2025-09-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za wrzesień 2025"
+cat-opex,19772.73,2025-09-14,PLN,Czynsz i koszty eksploatacji biura i przestrzeni technologicznej LoremIpsumCODE Hub
+cat-opex,14218.18,2025-09-20,PLN,"Licencje i infrastruktura deweloperska: GitHub Enterprise, JetBrains, Datadog, Slack, Google Workspace"
+cat-opex,9698.18,2025-09-25,PLN,"Koszty procesów rekrutacyjnych IT, szkoleń certyfikacyjnych AWS/GCP i konferencji branżowych"
+cat-opex,5790.91,2025-09-27,PLN,"Obsługa księgowo-kadrowa, doradztwo podatkowe IP Box oraz audyt prawny umów ramowych"
+cat-depreciation,7669.09,2025-09-30,PLN,"Odpis amortyzacyjny stacji roboczych Apple MacBook Pro M-series, serwerów testowych i osprzętu sieciowego"
+cat-financial,1740.00,2025-09-30,PLN,"Prowizje bankowe, obsługa transakcji wielowalutowych i raty leasingu sprzętu"
+cat-tax,21754.31,2025-09-30,PLN,Zaliczka na podatek dochodowy CIT-8 (z uwzględnieniem preferencji B+R / IP Box) za wrzesień 2025
+cat-cash,2019269.09,2025-09-30,PLN,Bilans: Stan środków pieniężnych na rachunkach bieżących PLN/EUR/USD oraz lokacie automatycznej
+cat-receivables,621864.80,2025-09-30,PLN,Bilans: Należności krótkoterminowe z tytułu zrealizowanych usług programistycznych
+cat-current-liabilities,276130.64,2025-09-30,PLN,"Bilans: Zobowiązania bieżące wobec podwykonawców B2B, podatkowe i ZUS"
+cat-revenue,344710.00,2025-10-04,PLN,Faktura FV/2025/10/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za październik 2025
+cat-revenue,205930.00,2025-10-12,PLN,Faktura FV/2025/10/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
+cat-revenue,140470.00,2025-10-22,PLN,Faktura FV/2025/10/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
+cat-cogs,194330.00,2025-10-08,PLN,Podwykonawstwo B2B: Zespół Senior Fullstack / Python / DevOps inżynierów kontraktowych za październik 2025
+cat-cogs,57270.00,2025-10-24,PLN,Dedykowane klastry Kubernetes AWS/GCP oraz licencje środowisk klienckich
+cat-opex,132050.00,2025-10-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za październik 2025"
+cat-opex,20000.00,2025-10-14,PLN,Czynsz i koszty eksploatacji biura i przestrzeni technologicznej LoremIpsumCODE Hub
+cat-opex,14450.00,2025-10-20,PLN,"Licencje i infrastruktura deweloperska: GitHub Enterprise, JetBrains, Datadog, Slack, Google Workspace"
+cat-opex,9870.00,2025-10-25,PLN,"Koszty procesów rekrutacyjnych IT, szkoleń certyfikacyjnych AWS/GCP i konferencji branżowych"
+cat-opex,5862.50,2025-10-27,PLN,"Obsługa księgowo-kadrowa, doradztwo podatkowe IP Box oraz audyt prawny umów ramowych"
+cat-depreciation,7790.00,2025-10-31,PLN,"Odpis amortyzacyjny stacji roboczych Apple MacBook Pro M-series, serwerów testowych i osprzętu sieciowego"
+cat-financial,1760.00,2025-10-31,PLN,"Prowizje bankowe, obsługa transakcji wielowalutowych i raty leasingu sprzętu"
+cat-tax,22295.47,2025-10-31,PLN,Zaliczka na podatek dochodowy CIT-8 (z uwzględnieniem preferencji B+R / IP Box) za październik 2025
+cat-cash,2074090.00,2025-10-31,PLN,Bilans: Stan środków pieniężnych na rachunkach bieżących PLN/EUR/USD oraz lokacie automatycznej
+cat-receivables,635821.20,2025-10-31,PLN,Bilans: Należności krótkoterminowe z tytułu zrealizowanych usług programistycznych
+cat-current-liabilities,281991.12,2025-10-31,PLN,"Bilans: Zobowiązania bieżące wobec podwykonawców B2B, podatkowe i ZUS"
+cat-revenue,352080.00,2025-11-04,PLN,Faktura FV/2025/11/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za listopad 2025
+cat-revenue,210576.36,2025-11-12,PLN,Faktura FV/2025/11/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
+cat-revenue,143623.64,2025-11-22,PLN,Faktura FV/2025/11/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
+cat-cogs,198485.45,2025-11-08,PLN,Podwykonawstwo B2B: Zespół Senior Fullstack / Python / DevOps inżynierów kontraktowych za listopad 2025
+cat-cogs,58605.45,2025-11-24,PLN,Dedykowane klastry Kubernetes AWS/GCP oraz licencje środowisk klienckich
+cat-opex,134872.73,2025-11-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za listopad 2025"
+cat-opex,20227.27,2025-11-14,PLN,Czynsz i koszty eksploatacji biura i przestrzeni technologicznej LoremIpsumCODE Hub
+cat-opex,14681.82,2025-11-20,PLN,"Licencje i infrastruktura deweloperska: GitHub Enterprise, JetBrains, Datadog, Slack, Google Workspace"
+cat-opex,10041.82,2025-11-25,PLN,"Koszty procesów rekrutacyjnych IT, szkoleń certyfikacyjnych AWS/GCP i konferencji branżowych"
+cat-opex,5934.09,2025-11-27,PLN,"Obsługa księgowo-kadrowa, doradztwo podatkowe IP Box oraz audyt prawny umów ramowych"
+cat-depreciation,7910.91,2025-11-30,PLN,"Odpis amortyzacyjny stacji roboczych Apple MacBook Pro M-series, serwerów testowych i osprzętu sieciowego"
+cat-financial,1780.00,2025-11-30,PLN,"Prowizje bankowe, obsługa transakcji wielowalutowych i raty leasingu sprzętu"
+cat-tax,22836.64,2025-11-30,PLN,Zaliczka na podatek dochodowy CIT-8 (z uwzględnieniem preferencji B+R / IP Box) za listopad 2025
+cat-cash,2128910.91,2025-11-30,PLN,Bilans: Stan środków pieniężnych na rachunkach bieżących PLN/EUR/USD oraz lokacie automatycznej
+cat-receivables,649777.60,2025-11-30,PLN,Bilans: Należności krótkoterminowe z tytułu zrealizowanych usług programistycznych
+cat-current-liabilities,287851.61,2025-11-30,PLN,"Bilans: Zobowiązania bieżące wobec podwykonawców B2B, podatkowe i ZUS"
+cat-revenue,359450.00,2025-12-04,PLN,Faktura FV/2025/12/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za grudzień 2025
+cat-revenue,215222.73,2025-12-12,PLN,Faktura FV/2025/12/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
+cat-revenue,146777.27,2025-12-22,PLN,Faktura FV/2025/12/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
+cat-cogs,202640.91,2025-12-08,PLN,Podwykonawstwo B2B: Zespół Senior Fullstack / Python / DevOps inżynierów kontraktowych za grudzień 2025
+cat-cogs,59940.91,2025-12-24,PLN,Dedykowane klastry Kubernetes AWS/GCP oraz licencje środowisk klienckich
+cat-opex,137695.45,2025-12-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za grudzień 2025"
+cat-opex,20454.55,2025-12-14,PLN,Czynsz i koszty eksploatacji biura i przestrzeni technologicznej LoremIpsumCODE Hub
+cat-opex,14913.64,2025-12-20,PLN,"Licencje i infrastruktura deweloperska: GitHub Enterprise, JetBrains, Datadog, Slack, Google Workspace"
+cat-opex,10213.64,2025-12-25,PLN,"Koszty procesów rekrutacyjnych IT, szkoleń certyfikacyjnych AWS/GCP i konferencji branżowych"
+cat-opex,6005.68,2025-12-27,PLN,"Obsługa księgowo-kadrowa, doradztwo podatkowe IP Box oraz audyt prawny umów ramowych"
+cat-depreciation,8031.82,2025-12-31,PLN,"Odpis amortyzacyjny stacji roboczych Apple MacBook Pro M-series, serwerów testowych i osprzętu sieciowego"
+cat-financial,1800.00,2025-12-31,PLN,"Prowizje bankowe, obsługa transakcji wielowalutowych i raty leasingu sprzętu"
+cat-tax,23377.81,2025-12-31,PLN,Zaliczka na podatek dochodowy CIT-8 (z uwzględnieniem preferencji B+R / IP Box) za grudzień 2025
+cat-cash,2183731.82,2025-12-31,PLN,Bilans: Stan środków pieniężnych na rachunkach bieżących PLN/EUR/USD oraz lokacie automatycznej
+cat-receivables,663734.00,2025-12-31,PLN,Bilans: Należności krótkoterminowe z tytułu zrealizowanych usług programistycznych
+cat-current-liabilities,293712.11,2025-12-31,PLN,"Bilans: Zobowiązania bieżące wobec podwykonawców B2B, podatkowe i ZUS"

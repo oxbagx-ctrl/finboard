@@ -1,0 +1,193 @@
+kategoria,kwota,data,waluta,opis
+cat-revenue,110000.00,2023-01-04,PLN,Faktura FV/2023/01/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za styczeń 2023
+cat-revenue,65000.00,2023-01-12,PLN,Faktura FV/2023/01/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
+cat-revenue,45000.00,2023-01-22,PLN,Faktura FV/2023/01/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
+cat-cogs,62000.00,2023-01-08,PLN,Podwykonawstwo B2B: Zespół Senior Fullstack / Python / DevOps inżynierów kontraktowych za styczeń 2023
+cat-cogs,18000.00,2023-01-24,PLN,Dedykowane klastry Kubernetes AWS/GCP oraz licencje środowisk klienckich
+cat-opex,42000.00,2023-01-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za styczeń 2023"
+cat-opex,12500.00,2023-01-14,PLN,Czynsz i koszty eksploatacji biura i przestrzeni technologicznej LoremIpsumCODE Hub
+cat-opex,6800.00,2023-01-20,PLN,"Licencje i infrastruktura deweloperska: GitHub Enterprise, JetBrains, Datadog, Slack, Google Workspace"
+cat-opex,4200.00,2023-01-25,PLN,"Koszty procesów rekrutacyjnych IT, szkoleń certyfikacyjnych AWS/GCP i konferencji branżowych"
+cat-opex,3500.00,2023-01-27,PLN,"Obsługa księgowo-kadrowa, doradztwo podatkowe IP Box oraz audyt prawny umów ramowych"
+cat-depreciation,3800.00,2023-01-31,PLN,"Odpis amortyzacyjny stacji roboczych Apple MacBook Pro M-series, serwerów testowych i osprzętu sieciowego"
+cat-financial,1100.00,2023-01-31,PLN,"Prowizje bankowe, obsługa transakcji wielowalutowych i raty leasingu sprzętu"
+cat-tax,5949.00,2023-01-31,PLN,Zaliczka na podatek dochodowy CIT-8 (z uwzględnieniem preferencji B+R / IP Box) za styczeń 2023
+cat-cash,280000.00,2023-01-31,PLN,Bilans: Stan środków pieniężnych na rachunkach bieżących PLN/EUR/USD oraz lokacie automatycznej
+cat-receivables,202400.00,2023-01-31,PLN,Bilans: Należności krótkoterminowe z tytułu zrealizowanych usług programistycznych
+cat-current-liabilities,96850.00,2023-01-31,PLN,"Bilans: Zobowiązania bieżące wobec podwykonawców B2B, podatkowe i ZUS"
+cat-revenue,117370.00,2023-02-04,PLN,Faktura FV/2023/02/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za luty 2023
+cat-revenue,69646.36,2023-02-12,PLN,Faktura FV/2023/02/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
+cat-revenue,48153.64,2023-02-22,PLN,Faktura FV/2023/02/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
+cat-cogs,66155.45,2023-02-08,PLN,Podwykonawstwo B2B: Zespół Senior Fullstack / Python / DevOps inżynierów kontraktowych za luty 2023
+cat-cogs,19335.45,2023-02-24,PLN,Dedykowane klastry Kubernetes AWS/GCP oraz licencje środowisk klienckich
+cat-opex,44822.73,2023-02-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za luty 2023"
+cat-opex,12727.27,2023-02-14,PLN,Czynsz i koszty eksploatacji biura i przestrzeni technologicznej LoremIpsumCODE Hub
+cat-opex,7031.82,2023-02-20,PLN,"Licencje i infrastruktura deweloperska: GitHub Enterprise, JetBrains, Datadog, Slack, Google Workspace"
+cat-opex,4371.82,2023-02-25,PLN,"Koszty procesów rekrutacyjnych IT, szkoleń certyfikacyjnych AWS/GCP i konferencji branżowych"
+cat-opex,3571.59,2023-02-27,PLN,"Obsługa księgowo-kadrowa, doradztwo podatkowe IP Box oraz audyt prawny umów ramowych"
+cat-depreciation,3920.91,2023-02-28,PLN,"Odpis amortyzacyjny stacji roboczych Apple MacBook Pro M-series, serwerów testowych i osprzętu sieciowego"
+cat-financial,1120.00,2023-02-28,PLN,"Prowizje bankowe, obsługa transakcji wielowalutowych i raty leasingu sprzętu"
+cat-tax,6490.17,2023-02-28,PLN,Zaliczka na podatek dochodowy CIT-8 (z uwzględnieniem preferencji B+R / IP Box) za luty 2023
+cat-cash,334820.91,2023-02-28,PLN,Bilans: Stan środków pieniężnych na rachunkach bieżących PLN/EUR/USD oraz lokacie automatycznej
+cat-receivables,216356.40,2023-02-28,PLN,Bilans: Należności krótkoterminowe z tytułu zrealizowanych usług programistycznych
+cat-current-liabilities,102710.48,2023-02-28,PLN,"Bilans: Zobowiązania bieżące wobec podwykonawców B2B, podatkowe i ZUS"
+cat-revenue,124740.00,2023-03-04,PLN,Faktura FV/2023/03/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za marzec 2023
+cat-revenue,74292.73,2023-03-12,PLN,Faktura FV/2023/03/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
+cat-revenue,51307.27,2023-03-22,PLN,Faktura FV/2023/03/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
+cat-cogs,70310.91,2023-03-08,PLN,Podwykonawstwo B2B: Zespół Senior Fullstack / Python / DevOps inżynierów kontraktowych za marzec 2023
+cat-cogs,20670.91,2023-03-24,PLN,Dedykowane klastry Kubernetes AWS/GCP oraz licencje środowisk klienckich
+cat-opex,47645.45,2023-03-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za marzec 2023"
+cat-opex,12954.55,2023-03-14,PLN,Czynsz i koszty eksploatacji biura i przestrzeni technologicznej LoremIpsumCODE Hub
+cat-opex,7263.64,2023-03-20,PLN,"Licencje i infrastruktura deweloperska: GitHub Enterprise, JetBrains, Datadog, Slack, Google Workspace"
+cat-opex,4543.64,2023-03-25,PLN,"Koszty procesów rekrutacyjnych IT, szkoleń certyfikacyjnych AWS/GCP i konferencji branżowych"
+cat-opex,3643.18,2023-03-27,PLN,"Obsługa księgowo-kadrowa, doradztwo podatkowe IP Box oraz audyt prawny umów ramowych"
+cat-depreciation,4041.82,2023-03-31,PLN,"Odpis amortyzacyjny stacji roboczych Apple MacBook Pro M-series, serwerów testowych i osprzętu sieciowego"
+cat-financial,1140.00,2023-03-31,PLN,"Prowizje bankowe, obsługa transakcji wielowalutowych i raty leasingu sprzętu"
+cat-tax,7031.33,2023-03-31,PLN,Zaliczka na podatek dochodowy CIT-8 (z uwzględnieniem preferencji B+R / IP Box) za marzec 2023
+cat-cash,389641.82,2023-03-31,PLN,Bilans: Stan środków pieniężnych na rachunkach bieżących PLN/EUR/USD oraz lokacie automatycznej
+cat-receivables,230312.80,2023-03-31,PLN,Bilans: Należności krótkoterminowe z tytułu zrealizowanych usług programistycznych
+cat-current-liabilities,108570.98,2023-03-31,PLN,"Bilans: Zobowiązania bieżące wobec podwykonawców B2B, podatkowe i ZUS"
+cat-revenue,132110.00,2023-04-04,PLN,Faktura FV/2023/04/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za kwiecień 2023
+cat-revenue,78939.09,2023-04-12,PLN,Faktura FV/2023/04/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
+cat-revenue,54460.91,2023-04-22,PLN,Faktura FV/2023/04/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
+cat-cogs,74466.36,2023-04-08,PLN,Podwykonawstwo B2B: Zespół Senior Fullstack / Python / DevOps inżynierów kontraktowych za kwiecień 2023
+cat-cogs,22006.36,2023-04-24,PLN,Dedykowane klastry Kubernetes AWS/GCP oraz licencje środowisk klienckich
+cat-opex,50468.18,2023-04-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za kwiecień 2023"
+cat-opex,13181.82,2023-04-14,PLN,Czynsz i koszty eksploatacji biura i przestrzeni technologicznej LoremIpsumCODE Hub
+cat-opex,7495.45,2023-04-20,PLN,"Licencje i infrastruktura deweloperska: GitHub Enterprise, JetBrains, Datadog, Slack, Google Workspace"
+cat-opex,4715.45,2023-04-25,PLN,"Koszty procesów rekrutacyjnych IT, szkoleń certyfikacyjnych AWS/GCP i konferencji branżowych"
+cat-opex,3714.77,2023-04-27,PLN,"Obsługa księgowo-kadrowa, doradztwo podatkowe IP Box oraz audyt prawny umów ramowych"
+cat-depreciation,4162.73,2023-04-30,PLN,"Odpis amortyzacyjny stacji roboczych Apple MacBook Pro M-series, serwerów testowych i osprzętu sieciowego"
+cat-financial,1160.00,2023-04-30,PLN,"Prowizje bankowe, obsługa transakcji wielowalutowych i raty leasingu sprzętu"
+cat-tax,7572.50,2023-04-30,PLN,Zaliczka na podatek dochodowy CIT-8 (z uwzględnieniem preferencji B+R / IP Box) za kwiecień 2023
+cat-cash,444462.73,2023-04-30,PLN,Bilans: Stan środków pieniężnych na rachunkach bieżących PLN/EUR/USD oraz lokacie automatycznej
+cat-receivables,244269.20,2023-04-30,PLN,Bilans: Należności krótkoterminowe z tytułu zrealizowanych usług programistycznych
+cat-current-liabilities,114431.45,2023-04-30,PLN,"Bilans: Zobowiązania bieżące wobec podwykonawców B2B, podatkowe i ZUS"
+cat-revenue,139480.00,2023-05-04,PLN,Faktura FV/2023/05/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za maj 2023
+cat-revenue,83585.45,2023-05-12,PLN,Faktura FV/2023/05/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
+cat-revenue,57614.55,2023-05-22,PLN,Faktura FV/2023/05/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
+cat-cogs,78621.82,2023-05-08,PLN,Podwykonawstwo B2B: Zespół Senior Fullstack / Python / DevOps inżynierów kontraktowych za maj 2023
+cat-cogs,23341.82,2023-05-24,PLN,Dedykowane klastry Kubernetes AWS/GCP oraz licencje środowisk klienckich
+cat-opex,53290.91,2023-05-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za maj 2023"
+cat-opex,13409.09,2023-05-14,PLN,Czynsz i koszty eksploatacji biura i przestrzeni technologicznej LoremIpsumCODE Hub
+cat-opex,7727.27,2023-05-20,PLN,"Licencje i infrastruktura deweloperska: GitHub Enterprise, JetBrains, Datadog, Slack, Google Workspace"
+cat-opex,4887.27,2023-05-25,PLN,"Koszty procesów rekrutacyjnych IT, szkoleń certyfikacyjnych AWS/GCP i konferencji branżowych"
+cat-opex,3786.36,2023-05-27,PLN,"Obsługa księgowo-kadrowa, doradztwo podatkowe IP Box oraz audyt prawny umów ramowych"
+cat-depreciation,4283.64,2023-05-31,PLN,"Odpis amortyzacyjny stacji roboczych Apple MacBook Pro M-series, serwerów testowych i osprzętu sieciowego"
+cat-financial,1180.00,2023-05-31,PLN,"Prowizje bankowe, obsługa transakcji wielowalutowych i raty leasingu sprzętu"
+cat-tax,8113.66,2023-05-31,PLN,Zaliczka na podatek dochodowy CIT-8 (z uwzględnieniem preferencji B+R / IP Box) za maj 2023
+cat-cash,499283.64,2023-05-31,PLN,Bilans: Stan środków pieniężnych na rachunkach bieżących PLN/EUR/USD oraz lokacie automatycznej
+cat-receivables,258225.60,2023-05-31,PLN,Bilans: Należności krótkoterminowe z tytułu zrealizowanych usług programistycznych
+cat-current-liabilities,120291.95,2023-05-31,PLN,"Bilans: Zobowiązania bieżące wobec podwykonawców B2B, podatkowe i ZUS"
+cat-revenue,146850.00,2023-06-04,PLN,Faktura FV/2023/06/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za czerwiec 2023
+cat-revenue,88231.82,2023-06-12,PLN,Faktura FV/2023/06/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
+cat-revenue,60768.18,2023-06-22,PLN,Faktura FV/2023/06/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
+cat-cogs,82777.27,2023-06-08,PLN,Podwykonawstwo B2B: Zespół Senior Fullstack / Python / DevOps inżynierów kontraktowych za czerwiec 2023
+cat-cogs,24677.27,2023-06-24,PLN,Dedykowane klastry Kubernetes AWS/GCP oraz licencje środowisk klienckich
+cat-opex,56113.64,2023-06-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za czerwiec 2023"
+cat-opex,13636.36,2023-06-14,PLN,Czynsz i koszty eksploatacji biura i przestrzeni technologicznej LoremIpsumCODE Hub
+cat-opex,7959.09,2023-06-20,PLN,"Licencje i infrastruktura deweloperska: GitHub Enterprise, JetBrains, Datadog, Slack, Google Workspace"
+cat-opex,5059.09,2023-06-25,PLN,"Koszty procesów rekrutacyjnych IT, szkoleń certyfikacyjnych AWS/GCP i konferencji branżowych"
+cat-opex,3857.95,2023-06-27,PLN,"Obsługa księgowo-kadrowa, doradztwo podatkowe IP Box oraz audyt prawny umów ramowych"
+cat-depreciation,4404.55,2023-06-30,PLN,"Odpis amortyzacyjny stacji roboczych Apple MacBook Pro M-series, serwerów testowych i osprzętu sieciowego"
+cat-financial,1200.00,2023-06-30,PLN,"Prowizje bankowe, obsługa transakcji wielowalutowych i raty leasingu sprzętu"
+cat-tax,8654.83,2023-06-30,PLN,Zaliczka na podatek dochodowy CIT-8 (z uwzględnieniem preferencji B+R / IP Box) za czerwiec 2023
+cat-cash,554104.55,2023-06-30,PLN,Bilans: Stan środków pieniężnych na rachunkach bieżących PLN/EUR/USD oraz lokacie automatycznej
+cat-receivables,272182.00,2023-06-30,PLN,Bilans: Należności krótkoterminowe z tytułu zrealizowanych usług programistycznych
+cat-current-liabilities,126152.44,2023-06-30,PLN,"Bilans: Zobowiązania bieżące wobec podwykonawców B2B, podatkowe i ZUS"
+cat-revenue,154220.00,2023-07-04,PLN,Faktura FV/2023/07/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za lipiec 2023
+cat-revenue,92878.18,2023-07-12,PLN,Faktura FV/2023/07/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
+cat-revenue,63921.82,2023-07-22,PLN,Faktura FV/2023/07/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
+cat-cogs,86932.73,2023-07-08,PLN,Podwykonawstwo B2B: Zespół Senior Fullstack / Python / DevOps inżynierów kontraktowych za lipiec 2023
+cat-cogs,26012.73,2023-07-24,PLN,Dedykowane klastry Kubernetes AWS/GCP oraz licencje środowisk klienckich
+cat-opex,58936.36,2023-07-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za lipiec 2023"
+cat-opex,13863.64,2023-07-14,PLN,Czynsz i koszty eksploatacji biura i przestrzeni technologicznej LoremIpsumCODE Hub
+cat-opex,8190.91,2023-07-20,PLN,"Licencje i infrastruktura deweloperska: GitHub Enterprise, JetBrains, Datadog, Slack, Google Workspace"
+cat-opex,5230.91,2023-07-25,PLN,"Koszty procesów rekrutacyjnych IT, szkoleń certyfikacyjnych AWS/GCP i konferencji branżowych"
+cat-opex,3929.55,2023-07-27,PLN,"Obsługa księgowo-kadrowa, doradztwo podatkowe IP Box oraz audyt prawny umów ramowych"
+cat-depreciation,4525.45,2023-07-31,PLN,"Odpis amortyzacyjny stacji roboczych Apple MacBook Pro M-series, serwerów testowych i osprzętu sieciowego"
+cat-financial,1220.00,2023-07-31,PLN,"Prowizje bankowe, obsługa transakcji wielowalutowych i raty leasingu sprzętu"
+cat-tax,9195.99,2023-07-31,PLN,Zaliczka na podatek dochodowy CIT-8 (z uwzględnieniem preferencji B+R / IP Box) za lipiec 2023
+cat-cash,608925.45,2023-07-31,PLN,Bilans: Stan środków pieniężnych na rachunkach bieżących PLN/EUR/USD oraz lokacie automatycznej
+cat-receivables,286138.40,2023-07-31,PLN,Bilans: Należności krótkoterminowe z tytułu zrealizowanych usług programistycznych
+cat-current-liabilities,132012.94,2023-07-31,PLN,"Bilans: Zobowiązania bieżące wobec podwykonawców B2B, podatkowe i ZUS"
+cat-revenue,161590.00,2023-08-04,PLN,Faktura FV/2023/08/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za sierpień 2023
+cat-revenue,97524.55,2023-08-12,PLN,Faktura FV/2023/08/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
+cat-revenue,67075.45,2023-08-22,PLN,Faktura FV/2023/08/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
+cat-cogs,91088.18,2023-08-08,PLN,Podwykonawstwo B2B: Zespół Senior Fullstack / Python / DevOps inżynierów kontraktowych za sierpień 2023
+cat-cogs,27348.18,2023-08-24,PLN,Dedykowane klastry Kubernetes AWS/GCP oraz licencje środowisk klienckich
+cat-opex,61759.09,2023-08-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za sierpień 2023"
+cat-opex,14090.91,2023-08-14,PLN,Czynsz i koszty eksploatacji biura i przestrzeni technologicznej LoremIpsumCODE Hub
+cat-opex,8422.73,2023-08-20,PLN,"Licencje i infrastruktura deweloperska: GitHub Enterprise, JetBrains, Datadog, Slack, Google Workspace"
+cat-opex,5402.73,2023-08-25,PLN,"Koszty procesów rekrutacyjnych IT, szkoleń certyfikacyjnych AWS/GCP i konferencji branżowych"
+cat-opex,4001.14,2023-08-27,PLN,"Obsługa księgowo-kadrowa, doradztwo podatkowe IP Box oraz audyt prawny umów ramowych"
+cat-depreciation,4646.36,2023-08-31,PLN,"Odpis amortyzacyjny stacji roboczych Apple MacBook Pro M-series, serwerów testowych i osprzętu sieciowego"
+cat-financial,1240.00,2023-08-31,PLN,"Prowizje bankowe, obsługa transakcji wielowalutowych i raty leasingu sprzętu"
+cat-tax,9737.16,2023-08-31,PLN,Zaliczka na podatek dochodowy CIT-8 (z uwzględnieniem preferencji B+R / IP Box) za sierpień 2023
+cat-cash,663746.36,2023-08-31,PLN,Bilans: Stan środków pieniężnych na rachunkach bieżących PLN/EUR/USD oraz lokacie automatycznej
+cat-receivables,300094.80,2023-08-31,PLN,Bilans: Należności krótkoterminowe z tytułu zrealizowanych usług programistycznych
+cat-current-liabilities,137873.42,2023-08-31,PLN,"Bilans: Zobowiązania bieżące wobec podwykonawców B2B, podatkowe i ZUS"
+cat-revenue,168960.00,2023-09-04,PLN,Faktura FV/2023/09/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za wrzesień 2023
+cat-revenue,102170.91,2023-09-12,PLN,Faktura FV/2023/09/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
+cat-revenue,70229.09,2023-09-22,PLN,Faktura FV/2023/09/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
+cat-cogs,95243.64,2023-09-08,PLN,Podwykonawstwo B2B: Zespół Senior Fullstack / Python / DevOps inżynierów kontraktowych za wrzesień 2023
+cat-cogs,28683.64,2023-09-24,PLN,Dedykowane klastry Kubernetes AWS/GCP oraz licencje środowisk klienckich
+cat-opex,64581.82,2023-09-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za wrzesień 2023"
+cat-opex,14318.18,2023-09-14,PLN,Czynsz i koszty eksploatacji biura i przestrzeni technologicznej LoremIpsumCODE Hub
+cat-opex,8654.55,2023-09-20,PLN,"Licencje i infrastruktura deweloperska: GitHub Enterprise, JetBrains, Datadog, Slack, Google Workspace"
+cat-opex,5574.55,2023-09-25,PLN,"Koszty procesów rekrutacyjnych IT, szkoleń certyfikacyjnych AWS/GCP i konferencji branżowych"
+cat-opex,4072.73,2023-09-27,PLN,"Obsługa księgowo-kadrowa, doradztwo podatkowe IP Box oraz audyt prawny umów ramowych"
+cat-depreciation,4767.27,2023-09-30,PLN,"Odpis amortyzacyjny stacji roboczych Apple MacBook Pro M-series, serwerów testowych i osprzętu sieciowego"
+cat-financial,1260.00,2023-09-30,PLN,"Prowizje bankowe, obsługa transakcji wielowalutowych i raty leasingu sprzętu"
+cat-tax,10278.33,2023-09-30,PLN,Zaliczka na podatek dochodowy CIT-8 (z uwzględnieniem preferencji B+R / IP Box) za wrzesień 2023
+cat-cash,718567.27,2023-09-30,PLN,Bilans: Stan środków pieniężnych na rachunkach bieżących PLN/EUR/USD oraz lokacie automatycznej
+cat-receivables,314051.20,2023-09-30,PLN,Bilans: Należności krótkoterminowe z tytułu zrealizowanych usług programistycznych
+cat-current-liabilities,143733.92,2023-09-30,PLN,"Bilans: Zobowiązania bieżące wobec podwykonawców B2B, podatkowe i ZUS"
+cat-revenue,176330.00,2023-10-04,PLN,Faktura FV/2023/10/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za październik 2023
+cat-revenue,106817.27,2023-10-12,PLN,Faktura FV/2023/10/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
+cat-revenue,73382.73,2023-10-22,PLN,Faktura FV/2023/10/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
+cat-cogs,99399.09,2023-10-08,PLN,Podwykonawstwo B2B: Zespół Senior Fullstack / Python / DevOps inżynierów kontraktowych za październik 2023
+cat-cogs,30019.09,2023-10-24,PLN,Dedykowane klastry Kubernetes AWS/GCP oraz licencje środowisk klienckich
+cat-opex,67404.55,2023-10-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za październik 2023"
+cat-opex,14545.45,2023-10-14,PLN,Czynsz i koszty eksploatacji biura i przestrzeni technologicznej LoremIpsumCODE Hub
+cat-opex,8886.36,2023-10-20,PLN,"Licencje i infrastruktura deweloperska: GitHub Enterprise, JetBrains, Datadog, Slack, Google Workspace"
+cat-opex,5746.36,2023-10-25,PLN,"Koszty procesów rekrutacyjnych IT, szkoleń certyfikacyjnych AWS/GCP i konferencji branżowych"
+cat-opex,4144.32,2023-10-27,PLN,"Obsługa księgowo-kadrowa, doradztwo podatkowe IP Box oraz audyt prawny umów ramowych"
+cat-depreciation,4888.18,2023-10-31,PLN,"Odpis amortyzacyjny stacji roboczych Apple MacBook Pro M-series, serwerów testowych i osprzętu sieciowego"
+cat-financial,1280.00,2023-10-31,PLN,"Prowizje bankowe, obsługa transakcji wielowalutowych i raty leasingu sprzętu"
+cat-tax,10819.49,2023-10-31,PLN,Zaliczka na podatek dochodowy CIT-8 (z uwzględnieniem preferencji B+R / IP Box) za październik 2023
+cat-cash,773388.18,2023-10-31,PLN,Bilans: Stan środków pieniężnych na rachunkach bieżących PLN/EUR/USD oraz lokacie automatycznej
+cat-receivables,328007.60,2023-10-31,PLN,Bilans: Należności krótkoterminowe z tytułu zrealizowanych usług programistycznych
+cat-current-liabilities,149594.39,2023-10-31,PLN,"Bilans: Zobowiązania bieżące wobec podwykonawców B2B, podatkowe i ZUS"
+cat-revenue,183700.00,2023-11-04,PLN,Faktura FV/2023/11/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za listopad 2023
+cat-revenue,111463.64,2023-11-12,PLN,Faktura FV/2023/11/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
+cat-revenue,76536.36,2023-11-22,PLN,Faktura FV/2023/11/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
+cat-cogs,103554.55,2023-11-08,PLN,Podwykonawstwo B2B: Zespół Senior Fullstack / Python / DevOps inżynierów kontraktowych za listopad 2023
+cat-cogs,31354.55,2023-11-24,PLN,Dedykowane klastry Kubernetes AWS/GCP oraz licencje środowisk klienckich
+cat-opex,70227.27,2023-11-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za listopad 2023"
+cat-opex,14772.73,2023-11-14,PLN,Czynsz i koszty eksploatacji biura i przestrzeni technologicznej LoremIpsumCODE Hub
+cat-opex,9118.18,2023-11-20,PLN,"Licencje i infrastruktura deweloperska: GitHub Enterprise, JetBrains, Datadog, Slack, Google Workspace"
+cat-opex,5918.18,2023-11-25,PLN,"Koszty procesów rekrutacyjnych IT, szkoleń certyfikacyjnych AWS/GCP i konferencji branżowych"
+cat-opex,4215.91,2023-11-27,PLN,"Obsługa księgowo-kadrowa, doradztwo podatkowe IP Box oraz audyt prawny umów ramowych"
+cat-depreciation,5009.09,2023-11-30,PLN,"Odpis amortyzacyjny stacji roboczych Apple MacBook Pro M-series, serwerów testowych i osprzętu sieciowego"
+cat-financial,1300.00,2023-11-30,PLN,"Prowizje bankowe, obsługa transakcji wielowalutowych i raty leasingu sprzętu"
+cat-tax,11360.66,2023-11-30,PLN,Zaliczka na podatek dochodowy CIT-8 (z uwzględnieniem preferencji B+R / IP Box) za listopad 2023
+cat-cash,828209.09,2023-11-30,PLN,Bilans: Stan środków pieniężnych na rachunkach bieżących PLN/EUR/USD oraz lokacie automatycznej
+cat-receivables,341964.00,2023-11-30,PLN,Bilans: Należności krótkoterminowe z tytułu zrealizowanych usług programistycznych
+cat-current-liabilities,155454.89,2023-11-30,PLN,"Bilans: Zobowiązania bieżące wobec podwykonawców B2B, podatkowe i ZUS"
+cat-revenue,191070.00,2023-12-04,PLN,Faktura FV/2023/12/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za grudzień 2023
+cat-revenue,116110.00,2023-12-12,PLN,Faktura FV/2023/12/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
+cat-revenue,79690.00,2023-12-22,PLN,Faktura FV/2023/12/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
+cat-cogs,107710.00,2023-12-08,PLN,Podwykonawstwo B2B: Zespół Senior Fullstack / Python / DevOps inżynierów kontraktowych za grudzień 2023
+cat-cogs,32690.00,2023-12-24,PLN,Dedykowane klastry Kubernetes AWS/GCP oraz licencje środowisk klienckich
+cat-opex,73050.00,2023-12-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za grudzień 2023"
+cat-opex,15000.00,2023-12-14,PLN,Czynsz i koszty eksploatacji biura i przestrzeni technologicznej LoremIpsumCODE Hub
+cat-opex,9350.00,2023-12-20,PLN,"Licencje i infrastruktura deweloperska: GitHub Enterprise, JetBrains, Datadog, Slack, Google Workspace"
+cat-opex,6090.00,2023-12-25,PLN,"Koszty procesów rekrutacyjnych IT, szkoleń certyfikacyjnych AWS/GCP i konferencji branżowych"
+cat-opex,4287.50,2023-12-27,PLN,"Obsługa księgowo-kadrowa, doradztwo podatkowe IP Box oraz audyt prawny umów ramowych"
+cat-depreciation,5130.00,2023-12-31,PLN,"Odpis amortyzacyjny stacji roboczych Apple MacBook Pro M-series, serwerów testowych i osprzętu sieciowego"
+cat-financial,1320.00,2023-12-31,PLN,"Prowizje bankowe, obsługa transakcji wielowalutowych i raty leasingu sprzętu"
+cat-tax,11901.82,2023-12-31,PLN,Zaliczka na podatek dochodowy CIT-8 (z uwzględnieniem preferencji B+R / IP Box) za grudzień 2023
+cat-cash,883030.00,2023-12-31,PLN,Bilans: Stan środków pieniężnych na rachunkach bieżących PLN/EUR/USD oraz lokacie automatycznej
+cat-receivables,355920.40,2023-12-31,PLN,Bilans: Należności krótkoterminowe z tytułu zrealizowanych usług programistycznych
+cat-current-liabilities,161315.38,2023-12-31,PLN,"Bilans: Zobowiązania bieżące wobec podwykonawców B2B, podatkowe i ZUS"

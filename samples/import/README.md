@@ -42,3 +42,26 @@ Zestaw przygotowanych plików demonstracyjnych na potrzeby testów modułu impor
   4. *Linia 6*: Pusty opis operacji.
   5. *Linia 7*: Nieobsługiwana waluta (`BITCOIN`).
 - **Oczekiwany wynik**: **Dry-Run Failed (Błędy walidacji)**. Blokada uruchomienia importu i wykazanie precyzyjnych komunikatów z numerami wierszy i kolumn.
+
+---
+
+### 5. Zbiór Danych Finansowych LoremIpsumCODE (2023 – 2026 YTD do 19.09.2026)
+
+Kompletny zestaw danych transakcyjnych dla spółki technologicznej **LoremIpsumCODE** (Software House & Cloud Solutions), obrazujący dynamiczny rozwój skali przychodów (od ~220 tys. PLN do ponad 800 tys. PLN miesięcznie) oraz strukturę rentowności branży IT.
+
+- [`05_lorem_2023_2026_complete.csv`](05_lorem_2023_2026_complete.csv):
+  - **Okres**: 2023-01-01 do 2026-09-19 (45 miesięcy).
+  - **Liczba rekordów**: 720 operacji (100% Poprawny Dry-Run).
+  - **Zakres**: Pełny szereg czasowy obejmujący przychody z kontraktów programistycznych i SLA, podwykonawców B2B (COGS), koszty zespołu i narzędzi (OPEX), odpisy amortyzacyjne sprzętu (MacBooki), koszty finansowe, CIT (IP Box) oraz comiesięczne migawki bilansowe (gotówka, należności, zobowiązania).
+- [`lorem_2023_full_year.csv`](lorem_2023_full_year.csv):
+  - **Okres**: 2023-01-01 do 2023-12-31 (192 rekordy).
+  - **Faza rozwoju**: Wczesna faza skalowania, obroty roczne ~3.2M PLN, wysoka płynność bieżąca.
+- [`lorem_2024_full_year.csv`](lorem_2024_full_year.csv):
+  - **Okres**: 2024-01-01 do 2024-12-31 (192 rekordy).
+  - **Faza rozwoju**: Ekspansja zagraniczna (FinTech, e-commerce), obroty roczne ~4.8M PLN.
+- [`lorem_2025_full_year.csv`](lorem_2025_full_year.csv):
+  - **Okres**: 2025-01-01 do 2025-12-31 (192 rekordy).
+  - **Faza rozwoju**: Wdrożenia platform AI/ML i mikroserwisów, obroty roczne ~6.9M PLN.
+- [`lorem_2026_ytd.csv`](lorem_2026_ytd.csv):
+  - **Okres**: 2026-01-01 do 2026-09-19 (144 rekordy).
+  - **Faza rozwoju**: Bieżący rok transakcyjny (YTD) do dnia dzisiejszego (19 września 2026).
