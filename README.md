@@ -5,7 +5,7 @@
 [![PostgreSQL](https://img.shields.io/badge/postgresql-16-blue.svg)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/redis-alpine-red.svg)](https://redis.io/)
 [![Architecture](https://img.shields.io/badge/architecture-DDD%20%2F%20CQRS-brightgreen.svg)]()
-[![Tests](https://img.shields.io/badge/tests-272%20backend%20%7C%2099%20frontend%20passed-success.svg)]()
+[![Tests](https://img.shields.io/badge/tests-277%20backend%20%7C%2099%20frontend%20passed-success.svg)]()
 
 FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakcyjnego (M&A, Due Diligence, Corporate Finance) oraz ich klientom (CFO, Zarządy). Aplikacja łączy w sobie zaawansowaną analitykę finansową w ujęciu wielo-najemcowym (Multi-Tenant) z bezpiecznym repozytorium dokumentów Virtual Data Room (VDR).
 
@@ -19,6 +19,7 @@ FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakc
     - Domenowe Value Objects (`Money` z precyzją `bcmath` do 4 miejsc po przecinku, `DateRange`, `FileMetadata`, `CompanyId`, `RoleType`, `Token`, `InvitationId`, `FinancialMetrics`).
     - Domenowy kalkulator finansowy (`FinancialCalculator`) oraz metody domenowe `FinancialRecord` wyliczające wskaźniki P&L (Gross Profit, OPEX, EBIT, EBITDA, Zysk Netto, marże) oraz bilansu i płynności (Current Ratio, Quick Ratio, Debt-to-Assets).
     - Serwis aplikacyjny `KpiCalculationService` kalkulujący dynamikę YoY oraz MoM na danych historycznych ze ścisłą ochroną przed dzieleniem przez zero.
+    - Kontroler `KpiController` w warstwie prezentacji API serwujący dynamiczne wskaźniki P&L, bilansowe oraz wariancje okresowe YoY/MoM.
 - **Bezpieczeństwo i Izolacja Multi-Tenant**:
     - Pełna separacja danych pomiędzy firmami (Tenant Isolation).
     - Hierarchiczny model uprawnień: **Super Admin** (Partner z globalnym zarządzaniem), **Doradca** (Advisor przypisany do wybranych spółek portfela) oraz **Klient** (Client ze ścisłym dostępem wyłącznie do własnej spółki).
@@ -93,7 +94,7 @@ app/
 ├── Models/                       # Modele Eloquent (User, Company, FinancialRecord, FinancialCategory, Document, DocumentAccessLog, CsvImport, Invitation)
 ├── Presentation/                 # Warstwa Prezentacji i Komunikacji API
 │   └── Api/
-│       ├── Controllers/          # Kontrolery REST API (Auth, FinancialRecord, FinancialCategory, FinancialImport, FinancialAnalytics, Document, Health, Invitation, AdvisorManagement)
+│       ├── Controllers/          # Kontrolery REST API (Auth, FinancialRecord, FinancialCategory, FinancialImport, FinancialAnalytics, KpiController, Document, Health, Invitation, AdvisorManagement)
 │       ├── Middleware/           # RoleMiddleware, RequireCompanyAccessMiddleware (Tenant Isolation Guard)
 │       ├── Requests/             # FormRequests z walidacją (StoreInvitationRequest, AcceptInvitationRequest, AssignCompanyRequest, SyncAdvisorCompaniesRequest, StoreCompanyRequest)
 │       ├── Resources/            # API Resources (InvitationResource, AdvisorResource, CompanyAssignmentResource, FinancialRecordResource, DocumentResource)
@@ -236,8 +237,9 @@ Baza danych zasilona jest danymi demonstracyjnymi (21 miesięcy historii finanso
 - `GET /api/v1/finance/imports/{id}` *(lub `/finance/import/csv/{id}`)* – Sprawdzenie statusu realizacji i ewentualnych błędów zadania
 - `GET /api/v1/finance/imports/history` *(lub `/finance/import/history`)* – Dziennik historycznych zadań importu spółki
 
-### Finanse – Analityka i Wykresy (CQRS Read Side)
-- `GET /api/v1/finance/analytics/metrics` – Zbiorcze KPI (Przychody, Marża, EBITDA, Zysk Netto, Wskaźniki płynności)
+### Finanse – Analityka i Wykresy (CQRS Read Side & Dynamic KPI)
+- `GET /api/v1/finance/kpi` – Dedykowany endpoint KPI ze wskaźnikami P&L, bilansem, płynnością oraz dynamikami YoY i MoM (`KpiController`)
+- `GET /api/v1/finance/analytics/metrics` – Zbiorcze KPI wzbogacone o dynamiczne relacje roczne i miesięczne
 - `GET /api/v1/finance/analytics/trends` – Chronologiczne trendy miesięczne dla wykresów P&L (Recharts)
 - `GET /api/v1/finance/analytics/breakdown` – Struktura kosztów i przychodów per kategoria z procentami
 - `GET /api/v1/finance/analytics/liquidity` – Dynamika wskaźników płynności (Current & Quick Ratio)
@@ -319,12 +321,12 @@ Baza danych zasilona jest danymi demonstracyjnymi (21 miesięcy historii finanso
   - Interfejs dodawania nowej spółki portfelowej z matrycy spółek (Frontend UI).
   - Reaktywna synchronizacja listy spółek w modalach zaproszeń i kontekstu bez przeładowania strony (Frontend UI).
   - Integracja kontenera Mailpit (Mailcatcher) dla testowania wysyłki e-maili i linków aktywacyjnych w środowisku lokalnym.
-- [ ] **Faza 12: Dynamiczne Obliczenia Wskaźników i Dynamiki (Finance)**
+- [x] **Faza 12: Dynamiczne Obliczenia Wskaźników i Dynamiki (Finance)**
   - [x] Implementacja logiki domenowej w `FinancialRecord` do wyliczania wskaźników płynności i zadłużenia (Current, Quick Ratios, Debt-to-Assets).
   - [x] Implementacja logiki domenowej dla kalkulacji marż (Gross, EBITDA, EBIT, Net Margin).
   - [x] Serwis aplikacyjny `KpiCalculationService` z dynamiczną kalkulacją dynamiki YoY i MoM z danych historycznych.
   - [x] Testy jednostkowe dla kalkulacji wskaźników i dynamiki z uwzględnieniem edge-cases.
-  - [ ] Aktualizacja kontrolera `KpiController` do zwracania dynamicznie wyliczonych wskaźników.
+  - [x] Aktualizacja kontrolera `KpiController` do zwracania dynamicznie wyliczonych wskaźników.
 
 ---
 

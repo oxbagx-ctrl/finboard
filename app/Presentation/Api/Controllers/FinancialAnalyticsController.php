@@ -6,8 +6,6 @@ namespace App\Presentation\Api\Controllers;
 
 use App\Contexts\Finance\Application\Queries\GetCategoryBreakdown\GetCategoryBreakdownHandler;
 use App\Contexts\Finance\Application\Queries\GetCategoryBreakdown\GetCategoryBreakdownQuery;
-use App\Contexts\Finance\Application\Queries\GetFinancialMetrics\GetFinancialMetricsHandler;
-use App\Contexts\Finance\Application\Queries\GetFinancialMetrics\GetFinancialMetricsQuery;
 use App\Contexts\Finance\Application\Queries\GetLiquidityTrends\GetLiquidityTrendsHandler;
 use App\Contexts\Finance\Application\Queries\GetLiquidityTrends\GetLiquidityTrendsQuery;
 use App\Contexts\Finance\Application\Queries\GetMonthlyTrends\GetMonthlyTrendsHandler;
@@ -22,28 +20,14 @@ final class FinancialAnalyticsController
     use ResolvesCompanyContext;
 
     /**
-     * Get aggregate KPI financial metrics (P&L and Liquidity).
+     * Get aggregate KPI financial metrics (P&L, Liquidity, and YoY/MoM dynamics).
+     * Delegated to KpiController for unified KPI handling.
      */
     public function metrics(
         FinancialAnalyticsQueryRequest $request,
-        GetFinancialMetricsHandler $handler
+        KpiController $kpiController
     ): JsonResponse {
-        $companyId = $this->resolveCompanyId($request);
-
-        $query = new GetFinancialMetricsQuery(
-            companyId: $companyId,
-            startDate: $request->query('start_date'),
-            endDate: $request->query('end_date'),
-            currency: (string) $request->query('currency', 'PLN')
-        );
-
-        $metrics = $handler->handle($query);
-
-        return new JsonResponse([
-            'status' => 'success',
-            'company_id' => $companyId,
-            'data' => $metrics->toArray(),
-        ], Response::HTTP_OK);
+        return $kpiController->metrics($request);
     }
 
     /**

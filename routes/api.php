@@ -9,6 +9,7 @@ use App\Presentation\Api\Controllers\FinancialImportController;
 use App\Presentation\Api\Controllers\FinancialRecordController;
 use App\Presentation\Api\Controllers\HealthController;
 use App\Presentation\Api\Controllers\InvitationController;
+use App\Presentation\Api\Controllers\KpiController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -59,52 +60,56 @@ Route::prefix('v1')->group(function () {
         // Finance Module Endpoints
         Route::prefix('finance')->group(function () {
             // Categories
-            Route::get('/categories', [FinancialCategoryController::class, 'index'])
-                ->name('api.finance.categories.index');
+            Route::get('/categories', [FinancialCategoryController::class, 'index']
+                )->name('api.finance.categories.index');
 
             // Financial Records CRUD
-            Route::get('/records', [FinancialRecordController::class, 'index'])
-                ->name('api.finance.records.index');
-            Route::post('/records', [FinancialRecordController::class, 'store'])
-                ->name('api.finance.records.store');
-            Route::get('/records/{id}', [FinancialRecordController::class, 'show'])
-                ->name('api.finance.records.show');
-            Route::put('/records/{id}', [FinancialRecordController::class, 'update'])
-                ->name('api.finance.records.update');
-            Route::delete('/records/{id}', [FinancialRecordController::class, 'destroy'])
-                ->name('api.finance.records.destroy');
+            Route::get('/records', [FinancialRecordController::class, 'index']
+                )->name('api.finance.records.index');
+            Route::post('/records', [FinancialRecordController::class, 'store']
+                )->name('api.finance.records.store');
+            Route::get('/records/{id}', [FinancialRecordController::class, 'show']
+                )->name('api.finance.records.show');
+            Route::put('/records/{id}', [FinancialRecordController::class, 'update']
+                )->name('api.finance.records.update');
+            Route::delete('/records/{id}', [FinancialRecordController::class, 'destroy']
+                )->name('api.finance.records.destroy');
 
             // CSV Import (canonical and plural REST routes)
-            Route::post('/import/csv', [FinancialImportController::class, 'store'])
-                ->name('api.finance.import.store');
-            Route::post('/imports', [FinancialImportController::class, 'store'])
-                ->name('api.finance.imports.store');
+            Route::post('/import/csv', [FinancialImportController::class, 'store']
+                )->name('api.finance.import.store');
+            Route::post('/imports', [FinancialImportController::class, 'store']
+                )->name('api.finance.imports.store');
 
-            Route::post('/import/preview', [FinancialImportController::class, 'preview'])
-                ->name('api.finance.import.preview');
-            Route::post('/imports/preview', [FinancialImportController::class, 'preview'])
-                ->name('api.finance.imports.preview');
+            Route::post('/import/preview', [FinancialImportController::class, 'preview']
+                )->name('api.finance.import.preview');
+            Route::post('/imports/preview', [FinancialImportController::class, 'preview']
+                )->name('api.finance.imports.preview');
 
-            Route::get('/import/history', [FinancialImportController::class, 'history'])
-                ->name('api.finance.import.history');
-            Route::get('/imports/history', [FinancialImportController::class, 'history'])
-                ->name('api.finance.imports.history');
+            Route::get('/import/history', [FinancialImportController::class, 'history']
+                )->name('api.finance.import.history');
+            Route::get('/imports/history', [FinancialImportController::class, 'history']
+                )->name('api.finance.imports.history');
 
-            Route::get('/import/csv/{id}', [FinancialImportController::class, 'show'])
-                ->name('api.finance.import.show');
-            Route::get('/imports/{id}', [FinancialImportController::class, 'show'])
-                ->name('api.finance.imports.show');
+            Route::get('/import/csv/{id}', [FinancialImportController::class, 'show']
+                )->name('api.finance.import.show');
+            Route::get('/imports/{id}', [FinancialImportController::class, 'show']
+                )->name('api.finance.imports.show');
+
+            // Dedicated KPI Endpoint
+            Route::get('/kpi', [KpiController::class, 'metrics']
+                )->name('api.finance.kpi');
 
             // Analytics, KPIs and Chart Data
             Route::prefix('analytics')->group(function () {
-                Route::get('/metrics', [FinancialAnalyticsController::class, 'metrics'])
-                    ->name('api.finance.analytics.metrics');
-                Route::get('/trends', [FinancialAnalyticsController::class, 'trends'])
-                    ->name('api.finance.analytics.trends');
-                Route::get('/breakdown', [FinancialAnalyticsController::class, 'breakdown'])
-                    ->name('api.finance.analytics.breakdown');
-                Route::get('/liquidity', [FinancialAnalyticsController::class, 'liquidity'])
-                    ->name('api.finance.analytics.liquidity');
+                Route::get('/metrics', [KpiController::class, 'metrics']
+                    )->name('api.finance.analytics.metrics');
+                Route::get('/trends', [FinancialAnalyticsController::class, 'trends']
+                    )->name('api.finance.analytics.trends');
+                Route::get('/breakdown', [FinancialAnalyticsController::class, 'breakdown']
+                    )->name('api.finance.analytics.breakdown');
+                Route::get('/liquidity', [FinancialAnalyticsController::class, 'liquidity']
+                    )->name('api.finance.analytics.liquidity');
             });
         });
 
@@ -112,22 +117,22 @@ Route::prefix('v1')->group(function () {
         Route::prefix('documents')->group(function () {
             Route::get('/audit-logs', [DocumentController::class, 'allAuditLogs']
                 )->name('api.documents.all-audit-logs');
-            Route::get('/', [DocumentController::class, 'index'])
-                ->name('api.documents.index');
-            Route::post('/', [DocumentController::class, 'store'])
-                ->name('api.documents.store');
-            Route::get('/{id}', [DocumentController::class, 'show'])
-                ->name('api.documents.show');
-            Route::put('/{id}', [DocumentController::class, 'update'])
-                ->name('api.documents.update');
-            Route::delete('/{id}', [DocumentController::class, 'destroy'])
-                ->name('api.documents.destroy');
-            Route::get('/{id}/download', [DocumentController::class, 'download'])
-                ->name('api.documents.download');
-            Route::patch('/{id}/archive', [DocumentController::class, 'archive'])
-                ->name('api.documents.archive');
-            Route::get('/{id}/audit-logs', [DocumentController::class, 'auditLogs'])
-                ->name('api.documents.audit-logs');
+            Route::get('/', [DocumentController::class, 'index']
+                )->name('api.documents.index');
+            Route::post('/', [DocumentController::class, 'store']
+                )->name('api.documents.store');
+            Route::get('/{id}', [DocumentController::class, 'show']
+                )->name('api.documents.show');
+            Route::put('/{id}', [DocumentController::class, 'update']
+                )->name('api.documents.update');
+            Route::delete('/{id}', [DocumentController::class, 'destroy']
+                )->name('api.documents.destroy');
+            Route::get('/{id}/download', [DocumentController::class, 'download']
+                )->name('api.documents.download');
+            Route::patch('/{id}/archive', [DocumentController::class, 'archive']
+                )->name('api.documents.archive');
+            Route::get('/{id}/audit-logs', [DocumentController::class, 'auditLogs']
+                )->name('api.documents.audit-logs');
         });
     });
 });

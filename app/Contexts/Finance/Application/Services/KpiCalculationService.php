@@ -21,31 +21,33 @@ final class KpiCalculationService
     }
 
     /**
-     * Calculate growth percentage between two Money amounts: (current - previous) / |previous| * 100
-     * Returns null if previous is null, zero, or missing (division by zero guard).
+     * Safely calculate dynamic growth percentage: ((current - previous) / |previous|) * 100
+     *
+     * Returns null if previous value is zero or null, preventing division by zero.
+     * Accurately handles negative base (e.g. exiting from a loss to profit).
      */
     public function calculateGrowthPercentage(?Money $current, ?Money $previous): ?float
     {
-        if ($current === null || $previous === null || $previous->isZero()) {
+        if ($current === null || $previous === null) {
             return null;
         }
 
-        $diff = $current->subtract($previous);
-        $absPreviousAmount = ltrim($previous->amount(), '-');
-
-        if ($absPreviousAmount === '0.0000' || $absPreviousAmount === '0' || $absPreviousAmount === '') {
+        $prevAmount = $previous->amount();
+        if ($prevAmount === '0' || $prevAmount === '0.0000') {
             return null;
         }
 
-        $ratio = bcdiv($diff->amount(), $absPreviousAmount, 6);
+        $diff = bcsub($current->amount(), $prevAmount, 6);
+        $absPrev = $previous->isNegative() ? bcmul($prevAmount, '-1', 6) : $prevAmount;
+
+        $ratio = bcdiv($diff, $absPrev, 6);
         $percentage = bcmul($ratio, '100', 4);
 
         return round((float) $percentage, 2);
     }
 
     /**
-     * Calculate difference between two ratio floats (e.g. Current Ratio, Quick Ratio).
-     * Returns null if either ratio is null.
+     * Calculate absolute point difference for solvency ratios.
      */
     public function calculateRatioDifference(?float $currentRatio, ?float $previousRatio): ?float
     {
@@ -53,11 +55,11 @@ final class KpiCalculationService
             return null;
         }
 
-        return round($currentRatio - $previousRatio, 2);
+        return round($currentRatio - $previousRatio, 4);
     }
 
     /**
-     * Calculate difference in margin percentage points between two margins.
+     * Calculate percentage point difference for profit margins.
      */
     public function calculateMarginDifference(?float $currentMargin, ?float $previousMargin): ?float
     {
@@ -69,7 +71,7 @@ final class KpiCalculationService
     }
 
     /**
-     * Calculate YoY and MoM dynamics for given company and period.
+     * Calculate complete KPI metrics along with YoY and MoM dynamics for a company.
      *
      * @return array{
      *     company_id: string,
@@ -173,7 +175,9 @@ final class KpiCalculationService
      *     opex_growth_pct: ?float,
      *     current_ratio_diff: ?float,
      *     quick_ratio_diff: ?float,
+     *     debt_to_assets_diff: ?float,
      *     gross_margin_diff_pct: ?float,
+     *     operating_margin_diff_pct: ?float,
      *     ebitda_margin_diff_pct: ?float,
      *     net_margin_diff_pct: ?float
      * }
@@ -192,7 +196,9 @@ final class KpiCalculationService
                 'opex_growth_pct' => null,
                 'current_ratio_diff' => null,
                 'quick_ratio_diff' => null,
+                'debt_to_assets_diff' => null,
                 'gross_margin_diff_pct' => null,
+                'operating_margin_diff_pct' => null,
                 'ebitda_margin_diff_pct' => null,
                 'net_margin_diff_pct' => null,
             ];
@@ -207,7 +213,9 @@ final class KpiCalculationService
             'opex_growth_pct' => $this->calculateGrowthPercentage($current->opex(), $previous->opex()),
             'current_ratio_diff' => $this->calculateRatioDifference($current->currentRatio(), $previous->currentRatio()),
             'quick_ratio_diff' => $this->calculateRatioDifference($current->quickRatio(), $previous->quickRatio()),
+            'debt_to_assets_diff' => $this->calculateRatioDifference($current->debtToAssets(), $previous->debtToAssets()),
             'gross_margin_diff_pct' => $this->calculateMarginDifference($current->grossMargin(), $previous->grossMargin()),
+            'operating_margin_diff_pct' => $this->calculateMarginDifference($current->operatingMargin(), $previous->operatingMargin()),
             'ebitda_margin_diff_pct' => $this->calculateMarginDifference($current->ebitdaMargin(), $previous->ebitdaMargin()),
             'net_margin_diff_pct' => $this->calculateMarginDifference($current->netMargin(), $previous->netMargin()),
         ];
