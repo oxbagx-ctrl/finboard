@@ -267,11 +267,17 @@ npm test
   - Zastąpienie statycznych wartości na Pulpicie Zarządczym i w Analityce P&L dynamicznymi danymi z API.
   - Interfejs edycji celów finansowych dla Doradcy z dynamicznymi wskaźnikami statusów i semaforami (OPT, WARN, CRIT).
 - [x] **Faza 15: Dynamiczne Lata Obrachunkowe i Precyzyjne Rozbicie OPEX**
-  - [x] Implementacja zapytania domenowego `GetAvailableFiscalYearsQuery` oraz metody repozytorium do dynamicznego wyciągania aktywnych lat obrachunkowych spółki.
-  - [x] Endpoint REST API `GET /api/v1/finance/analytics/years`.
-  - [x] Rozszerzenie zapytania `GetCategoryBreakdownQuery` o filtrowanie `category_type` (OPEX vs COGS/TAX).
-  - [x] Testy jednostkowe i integracyjne dla dynamicznych lat i filtrowania kategorii.
-  - [x] Integracja `DealContext` z dynamiczną listą lat oraz zaktualizowanie wykresu struktury kosztów.
+  - Implementacja zapytania domenowego `GetAvailableFiscalYearsQuery` oraz metody repozytorium do dynamicznego wyciągania aktywnych lat obrachunkowych spółki.
+  - Endpoint REST API `GET /api/v1/finance/analytics/years`.
+  - Rozszerzenie zapytania `GetCategoryBreakdownQuery` o filtrowanie `category_type` (OPEX vs COGS/TAX).
+  - Testy jednostkowe i integracyjne dla dynamicznych lat i filtrowania kategorii.
+  - Integracja `DealContext` z dynamiczną listą lat oraz zaktualizowanie wykresu struktury kosztów.
+- [ ] **Faza 16: Naprawa Kontraktu Wskaźników Płynności i Statusów Benchmarkowych**
+  - [x] Standaryzacja struktury DTO `FinancialMetrics` (ujednolicenie struktur `ratios`, `liquidity` i `solvency`).
+  - [ ] Obsługa braku rekordów bilansowych w `KpiEvaluationService` (eliminacja fałszywych alarmów krytycznych).
+  - [ ] Testy jednostkowe serializacji `FinancialMetrics` i ewaluacji wskaźników brzegowych.
+  - [ ] Refaktoryzacja `DashboardView` i `FinancialMultiplesStrip` pod ujednolicony kontrakt wskaźników.
+  - [ ] Wprowadzenie estetycznych stanów fallback ("—") dla brakujących danych bilansowych.
 
 ---
 

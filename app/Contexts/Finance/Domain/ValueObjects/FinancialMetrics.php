@@ -156,6 +156,88 @@ final class FinancialMetrics implements ValueObject
         return $this->period;
     }
 
+    /**
+     * Structure of liquidity ratios and balance components.
+     *
+     * @return array{
+     *     current_ratio: ?float,
+     *     quick_ratio: ?float,
+     *     current_assets: array{amount: float, formatted: string},
+     *     current_liabilities: array{amount: float, formatted: string},
+     *     quick_assets: array{amount: float, formatted: string},
+     *     inventory: array{amount: float, formatted: string}
+     * }
+     */
+    public function liquidity(): array
+    {
+        return [
+            'current_ratio' => $this->currentRatio !== null ? round($this->currentRatio, 2) : null,
+            'quick_ratio' => $this->quickRatio !== null ? round($this->quickRatio, 2) : null,
+            'current_assets' => [
+                'amount' => $this->currentAssets->toDecimal(),
+                'formatted' => $this->currentAssets->format(),
+            ],
+            'current_liabilities' => [
+                'amount' => $this->currentLiabilities->toDecimal(),
+                'formatted' => $this->currentLiabilities->format(),
+            ],
+            'quick_assets' => [
+                'amount' => $this->quickAssets->toDecimal(),
+                'formatted' => $this->quickAssets->format(),
+            ],
+            'inventory' => [
+                'amount' => $this->inventory->toDecimal(),
+                'formatted' => $this->inventory->format(),
+            ],
+        ];
+    }
+
+    /**
+     * Structure of solvency and leverage metrics.
+     *
+     * @return array{
+     *     debt_to_assets: ?float,
+     *     total_assets: ?array{amount: float, formatted: string},
+     *     total_debt: ?array{amount: float, formatted: string}
+     * }
+     */
+    public function solvency(): array
+    {
+        return [
+            'debt_to_assets' => $this->debtToAssets !== null ? round($this->debtToAssets, 4) : null,
+            'total_assets' => $this->totalAssets ? [
+                'amount' => $this->totalAssets->toDecimal(),
+                'formatted' => $this->totalAssets->format(),
+            ] : null,
+            'total_debt' => $this->totalDebt ? [
+                'amount' => $this->totalDebt->toDecimal(),
+                'formatted' => $this->totalDebt->format(),
+            ] : null,
+        ];
+    }
+
+    /**
+     * Unified ratios combining liquidity, solvency, and profitability margins.
+     *
+     * @return array<string, mixed>
+     */
+    public function ratios(): array
+    {
+        return [
+            'current_ratio' => $this->currentRatio !== null ? round($this->currentRatio, 2) : null,
+            'quick_ratio' => $this->quickRatio !== null ? round($this->quickRatio, 2) : null,
+            'debt_to_assets' => $this->debtToAssets !== null ? round($this->debtToAssets, 4) : null,
+            'gross_margin' => round($this->grossMargin, 4),
+            'gross_margin_pct' => round($this->grossMargin * 100, 2),
+            'operating_margin' => round($this->operatingMargin, 4),
+            'operating_margin_pct' => round($this->operatingMargin * 100, 2),
+            'ebitda_margin' => round($this->ebitdaMargin, 4),
+            'ebitda_margin_pct' => round($this->ebitdaMargin * 100, 2),
+            'net_margin' => round($this->netMargin, 4),
+            'net_margin_pct' => round($this->netMargin * 100, 2),
+        ];
+    }
+
     public function equals(ValueObject $other): bool
     {
         if (!$other instanceof self) {
@@ -253,11 +335,9 @@ final class FinancialMetrics implements ValueObject
                     'formatted' => $this->totalDebt->format(),
                 ] : null,
             ],
-            'ratios' => [
-                'current_ratio' => $this->currentRatio !== null ? round($this->currentRatio, 2) : null,
-                'quick_ratio' => $this->quickRatio !== null ? round($this->quickRatio, 2) : null,
-                'debt_to_assets' => $this->debtToAssets !== null ? round($this->debtToAssets, 4) : null,
-            ],
+            'ratios' => $this->ratios(),
+            'liquidity' => $this->liquidity(),
+            'solvency' => $this->solvency(),
         ];
     }
 }

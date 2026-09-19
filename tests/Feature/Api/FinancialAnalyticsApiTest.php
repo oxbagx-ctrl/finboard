@@ -95,6 +95,16 @@ final class FinancialAnalyticsApiTest extends TestCase
                     'ratios' => [
                         'current_ratio',
                         'quick_ratio',
+                        'debt_to_assets',
+                    ],
+                    'liquidity' => [
+                        'current_ratio',
+                        'quick_ratio',
+                        'current_assets',
+                        'current_liabilities',
+                    ],
+                    'solvency' => [
+                        'debt_to_assets',
                     ],
                 ],
             ]);
