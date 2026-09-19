@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Finance;
 
+use App\Contexts\Finance\Application\Queries\GetAvailableFiscalYears\GetAvailableFiscalYearsHandler;
+use App\Contexts\Finance\Application\Queries\GetAvailableFiscalYears\GetAvailableFiscalYearsQuery;
 use App\Contexts\Finance\Application\Queries\GetCategoryBreakdown\GetCategoryBreakdownQuery;
 use App\Contexts\Finance\Application\Queries\GetCategoryBreakdown\GetCategoryBreakdownHandler;
 use App\Contexts\Finance\Application\Queries\GetFinancialMetrics\GetFinancialMetricsQuery;
@@ -14,6 +16,7 @@ use App\Contexts\Finance\Application\Queries\GetMonthlyTrends\GetMonthlyTrendsQu
 use App\Contexts\Finance\Application\Queries\GetMonthlyTrends\GetMonthlyTrendsHandler;
 use App\Contexts\Finance\Domain\Repositories\FinancialRecordRepositoryInterface;
 use App\Contexts\Finance\Domain\Services\FinancialCalculator;
+use DateTimeImmutable;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
@@ -127,5 +130,33 @@ final class QueriesTest extends TestCase
             $this->assertGreaterThan(0, $monthTrend['current_assets']);
             $this->assertGreaterThan(0, $monthTrend['current_liabilities']);
         }
+    }
+
+    public function test_get_available_fiscal_years_handler(): void
+    {
+        $handler = new GetAvailableFiscalYearsHandler($this->repo);
+        $query = new GetAvailableFiscalYearsQuery(self::ACME_COMPANY_ID);
+
+        $years = $handler->handle($query);
+
+        $this->assertNotEmpty($years);
+        $this->assertContains(2026, $years);
+
+        // Verify descending
+        $expected = $years;
+        rsort($expected, SORT_NUMERIC);
+        $this->assertSame($expected, $years);
+    }
+
+    public function test_get_available_fiscal_years_handler_falls_back_to_current_year_when_empty(): void
+    {
+        $emptyCompanyId = '00000000-0000-0000-0000-000000000000';
+        $handler = new GetAvailableFiscalYearsHandler($this->repo);
+        $query = new GetAvailableFiscalYearsQuery($emptyCompanyId);
+
+        $years = $handler->handle($query);
+
+        $currentYear = (int) (new DateTimeImmutable())->format('Y');
+        $this->assertSame([$currentYear], $years);
     }
 }

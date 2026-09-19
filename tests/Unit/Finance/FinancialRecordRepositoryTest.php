@@ -68,4 +68,25 @@ final class FinancialRecordRepositoryTest extends TestCase
             );
         }
     }
+
+    public function test_repository_can_extract_available_fiscal_years_ordered_descending(): void
+    {
+        $years = $this->repository->getAvailableFiscalYears(self::COMPANY_ID);
+
+        $this->assertNotEmpty($years);
+        $this->assertContains(2026, $years);
+
+        // Verify descending order
+        $sorted = $years;
+        rsort($sorted, SORT_NUMERIC);
+        $this->assertSame($sorted, $years);
+    }
+
+    public function test_repository_returns_empty_array_when_no_records_exist_for_company(): void
+    {
+        $emptyCompanyId = '99999999-9999-9999-9999-999999999999';
+        $years = $this->repository->getAvailableFiscalYears($emptyCompanyId);
+
+        $this->assertSame([], $years);
+    }
 }

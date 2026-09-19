@@ -17,6 +17,11 @@ interface FinancialRecordRepositoryInterface
      */
     public function findByCompanyId(string $companyId, ?DateRange $period = null): array;
 
+    /**
+     * @return array<int> List of distinct fiscal years with financial records for company, sorted descending (e.g. [2026, 2025, 2024])
+     */
+    public function getAvailableFiscalYears(string $companyId): array;
+
     public function save(FinancialRecord $record): void;
 
     /**

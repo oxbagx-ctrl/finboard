@@ -57,6 +57,31 @@ final class EloquentFinancialRecordRepository implements FinancialRecordReposito
             ->all();
     }
 
+    /**
+     * @return array<int> List of distinct fiscal years with financial records for company, sorted descending (e.g. [2026, 2025, 2024])
+     */
+    public function getAvailableFiscalYears(string $companyId): array
+    {
+        /** @var \Illuminate\Database\Eloquent\Builder $query */
+        $query = EloquentFinancialRecord::query()
+            ->where('company_id', $companyId);
+
+        $driver = DB::connection()->getDriverName();
+        if ($driver === 'sqlite') {
+            $yearExpression = "cast(strftime('%Y', record_date) as integer)";
+        } else {
+            $yearExpression = 'EXTRACT(YEAR FROM record_date)::integer';
+        }
+
+        return $query
+            ->selectRaw("DISTINCT {$yearExpression} AS fiscal_year")
+            ->orderBy('fiscal_year', 'desc')
+            ->pluck('fiscal_year')
+            ->map(fn ($year) => (int) $year)
+            ->values()
+            ->all();
+    }
+
     public function save(FinancialRecord $record): void
     {
         EloquentFinancialRecord::query()->updateOrCreate(
