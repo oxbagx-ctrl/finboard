@@ -3,15 +3,12 @@
 [![PHP Version](https://img.shields.io/badge/php-8.2%2B-blue.svg)](https://www.php.net/)
 [![Laravel](https://img.shields.io/badge/laravel-11.x-red.svg)](https://laravel.com/)
 [![PostgreSQL](https://img.shields.io/badge/postgresql-16-blue.svg)](https://www.postgresql.org/)
-[![Redis](https://img.shields.io/badge/redis-alpine-red.svg)](https://redis.io/)
-[![Architecture](https://img.shields.io/badge/architecture-DDD%20%2F%20CQRS-brightgreen.svg)]()
-[![Tests](https://img.shields.io/badge/tests-324%20backend%20%7C%2099%20frontend%20passed-success.svg)]()
+[![Redis](https://img.shields.io/badge/redis-alpine-red.svg)](https://redis.io/)\n[![Architecture](https://img.shields.io/badge/architecture-DDD%20%2F%20CQRS-brightgreen.svg)]()
+[![Tests](https://img.shields.io/badge/tests-330%20backend%20%7C%2099%20frontend%20passed-success.svg)]()
 
 FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakcyjnego (M&A, Due Diligence, Corporate Finance) oraz ich klientom (CFO, Zarządy). Aplikacja łączy w sobie zaawansowaną analitykę finansową w ujęciu wielo-najemcowym (Multi-Tenant) z bezpiecznym repozytorium dokumentów Virtual Data Room (VDR).
 
----
-
-## 📌 Kluczowe Funkcjonalności
+---\n\n## 📌 Kluczowe Funkcjonalności
 
 - **Architektura DDD (Domain-Driven Design) & CQRS**:
     - Wyraźny podział na Bounded Contexts: `Identity`, `Finance`, `DocumentManagement`, `Tenant`.
@@ -20,6 +17,7 @@ FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakc
     - Domenowy kalkulator finansowy (`FinancialCalculator`) oraz metody domenowe `FinancialRecord` wyliczające wskaźniki P&L (Gross Profit, OPEX, EBIT, EBITDA, Zysk Netto, marże) oraz bilansu i płynności (Current Ratio, Quick Ratio, Debt-to-Assets).
     - Encja domenowa `FinancialBenchmark` realizująca ewaluację wskaźników spółki z przypisaniem flag statusu (`OPT`, `WARN`, `CRIT`, `UNKNOWN`) oraz repozytorium `FinancialBenchmarkRepositoryInterface` trwale zapisujące cele w PostgreSQL.
     - Encja domenowa `FinancialAuditLog` i repozytorium `FinancialAuditLogRepositoryInterface` zapewniające niezmienny rejestr ścieżki audytowej (Audit Trail) dla operacji finansowych, konfiguracji celów i importów.
+    - Reaktywne listenery zdarzeń domenowych (`LogFinancialRecordCreatedListener`, `LogFinancialRecordUpdatedListener`, `LogFinancialRecordDeletedListener`, `LogBenchmarkConfiguredListener`, `LogBenchmarkResetListener`, `LogCsvImportAuditListener`) automatycznie utrwalające zdarzenia w dzienniku audytowym z metadanymi żądania (IP, User-Agent, identyfikator użytkownika).
     - Serwis aplikacyjny `KpiCalculationService` kalkulujący dynamikę YoY oraz MoM na danych historycznych ze ścisłą ochroną przed dzieleniem przez zero.
     - Serwis aplikacyjny `KpiEvaluationService` ewaluujący dynamicznie metryki finansowe spółki wobec skonfigurowanych celów doradcy (lub rynkowych wartości domyślnych) wraz z wyznaczaniem statusów semaforowych (`OPT`, `WARN`, `CRIT`), syntetycznego wskaźnika `health_score` i zagregowanego stanu zdrowia finansowego.
     - Kontroler `BenchmarkController` w warstwie prezentacji REST API obsługujący odczyt, konfigurację progów, masową aktualizację i resetowanie celów finansowych spółek portfelowych przez Doradców i Administratorów.
@@ -43,200 +41,138 @@ FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakc
     - Dedykowany interfejs drag & drop, kategoryzacja taksonomiczna M&A oraz natychmiastowe pobieranie plików.
 - **Generator Raportów Zarządczych i Memorandów M&A (PDF)**:
     - Dedykowany konfigurator parametrów raportu (okresy LTM/FY, waluta przeliczeniowa, klauzule poufności, komentarz analityczny doradcy).
-    - Układ formalnego memorandumu transakcyjnego: karta wyników KPI, pełny rachunek zysków i strat (P&L), analiza płynności i kapitału obrotowego, struktura OPEX.
-    - Cyfrowy certyfikat integralności danych ze skrótem kryptograficznym SHA-256 oraz blokiem podpisów partnerskich.
-    - Zoptymalizowany wektorowy druk A4 w standardzie `@media print` (czysta biel, wysoki kontrast, brak elementów nawigacji).
-- **Frontend SPA w Stylu Terminala Deal Advisory (Bloomberg / FactSet)**:
-    - Estetyka o wysokim kontraście (Zinc 950/900), inżynieryjne krawędzie, brak sztucznych ozdobników AI.
-    - Liczby tabelaryczne (`tabular-nums`, `font-mono`) dla kwot, marż i dat.
-    - Pasek kontekstu transakcyjnego z selektorem waluty przeliczeniowej w locie (PLN, EUR, USD, GBP), statusem poufności oraz zakresem dat.
-    - Interaktywne wykresy Recharts (trendy P&L, struktura kosztów OPEX, wskaźniki płynności z benchmarkami branżowymi).
-    - Pełny moduł księgi operacji (General Ledger) z filtrami i paginacją serwerową.
-    - Dedykowany moduł analityki finansowej i wskaźników Deal Advisory (`AnalyticsView`) z 4 dynamicznymi trybami analizy (Przegląd Kompleksowy, Rentowność i Marże, Płynność i Wskaźniki, Dekompozycja Przychodów / Kosztów) oraz interaktywnymi wykresami Recharts.
-    - Widok importu CSV z podglądem walidacji dry-run i animowanym monitorem kolejki Redis.
-    - Moduł VDR oraz globalny rejestr ścieżki audytowej (Audit Trail).
-    - Widok zarządzania doradcami i przypisaniami spółek (`AdvisorsManagementView`) wraz z matrycą pokrycia portfela i modalem przypisań (`AdvisorAssignmentModal`).
-    - Modal zapraszania nowych użytkowników (`InviteUserModal`) w paradygmacie Zero-Trust z podziałem ról i selekcją firm.
-    - Bezpieczna strona aktywacji konta i ustanawiania hasła (`AcceptInvitationView`) weryfikująca token kryptograficzny w URL.
-    - Zestaw 99 testów jednostkowych i integracyjnych Vitest (formatery, silnik walutowy, formularze, blokady Dry-Run, eksplorator VDR, raporty PDF, E2E workflow, analityka finansowa i wskaźniki Recharts, zarządzanie doradcami, zaproszenia i aktywacja konta, reaktywne dodawanie spółek).
-- **Monitoring Produkcyjny, Bezpieczeństwo Nginx i Automatyzacja Wdrożenia**:
-    - Dedykowany endpoint `/api/v1/health` badający stan bazy PostgreSQL, klastra Redis, uprawnień magazynu plików oraz zużycia zasobów.
-    - Automatyczne konteneryzowane skrypty backupu (`scripts/backup.sh`) z rotacją 30 dni oraz zero-downtime deployment (`scripts/deploy.sh`).
-    - Konfiguracja Nginx z certyfikatami SSL/TLS, nagłówkami bezpieczeństwa HSTS, Content-Security-Policy oraz blokadami exploitów.
+    - Dwu-panelowy interfejs w dashboardzie z podglądem na żywo i asynchronicznym generowaniem dokumentów PDF.
+    - Precyzyjny szablon raportu w formacie A4 z certyfikatem integralności SHA-256.
+- **Wielowalutowość i Konwersja FX w Czasie Rzeczywistym**:
+    - Centralny serwis wymiany walut `FxRateService` z obsługą par walutowych PLN, EUR, USD, GBP.
+    - Globalny przełącznik waluty transakcyjnej z natychmiastowym przeliczaniem wskaźników finansowych.
+- **Powiadomienia Transakcyjne i Integracja E-mail**:
+    - Transakcyjne e-maile z zaproszeniami użytkowników z bezpiecznymi linkami aktywacyjnymi.
+    - Zintegrowane środowisko Mailpit (Mailcatcher) do bezpiecznego podglądu wiadomości e-mail w fazie deweloperskiej.
+- **Nowoczesny Interfejs Użytkownika (SPA)**:
+    - Reaktywny frontend zbudowany w oparciu o React 18, Tailwind CSS i bibliotekę wykresów Recharts.
+    - Estetyka profesjonalnego terminala transakcyjnego Deal Advisory (Dark Theme, akcenty szmaragdowe/bursztynowe, typografia `font-mono` / `tabular-nums`).
+    - Dedykowane widoki: Dashboard ze wskaźnikami KPI, Analityka P&L i Płynności, Księga Główna Transakcji, Wirtualny Pokój Danych (VDR), Raporty Wykonawcze PDF oraz Zarządzanie Doradcami i Klientami.
 
 ---
 
-## 🏗️ Architektura Systemu i Bounded Contexts
-
-Platforma została zaprojektowana w oparciu o pryncypia Domain-Driven Design (DDD):
-
-```
-app/
-├── Contexts/
-│   ├── Identity/               # Bounded Context: Tożsamość, Konta, RBAC i Zaproszenia
-│   │   ├── Domain/             # Agregaty (User, Invitation), Value Objects (Role, Token), Eventy
-│   │   ├── Application/        # Use Cases (InviteUser, AcceptInvitation), DTOs, Listeners
-│   │   └── Infrastructure/     # Repozytoria Eloquent, Hashers, Providers
-│   ├── Finance/                # Bounded Context: Księgowość, Dynamiczne KPI, Importy, Benchmarki, Logi Audytowe
-│   │   ├── Domain/             # Agregaty (FinancialRecord, FinancialBenchmark, FinancialAuditLog), Value Objects
-│   │   │                       # Serwis domenowy FinancialCalculator, kalkulacje P&L i wskaźników płynności
-│   │   ├── Application/        # Commands/Queries, KpiCalculationService (dynamika YoY/MoM), KpiEvaluationService (flagi OPT/WARN/CRIT), CsvFinancialDataParser, Jobs
-│   │   └── Infrastructure/     # Repozytoria Eloquent (FinancialRecord, FinancialBenchmark, FinancialAuditLog), Providers
-│   ├── DocumentManagement/     # Bounded Context: Virtual Data Room (VDR)
-│   │   ├── Domain/             # Agregat Document, Logi audytowe, Value Objects (FileMetadata, Checksum)
-│   │   ├── Application/        # DTOs, Handlers, Zarządzanie wersjami i audytem
-│   │   └── Infrastructure/     # Dyskowe repozytorium szyfrowane, adaptery Storage
-│   └── Tenant/                 # Bounded Context: Multi-Tenancy & Portfolio Assignments
-│       ├── Domain/             # Agregat CompanyAdvisorAssignment, repozytoria powiązań
-│       ├── Application/        # Use Cases przypisywania doradców (AssignAdvisor, RevokeAdvisor)
-│       └── Infrastructure/     # EloquentCompanyAdvisorRepository
-├── Models/                     # Modele Eloquent (User, Company, FinancialRecord, FinancialBenchmark, FinancialAuditLog, Document, etc.)
-└── Presentation/
-    └── Api/Controllers/        # Kontrolery REST API (Auth, Kpi, Benchmark, FinancialRecords, Analytics, VDR, Invitations, Advisors)
-```
-
----
-
-## 🛠️ Struktura Katalogów i Modułów
+## 🛠️ Architektura Technologiczna
 
 ```
 finboard/
 ├── app/
-│   ├── Contexts/               # Domenowe Bounded Contexts (Identity, Finance, DocumentManagement, Tenant)
-│   ├── Models/                 # Modele bazodanowe Eloquent
-│   ├── Http/Middleware/        # Middleware autoryzacji Sanctum, RBAC, TenantContext
-│   └── Presentation/Api/       # Kontrolery API pogrupowane domenowo
+│   ├── Contexts/
+│   │   ├── Identity/              # Bounded Context: Uwierzytelnianie, Użytkownicy, Role, Zaproszenia
+│   │   ├── Finance/               # Bounded Context: Transakcje, Analityka, Wskaźniki, Benchmarki, Audyt
+│   │   │   ├── Application/       # Commands, Queries, Handlery, Serwisy aplikacyjne (KpiCalculation, KpiEvaluation)
+│   │   │   ├── Domain/            # Agregaty, Encje, Value Objects, Zdarzenia, Repozytoria (Interfejsy)
+│   │   │   └── Infrastructure/    # Repozytoria Eloquent, Listenery zdarzeń audytowych, Parsery
+│   │   ├── DocumentManagement/    # Bounded Context: Repozytorium VDR, Sumy Kontrolne, Logi Pobrań
+│   │   └── Tenant/                # Bounded Context: Izolacja Wielonajemcowa, Przypisania Spółek
+│   ├── Shared/                    # Współdzielone elementy domenowe (AggregateRoot, Entity, DomainEvent)
+│   ├── Models/                    # Modele Eloquent (Persistence Model)
+│   ├── Presentation/              # Warstwa Prezentacji: Kontrolery REST API, Form Requests, Resources
+│   └── Mail/                      # Szablony powiadomień e-mail (Mailable)
+├── database/                      # Migracje, Fabryki, Seedery danych demonstracyjnych
 ├── resources/
-│   └── js/
-│       ├── components/         # Komponenty UI (FinancialOverview, GeneralLedger, DataRoom, AnalyticsView, etc.)
-│       ├── context/            # DealContext (stan sesji, waluta bazowa, okres raportowy, tenant)
-│       └── tests/              # Testy jednostkowe i integracyjne Vitest
-├── routes/
-│   └── api.php                 # Definicje tras REST API (/api/v1/...)
-├── database/
-│   ├── migrations/             # Migracje schematu PostgreSQL
-│   └── seeders/                # Idempotentne seedery danych demo (Acme & Helvest)
-├── docker/                     # Konfiguracje Dockerfile, Nginx, PHP, php.ini
-├── changelog/                  # Historia commitów i ewolucji architektury projektu
-├── scripts/
-│   ├── deploy.sh               # Skrypt bezprzerwowego wdrożenia produkcyjnego (zero-downtime)
-│   └── backup.sh               # Automatyczny zrzut bazy PostgreSQL i archiwizacja plików VDR z rotacją 30 dni
+│   ├── js/                        # Aplikacja Frontendowa React 18 SPA (Components, Context, Layouts)
+│   └── views/                     # Widoki Blade (szablony raportów PDF, podstawa SPA)
+├── tests/
+│   ├── Unit/                      # Testy jednostkowe domeny DDD i reguł biznesowych
+│   └── Feature/                   # Testy integracyjne API, autoryzacji i scenariuszy biznesowych
+└── docker/                        # Konfiguracja środowiska kontenerowego (Nginx, PHP, Redis, Postgres)
 ```
 
 ---
 
-## 🚀 Środowisko Docker i Uruchomienie
+## 🚀 Uruchomienie Środowiska (Lokalny Rozwój)
 
-Środowisko developerskie i produkcyjne oparte jest o konteneryzację Docker Compose:
-- **`app`**: PHP-FPM 8.2 z rozszerzeniami `bcmath`, `pdo_pgsql`, `redis`, `gd`, `zip`
-- **`web` / `nginx`**: Nginx 1.25 z kompresją Gzip i nagłówkami bezpieczeństwa (port `8080` / prod `80`/`443`)
-- **`postgres`**: PostgreSQL 16 (port `5432`) z wolumenem danych
-- **`redis`**: Redis Alpine jako broker kolejek i cache (port `6379`)
-- **`worker`**: Dedykowany kontener wykonujący zadania w tle (`php artisan queue:work --queue=financial-imports,default`)
-- **`scheduler`**: Kontener harmonogramu zadań cron (`php artisan schedule:work`)
-- **`mailpit`**: Serwer SMTP oraz webowy interfejs inspekcji e-maili (Mailcatcher) w środowisku dev (port SMTP `1025`, web dashboard: [http://localhost:8025](http://localhost:8025))
+### Wymagania wstępne
+- Zainstalowany `docker` oraz wtyczka `docker compose` (v2+)
+- Opcjonalnie środowisko `node` (v20+) i `npm` do uruchamiania testów frontendowych poza kontenerem
 
-### Uruchomienie Środowiska Developerskiego
-
+### 1. Klonowanie repozytorium i konfiguracja środowiska
 ```bash
-# 1. Start kontenerów
-docker compose up -d
+git clone <adres-repozytorium> finboard
+cd finboard
+cp .env.example .env
+```
 
-# 2. Instalacja zależności (jeśli wymagane)
-docker compose exec app composer install
-npm install
+### 2. Uruchomienie kontenerów Docker
+```bash
+docker compose up -d --build
+```
+Kontenery wchodzące w skład infrastruktury:
+- `finboard_app` – PHP-FPM 8.2 z rozszerzeniami `pdo_pgsql`, `redis`, `bcmath`, `gd`, `zip`
+- `finboard_web` – Serwer Nginx serwujący aplikację i statyczne zasoby na porcie `8080`
+- `finboard_db` – Baza danych PostgreSQL 16 na porcie `5432`
+- `finboard_redis` – Pamięć podręczna i broker kolejki zadań na porcie `6379`
+- `finboard_worker` – Asynchroniczny worker przetwarzający zadania kolejki (importy CSV, raporty)
+- `finboard_mailpit` – Serwer SMTP/Web UI do przechwytywania wiadomości e-mail na portach `1025` (SMTP) i `8025` (Web UI)
 
-# 3. Migracje bazy danych i seeder danych demo
-docker compose exec app php artisan migrate --seed
+### 3. Inicjalizacja bazy danych i danych demonstracyjnych
+```bash
+docker compose exec app php artisan migrate --force
+docker compose exec app php artisan db:seed --force
+```
 
-# 4. Kompilacja assetów frontendu (React / Tailwind)
-npm run build
+Po zakończeniu seedowania w systemie dostępne są konta użytkowników:
+- **Super Administrator (Partner)**: `admin@finboard.local` / hasło: `password`
+- **Doradca Finansowy (Advisor)**: `advisor@helvest.com` / hasło: `password`
+- **Klient Portfelowy (Client Acme Corp)**: `client@acme.com` / hasło: `password`
 
-# 5. Uruchomienie pełnego zestawu testów
-docker compose exec app php artisan test
+### 4. Dostęp do interfejsów
+- **Aplikacja FinBoard (SPA)**: [http://localhost:8080](http://localhost:8080)
+- **Web UI Mailpit (Mailcatcher)**: [http://localhost:8025](http://localhost:8025)
+
+---
+
+## 🧪 Uruchamianie Testów Automatycznych
+
+### Testy Backendowe (PHPUnit)
+```bash
+docker compose exec app ./vendor/bin/phpunit
+```
+*Aktualny status: **330 testów** (2252 asercje), 100% zaliczonych.*
+
+### Testy Frontendowe (Vitest)
+```bash
 npm test
 ```
-
-### Automatyczne Wdrożenie Produkcyjne (Zero-Downtime)
-
-Wdrożenie produkcyjne wraz z optymalizacją pamięci podręcznej i weryfikacją liveness probe:
-
-```bash
-./scripts/deploy.sh
-```
-
-Szczegółowy przewodnik operacyjny dla inżynierów DevOps i konfiguracja produkcyjna `docker-compose.prod.yml` znajdują się w dokumencie: [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
+*Aktualny status: **99 testów** (12 zestawów), 100% zaliczonych.*
 
 ---
 
-## 🔑 Dane Dostępowe Środowiska Demo
+## 📋 Główne Punkty Końcowe REST API
 
-Baza danych zasilona jest danymi demonstracyjnymi (21 miesięcy historii finansowej od stycznia 2025 do września 2026, relacje wielo-najemcowe oraz repozytorium VDR ze ścieżką audytową):
+### Uwierzytelnianie i Zarządzanie Tożsamością
+- `POST /api/v1/auth/login` – Uwierzytelnienie użytkownika i wydanie tokenu Sanctum
+- `POST /api/v1/auth/logout` – Unieważnienie bieżącej sesji tokenu
+- `GET /api/v1/auth/me` – Pobranie danych zalogowanego użytkownika, jego roli oraz przypisanych firm
+- `POST /api/v1/auth/invite` – Zaproszenie nowego doradcy lub klienta z określeniem roli i firm
+- `POST /api/v1/auth/accept-invitation` – Aktywacja konta na podstawie jednorazowego tokenu zaproszenia
 
-| Rola w Systemie | Użytkownik | Email | Hasło | Zakres Dostępu i Spółka Powiązana |
-| :--- | :--- | :--- | :--- | :--- |
-| **Super Admin** | Partner Zarządzający (Helvest) | `superadmin@helvest.com` | `password123` | Helvest Advisory Sp. z o.o. *(Dostęp globalny: zarządzanie doradcami, przypisywanie spółek, zapraszanie użytkowników)* |
-| **Doradca M&A** | Doradca Transakcyjny (Helvest) | `advisor@helvest.com` | `password123` | Helvest Advisory Sp. z o.o. *(Dostęp do przypisanych spółek portfela: Acme Manufacturing S.A., zapraszanie klientów)* |
-| **Analityk (Admin)** | Analityk Finansowy (Helvest) | `admin@helvest.com` | `password123` | Helvest Advisory Sp. z o.o. *(Pełny wgląd analityczny i finansowy do całego portfela)* |
-| **Klient / CFO** | Jan Kowalski (CFO Acme) | `klient@acme.com` | `password123` | Acme Manufacturing S.A. *(Ścisła izolacja multi-tenant: dostęp wyłącznie do Acme)* |
+### Spółki i Nadzór Transakcyjny
+- `GET /api/v1/companies` – Lista dostępnych dla użytkownika spółek portfelowych
+- `POST /api/v1/companies` – Utworzenie nowej spółki portfelowej (dla Doradcy/SuperAdmina)
+- `GET /api/v1/companies/{id}/advisors` – Lista doradców przypisanych do spółki
+- `POST /api/v1/companies/{id}/advisors` – Przypisanie doradcy do spółki (SuperAdmin)
+- `DELETE /api/v1/companies/{id}/advisors/{userId}` – Odebranie doradcy dostępu do spółki
 
-### Narzędzia Deweloperskie i Podgląd E-maili
-- **Mailpit Web Dashboard**: [http://localhost:8025](http://localhost:8025)
-  - Przechwytuje wszystkie wiadomości wychodzące (zaproszenia `UserInvitationMail`, powiadomienia, linki aktywacyjne) w środowisku lokalnym.
-  - Port SMTP dla usług aplikacji: `1025` (host: `mailpit`).
+### Finanse – Księga Główna i Importy (CQRS Write Side)
+- `GET /api/v1/finance/records` – Lista rekordów księgowych z filtrami dat, kategorii i typu
+- `POST /api/v1/finance/records` – Dodanie pojedynczego rekordu księgowego
+- `PUT /api/v1/finance/records/{id}` – Aktualizacja kwoty i szczegółów rekordu
+- `DELETE /api/v1/finance/records/{id}` – Usunięcie rekordu księgowego
+- `POST /api/v1/finance/import/preview` – Walidacja i podgląd pliku CSV (dry-run)
+- `POST /api/v1/finance/import/upload` – Kolejkowanie pliku do asynchronicznego importu w tle
 
----
-
-## 📡 Przegląd Endpointów REST API (`/api/v1`)
-
-### Diagnostyka i Monitoring Platformy
-- `GET /api/v1/health` – Status zdrowia platformy (PostgreSQL, Redis, Storage disk, pamięć RAM, wersja środowiska)
-
-### Autoryzacja i Profil
-- `POST /api/v1/auth/login` – Logowanie i generowanie tokenu Sanctum
-- `GET /api/v1/auth/me` – Dane zalogowanego użytkownika, uprawnienia i lista dostępnych spółek
-- `PUT /api/v1/auth/profile` – Aktualizacja danych profilu oraz zmiana hasła z weryfikacją dotychczasowego
-- `POST /api/v1/auth/logout` – Unieważnienie tokenu sesji
-
-### Panel SuperAdmina – Zarządzanie Doradcami i Przypisaniami Spółek
-- `GET /api/v1/admin/advisors` – Lista doradców i administratorów z przypisanymi firmami, filtrami i wyszukiwarką
-- `GET /api/v1/admin/advisors/{id}` – Szczegóły profilu doradcy i lista powiązanych spółek portfela
-- `POST /api/v1/admin/advisors/{id}/companies` – Przypisanie doradcy do jednej lub wielu spółek
-- `DELETE /api/v1/admin/advisors/{id}/companies/{companyId}` – Odpięcie doradcy od wskazanej spółki
-- `PUT /api/v1/admin/advisors/{id}/companies` – Synchronizacja pełnej listy spółek przypisanych doradcy
-- `PATCH /api/v1/admin/advisors/{id}/toggle-status` – Zmiana statusu aktywności konta doradcy (aktywacja/dezaktywacja)
-- `GET /api/v1/admin/companies` – Przegląd wszystkich firm w systemie z liczbą doradców i klientów
-- `POST /api/v1/admin/companies` – Rejestracja nowej spółki portfelowej wraz z opcjonalnym przypisaniem początkowych doradców
-
-### Zarządzanie Zaproszeniami i Aktywacja Konta (Invitation System)
-- `POST /api/v1/invitations` – Utworzenie i wysyłka nowego zaproszenia użytkownika (SuperAdmin, Advisor)
-- `GET /api/v1/invitations` – Lista zaproszeń z filtrami statusu i izolacją dla doradców
-- `GET /api/v1/invitations/verify?token=...` – Publiczna weryfikacja tokenu zaproszenia przed aktywacją
-- `GET /api/v1/invitations/tokens/{token}` – Publiczny odczyt parametrów zaproszenia na podstawie tokenu
-- `POST /api/v1/invitations/accept` – Publiczna aktywacja konta, bezpieczne ustawienie hasła i wydanie tokenu Sanctum
-- `POST /api/v1/invitations/{id}/resend` – Ponowne przesłanie zaproszenia z nowym 48-godzinnym tokenem
-- `DELETE /api/v1/invitations/{id}` – Anulowanie i unieważnienie oczekującego zaproszenia
-
-### Finanse – Kategorie i Transakcje (CRUD)
-- `GET /api/v1/finance/categories` – Lista kategorii analitycznych
-- `GET /api/v1/finance/records` – Lista rekordów z wyszukiwaniem (`search`), filtrowaniem i paginacją
-- `POST /api/v1/finance/records` – Dodanie rekordu transakcyjnego
-- `GET /api/v1/finance/records/{id}` – Szczegóły pojedynczego rekordu
-- `PUT /api/v1/finance/records/{id}` – Aktualizacja rekordu
-- `DELETE /api/v1/finance/records/{id}` – Usunięcie rekordu
-
-### Finanse – Import CSV (Asynchroniczny z kolejką Redis)
-- `POST /api/v1/finance/imports/preview` *(lub `/finance/import/preview`)* – Walidacja w locie i podgląd dry-run pliku CSV
-- `POST /api/v1/finance/imports` *(lub `/finance/import/csv`)* – Upload pliku i zakolejkowanie asynchronicznego zadania w Redis
-- `GET /api/v1/finance/imports/{id}` *(lub `/finance/import/csv/{id}`)* – Sprawdzenie statusu realizacji i ewentualnych błędów zadania
-- `GET /api/v1/finance/imports/history` *(lub `/finance/import/history`)* – Dziennik historycznych zadań importu spółki
-
-### Finanse – Benchmarki i Cele Finansowe (Industry Standards & Targets)
-- `GET /api/v1/finance/benchmarks` – Lista 8 wskaźników benchmarkowych firmy (konfigurowane lub domyślne)
-- `GET /api/v1/finance/benchmarks/{metricType}` – Szczegóły progów pojedynczego wskaźnika
-- `PUT /api/v1/finance/benchmarks/{metricType}` – Aktualizacja progów wskaźnika przez doradcę/administratora
-- `PUT /api/v1/finance/benchmarks` – Masowa aktualizacja celów finansowych spółki (batch update)
-- `POST /api/v1/finance/benchmarks/reset` – Reset progów wskaźników do rynkowych standardów domyślnych
+### Finanse – Benchmarki i Cele Finansowe
+- `GET /api/v1/finance/benchmarks` – Lista progów i celów dla wszystkich wskaźników spółki
+- `GET /api/v1/finance/benchmarks/{metricType}` – Szczegóły konfiguracji wybranego wskaźnika
+- `PUT /api/v1/finance/benchmarks/{metricType}` – Aktualizacja lub utworzenie celów i progów ostrzegawczych
+- `PUT /api/v1/finance/benchmarks` – Zbiorcza (batch) aktualizacja celów wskaźników spółki
+- `POST /api/v1/finance/benchmarks/reset` – Przywrócenie domyślnych standardów rynkowych dla wskazanego lub wszystkich wskaźników
 
 ### Finanse – Analityka i Wykresy (CQRS Read Side & Dynamic KPI)
 - `GET /api/v1/finance/kpi` – Dedykowany endpoint KPI ze wskaźnikami P&L, bilansem, płynnością oraz dynamikami YoY i MoM (`KpiController`)
@@ -329,14 +265,14 @@ Baza danych zasilona jest danymi demonstracyjnymi (21 miesięcy historii finanso
   - Testy jednostkowe dla kalkulacji wskaźników i dynamiki z uwzględnieniem edge-cases.
   - Aktualizacja kontrolera `KpiController` do zwracania dynamicznie wyliczonych wskaźników.
 - [x] **Faza 13: Konfiguracja Benchmarków i Celów Finansowych (Finance)**
-  - [x] Encja `FinancialBenchmark`, enumy `BenchmarkStatus`, `BenchmarkMetricType` oraz reguły ewaluacji statusów KPI.
-  - [x] Migracja bazy danych, model Eloquent i repozytorium dla benchmarków spółek.
-  - [x] Serwis ewaluacji wskaźników z dynamicznym wyliczaniem flag statusów (OPT, WARN, CRIT).
-  - [x] Endpointy REST API do pobierania i konfiguracji benchmarków dla doradców.
-  - [x] Testy jednostkowe i integracyjne modułu benchmarków oraz weryfikacja uprawnień.
+  - Encja `FinancialBenchmark`, enumy `BenchmarkStatus`, `BenchmarkMetricType` oraz reguły ewaluacji statusów KPI.
+  - Migracja bazy danych, model Eloquent i repozytorium dla benchmarków spółek.
+  - Serwis ewaluacji wskaźników z dynamicznym wyliczaniem flag statusów (OPT, WARN, CRIT).
+  - Endpointy REST API do pobierania i konfiguracji benchmarków dla doradców.
+  - Testy jednostkowe i integracyjne modułu benchmarków oraz weryfikacja uprawnień.
 - [ ] **Faza 14: Logi Audytowe i Dynamiczny Frontend (Finance & Deal Advisory)**
   - [x] Encja `FinancialAuditLog`, migracja bazy danych i repozytorium dla operacji finansowych i konfiguracji celów.
-  - [ ] Rejestracja listenerów zdarzeń domenowych utrwalających wpisy w dzienniku audytowym.
+  - [x] Rejestracja listenerów zdarzeń domenowych utrwalających wpisy w dzienniku audytowym.
   - [ ] Endpointy REST API do pobierania logów audytowych przypisanych do spółki.
   - [ ] Zastąpienie statycznych wartości na Pulpicie Zarządczym i w Analityce P&L dynamicznymi danymi z API.
   - [ ] Interfejs edycji celów finansowych dla Doradcy z dynamicznymi wskaźnikami statusów i semaforami (OPT, WARN, CRIT).

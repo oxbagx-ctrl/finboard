@@ -8,18 +8,15 @@ use App\Contexts\Finance\Domain\ValueObjects\FinancialRecordId;
 use App\Shared\Domain\DomainEvent;
 use DateTimeImmutable;
 
-final class FinancialRecordCreated implements DomainEvent
+final class FinancialRecordDeleted implements DomainEvent
 {
     private DateTimeImmutable $occurredAt;
 
     public function __construct(
         private readonly FinancialRecordId $recordId,
         private readonly string $companyId,
-        private readonly string $categoryId,
-        private readonly string $amount,
-        private readonly string $currency,
-        private readonly string $recordDate,
-        private readonly string $source,
+        private readonly ?string $deletedBy = null,
+        private readonly ?array $payload = null,
         ?DateTimeImmutable $occurredAt = null
     ) {
         $this->occurredAt = $occurredAt ?? new DateTimeImmutable();
@@ -45,29 +42,14 @@ final class FinancialRecordCreated implements DomainEvent
         return $this->companyId;
     }
 
-    public function categoryId(): string
+    public function deletedBy(): ?string
     {
-        return $this->categoryId;
+        return $this->deletedBy;
     }
 
-    public function amount(): string
+    public function payload(): ?array
     {
-        return $this->amount;
-    }
-
-    public function currency(): string
-    {
-        return $this->currency;
-    }
-
-    public function recordDate(): string
-    {
-        return $this->recordDate;
-    }
-
-    public function source(): string
-    {
-        return $this->source;
+        return $this->payload;
     }
 
     public function toPayload(): array
@@ -75,11 +57,8 @@ final class FinancialRecordCreated implements DomainEvent
         return [
             'record_id' => $this->recordId->value(),
             'company_id' => $this->companyId,
-            'category_id' => $this->categoryId,
-            'amount' => $this->amount,
-            'currency' => $this->currency,
-            'record_date' => $this->recordDate,
-            'source' => $this->source,
+            'deleted_by' => $this->deletedBy,
+            'payload' => $this->payload,
             'occurred_at' => $this->occurredAt->format(DateTimeImmutable::ATOM),
         ];
     }

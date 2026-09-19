@@ -17,6 +17,7 @@ final class FinancialRecordUpdated implements DomainEvent
         private readonly string $previousAmount,
         private readonly string $newAmount,
         private readonly string $currency,
+        private readonly ?string $companyId = null,
         ?DateTimeImmutable $occurredAt = null
     ) {
         $this->occurredAt = $occurredAt ?? new DateTimeImmutable();
@@ -32,10 +33,36 @@ final class FinancialRecordUpdated implements DomainEvent
         return $this->recordId->value();
     }
 
+    public function recordId(): FinancialRecordId
+    {
+        return $this->recordId;
+    }
+
+    public function companyId(): ?string
+    {
+        return $this->companyId;
+    }
+
+    public function previousAmount(): string
+    {
+        return $this->previousAmount;
+    }
+
+    public function newAmount(): string
+    {
+        return $this->newAmount;
+    }
+
+    public function currency(): string
+    {
+        return $this->currency;
+    }
+
     public function toPayload(): array
     {
         return [
             'record_id' => $this->recordId->value(),
+            'company_id' => $this->companyId,
             'previous_amount' => $this->previousAmount,
             'new_amount' => $this->newAmount,
             'currency' => $this->currency,

@@ -144,7 +144,8 @@ final class FinancialRecord extends AggregateRoot
             recordId: $this->id,
             previousAmount: $previousAmount,
             newAmount: $newAmount->amount(),
-            currency: $newAmount->currency()->value
+            currency: $newAmount->currency()->value,
+            companyId: $this->companyId
         ));
     }
 

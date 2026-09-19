@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Presentation\Api\Controllers;
 
+use App\Contexts\Finance\Domain\Events\FinancialBenchmarkReset;
 use App\Contexts\Finance\Domain\Model\FinancialBenchmark;
 use App\Contexts\Finance\Domain\Repositories\FinancialBenchmarkRepositoryInterface;
 use App\Contexts\Finance\Domain\ValueObjects\BenchmarkMetricType;
@@ -14,6 +15,7 @@ use App\Presentation\Api\Requests\UpdateBenchmarkRequest;
 use App\Presentation\Api\Traits\ResolvesCompanyContext;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Event;
 use InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -285,6 +287,12 @@ final class BenchmarkController
                 $this->benchmarkRepository->delete(FinancialBenchmarkId::fromString($benchmark->id()));
             }
 
+            Event::dispatch(new FinancialBenchmarkReset(
+                companyId: $companyId,
+                metricType: $type,
+                resetBy: (string) $user->id
+            ));
+
             return new JsonResponse([
                 'status' => 'success',
                 'message' => "Przywrócono domyślne progi rynkowe dla wskaźnika {$type->label()}.",
@@ -293,6 +301,12 @@ final class BenchmarkController
         }
 
         $deletedCount = $this->benchmarkRepository->deleteByCompanyId($companyId);
+
+        Event::dispatch(new FinancialBenchmarkReset(
+            companyId: $companyId,
+            metricType: null,
+            resetBy: (string) $user->id
+        ));
 
         return new JsonResponse([
             'status' => 'success',
