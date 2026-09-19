@@ -5,7 +5,7 @@
 [![PostgreSQL](https://img.shields.io/badge/postgresql-16-blue.svg)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/redis-alpine-red.svg)](https://redis.io/)
 [![Architecture](https://img.shields.io/badge/architecture-DDD%20%2F%20CQRS-brightgreen.svg)]()
-[![Tests](https://img.shields.io/badge/tests-297%20backend%20%7C%2099%20frontend%20passed-success.svg)]()
+[![Tests](https://img.shields.io/badge/tests-308%20backend%20%7C%2099%20frontend%20passed-success.svg)]()
 
 FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakcyjnego (M&A, Due Diligence, Corporate Finance) oraz ich klientom (CFO, Zarządy). Aplikacja łączy w sobie zaawansowaną analitykę finansową w ujęciu wielo-najemcowym (Multi-Tenant) z bezpiecznym repozytorium dokumentów Virtual Data Room (VDR).
 
@@ -21,6 +21,7 @@ FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakc
     - Encja domenowa `FinancialBenchmark` realizująca ewaluację wskaźników spółki z przypisaniem flag statusu (`OPT`, `WARN`, `CRIT`, `UNKNOWN`) oraz repozytorium `FinancialBenchmarkRepositoryInterface` trwale zapisujące cele w PostgreSQL.
     - Serwis aplikacyjny `KpiCalculationService` kalkulujący dynamikę YoY oraz MoM na danych historycznych ze ścisłą ochroną przed dzieleniem przez zero.
     - Serwis aplikacyjny `KpiEvaluationService` ewaluujący dynamicznie metryki finansowe spółki wobec skonfigurowanych celów doradcy (lub rynkowych wartości domyślnych) wraz z wyznaczaniem statusów semaforowych (`OPT`, `WARN`, `CRIT`), syntetycznego wskaźnika `health_score` i zagregowanego stanu zdrowia finansowego.
+    - Kontroler `BenchmarkController` w warstwie prezentacji REST API obsługujący odczyt, konfigurację progów, masową aktualizację i resetowanie celów finansowych spółek portfelowych przez Doradców i Administratorów.
     - Kontroler `KpiController` w warstwie prezentacji API serwujący dynamiczne wskaźniki P&L, bilansowe oraz wariancje okresowe YoY/MoM.
 - **Bezpieczeństwo i Izolacja Multi-Tenant**:
     - Pełna separacja danych pomiędzy firmami (Tenant Isolation).
@@ -90,7 +91,7 @@ app/
 │       └── Infrastructure/     # EloquentCompanyAdvisorRepository
 ├── Models/                     # Modele Eloquent (User, Company, FinancialRecord, FinancialBenchmark, Document, etc.)
 └── Presentation/
-    └── Api/Controllers/        # Kontrolery REST API (Auth, Kpi, FinancialRecords, Analytics, VDR, Invitations, Advisors)
+    └── Api/Controllers/        # Kontrolery REST API (Auth, Kpi, Benchmark, FinancialRecords, Analytics, VDR, Invitations, Advisors)
 ```
 
 ---
@@ -229,6 +230,13 @@ Baza danych zasilona jest danymi demonstracyjnymi (21 miesięcy historii finanso
 - `GET /api/v1/finance/imports/{id}` *(lub `/finance/import/csv/{id}`)* – Sprawdzenie statusu realizacji i ewentualnych błędów zadania
 - `GET /api/v1/finance/imports/history` *(lub `/finance/import/history`)* – Dziennik historycznych zadań importu spółki
 
+### Finanse – Benchmarki i Cele Finansowe (Industry Standards & Targets)
+- `GET /api/v1/finance/benchmarks` – Lista 8 wskaźników benchmarkowych firmy (konfigurowane lub domyślne)
+- `GET /api/v1/finance/benchmarks/{metricType}` – Szczegóły progów pojedynczego wskaźnika
+- `PUT /api/v1/finance/benchmarks/{metricType}` – Aktualizacja progów wskaźnika przez doradcę/administratora
+- `PUT /api/v1/finance/benchmarks` – Masowa aktualizacja celów finansowych spółki (batch update)
+- `POST /api/v1/finance/benchmarks/reset` – Reset progów wskaźników do rynkowych standardów domyślnych
+
 ### Finanse – Analityka i Wykresy (CQRS Read Side & Dynamic KPI)
 - `GET /api/v1/finance/kpi` – Dedykowany endpoint KPI ze wskaźnikami P&L, bilansem, płynnością oraz dynamikami YoY i MoM (`KpiController`)
 - `GET /api/v1/finance/analytics/metrics` – Zbiorcze KPI wzbogacone o dynamiczne relacje roczne i miesięczne
@@ -323,7 +331,7 @@ Baza danych zasilona jest danymi demonstracyjnymi (21 miesięcy historii finanso
   - [x] Encja `FinancialBenchmark`, enumy `BenchmarkStatus`, `BenchmarkMetricType` oraz reguły ewaluacji statusów KPI.
   - [x] Migracja bazy danych, model Eloquent i repozytorium dla benchmarków spółek.
   - [x] Serwis ewaluacji wskaźników z dynamicznym wyliczaniem flag statusów (OPT, WARN, CRIT).
-  - [ ] Endpointy REST API do pobierania i konfiguracji benchmarków dla doradców.
+  - [x] Endpointy REST API do pobierania i konfiguracji benchmarków dla doradców.
   - [ ] Testy jednostkowe i integracyjne modułu benchmarków oraz weryfikacja uprawnień.
 
 ---

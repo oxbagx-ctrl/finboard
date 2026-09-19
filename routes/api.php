@@ -2,6 +2,7 @@
 
 use App\Presentation\Api\Controllers\AdvisorManagementController;
 use App\Presentation\Api\Controllers\AuthController;
+use App\Presentation\Api\Controllers\BenchmarkController;
 use App\Presentation\Api\Controllers\DocumentController;
 use App\Presentation\Api\Controllers\FinancialAnalyticsController;
 use App\Presentation\Api\Controllers\FinancialCategoryController;
@@ -74,6 +75,15 @@ Route::prefix('v1')->group(function () {
                 )->name('api.finance.records.update');
             Route::delete('/records/{id}', [FinancialRecordController::class, 'destroy']
                 )->name('api.finance.records.destroy');
+
+            // Financial Benchmarks & Targets Management
+            Route::prefix('benchmarks')->group(function () {
+                Route::get('/', [BenchmarkController::class, 'index'])->name('api.finance.benchmarks.index');
+                Route::put('/', [BenchmarkController::class, 'batchUpdate'])->name('api.finance.benchmarks.batch-update');
+                Route::post('/reset', [BenchmarkController::class, 'reset'])->name('api.finance.benchmarks.reset');
+                Route::get('/{metricType}', [BenchmarkController::class, 'show'])->name('api.finance.benchmarks.show');
+                Route::put('/{metricType}', [BenchmarkController::class, 'update'])->name('api.finance.benchmarks.update');
+            });
 
             // CSV Import (canonical and plural REST routes)
             Route::post('/import/csv', [FinancialImportController::class, 'store']
