@@ -248,4 +248,93 @@ final class KpiEvaluationServiceTest extends TestCase
         // (1*100 + 1*50) / 200 * 100 = 75.0
         $this->assertSame(75.0, $summary['health_score']);
     }
+
+    public function test_evaluate_metric_with_zero_liquidity_ratio_treated_as_unknown_without_false_critical_alert(): void
+    {
+        $this->repositoryMock
+            ->method('findByCompanyAndMetric')
+            ->willReturn(null);
+
+        // When current_ratio is 0.0 (e.g. unrecorded balance), it should NOT be flagged as CRITICAL
+        $result = $this->service->evaluateMetric(self::COMPANY_ID, BenchmarkMetricType::CURRENT_RATIO, 0.0);
+
+        $this->assertNull($result['actual_value']);
+        $this->assertSame(BenchmarkStatus::UNKNOWN->value, $result['status']);
+        $this->assertSame('Brak danych', $result['status_label']);
+        $this->assertSame('zinc', $result['status_color']);
+        $this->assertTrue($result['is_unknown']);
+        $this->assertFalse($result['is_critical']);
+        $this->assertFalse($result['is_warning']);
+        $this->assertFalse($result['has_data']);
+
+        // Quick ratio 0.0 also treated as unknown
+        $quickResult = $this->service->evaluateMetric(self::COMPANY_ID, BenchmarkMetricType::QUICK_RATIO, 0.0);
+        $this->assertNull($quickResult['actual_value']);
+        $this->assertSame(BenchmarkStatus::UNKNOWN->value, $quickResult['status']);
+        $this->assertTrue($quickResult['is_unknown']);
+        $this->assertFalse($quickResult['is_critical']);
+    }
+
+    public function test_evaluate_metrics_with_empty_balance_sheet_marks_liquidity_and_solvency_as_unknown(): void
+    {
+        $this->repositoryMock
+            ->method('findByCompanyAndMetric')
+            ->willReturn(null);
+
+        $c = Currency::PLN;
+        // P&L only: positive revenue, healthy margins, but NO balance sheet records
+        $metrics = new FinancialMetrics(
+            revenue: Money::fromDecimal('500000', $c),
+            cogs: Money::fromDecimal('200000', $c),
+            grossProfit: Money::fromDecimal('300000', $c),
+            grossMargin: 0.60,
+            opex: Money::fromDecimal('100000', $c),
+            depreciation: Money::fromDecimal('20000', $c),
+            ebit: Money::fromDecimal('180000', $c),
+            operatingMargin: 0.36,
+            ebitda: Money::fromDecimal('200000', $c),
+            ebitdaMargin: 0.40,
+            financialCosts: Money::zero($c),
+            tax: Money::fromDecimal('34200', $c),
+            netProfit: Money::fromDecimal('145800', $c),
+            netMargin: 0.2916,
+            currentAssets: Money::zero($c),
+            inventory: Money::zero($c),
+            quickAssets: Money::zero($c),
+            currentLiabilities: Money::zero($c),
+            currentRatio: null,
+            quickRatio: null,
+            period: null,
+            totalAssets: Money::zero($c),
+            totalDebt: Money::zero($c),
+            debtToAssets: null
+        );
+
+        $result = $this->service->evaluateMetrics(self::COMPANY_ID, $metrics);
+
+        $evaluations = $result['evaluations'];
+        $this->assertTrue($evaluations[BenchmarkMetricType::CURRENT_RATIO->value]['is_unknown']);
+        $this->assertFalse($evaluations[BenchmarkMetricType::CURRENT_RATIO->value]['is_critical']);
+        $this->assertNull($evaluations[BenchmarkMetricType::CURRENT_RATIO->value]['actual_value']);
+
+        $this->assertTrue($evaluations[BenchmarkMetricType::QUICK_RATIO->value]['is_unknown']);
+        $this->assertFalse($evaluations[BenchmarkMetricType::QUICK_RATIO->value]['is_critical']);
+
+        $this->assertTrue($evaluations[BenchmarkMetricType::DEBT_TO_ASSETS->value]['is_unknown']);
+        $this->assertFalse($evaluations[BenchmarkMetricType::DEBT_TO_ASSETS->value]['is_critical']);
+
+        // P&L metrics should be optimal
+        $this->assertSame(BenchmarkStatus::OPTIMAL->value, $evaluations[BenchmarkMetricType::GROSS_MARGIN->value]['status']);
+        $this->assertSame(BenchmarkStatus::OPTIMAL->value, $evaluations[BenchmarkMetricType::EBITDA_MARGIN->value]['status']);
+
+        // Summary must NOT have false critical alerts due to missing balance sheet
+        $summary = $result['summary'];
+        $this->assertSame(0, $summary['critical_count']);
+        $this->assertSame(0, $summary['warning_count']);
+        $this->assertSame(4, $summary['optimal_count']);
+        $this->assertSame(4, $summary['unknown_count']); // CR, QR, DTA, REV_GROWTH
+        $this->assertSame(4, $summary['evaluated_count']);
+        $this->assertSame(BenchmarkStatus::OPTIMAL->value, $summary['overall_status']);
+        $this->assertSame(100.0, $summary['health_score']);
+    }
 }

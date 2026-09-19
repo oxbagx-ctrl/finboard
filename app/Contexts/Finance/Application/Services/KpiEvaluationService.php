@@ -37,6 +37,7 @@ final class KpiEvaluationService
      *     is_warning: bool,
      *     is_critical: bool,
      *     is_unknown: bool,
+     *     has_data: bool,
      *     description: ?string
      * }
      */
@@ -55,12 +56,16 @@ final class KpiEvaluationService
             );
         }
 
-        $status = $benchmark->evaluateStatus($actualValue);
+        // Treat 0.0 for liquidity ratios as missing data to avoid false alerts when balance sheet is empty
+        $isLiquidityRatio = ($metricType === BenchmarkMetricType::CURRENT_RATIO || $metricType === BenchmarkMetricType::QUICK_RATIO);
+        $effectiveValue = ($actualValue === 0.0 && $isLiquidityRatio) ? null : $actualValue;
+
+        $status = $benchmark->evaluateStatus($effectiveValue);
 
         return [
             'metric_type' => $metricType->value,
             'label' => $metricType->label(),
-            'actual_value' => $actualValue !== null ? round($actualValue, 4) : null,
+            'actual_value' => $effectiveValue !== null ? round($effectiveValue, 4) : null,
             'target_value' => $benchmark->targetValue(),
             'warning_threshold' => $benchmark->warningThreshold(),
             'critical_threshold' => $benchmark->criticalThreshold(),
@@ -73,6 +78,7 @@ final class KpiEvaluationService
             'is_warning' => $status->isWarning(),
             'is_critical' => $status->isCritical(),
             'is_unknown' => $status->isUnknown(),
+            'has_data' => $effectiveValue !== null,
             'description' => $benchmark->description(),
         ];
     }
@@ -90,14 +96,21 @@ final class KpiEvaluationService
         FinancialMetrics $metrics,
         ?float $yoyRevenueGrowth = null
     ): array {
+        $hasBalanceSheetData = !$metrics->currentAssets()->isZero()
+            || !$metrics->currentLiabilities()->isZero()
+            || ($metrics->totalAssets() !== null && !$metrics->totalAssets()->isZero())
+            || ($metrics->totalDebt() !== null && !$metrics->totalDebt()->isZero());
+
+        $hasRevenueData = !$metrics->revenue()->isZero();
+
         $actualValues = [
-            BenchmarkMetricType::CURRENT_RATIO->value => $metrics->currentRatio(),
-            BenchmarkMetricType::QUICK_RATIO->value => $metrics->quickRatio(),
-            BenchmarkMetricType::DEBT_TO_ASSETS->value => $metrics->debtToAssets(),
-            BenchmarkMetricType::GROSS_MARGIN->value => $metrics->grossMargin(),
-            BenchmarkMetricType::EBITDA_MARGIN->value => $metrics->ebitdaMargin(),
-            BenchmarkMetricType::OPERATING_MARGIN->value => $metrics->operatingMargin(),
-            BenchmarkMetricType::NET_MARGIN->value => $metrics->netMargin(),
+            BenchmarkMetricType::CURRENT_RATIO->value => $hasBalanceSheetData ? $metrics->currentRatio() : null,
+            BenchmarkMetricType::QUICK_RATIO->value => $hasBalanceSheetData ? $metrics->quickRatio() : null,
+            BenchmarkMetricType::DEBT_TO_ASSETS->value => $hasBalanceSheetData ? $metrics->debtToAssets() : null,
+            BenchmarkMetricType::GROSS_MARGIN->value => $hasRevenueData ? $metrics->grossMargin() : null,
+            BenchmarkMetricType::EBITDA_MARGIN->value => $hasRevenueData ? $metrics->ebitdaMargin() : null,
+            BenchmarkMetricType::OPERATING_MARGIN->value => $hasRevenueData ? $metrics->operatingMargin() : null,
+            BenchmarkMetricType::NET_MARGIN->value => $hasRevenueData ? $metrics->netMargin() : null,
             BenchmarkMetricType::REVENUE_GROWTH->value => $yoyRevenueGrowth,
         ];
 
@@ -128,8 +141,8 @@ final class KpiEvaluationService
         }
 
         return [
-            'evaluations' => $evaluations,
-            'summary' => $this->computeSummary($evaluations),
+            "evaluations" => $evaluations,
+            "summary" => $this->computeSummary($evaluations),
         ];
     }
 
@@ -144,19 +157,77 @@ final class KpiEvaluationService
      */
     public function evaluateKpiPayload(string $companyId, array $kpiData): array
     {
-        $metrics = $kpiData['metrics'] ?? [];
-        $dynamics = $kpiData['dynamics'] ?? ($kpiData['yoy'] ?? []);
-        $yoy = isset($kpiData['dynamics']['yoy']) ? $kpiData['dynamics']['yoy'] : $dynamics;
+        $metrics = $kpiData["metrics"] ?? [];
+        $dynamics = $kpiData["dynamics"] ?? ($kpiData["yoy"] ?? []);
+        $yoy = isset($kpiData["dynamics"]["yoy"]) ? $kpiData["dynamics"]["yoy"] : $dynamics;
+
+        $ratios = $metrics["ratios"] ?? [];
+        $liquidity = $metrics["liquidity"] ?? [];
+        $solvency = $metrics["solvency"] ?? [];
+        $balanceSheet = $metrics["balance_sheet"] ?? [];
+        $pnl = $metrics["pnl"] ?? [];
+
+        // Check if balance sheet data actually exists
+        $hasBalanceSheet = false;
+        if (!empty($balanceSheet)) {
+            $curAssets = (float) ($balanceSheet["current_assets"]["amount"] ?? 0);
+            $curLiab = (float) ($balanceSheet["current_liabilities"]["amount"] ?? 0);
+            $totAssets = (float) ($balanceSheet["total_assets"]["amount"] ?? 0);
+            $totDebt = (float) ($balanceSheet["total_debt"]["amount"] ?? 0);
+            if ($curAssets > 0 || $curLiab > 0 || $totAssets > 0 || $totDebt > 0) {
+                $hasBalanceSheet = true;
+            }
+        } elseif (!empty($liquidity)) {
+            $curAssets = (float) ($liquidity["current_assets"]["amount"] ?? 0);
+            $curLiab = (float) ($liquidity["current_liabilities"]["amount"] ?? 0);
+            if ($curAssets > 0 || $curLiab > 0) {
+                $hasBalanceSheet = true;
+            }
+        }
+
+        $curRatio = $metrics["current_ratio"]
+            ?? ($ratios["current_ratio"]
+            ?? ($liquidity["current_ratio"] ?? null));
+
+        $qRatio = $metrics["quick_ratio"]
+            ?? ($ratios["quick_ratio"]
+            ?? ($liquidity["quick_ratio"] ?? null));
+
+        $dta = $metrics["debt_to_assets"]
+            ?? ($ratios["debt_to_assets"]
+            ?? ($solvency["debt_to_assets"] ?? null));
+
+        if (!$hasBalanceSheet && !isset($metrics["current_ratio"])) {
+            $curRatio = null;
+            $qRatio = null;
+            $dta = null;
+        }
+
+        $grossMargin = $metrics["gross_margin"]
+            ?? ($ratios["gross_margin"]
+            ?? (isset($pnl["gross_margin_pct"]) ? ((float) $pnl["gross_margin_pct"]) / 100 : null));
+
+        $ebitdaMargin = $metrics["ebitda_margin"]
+            ?? ($ratios["ebitda_margin"]
+            ?? (isset($pnl["ebitda_margin_pct"]) ? ((float) $pnl["ebitda_margin_pct"]) / 100 : null));
+
+        $operatingMargin = $metrics["operating_margin"]
+            ?? ($ratios["operating_margin"]
+            ?? (isset($pnl["operating_margin_pct"]) ? ((float) $pnl["operating_margin_pct"]) / 100 : null));
+
+        $netMargin = $metrics["net_margin"]
+            ?? ($ratios["net_margin"]
+            ?? (isset($pnl["net_margin_pct"]) ? ((float) $pnl["net_margin_pct"]) / 100 : null));
 
         $rawValues = [
-            BenchmarkMetricType::CURRENT_RATIO->value => $metrics['current_ratio'] ?? null,
-            BenchmarkMetricType::QUICK_RATIO->value => $metrics['quick_ratio'] ?? null,
-            BenchmarkMetricType::DEBT_TO_ASSETS->value => $metrics['debt_to_assets'] ?? null,
-            BenchmarkMetricType::GROSS_MARGIN->value => $metrics['gross_margin'] ?? null,
-            BenchmarkMetricType::EBITDA_MARGIN->value => $metrics['ebitda_margin'] ?? null,
-            BenchmarkMetricType::OPERATING_MARGIN->value => $metrics['operating_margin'] ?? null,
-            BenchmarkMetricType::NET_MARGIN->value => $metrics['net_margin'] ?? null,
-            BenchmarkMetricType::REVENUE_GROWTH->value => $yoy['revenue_growth_pct'] ?? null,
+            BenchmarkMetricType::CURRENT_RATIO->value => $curRatio !== null ? (float) $curRatio : null,
+            BenchmarkMetricType::QUICK_RATIO->value => $qRatio !== null ? (float) $qRatio : null,
+            BenchmarkMetricType::DEBT_TO_ASSETS->value => $dta !== null ? (float) $dta : null,
+            BenchmarkMetricType::GROSS_MARGIN->value => $grossMargin !== null ? (float) $grossMargin : null,
+            BenchmarkMetricType::EBITDA_MARGIN->value => $ebitdaMargin !== null ? (float) $ebitdaMargin : null,
+            BenchmarkMetricType::OPERATING_MARGIN->value => $operatingMargin !== null ? (float) $operatingMargin : null,
+            BenchmarkMetricType::NET_MARGIN->value => $netMargin !== null ? (float) $netMargin : null,
+            BenchmarkMetricType::REVENUE_GROWTH->value => isset($yoy["revenue_growth_pct"]) && $yoy["revenue_growth_pct"] !== null ? (float) $yoy["revenue_growth_pct"] : null,
         ];
 
         return $this->evaluateRawValues($companyId, $rawValues);
@@ -188,7 +259,7 @@ final class KpiEvaluationService
         $unknown = 0;
 
         foreach ($evaluations as $evaluation) {
-            $status = $evaluation['status'] ?? BenchmarkStatus::UNKNOWN->value;
+            $status = $evaluation["status"] ?? BenchmarkStatus::UNKNOWN->value;
 
             match ($status) {
                 BenchmarkStatus::OPTIMAL->value => $optimal++,
@@ -216,16 +287,16 @@ final class KpiEvaluationService
         }
 
         return [
-            'total_metrics' => $total,
-            'evaluated_count' => $evaluatedCount,
-            'optimal_count' => $optimal,
-            'warning_count' => $warning,
-            'critical_count' => $critical,
-            'unknown_count' => $unknown,
-            'overall_status' => $overallStatus->value,
-            'overall_status_label' => $overallStatus->label(),
-            'overall_status_color' => $overallStatus->color(),
-            'health_score' => $healthScore,
+            "total_metrics" => $total,
+            "evaluated_count" => $evaluatedCount,
+            "optimal_count" => $optimal,
+            "warning_count" => $warning,
+            "critical_count" => $critical,
+            "unknown_count" => $unknown,
+            "overall_status" => $overallStatus->value,
+            "overall_status_label" => $overallStatus->label(),
+            "overall_status_color" => $overallStatus->color(),
+            "health_score" => $healthScore,
         ];
     }
 }

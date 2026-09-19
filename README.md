@@ -274,7 +274,7 @@ npm test
   - Integracja `DealContext` z dynamiczną listą lat oraz zaktualizowanie wykresu struktury kosztów.
 - [ ] **Faza 16: Naprawa Kontraktu Wskaźników Płynności i Statusów Benchmarkowych**
   - [x] Standaryzacja struktury DTO `FinancialMetrics` (ujednolicenie struktur `ratios`, `liquidity` i `solvency`).
-  - [ ] Obsługa braku rekordów bilansowych w `KpiEvaluationService` (eliminacja fałszywych alarmów krytycznych).
+  - [x] Obsługa braku rekordów bilansowych w `KpiEvaluationService` (eliminacja fałszywych alarmów krytycznych).
   - [ ] Testy jednostkowe serializacji `FinancialMetrics` i ewaluacji wskaźników brzegowych.
   - [ ] Refaktoryzacja `DashboardView` i `FinancialMultiplesStrip` pod ujednolicony kontrakt wskaźników.
   - [ ] Wprowadzenie estetycznych stanów fallback ("—") dla brakujących danych bilansowych.
