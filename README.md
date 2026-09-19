@@ -5,7 +5,7 @@
 [![PostgreSQL](https://img.shields.io/badge/postgresql-16-blue.svg)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/redis-alpine-red.svg)](https://redis.io/)
 [![Architecture](https://img.shields.io/badge/architecture-DDD%20%2F%20CQRS-brightgreen.svg)]()
-[![Tests](https://img.shields.io/badge/tests-240%20backend%20%7C%2083%20frontend%20passed-success.svg)]()
+[![Tests](https://img.shields.io/badge/tests-240%20backend%20%7C%2088%20frontend%20passed-success.svg)]()
 
 FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakcyjnego (M&A, Due Diligence, Corporate Finance) oraz ich klientom (CFO, Zarządy). Aplikacja łączy w sobie zaawansowaną analitykę finansową w ujęciu wielo-najemcowym (Multi-Tenant) z bezpiecznym repozytorium dokumentów Virtual Data Room (VDR).
 
@@ -46,12 +46,13 @@ FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakc
     - Pasek kontekstu transakcyjnego z selektorem waluty przeliczeniowej w locie (PLN, EUR, USD, GBP), statusem poufności oraz zakresem dat.
     - Interaktywne wykresy Recharts (trendy P&L, struktura kosztów OPEX, wskaźniki płynności z benchmarkami branżowymi).
     - Pełny moduł księgi operacji (General Ledger) z filtrami i paginacją serwerową.
+    - Dedykowany moduł analityki finansowej i wskaźników Deal Advisory (`AnalyticsView`) z 4 dynamicznymi trybami analizy (Przegląd Kompleksowy, Rentowność i Marże, Płynność i Wskaźniki, Dekompozycja Przychodów / Kosztów) oraz interaktywnymi wykresami Recharts.
     - Widok importu CSV z podglądem walidacji dry-run i animowanym monitorem kolejki Redis.
     - Moduł VDR oraz globalny rejestr ścieżki audytowej (Audit Trail).
     - Widok zarządzania doradcami i przypisaniami spółek (`AdvisorsManagementView`) wraz z matrycą pokrycia portfela i modalem przypisań (`AdvisorAssignmentModal`).
     - Modal zapraszania nowych użytkowników (`InviteUserModal`) w paradygmacie Zero-Trust z podziałem ról i selekcją firm.
     - Bezpieczna strona aktywacji konta i ustanawiania hasła (`AcceptInvitationView`) weryfikująca token kryptograficzny w URL.
-    - Zestaw 83 testów jednostkowych i integracyjnych Vitest (formatery, silnik walutowy, formularze, blokady Dry-Run, eksplorator VDR, raporty PDF, E2E workflow, zarządzanie doradcami, zaproszenia i aktywacja konta).
+    - Zestaw 88 testów jednostkowych i integracyjnych Vitest (formatery, silnik walutowy, formularze, blokady Dry-Run, eksplorator VDR, raporty PDF, E2E workflow, analityka finansowa i wskaźniki Recharts, zarządzanie doradcami, zaproszenia i aktywacja konta).
 - **Monitoring Produkcyjny, Bezpieczeństwo Nginx i Automatyzacja Wdrożenia**:
     - Dedykowany endpoint `/api/v1/health` badający stan bazy PostgreSQL, klastra Redis, uprawnień magazynu plików oraz zużycia zasobów.
     - Reguły kompresji Gzip i instytucjonalne nagłówki bezpieczeństwa Nginx (`SAMEORIGIN`, `nosniff`, `strict-origin-when-cross-origin`).
@@ -114,7 +115,7 @@ resources/js/
 │   ├── reports/                  # ReportConfigurator (parametryzacja, waluty, okresy), ExecutivePdfReport (układ memorandumu A4, SHA-256)
 │   └── ui/                       # Badge, Button, Card, MultiplesStrip (wskaźniki EV/EBITDA, P/E), FinancialTable
 ├── context/                      # AuthContext (tożsamość, role, kontekst spółki), DealContext (FX, okres), NotificationContext (toasty)
-├── tests/                        # Vitest setup, unit tests (formatters, dealContext) & component integration tests (CsvPreviewTable, FinancialRecordModal, DataRoom, ExecutiveReports, DealAdvisoryE2E, AdvisorsManagement, InviteUserModal, AcceptInvitation)
+├── tests/                        # Vitest setup, unit tests (formatters, dealContext) & component integration tests (CsvPreviewTable, FinancialRecordModal, DataRoom, ExecutiveReports, DealAdvisoryE2E, AdvisorsManagement, InviteUserModal, AcceptInvitation, AnalyticsView)
 ├── utils/                        # formatters.js (liczby tabelaryczne tabular-nums, waluty PLN/EUR/USD/GBP, formatowanie wskaźników, formatFileSize, formatDateTime)
 └── views/                        # DashboardView, RecordsView, ImportView, DataRoomView, AuditLogsView, ReportsView, AnalyticsView, LoginView, AdvisorsManagementView, AcceptInvitationView
 ```
@@ -278,6 +279,7 @@ Baza danych zasilona jest danymi demonstracyjnymi (21 miesięcy historii finanso
   - Moduł uwierzytelniania i przełącznik kontekstu firmy dla doradcy.
   - Główny Dashboard ze wskaźnikami KPI i wykresami Recharts (trendy, struktura kosztów, płynność).
   - Moduł tabeli transakcji finansowych z filtrami i kreatorem dodawania.
+  - Dedykowany moduł analityki finansowej (AnalyticsView) z 4 trybami analitycznymi (Przegląd Kompleksowy, Rentowność i Marże, Płynność i Wskaźniki, Dekompozycja Przychodów / Kosztów) oraz seriami Recharts.
   - Interfejs importu plików CSV z podglądem na żywo i paskiem postępu.
   - Środowisko testowe Vitest i testy jednostkowe reguł matematycznych oraz formatowania walutowego.
   - Testy integracyjne komponentów: walidacja podglądu dry-run CSV oraz formularzy księgi głównej.
