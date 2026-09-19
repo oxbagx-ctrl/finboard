@@ -124,7 +124,7 @@ docker compose exec app ./vendor/bin/phpunit
 ```
 
 ### Testy Frontendowe (Vitest)
-Pakiet 120 testów jednostkowych i integracyjnych dla komponentów React, kontekstu transakcyjnego, walidacji danych, kalkulatorów walutowych oraz konfiguratora celów benchmarkowych:
+Pakiet 124 testów jednostkowych i integracyjnych dla komponentów React, kontekstu transakcyjnego, walidacji danych, kalkulatorów walutowych oraz konfiguratora celów benchmarkowych:
 ```bash
 npm test
 ```
@@ -272,12 +272,18 @@ npm test
   - Rozszerzenie zapytania `GetCategoryBreakdownQuery` o filtrowanie `category_type` (OPEX vs COGS/TAX).
   - Testy jednostkowe i integracyjne dla dynamicznych lat i filtrowania kategorii.
   - Integracja `DealContext` z dynamiczną listą lat oraz zaktualizowanie wykresu struktury kosztów.
-- [ ] **Faza 16: Naprawa Kontraktu Wskaźników Płynności i Statusów Benchmarkowych**
+- [x] **Faza 16: Naprawa Kontraktu Wskaźników Płynności i Statusów Benchmarkowych**
   - [x] Standaryzacja struktury DTO `FinancialMetrics` (ujednolicenie struktur `ratios`, `liquidity` i `solvency`).
   - [x] Obsługa braku rekordów bilansowych w `KpiEvaluationService` (eliminacja fałszywych alarmów krytycznych).
   - [x] Testy jednostkowe serializacji `FinancialMetrics` i ewaluacji wskaźników brzegowych.
   - [x] Refaktoryzacja `DashboardView` i `FinancialMultiplesStrip` pod ujednolicony kontrakt wskaźników.
-  - [ ] Wprowadzenie estetycznych stanów fallback ("—") dla brakujących danych bilansowych.
+  - [x] Wprowadzenie estetycznych stanów fallback ("—") dla brakujących danych bilansowych.
+- [ ] **Faza 17: Precyzja Dynamiki R/R i Optymalizacja Prezentacji Finansowej**
+  - [ ] Analiza i rozszerzenie obliczeń dynamiki rok-do-roku (YoY) w `CalculateFinancialDynamicsQuery`.
+  - [ ] Poprawa `PercentageBadge` i `FinancialTable` pod kątem rozróżnienia braku danych (`null`) od wzrostu `0.0%`.
+  - [ ] Standaryzacja hierarchii i formatowania wierszy w zestawieniu Rachunku Zysków i Strat (P&L Table).
+  - [ ] Testy jednostkowe i integracyjne dla precyzji obliczeń dynamiki oraz weryfikacji stanów brzegowych.
+  - [ ] Weryfikacja spójności całego pulpitu zarządczego (Executive Overview) oraz generowanie pełnego buildu produkcyjnego.
 
 ---
 

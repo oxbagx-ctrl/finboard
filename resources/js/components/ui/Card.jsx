@@ -31,6 +31,9 @@ export const MetricCard = ({
     ratioSuffix = 'x',
     className = '',
 }) => {
+    const isFallback = value === null || value === undefined || value === '—' || value === '-' || value === 'N/A';
+    const displayValue = isFallback ? '—' : value;
+
     return (
         <div className={`bg-zinc-900 border border-zinc-800 rounded-lg p-4 shadow-sm relative group hover:border-zinc-700 transition-colors ${className}`}>
             <div className="flex items-center justify-between mb-2.5">
@@ -43,16 +46,20 @@ export const MetricCard = ({
             </div>
 
             <div className="my-1">
-                {isRatio ? (
+                {isFallback ? (
+                    <div className="text-2xl font-bold font-mono tracking-tight text-zinc-500 tabular-nums">
+                        —
+                    </div>
+                ) : isRatio ? (
                     <div className="text-2xl font-bold font-mono tracking-tight text-zinc-100 tabular-nums">
-                        {value}
+                        {displayValue}
                         <span className="text-xs font-mono font-normal text-zinc-500 ml-1">{ratioSuffix}</span>
                     </div>
-                ) : typeof value === 'number' ? (
-                    <FinancialValue amount={value} currency={currency} size="2xl" align="left" />
+                ) : typeof displayValue === 'number' ? (
+                    <FinancialValue amount={displayValue} currency={currency} size="2xl" align="left" />
                 ) : (
                     <div className="text-2xl font-bold font-mono tracking-tight text-zinc-100 tabular-nums">
-                        {value}
+                        {displayValue}
                     </div>
                 )}
             </div>

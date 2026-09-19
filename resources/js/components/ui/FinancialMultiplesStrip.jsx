@@ -15,13 +15,13 @@ export const FinancialMultiplesStrip = ({
     className = '',
 }) => {
     // Resolve values preferring unified ratios dictionary if available, falling back to direct props
-    const crVal = ratios?.current_ratio ?? currentRatio ?? 0;
-    const qrVal = ratios?.quick_ratio ?? quickRatio ?? 0;
-    const gmVal = ratios?.gross_margin ?? grossMargin ?? 0;
-    const emVal = ratios?.ebitda_margin ?? ebitdaMargin ?? 0;
-    const omVal = ratios?.operating_margin ?? operatingMargin ?? 0;
-    const nmVal = ratios?.net_margin ?? netMargin ?? 0;
-    const dtaVal = ratios?.debt_to_assets ?? debtRatio ?? 0;
+    const crVal = ratios?.current_ratio !== undefined ? ratios.current_ratio : currentRatio;
+    const qrVal = ratios?.quick_ratio !== undefined ? ratios.quick_ratio : quickRatio;
+    const gmVal = ratios?.gross_margin !== undefined ? ratios.gross_margin : (grossMargin ?? 0);
+    const emVal = ratios?.ebitda_margin !== undefined ? ratios.ebitda_margin : (ebitdaMargin ?? 0);
+    const omVal = ratios?.operating_margin !== undefined ? ratios.operating_margin : (operatingMargin ?? 0);
+    const nmVal = ratios?.net_margin !== undefined ? ratios.net_margin : (netMargin ?? 0);
+    const dtaVal = ratios?.debt_to_assets !== undefined ? ratios.debt_to_assets : debtRatio;
 
     const getStatusStyle = (status, hasData = true) => {
         if (!hasData || status === 'UNKNOWN' || status === 'unknown' || status === 'NA' || status === 'N/A') {
@@ -70,13 +70,16 @@ export const FinancialMultiplesStrip = ({
         if (bench?.has_data === false || bench?.is_unknown === true || bench?.status === 'UNKNOWN') {
             return { status: 'UNKNOWN', hasData: false };
         }
+        if (value === null || value === undefined) {
+            return { status: 'UNKNOWN', hasData: false };
+        }
         if (bench?.status) {
             return { status: bench.status, hasData: true };
         }
-        if (value == null || (value === 0 && !bench)) {
+        if (value === 0 && !bench) {
             return { status: 'STD', hasData: true };
         }
-        return { status: defaultRule(value), hasData: true };
+        return { status: defaultRule(Number(value)), hasData: true };
     };
 
     const crStatus = resolveBenchmarkStatus(crBench, crVal, (v) => (v >= 1.2 ? 'OPT' : v > 0 ? 'WARN' : 'STD'));
@@ -100,23 +103,23 @@ export const FinancialMultiplesStrip = ({
     const multiples = [
         {
             label: 'CURRENT RATIO',
-            value: formatRatio(crVal, 2),
+            value: crStatus.hasData && crVal != null && Number(crVal) > 0 ? formatRatio(crVal, 2) : '—',
             target: formatTarget(crBench, '> 1.20x'),
             status: crStatus.status,
             hasData: crStatus.hasData,
-            note: 'Płynność bieżąca',
+            note: crStatus.hasData ? 'Płynność bieżąca' : 'Brak bilansu',
         },
         {
             label: 'QUICK RATIO',
-            value: formatRatio(qrVal, 2),
+            value: qrStatus.hasData && qrVal != null && Number(qrVal) > 0 ? formatRatio(qrVal, 2) : '—',
             target: formatTarget(qrBench, '> 1.00x'),
             status: qrStatus.status,
             hasData: qrStatus.hasData,
-            note: 'Płynność szybka',
+            note: qrStatus.hasData ? 'Płynność szybka' : 'Brak bilansu',
         },
         {
             label: 'MARŻA BRUTTO',
-            value: formatPercent(gmVal, 1, false),
+            value: gmStatus.hasData && gmVal != null ? formatPercent(gmVal, 1, false) : '—',
             target: formatTarget(gmBench, 'Cel: > 30%', true),
             status: gmStatus.status,
             hasData: gmStatus.hasData,
@@ -124,7 +127,7 @@ export const FinancialMultiplesStrip = ({
         },
         {
             label: 'MARŻA EBITDA',
-            value: formatPercent(emVal, 1, false),
+            value: emStatus.hasData && emVal != null ? formatPercent(emVal, 1, false) : '—',
             target: formatTarget(emBench, 'Cel: > 15%', true),
             status: emStatus.status,
             hasData: emStatus.hasData,
@@ -132,7 +135,7 @@ export const FinancialMultiplesStrip = ({
         },
         {
             label: 'MARŻA OPERACYJNA',
-            value: formatPercent(omVal, 1, false),
+            value: omStatus.hasData && omVal != null ? formatPercent(omVal, 1, false) : '—',
             target: formatTarget(omBench, 'Cel: > 10%', true),
             status: omStatus.status,
             hasData: omStatus.hasData,
@@ -140,7 +143,7 @@ export const FinancialMultiplesStrip = ({
         },
         {
             label: 'MARŻA NETTO',
-            value: formatPercent(nmVal, 1, false),
+            value: nmStatus.hasData && nmVal != null ? formatPercent(nmVal, 1, false) : '—',
             target: formatTarget(nmBench, 'Cel: > 8%', true),
             status: nmStatus.status,
             hasData: nmStatus.hasData,
@@ -148,11 +151,11 @@ export const FinancialMultiplesStrip = ({
         },
         {
             label: 'WSKAŹNIK ZADŁUŻENIA',
-            value: formatRatio(dtaVal, 2),
+            value: dtaStatus.hasData && dtaVal != null && Number(dtaVal) >= 0 ? formatRatio(dtaVal, 2) : '—',
             target: formatTarget(dtaBench, '< 0.60x', false, true),
             status: dtaStatus.status,
             hasData: dtaStatus.hasData,
-            note: 'Debt-to-Assets',
+            note: dtaStatus.hasData ? 'Debt-to-Assets' : 'Brak bilansu',
         },
     ];
 
@@ -185,7 +188,7 @@ export const FinancialMultiplesStrip = ({
                                 {item.label}
                             </div>
                             <div className="mt-1 flex items-baseline justify-between gap-1">
-                                <span className="text-base font-bold tracking-tight text-zinc-100 tabular-nums">
+                                <span className={`text-base font-bold tracking-tight tabular-nums ${item.hasData ? 'text-zinc-100' : 'text-zinc-500'}`}>
                                     {item.value}
                                 </span>
                                 <span className={`text-[9px] px-1 py-0.2 rounded uppercase border ${statusConfig.className}`}>

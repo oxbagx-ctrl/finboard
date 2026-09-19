@@ -92,4 +92,63 @@ describe('FinancialMultiplesStrip Component', () => {
         expect(screen.getByText('CRIT')).toBeInTheDocument();
         expect(screen.getByText('N/A')).toBeInTheDocument();
     });
+
+    it('renders clean fallback state ("—") and N/A badges when balance sheet data is absent', () => {
+        const mockRatiosMissingBalance = {
+            current_ratio: null,
+            quick_ratio: null,
+            debt_to_assets: null,
+            gross_margin: 0.40,
+            ebitda_margin: 0.18,
+            operating_margin: 0.12,
+            net_margin: 0.09,
+        };
+
+        const mockBenchmarksUnknown = {
+            current_ratio: {
+                target: 1.20,
+                status: 'UNKNOWN',
+                status_label: 'Brak danych',
+                has_data: false,
+                is_unknown: true,
+            },
+            quick_ratio: {
+                target: 1.00,
+                status: 'UNKNOWN',
+                status_label: 'Brak danych',
+                has_data: false,
+                is_unknown: true,
+            },
+            debt_to_assets: {
+                target: 0.60,
+                status: 'UNKNOWN',
+                status_label: 'Brak danych',
+                has_data: false,
+                is_unknown: true,
+            },
+        };
+
+        render(
+            <FinancialMultiplesStrip
+                ratios={mockRatiosMissingBalance}
+                benchmarks={mockBenchmarksUnknown}
+            />
+        );
+
+        // Fallback "—" rendered for balance sheet items
+        const dashes = screen.getAllByText('—');
+        expect(dashes.length).toBe(3); // CR, QR, Debt-to-Assets
+
+        // N/A badges rendered
+        const naBadges = screen.getAllByText('N/A');
+        expect(naBadges.length).toBe(3);
+
+        // "Brak bilansu" notes rendered
+        const missingBalanceNotes = screen.getAllByText('Brak bilansu');
+        expect(missingBalanceNotes.length).toBe(3);
+
+        // Margin values still rendered properly
+        expect(screen.getByText('40.0%')).toBeInTheDocument();
+        expect(screen.getByText('18.0%')).toBeInTheDocument();
+    });
 });
