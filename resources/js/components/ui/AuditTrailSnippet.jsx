@@ -1,45 +1,71 @@
-import React from 'react';
-import { ShieldCheck, FileText, Download, Upload, Terminal } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import apiClient from '../../api/client';
+import { Terminal, ShieldCheck, Activity } from 'lucide-react';
 
-export const AuditTrailSnippet = ({ className = '' }) => {
-    const logs = [
-        {
-            time: '15:24:12',
-            action: 'VDR_FILE_DOWNLOAD',
-            actor: 'admin@helvest.com',
-            resource: 'Sprawozdanie_Finansowe_Audyt_2025.pdf',
-            hash: '7f83b165...7fd6',
-            ip: '192.168.10.45',
-            status: 'SUCCESS',
-        },
-        {
-            time: '14:52:08',
-            action: 'CSV_ASYNC_INGEST',
-            actor: 'klient@acme.com',
-            resource: 'Wyciag_Bankowy_PKO_Q2_2026.csv',
-            hash: 'a1b2c3d4...99ea',
-            ip: '89.64.120.12',
-            status: 'QUEUED',
-        },
-        {
-            time: '13:10:45',
-            action: 'METRICS_EVALUATE',
-            actor: 'admin@helvest.com',
-            resource: 'FinancialCalculator::computePnl()',
-            hash: '—',
-            ip: '192.168.10.45',
-            status: 'COMPUTED',
-        },
-        {
-            time: '11:05:19',
-            action: 'DATA_ROOM_ACCESS',
-            actor: 'klient@acme.com',
-            resource: 'Folder: 01_FINANSE_I_AUDYT',
-            hash: '—',
-            ip: '89.64.120.12',
-            status: 'VERIFIED',
-        },
-    ];
+export const AuditTrailSnippet = ({ className = '', logs: propLogs = null }) => {
+    const [logs, setLogs] = useState(propLogs || []);
+    const [loading, setLoading] = useState(!propLogs);
+
+    useEffect(() => {
+        if (propLogs) {
+            setLogs(propLogs);
+            setLoading(false);
+            return;
+        }
+
+        let isMounted = true;
+        const fetchAuditLogs = async () => {
+            try {
+                const response = await apiClient.get('/finance/audit-logs', {
+                    params: { per_page: 5 },
+                });
+                if (isMounted) {
+                    setLogs(response.data?.data || []);
+                }
+            } catch (err) {
+                // Silently fallback to empty array on network/auth error
+                if (isMounted) {
+                    setLogs([]);
+                }
+            } finally {
+                if (isMounted) {
+                    setLoading(false);
+                }
+            }
+        };
+
+        fetchAuditLogs();
+        return () => {
+            isMounted = false;
+        };
+    }, [propLogs]);
+
+    const formatTime = (dateStr) => {
+        if (!dateStr) return '—';
+        try {
+            const d = new Date(dateStr);
+            return d.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        } catch {
+            return dateStr;
+        }
+    };
+
+    const getBadgeStyle = (color) => {
+        switch (color) {
+            case 'emerald':
+                return 'text-emerald-400 bg-emerald-950/60 border-emerald-800/80';
+            case 'sky':
+                return 'text-sky-400 bg-sky-950/60 border-sky-800/80';
+            case 'amber':
+                return 'text-amber-400 bg-amber-950/60 border-amber-800/80';
+            case 'rose':
+                return 'text-rose-400 bg-rose-950/60 border-rose-800/80';
+            case 'purple':
+                return 'text-purple-400 bg-purple-950/60 border-purple-800/80';
+            default:
+                return 'text-zinc-400 bg-zinc-800 border-zinc-700';
+        }
+    };
 
     return (
         <div className={`bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden shadow-sm ${className}`}>
@@ -61,26 +87,50 @@ export const AuditTrailSnippet = ({ className = '' }) => {
                             <th className="py-2 px-4 font-semibold">Czas (CET)</th>
                             <th className="py-2 px-3 font-semibold">Zdarzenie / Akcja</th>
                             <th className="py-2 px-3 font-semibold">Użytkownik (Actor)</th>
-                            <th className="py-2 px-3 font-semibold">Obiekt / Zasób</th>
-                            <th className="py-2 px-3 font-semibold">Suma SHA-256</th>
-                            <th className="py-2 px-4 font-semibold text-right">Status</th>
+                            <th className="py-2 px-3 font-semibold">Opis / Zasób</th>
+                            <th className="py-2 px-3 font-semibold">Identyfikator</th>
+                            <th className="py-2 px-4 font-semibold text-right">Kategoria</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-zinc-850/80">
-                        {logs.map((log, i) => (
-                            <tr key={i} className="hover:bg-zinc-850/50 text-zinc-300 transition-colors">
-                                <td className="py-2 px-4 text-zinc-500 tabular-nums">{log.time}</td>
-                                <td className="py-2 px-3 font-semibold text-zinc-200">{log.action}</td>
-                                <td className="py-2 px-3 text-zinc-400">{log.actor}</td>
-                                <td className="py-2 px-3 text-zinc-300 max-w-xs truncate">{log.resource}</td>
-                                <td className="py-2 px-3 text-zinc-500">{log.hash}</td>
-                                <td className="py-2 px-4 text-right">
-                                    <span className="px-1.5 py-0.5 rounded text-[9px] font-mono uppercase bg-zinc-950 border border-zinc-800 text-emerald-400">
-                                        {log.status}
-                                    </span>
+                        {loading ? (
+                            <tr>
+                                <td colSpan="6" className="py-6 text-center text-zinc-500">
+                                    Ładowanie zdarzeń ścieżki audytowej...
                                 </td>
                             </tr>
-                        ))}
+                        ) : logs.length === 0 ? (
+                            <tr>
+                                <td colSpan="6" className="py-6 text-center text-zinc-500">
+                                    Brak zarejestrowanych operacji audytowych dla bieżącej spółki.
+                                </td>
+                            </tr>
+                        ) : (
+                            logs.map((log, i) => {
+                                const timeStr = log.created_at ? formatTime(log.created_at) : (log.time || '—');
+                                const actionText = log.action_label || log.action;
+                                const actorText = log.user?.name || log.user?.email || log.actor || 'System';
+                                const resourceText = log.description || log.resource || log.entity_type;
+                                const entityIdText = log.entity_id ? `${log.entity_id.substring(0, 8)}...` : (log.hash || '—');
+                                const categoryText = log.action_category || log.status || 'AUDIT';
+                                const badgeClass = getBadgeStyle(log.action_color);
+
+                                return (
+                                    <tr key={log.id || i} className="hover:bg-zinc-850/50 text-zinc-300 transition-colors">
+                                        <td className="py-2 px-4 text-zinc-500 tabular-nums whitespace-nowrap">{timeStr}</td>
+                                        <td className="py-2 px-3 font-semibold text-zinc-200 whitespace-nowrap">{actionText}</td>
+                                        <td className="py-2 px-3 text-zinc-400 whitespace-nowrap">{actorText}</td>
+                                        <td className="py-2 px-3 text-zinc-300 max-w-xs truncate" title={resourceText}>{resourceText}</td>
+                                        <td className="py-2 px-3 text-zinc-500 tabular-nums">{entityIdText}</td>
+                                        <td className="py-2 px-4 text-right whitespace-nowrap">
+                                            <span className={`px-1.5 py-0.5 rounded text-[9px] font-mono uppercase border ${badgeClass}`}>
+                                                {categoryText}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                );
+                            })
+                        )}
                     </tbody>
                 </table>
             </div>

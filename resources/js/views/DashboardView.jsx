@@ -31,8 +31,10 @@ export const DashboardView = () => {
 
     const [metrics, setMetrics] = useState(null);
     const [trends, setTrends] = useState([]);
-    const [breakdown, setBreakdown] = useState([]);
+    const [expenseBreakdown, setExpenseBreakdown] = useState([]);
+    const [revenueBreakdown, setRevenueBreakdown] = useState([]);
     const [liquidityTrends, setLiquidityTrends] = useState([]);
+    const [auditLogs, setAuditLogs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [chartMode, setChartMode] = useState('pnl'); // 'pnl' | 'liquidity'
 
@@ -40,26 +42,30 @@ export const DashboardView = () => {
         setLoading(true);
         try {
             const params = {};
-            if (dateRange.startDate) params.start_date = dateRange.startDate;
-            if (dateRange.endDate) params.end_date = dateRange.endDate;
+            if (dateRange?.startDate) params.start_date = dateRange.startDate;
+            if (dateRange?.endDate) params.end_date = dateRange.endDate;
 
-            const [metricsRes, trendsRes, breakdownRes, liquidityRes] = await Promise.all([
-                apiClient.get('/finance/analytics/metrics', { params }),
+            const [metricsRes, trendsRes, expensesRes, revenuesRes, liquidityRes, auditRes] = await Promise.all([
+                apiClient.get('/finance/analytics/metrics', { params }).catch(() => ({ data: { data: null } })),
                 apiClient.get('/finance/analytics/trends', { params }).catch(() => ({ data: { data: [] } })),
                 apiClient.get('/finance/analytics/breakdown', { params: { ...params, record_type: 'EXPENSE' } }).catch(() => ({ data: { data: [] } })),
+                apiClient.get('/finance/analytics/breakdown', { params: { ...params, record_type: 'REVENUE' } }).catch(() => ({ data: { data: [] } })),
                 apiClient.get('/finance/analytics/liquidity', { params }).catch(() => ({ data: { data: [] } })),
+                apiClient.get('/finance/audit-logs', { params: { per_page: 5 } }).catch(() => ({ data: { data: [] } })),
             ]);
 
-            setMetrics(metricsRes.data.data);
-            setTrends(trendsRes.data.data || []);
-            setBreakdown(breakdownRes.data.data || []);
-            setLiquidityTrends(liquidityRes.data.data || []);
+            setMetrics(metricsRes.data?.data || null);
+            setTrends(trendsRes.data?.data || []);
+            setExpenseBreakdown(expensesRes.data?.data || []);
+            setRevenueBreakdown(revenuesRes.data?.data || []);
+            setLiquidityTrends(liquidityRes.data?.data || []);
+            setAuditLogs(auditRes.data?.data || []);
         } catch (err) {
             error('Nie udało się pobrać danych analitycznych z serwera.');
         } finally {
             setLoading(false);
         }
-    }, [activeCompany?.id, dateRange.startDate, dateRange.endDate]);
+    }, [activeCompany?.id, dateRange?.startDate, dateRange?.endDate, error]);
 
     useEffect(() => {
         fetchData();
@@ -70,11 +76,12 @@ export const DashboardView = () => {
     }, [fetchData]);
 
     const rawRevenue = Number(metrics?.pnl?.revenue?.amount || 0);
-    const rawGrossProfit = Number(metrics?.pnl?.gross_profit?.amount || (rawRevenue * 0.45));
-    const rawCogs = rawRevenue - rawGrossProfit;
+    const rawCogs = Number(metrics?.pnl?.cogs?.amount || 0);
+    const rawGrossProfit = Number(metrics?.pnl?.gross_profit?.amount || (rawRevenue - rawCogs));
     const rawEbitda = Number(metrics?.pnl?.ebitda?.amount || 0);
     const rawEbit = Number(metrics?.pnl?.ebit?.amount || 0);
-    const rawDa = rawEbitda - rawEbit;
+    const rawDa = Number(metrics?.pnl?.depreciation?.amount || (rawEbitda > rawEbit ? rawEbitda - rawEbit : 0));
+    const rawTax = Number(metrics?.pnl?.tax?.amount || 0);
     const rawNetProfit = Number(metrics?.pnl?.net_profit?.amount || 0);
     const rawOpex = Number(metrics?.pnl?.opex?.amount || 0);
 
@@ -84,39 +91,92 @@ export const DashboardView = () => {
     const grossProfitVal = convertAmount(rawGrossProfit);
     const opexVal = convertAmount(rawOpex);
     const ebitdaVal = convertAmount(rawEbitda);
-    const daVal = convertAmount(rawDa > 0 ? rawDa : rawEbitda * 0.22);
+    const daVal = convertAmount(rawDa);
     const ebitVal = convertAmount(rawEbit);
-    const taxVal = convertAmount(rawEbit * 0.19);
+    const taxVal = convertAmount(rawTax);
     const netProfitVal = convertAmount(rawNetProfit);
 
-    const currentRatio = metrics?.liquidity?.current_ratio ? Number(metrics.liquidity.current_ratio) : 1.85;
-    const quickRatio = metrics?.liquidity?.quick_ratio ? Number(metrics.liquidity.quick_ratio) : 1.42;
-    const ebitdaMargin = metrics?.pnl?.ebitda_margin ? Number(metrics.pnl.ebitda_margin) : 0.184;
-    const operatingMargin = metrics?.pnl?.operating_margin ? Number(metrics.pnl.operating_margin) : 0.142;
-    const grossMargin = metrics?.pnl?.gross_margin ? Number(metrics.pnl.gross_margin) : 0.326;
-    const netMargin = rawRevenue > 0 ? rawNetProfit / rawRevenue : 0.118;
+    // Dynamic Liquidity & Margins from API / Benchmarks
+    const currentRatio = metrics?.liquidity?.current_ratio != null
+        ? Number(metrics.liquidity.current_ratio)
+        : (metrics?.benchmarks?.current_ratio?.current_value != null ? Number(metrics.benchmarks.current_ratio.current_value) : 0);
+
+    const quickRatio = metrics?.liquidity?.quick_ratio != null
+        ? Number(metrics.liquidity.quick_ratio)
+        : (metrics?.benchmarks?.quick_ratio?.current_value != null ? Number(metrics.benchmarks.quick_ratio.current_value) : 0);
+
+    const debtRatio = metrics?.solvency?.debt_to_assets != null
+        ? Number(metrics.solvency.debt_to_assets)
+        : (metrics?.benchmarks?.debt_to_assets?.current_value != null ? Number(metrics.benchmarks.debt_to_assets.current_value) : 0);
+
+    const ebitdaMargin = metrics?.pnl?.ebitda_margin_pct != null
+        ? Number(metrics.pnl.ebitda_margin_pct) / 100
+        : (metrics?.pnl?.ebitda_margin != null ? Number(metrics.pnl.ebitda_margin) : (rawRevenue > 0 ? rawEbitda / rawRevenue : 0));
+
+    const operatingMargin = metrics?.pnl?.operating_margin_pct != null
+        ? Number(metrics.pnl.operating_margin_pct) / 100
+        : (metrics?.pnl?.operating_margin != null ? Number(metrics.pnl.operating_margin) : (rawRevenue > 0 ? rawEbit / rawRevenue : 0));
+
+    const grossMargin = metrics?.pnl?.gross_margin_pct != null
+        ? Number(metrics.pnl.gross_margin_pct) / 100
+        : (metrics?.pnl?.gross_margin != null ? Number(metrics.pnl.gross_margin) : (rawRevenue > 0 ? rawGrossProfit / rawRevenue : 0));
+
+    const netMargin = metrics?.pnl?.net_margin_pct != null
+        ? Number(metrics.pnl.net_margin_pct) / 100
+        : (metrics?.pnl?.net_margin != null ? Number(metrics.pnl.net_margin) : (rawRevenue > 0 ? rawNetProfit / rawRevenue : 0));
+
+    // Dynamic YoY / MoM changes from API
+    const dynamics = metrics?.dynamics || {};
+    const yoyRevenueGrowth = dynamics?.yoy?.revenue_growth_pct != null ? Number(dynamics.yoy.revenue_growth_pct) : null;
+    const yoyEbitdaGrowth = dynamics?.yoy?.ebitda_growth_pct != null ? Number(dynamics.yoy.ebitda_growth_pct) : null;
+    const yoyEbitGrowth = dynamics?.yoy?.ebit_growth_pct != null ? Number(dynamics.yoy.ebit_growth_pct) : null;
+    const yoyNetProfitGrowth = dynamics?.yoy?.net_profit_growth_pct != null ? Number(dynamics.yoy.net_profit_growth_pct) : null;
+    const yoyOpexGrowth = dynamics?.yoy?.opex_growth_pct != null ? Number(dynamics.yoy.opex_growth_pct) : null;
+    const yoyGrossProfitGrowth = dynamics?.yoy?.gross_profit_growth_pct != null ? Number(dynamics.yoy.gross_profit_growth_pct) : null;
+    const yoyCurrentRatioDiff = dynamics?.yoy?.current_ratio_diff != null ? Number(dynamics.yoy.current_ratio_diff) : null;
 
     // Converted Trends Data for Charts
     const convertedTrends = useMemo(() => {
         return trends.map((item) => ({
             ...item,
-            revenue: convertAmount(item.revenue),
-            opex: convertAmount(item.opex),
-            ebitda: convertAmount(item.ebitda),
-            net_profit: convertAmount(item.net_profit),
+            revenue: convertAmount(item.revenue || 0),
+            opex: convertAmount(item.opex || 0),
+            ebitda: convertAmount(item.ebitda || 0),
+            net_profit: convertAmount(item.net_profit || 0),
         }));
     }, [trends, convertAmount]);
 
     // Converted Breakdown Data for Charts
     const convertedBreakdown = useMemo(() => {
-        return breakdown.map((item) => ({
+        return expenseBreakdown.map((item) => ({
             ...item,
-            amount: convertAmount(item.amount),
+            amount: convertAmount(item.amount || 0),
         }));
-    }, [breakdown, convertAmount]);
+    }, [expenseBreakdown, convertAmount]);
 
     // Structured P&L Table Rows
     const pnlRows = useMemo(() => {
+        const revenueChildren = revenueBreakdown.length > 0
+            ? revenueBreakdown.map((rev, i) => ({
+                id: rev.category_id || `rev_${i}`,
+                label: rev.category_name,
+                code: rev.category_code || `REV-0${i + 1}`,
+                amount: convertAmount(rev.amount),
+                change: null,
+            }))
+            : [];
+
+        const expenseChildren = expenseBreakdown.length > 0
+            ? expenseBreakdown.map((exp, i) => ({
+                id: exp.category_id || `opex_${i}`,
+                label: exp.category_name,
+                code: exp.category_code || `OPEX-0${i + 1}`,
+                amount: convertAmount(exp.amount),
+                change: null,
+                reverseChange: true,
+            }))
+            : [];
+
         return [
             {
                 id: 'revenue_group',
@@ -124,12 +184,8 @@ export const DashboardView = () => {
                 code: 'REV-TOT',
                 amount: revenueVal,
                 isGroup: true,
-                change: 12.4,
-                children: [
-                    { id: 'rev_prod', label: 'Sprzedaż wyrobów gotowych', code: 'REV-01', amount: revenueVal * 0.72, change: 14.1 },
-                    { id: 'rev_serv', label: 'Usługi serwisowe i wdrożeniowe', code: 'REV-02', amount: revenueVal * 0.24, change: 8.5 },
-                    { id: 'rev_other', label: 'Pozostałe przychody operacyjne', code: 'REV-99', amount: revenueVal * 0.04, change: -1.2 },
-                ],
+                change: yoyRevenueGrowth,
+                children: revenueChildren.length > 0 ? revenueChildren : undefined,
             },
             {
                 id: 'cogs',
@@ -137,7 +193,7 @@ export const DashboardView = () => {
                 code: 'COGS',
                 amount: cogsVal,
                 reverseChange: true,
-                change: 9.8,
+                change: null,
             },
             {
                 id: 'gross_profit',
@@ -146,7 +202,7 @@ export const DashboardView = () => {
                 amount: grossProfitVal,
                 isSummary: true,
                 color: 'profit',
-                change: 15.6,
+                change: yoyGrossProfitGrowth,
             },
             {
                 id: 'opex_group',
@@ -155,14 +211,8 @@ export const DashboardView = () => {
                 amount: opexVal,
                 isGroup: true,
                 reverseChange: true,
-                change: 6.4,
-                children: [
-                    { id: 'opex_sal', label: 'Wynagrodzenia i świadczenia pracownicze', code: 'OPEX-HR', amount: opexVal * 0.54, change: 7.2, reverseChange: true },
-                    { id: 'opex_it', label: 'Infrastruktura IT, Chmura i Licencje', code: 'OPEX-IT', amount: opexVal * 0.16, change: 4.8, reverseChange: true },
-                    { id: 'opex_mkt', label: 'Marketing B2B i Pozyskiwanie Klientów', code: 'OPEX-MKT', amount: opexVal * 0.14, change: 11.3, reverseChange: true },
-                    { id: 'opex_ext', label: 'Usługi obce, doradcze i prawne', code: 'OPEX-ADV', amount: opexVal * 0.11, change: -3.5, reverseChange: true },
-                    { id: 'opex_off', label: 'Najem biur i koszty administracyjne', code: 'OPEX-OFF', amount: opexVal * 0.05, change: 0.0, reverseChange: true },
-                ],
+                change: yoyOpexGrowth,
+                children: expenseChildren.length > 0 ? expenseChildren : undefined,
             },
             {
                 id: 'ebitda',
@@ -171,14 +221,14 @@ export const DashboardView = () => {
                 amount: ebitdaVal,
                 isSummary: true,
                 color: 'profit',
-                change: 8.2,
+                change: yoyEbitdaGrowth,
             },
             {
                 id: 'da',
                 label: '6. Amortyzacja Rzeczowa i Niematerialna (D&A)',
                 code: 'D&A',
                 amount: daVal,
-                change: 2.1,
+                change: null,
                 reverseChange: true,
             },
             {
@@ -188,14 +238,14 @@ export const DashboardView = () => {
                 amount: ebitVal,
                 isSummary: true,
                 color: 'profit',
-                change: 5.7,
+                change: yoyEbitGrowth,
             },
             {
                 id: 'tax',
                 label: '8. Podatek Dochodowy od Osób Prawnych (CIT)',
                 code: 'CIT',
                 amount: taxVal,
-                change: 4.2,
+                change: null,
                 reverseChange: true,
             },
             {
@@ -205,10 +255,32 @@ export const DashboardView = () => {
                 amount: netProfitVal,
                 isSummary: true,
                 color: 'profit',
-                change: 11.8,
+                change: yoyNetProfitGrowth,
             },
         ];
-    }, [revenueVal, cogsVal, grossProfitVal, opexVal, ebitdaVal, daVal, ebitVal, taxVal, netProfitVal]);
+    }, [
+        revenueVal,
+        cogsVal,
+        grossProfitVal,
+        opexVal,
+        ebitdaVal,
+        daVal,
+        ebitVal,
+        taxVal,
+        netProfitVal,
+        yoyRevenueGrowth,
+        yoyGrossProfitGrowth,
+        yoyOpexGrowth,
+        yoyEbitdaGrowth,
+        yoyEbitGrowth,
+        yoyNetProfitGrowth,
+        revenueBreakdown,
+        expenseBreakdown,
+        convertAmount,
+    ]);
+
+    const crTarget = metrics?.benchmarks?.current_ratio?.target;
+    const crSubtitle = crTarget ? `CEL DORADCY: >${crTarget}x` : 'NORMA BRANŻOWA: >1.20x';
 
     return (
         <div className="space-y-4">
@@ -227,7 +299,7 @@ export const DashboardView = () => {
                         </div>
                         <div className="text-[10px] text-zinc-500 flex items-center gap-1.5 mt-0.5 font-mono">
                             <Calendar className="w-3 h-3 text-zinc-600" />
-                            <span>FILTR ZAKRESU: {dateRange.label.toUpperCase()}</span>
+                            <span>FILTR ZAKRESU: {dateRange?.label?.toUpperCase() || 'CAŁY OKRES'}</span>
                         </div>
                     </div>
                 </div>
@@ -252,8 +324,8 @@ export const DashboardView = () => {
                     value={loading ? '...' : revenueVal}
                     currency={currency}
                     icon={DollarSign}
-                    change={12.4}
-                    subtitle="DYNAMIKA R/R"
+                    change={yoyRevenueGrowth}
+                    subtitle={yoyRevenueGrowth != null ? `DYNAMIKA R/R (${yoyRevenueGrowth > 0 ? '+' : ''}${yoyRevenueGrowth.toFixed(1)}%)` : 'DYNAMIKA R/R'}
                 />
 
                 <MetricCard
@@ -261,7 +333,7 @@ export const DashboardView = () => {
                     value={loading ? '...' : ebitdaVal}
                     currency={currency}
                     icon={TrendingUp}
-                    change={8.2}
+                    change={yoyEbitdaGrowth}
                     subtitle={`MARŻA: ${(ebitdaMargin * 100).toFixed(1)}%`}
                 />
 
@@ -270,18 +342,18 @@ export const DashboardView = () => {
                     value={loading ? '...' : ebitVal}
                     currency={currency}
                     icon={PieChart}
-                    change={5.7}
+                    change={yoyEbitGrowth}
                     subtitle={`MARŻA: ${(operatingMargin * 100).toFixed(1)}%`}
                 />
 
                 <MetricCard
                     title="Wskaźnik Płynności Bieżącej"
-                    value={loading ? '...' : currentRatio.toFixed(2)}
-                    isRatio={true}
+                    value={loading ? '...' : (currentRatio > 0 ? currentRatio.toFixed(2) : '—')}
+                    isRatio={currentRatio > 0}
                     ratioSuffix="x"
                     icon={ShieldAlert}
-                    change={3.1}
-                    subtitle="NORMA BRANŻOWA: >1.20x"
+                    change={yoyCurrentRatioDiff}
+                    subtitle={crSubtitle}
                 />
             </div>
 
@@ -293,7 +365,8 @@ export const DashboardView = () => {
                 operatingMargin={operatingMargin}
                 grossMargin={grossMargin}
                 netMargin={netMargin}
-                debtRatio={0.38}
+                debtRatio={debtRatio}
+                benchmarks={metrics?.benchmarks}
             />
 
             {/* Charts Section (Recharts) */}
@@ -374,14 +447,14 @@ export const DashboardView = () => {
             {/* High-Density P&L Breakdown Table */}
             <FinancialTable
                 title="Rachunek Zysków i Strat (P&L Konsolidowany)"
-                subtitle={`Zestawienie analityczne pozycji wynikowych dla okresu: ${dateRange.label}`}
+                subtitle={`Zestawienie analityczne pozycji wynikowych dla okresu: ${dateRange?.label || 'Bieżący'}`}
                 data={pnlRows}
                 currency={currency}
                 revenueTotal={revenueVal}
             />
 
-            {/* Immutable Audit Trail Snippet */}
-            <AuditTrailSnippet />
+            {/* Immutable Audit Trail Snippet with Live API Data */}
+            <AuditTrailSnippet logs={auditLogs} />
         </div>
     );
 };

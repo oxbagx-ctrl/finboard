@@ -81,10 +81,10 @@ export const AnalyticsView = () => {
         return () => window.removeEventListener('finboard:company-changed', handleCompanyChange);
     }, [fetchData]);
 
-    // Financial Values Calculation
+    // Financial Values Calculation from API
     const rawRevenue = Number(metrics?.pnl?.revenue?.amount || 0);
-    const rawGrossProfit = Number(metrics?.pnl?.gross_profit?.amount || (rawRevenue * 0.45));
-    const rawCogs = rawRevenue - rawGrossProfit;
+    const rawCogs = Number(metrics?.pnl?.cogs?.amount || 0);
+    const rawGrossProfit = Number(metrics?.pnl?.gross_profit?.amount || (rawRevenue - rawCogs));
     const rawEbitda = Number(metrics?.pnl?.ebitda?.amount || 0);
     const rawEbit = Number(metrics?.pnl?.ebit?.amount || 0);
     const rawNetProfit = Number(metrics?.pnl?.net_profit?.amount || 0);
@@ -98,14 +98,47 @@ export const AnalyticsView = () => {
     const ebitVal = convertAmount(rawEbit);
     const netProfitVal = convertAmount(rawNetProfit);
 
-    const currentRatio = metrics?.liquidity?.current_ratio ? Number(metrics.liquidity.current_ratio) : 1.85;
-    const quickRatio = metrics?.liquidity?.quick_ratio ? Number(metrics.liquidity.quick_ratio) : 1.42;
-    const workingCapitalVal = convertAmount(Number(metrics?.liquidity?.working_capital?.amount || 0));
+    const currentRatio = metrics?.liquidity?.current_ratio != null
+        ? Number(metrics.liquidity.current_ratio)
+        : (metrics?.benchmarks?.current_ratio?.current_value != null ? Number(metrics.benchmarks.current_ratio.current_value) : 0);
 
-    const ebitdaMargin = metrics?.pnl?.ebitda_margin ? Number(metrics.pnl.ebitda_margin) : (rawRevenue > 0 ? rawEbitda / rawRevenue : 0.184);
-    const operatingMargin = metrics?.pnl?.operating_margin ? Number(metrics.pnl.operating_margin) : (rawRevenue > 0 ? rawEbit / rawRevenue : 0.142);
-    const grossMargin = metrics?.pnl?.gross_margin ? Number(metrics.pnl.gross_margin) : (rawRevenue > 0 ? rawGrossProfit / rawRevenue : 0.326);
-    const netMargin = metrics?.pnl?.net_margin ? Number(metrics.pnl.net_margin) : (rawRevenue > 0 ? rawNetProfit / rawRevenue : 0.118);
+    const quickRatio = metrics?.liquidity?.quick_ratio != null
+        ? Number(metrics.liquidity.quick_ratio)
+        : (metrics?.benchmarks?.quick_ratio?.current_value != null ? Number(metrics.benchmarks.quick_ratio.current_value) : 0);
+
+    const debtRatio = metrics?.solvency?.debt_to_assets != null
+        ? Number(metrics.solvency.debt_to_assets)
+        : (metrics?.benchmarks?.debt_to_assets?.current_value != null ? Number(metrics.benchmarks.debt_to_assets.current_value) : 0);
+
+    const rawWorkingCapital = metrics?.liquidity?.working_capital?.amount != null
+        ? Number(metrics.liquidity.working_capital.amount)
+        : (metrics?.balance_sheet?.current_assets?.amount != null && metrics?.balance_sheet?.current_liabilities?.amount != null
+            ? Number(metrics.balance_sheet.current_assets.amount) - Number(metrics.balance_sheet.current_liabilities.amount)
+            : 0);
+    const workingCapitalVal = convertAmount(rawWorkingCapital);
+
+    const ebitdaMargin = metrics?.pnl?.ebitda_margin_pct != null
+        ? Number(metrics.pnl.ebitda_margin_pct) / 100
+        : (metrics?.pnl?.ebitda_margin != null ? Number(metrics.pnl.ebitda_margin) : (rawRevenue > 0 ? rawEbitda / rawRevenue : 0));
+
+    const operatingMargin = metrics?.pnl?.operating_margin_pct != null
+        ? Number(metrics.pnl.operating_margin_pct) / 100
+        : (metrics?.pnl?.operating_margin != null ? Number(metrics.pnl.operating_margin) : (rawRevenue > 0 ? rawEbit / rawRevenue : 0));
+
+    const grossMargin = metrics?.pnl?.gross_margin_pct != null
+        ? Number(metrics.pnl.gross_margin_pct) / 100
+        : (metrics?.pnl?.gross_margin != null ? Number(metrics.pnl.gross_margin) : (rawRevenue > 0 ? rawGrossProfit / rawRevenue : 0));
+
+    const netMargin = metrics?.pnl?.net_margin_pct != null
+        ? Number(metrics.pnl.net_margin_pct) / 100
+        : (metrics?.pnl?.net_margin != null ? Number(metrics.pnl.net_margin) : (rawRevenue > 0 ? rawNetProfit / rawRevenue : 0));
+
+    // Dynamics from API
+    const dynamics = metrics?.dynamics || {};
+    const yoyRevenueGrowth = dynamics?.yoy?.revenue_growth_pct != null ? Number(dynamics.yoy.revenue_growth_pct) : null;
+    const yoyEbitdaGrowth = dynamics?.yoy?.ebitda_growth_pct != null ? Number(dynamics.yoy.ebitda_growth_pct) : null;
+    const yoyEbitGrowth = dynamics?.yoy?.ebit_growth_pct != null ? Number(dynamics.yoy.ebit_growth_pct) : null;
+    const yoyNetProfitGrowth = dynamics?.yoy?.net_profit_growth_pct != null ? Number(dynamics.yoy.net_profit_growth_pct) : null;
 
     // Converted Trends for Charts
     const convertedTrends = useMemo(() => {
@@ -134,6 +167,9 @@ export const AnalyticsView = () => {
             amount: convertAmount(item.amount || 0),
         }));
     }, [activeBreakdown, convertAmount]);
+
+    const crBench = metrics?.benchmarks?.current_ratio;
+    const qrBench = metrics?.benchmarks?.quick_ratio;
 
     return (
         <div className="space-y-4">
@@ -233,8 +269,8 @@ export const AnalyticsView = () => {
                             value={loading ? '...' : revenueVal}
                             currency={currency}
                             icon={DollarSign}
-                            change={12.4}
-                            subtitle="DYNAMIKA R/R"
+                            change={yoyRevenueGrowth}
+                            subtitle={yoyRevenueGrowth != null ? `DYNAMIKA R/R (${yoyRevenueGrowth > 0 ? '+' : ''}${yoyRevenueGrowth.toFixed(1)}%)` : 'DYNAMIKA R/R'}
                         />
 
                         <MetricCard
@@ -242,7 +278,7 @@ export const AnalyticsView = () => {
                             value={loading ? '...' : ebitdaVal}
                             currency={currency}
                             icon={TrendingUp}
-                            change={8.2}
+                            change={yoyEbitdaGrowth}
                             subtitle={`MARŻA: ${(ebitdaMargin * 100).toFixed(1)}%`}
                         />
 
@@ -251,7 +287,7 @@ export const AnalyticsView = () => {
                             value={loading ? '...' : ebitVal}
                             currency={currency}
                             icon={BarChart3}
-                            change={5.7}
+                            change={yoyEbitGrowth}
                             subtitle={`MARŻA: ${(operatingMargin * 100).toFixed(1)}%`}
                         />
 
@@ -260,7 +296,7 @@ export const AnalyticsView = () => {
                             value={loading ? '...' : netProfitVal}
                             currency={currency}
                             icon={Activity}
-                            change={11.8}
+                            change={yoyNetProfitGrowth}
                             subtitle={`MARŻA: ${(netMargin * 100).toFixed(1)}%`}
                         />
                     </div>
@@ -273,7 +309,8 @@ export const AnalyticsView = () => {
                         operatingMargin={operatingMargin}
                         grossMargin={grossMargin}
                         netMargin={netMargin}
-                        debtRatio={0.38}
+                        debtRatio={debtRatio}
+                        benchmarks={metrics?.benchmarks}
                     />
 
                     {/* Charts Section */}
@@ -445,30 +482,36 @@ export const AnalyticsView = () => {
                         <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
                             <div className="flex items-center justify-between">
                                 <span className="text-[11px] font-mono uppercase text-zinc-400">Current Ratio (Wskaźnik Bieżący)</span>
-                                <Badge variant={currentRatio >= 1.2 ? 'success' : 'warning'} size="sm">
-                                    {currentRatio >= 1.2 ? 'OPTYMALNA' : 'PODWYŻSZONE RYZYKO'}
+                                <Badge
+                                    variant={crBench?.status === 'OPT' || (!crBench && currentRatio >= 1.2) ? 'success' : (crBench?.status === 'CRIT' ? 'danger' : 'warning')}
+                                    size="sm"
+                                >
+                                    {crBench?.status_label || (currentRatio >= 1.2 ? 'OPTYMALNA' : 'PODWYŻSZONE RYZYKO')}
                                 </Badge>
                             </div>
                             <div className="text-3xl font-bold font-mono text-zinc-100 mt-2 tabular-nums">
-                                {currentRatio.toFixed(2)}x
+                                {currentRatio > 0 ? `${currentRatio.toFixed(2)}x` : '—'}
                             </div>
                             <div className="text-[10px] font-mono text-zinc-500 mt-1">
-                                Benchmark bankowy: min. 1.20x
+                                {crBench?.target ? `Cel doradcy: min. ${crBench.target}x` : 'Benchmark bankowy: min. 1.20x'}
                             </div>
                         </div>
 
                         <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
                             <div className="flex items-center justify-between">
                                 <span className="text-[11px] font-mono uppercase text-zinc-400">Quick Ratio (Wskaźnik Szybki)</span>
-                                <Badge variant={quickRatio >= 1.0 ? 'success' : 'warning'} size="sm">
-                                    {quickRatio >= 1.0 ? 'OPTYMALNA' : 'UWAGA'}
+                                <Badge
+                                    variant={qrBench?.status === 'OPT' || (!qrBench && quickRatio >= 1.0) ? 'success' : (qrBench?.status === 'CRIT' ? 'danger' : 'warning')}
+                                    size="sm"
+                                >
+                                    {qrBench?.status_label || (quickRatio >= 1.0 ? 'OPTYMALNA' : 'UWAGA')}
                                 </Badge>
                             </div>
                             <div className="text-3xl font-bold font-mono text-amber-400 mt-2 tabular-nums">
-                                {quickRatio.toFixed(2)}x
+                                {quickRatio > 0 ? `${quickRatio.toFixed(2)}x` : '—'}
                             </div>
                             <div className="text-[10px] font-mono text-zinc-500 mt-1">
-                                Benchmark bankowy: min. 1.00x
+                                {qrBench?.target ? `Cel doradcy: min. ${qrBench.target}x` : 'Benchmark bankowy: min. 1.00x'}
                             </div>
                         </div>
 
@@ -517,17 +560,19 @@ export const AnalyticsView = () => {
                                 </div>
                                 <div className="space-y-3 text-xs text-zinc-300 font-sans leading-relaxed">
                                     <p>
-                                        Wskaźnik płynności bieżącej (Current Ratio) kształtuje się na poziomie <strong className="text-zinc-100 font-mono">{currentRatio.toFixed(2)}x</strong>, co świadczy o zachowaniu bezpiecznego bufora aktywów obrotowych w relacji do bieżących pasywów.
+                                        Wskaźnik płynności bieżącej (Current Ratio) kształtuje się na poziomie <strong className="text-zinc-100 font-mono">{currentRatio > 0 ? `${currentRatio.toFixed(2)}x` : '—'}</strong>, {currentRatio >= 1.2 ? 'co świadczy o zachowaniu bezpiecznego bufora aktywów obrotowych w relacji do bieżących pasywów.' : 'co wskazuje na podwyższoną presję na krótkoterminową płynność operacyjną.'}
                                     </p>
                                     <p>
-                                        Wskaźnik szybki (Quick Ratio) wynosi <strong className="text-zinc-100 font-mono">{quickRatio.toFixed(2)}x</strong>, co pozwala na pokrycie krótkoterminowych wierzytelności bez konieczności upłynniania zapasów.
+                                        Wskaźnik szybki (Quick Ratio) wynosi <strong className="text-zinc-100 font-mono">{quickRatio > 0 ? `${quickRatio.toFixed(2)}x` : '—'}</strong>, {quickRatio >= 1.0 ? 'co pozwala na pokrycie krótkoterminowych wierzytelności bez konieczności upłynniania zapasów.' : 'co może wymagać wsparcia finansowaniem obrotowym w okresach spiętrzenia płatności.'}
                                     </p>
                                 </div>
                             </div>
 
                             <div className="mt-4 pt-3 border-t border-zinc-800 font-mono text-[10px] text-zinc-500 flex items-center justify-between">
                                 <span>STATUS SOLWENCJI</span>
-                                <span className="text-emerald-400 font-semibold">STABILNY / LOW RISK</span>
+                                <span className={debtRatio <= 0.6 ? 'text-emerald-400 font-semibold' : 'text-amber-400 font-semibold'}>
+                                    {metrics?.benchmark_summary?.overall_status_label || (debtRatio <= 0.6 ? 'STABILNY / LOW RISK' : 'PODWYŻSZONE ZADŁUŻENIE')}
+                                </span>
                             </div>
                         </div>
                     </div>
