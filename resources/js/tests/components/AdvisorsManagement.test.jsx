@@ -364,4 +364,42 @@ describe('AdvisorsManagementView (SuperAdmin Dashboard)', () => {
             expect(apiClient.post).toHaveBeenCalledWith('/invitations/inv-test-1/resend');
         });
     });
+    it('opens create company modal from top bar and companies tab', async () => {
+        renderWithContext(<AdvisorsManagementView />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Super Partner Helvest')).toBeInTheDocument();
+        });
+
+        // Click top bar 'Dodaj Spółkę'
+        const addCompanyButtons = screen.getAllByRole('button', { name: /Dodaj Spółkę/i });
+        expect(addCompanyButtons.length).toBeGreaterThan(0);
+        fireEvent.click(addCompanyButtons[0]);
+
+        await waitFor(() => {
+            expect(screen.getByText('Dodaj Nową Spółkę Portfelową')).toBeInTheDocument();
+        });
+
+        // Close modal
+        fireEvent.click(screen.getByRole('button', { name: /Anuluj/i }));
+
+        await waitFor(() => {
+            expect(screen.queryByText('Dodaj Nową Spółkę Portfelową')).not.toBeInTheDocument();
+        });
+
+        // Switch to companies tab
+        fireEvent.click(screen.getByText(/Matryca Spółek Portfelowych/i));
+
+        await waitFor(() => {
+            expect(screen.getByText('Matryca Pokrycia Spółek Przez Doradców')).toBeInTheDocument();
+        });
+
+        // Click Dodaj Spółkę button in matrix header
+        const matrixAddBtn = screen.getAllByRole('button', { name: /Dodaj Spółkę/i });
+        fireEvent.click(matrixAddBtn[matrixAddBtn.length - 1]);
+
+        await waitFor(() => {
+            expect(screen.getByText('Dodaj Nową Spółkę Portfelową')).toBeInTheDocument();
+        });
+    });
 });

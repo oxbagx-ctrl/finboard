@@ -7,6 +7,7 @@ import { Button } from '../components/ui/Button';
 import { MetricCard } from '../components/ui/Card';
 import { AdvisorAssignmentModal } from '../components/advisors/AdvisorAssignmentModal';
 import { InviteUserModal } from '../components/advisors/InviteUserModal';
+import { CreateCompanyModal } from '../components/advisors/CreateCompanyModal';
 import {
     Users,
     Building2,
@@ -54,6 +55,7 @@ export const AdvisorsManagementView = () => {
     const [selectedAdvisorForAssignment, setSelectedAdvisorForAssignment] = useState(null);
     const [assignmentModalOpen, setAssignmentModalOpen] = useState(false);
     const [inviteModalOpen, setInviteModalOpen] = useState(false);
+    const [createCompanyModalOpen, setCreateCompanyModalOpen] = useState(false);
     const [actionInProgressId, setActionInProgressId] = useState(null);
 
     const fetchAdvisors = useCallback(async () => {
@@ -235,6 +237,16 @@ export const AdvisorsManagementView = () => {
                 </div>
 
                 <div className="flex items-center gap-2">
+                    {!isAdvisor && (
+                        <Button
+                            variant="secondary"
+                            size="sm"
+                            icon={Building2}
+                            onClick={() => setCreateCompanyModalOpen(true)}
+                        >
+                            Dodaj Spółkę
+                        </Button>
+                    )}
                     <Button
                         variant="primary"
                         size="sm"
@@ -557,9 +569,19 @@ export const AdvisorsManagementView = () => {
                                 Zestawienie podmiotów portfelowych wraz z obsadą analityczną Deal Advisory
                             </p>
                         </div>
-                        <Badge variant="default" size="sm">
-                            PODMIOTÓW: {companies.length}
-                        </Badge>
+                        <div className="flex items-center gap-2">
+                            <Badge variant="default" size="sm">
+                                PODMIOTÓW: {companies.length}
+                            </Badge>
+                            <Button
+                                variant="primary"
+                                size="sm"
+                                icon={Building2}
+                                onClick={() => setCreateCompanyModalOpen(true)}
+                            >
+                                Dodaj Spółkę
+                            </Button>
+                        </div>
                     </div>
 
                     <div className="overflow-x-auto">
@@ -836,6 +858,18 @@ export const AdvisorsManagementView = () => {
                 onClose={() => setInviteModalOpen(false)}
                 onSuccess={() => {
                     fetchInvitations();
+                    if (!isAdvisor) {
+                        fetchAdvisors();
+                    }
+                }}
+            />
+
+            {/* Modal: Create Company */}
+            <CreateCompanyModal
+                isOpen={createCompanyModalOpen}
+                onClose={() => setCreateCompanyModalOpen(false)}
+                onSuccess={() => {
+                    fetchCompanies();
                     if (!isAdvisor) {
                         fetchAdvisors();
                     }
