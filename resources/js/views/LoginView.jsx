@@ -130,11 +130,20 @@ export const LoginView = () => {
                         <div className="grid grid-cols-2 gap-2">
                             <button
                                 type="button"
-                                onClick={() => fillDemo('admin@helvest.com', 'password123')}
+                                onClick={() => fillDemo('superadmin@helvest.com', 'password123')}
+                                className="p-2.5 text-left rounded-md bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 transition-colors"
+                            >
+                                <div className="text-xs font-medium text-zinc-200">Super Admin</div>
+                                <div className="text-[10px] font-mono text-zinc-500 truncate mt-0.5">superadmin@helvest.com</div>
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={() => fillDemo('advisor@helvest.com', 'password123')}
                                 className="p-2.5 text-left rounded-md bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 transition-colors"
                             >
                                 <div className="text-xs font-medium text-zinc-200">Doradca M&A</div>
-                                <div className="text-[10px] font-mono text-zinc-500 truncate mt-0.5">admin@helvest.com</div>
+                                <div className="text-[10px] font-mono text-zinc-500 truncate mt-0.5">advisor@helvest.com</div>
                             </button>
 
                             <button
@@ -144,6 +153,15 @@ export const LoginView = () => {
                             >
                                 <div className="text-xs font-medium text-zinc-200">Klient / CFO</div>
                                 <div className="text-[10px] font-mono text-zinc-500 truncate mt-0.5">klient@acme.com</div>
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={() => fillDemo('admin@helvest.com', 'password123')}
+                                className="p-2.5 text-left rounded-md bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 transition-colors"
+                            >
+                                <div className="text-xs font-medium text-zinc-200">Analityk M&A</div>
+                                <div className="text-[10px] font-mono text-zinc-500 truncate mt-0.5">admin@helvest.com</div>
                             </button>
                         </div>
                     </div>
