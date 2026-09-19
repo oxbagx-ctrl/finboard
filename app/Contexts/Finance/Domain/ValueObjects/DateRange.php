@@ -104,6 +104,46 @@ final class DateRange implements ValueObject
         return $this->startDate <= $other->endDate && $this->endDate >= $other->startDate;
     }
 
+    public function previousYear(): self
+    {
+        $isFullYear = $this->startDate->format('m-d') === '01-01' && $this->endDate->format('m-d') === '12-31';
+        if ($isFullYear) {
+            return self::forYear((int) $this->startDate->format('Y') - 1);
+        }
+
+        $isFullMonth = ((int) $this->startDate->format('j') === 1) && ((int) $this->endDate->format('j') === (int) $this->startDate->format('t'));
+        if ($isFullMonth) {
+            $prevYear = (int) $this->startDate->format('Y') - 1;
+            $month = (int) $this->startDate->format('m');
+
+            return self::forMonth($prevYear, $month);
+        }
+
+        return new self(
+            $this->startDate->modify('-1 year'),
+            $this->endDate->modify('-1 year')
+        );
+    }
+
+    public function previousMonth(): self
+    {
+        $isFullMonth = ((int) $this->startDate->format('j') === 1) && ((int) $this->endDate->format('j') === (int) $this->startDate->format('t'));
+        if ($isFullMonth) {
+            $firstOfCurrent = $this->startDate->setDate((int) $this->startDate->format('Y'), (int) $this->startDate->format('m'), 1);
+            $lastOfPrev = $firstOfCurrent->modify('-1 day');
+            $year = (int) $lastOfPrev->format('Y');
+            $month = (int) $lastOfPrev->format('m');
+
+            return self::forMonth($year, $month);
+        }
+
+        $days = $this->days();
+        $newEnd = $this->startDate->modify('-1 day')->setTime(23, 59, 59);
+        $newStart = $newEnd->modify(sprintf('-%d days', $days - 1))->setTime(0, 0, 0);
+
+        return new self($newStart, $newEnd);
+    }
+
     public function equals(ValueObject $other): bool
     {
         if (!$other instanceof self) {

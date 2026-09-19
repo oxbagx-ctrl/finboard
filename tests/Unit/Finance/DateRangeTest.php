@@ -77,4 +77,21 @@ final class DateRangeTest extends TestCase
         $this->assertTrue($q1->overlaps($overlapRange));
         $this->assertFalse($q1->overlaps($disjointRange));
     }
+
+    public function test_previous_year_and_previous_month(): void
+    {
+        $march2026 = DateRange::forMonth(2026, 3);
+        $prevYear = $march2026->previousYear();
+        $this->assertSame('2025-03-01', $prevYear->startDate()->format('Y-m-d'));
+        $this->assertSame('2025-03-31', $prevYear->endDate()->format('Y-m-d'));
+
+        $prevMonth = $march2026->previousMonth();
+        $this->assertSame('2026-02-01', $prevMonth->startDate()->format('Y-m-d'));
+        $this->assertSame('2026-02-28', $prevMonth->endDate()->format('Y-m-d'));
+
+        $fullYear2026 = DateRange::forYear(2026);
+        $prevFullYear = $fullYear2026->previousYear();
+        $this->assertSame('2025-01-01', $prevFullYear->startDate()->format('Y-m-d'));
+        $this->assertSame('2025-12-31', $prevFullYear->endDate()->format('Y-m-d'));
+    }
 }
