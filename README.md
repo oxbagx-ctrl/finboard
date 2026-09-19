@@ -5,7 +5,7 @@
 [![PostgreSQL](https://img.shields.io/badge/postgresql-16-blue.svg)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/redis-alpine-red.svg)](https://redis.io/)
 [![Architecture](https://img.shields.io/badge/architecture-DDD%20%2F%20CQRS-brightgreen.svg)]()
-[![Tests](https://img.shields.io/badge/tests-344%20backend%20%7C%20110%20frontend%20passed-success.svg)]()
+[![Tests](https://img.shields.io/badge/tests-346%20backend%20%7C%20110%20frontend%20passed-success.svg)]()
 
 FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakcyjnego (M&A, Due Diligence, Corporate Finance) oraz ich klientom (CFO, Zarządy). Aplikacja łączy w sobie zaawansowaną analitykę finansową w ujęciu wielo-najemcowym (Multi-Tenant) z bezpiecznym repozytorium dokumentów Virtual Data Room (VDR).
 
@@ -118,7 +118,7 @@ Pulpit Mailpit (podgląd e-maili deweloperskich): `http://localhost:8025`.
 ## 🧪 Uruchamianie Testów
 
 ### Testy Backendowe (PHPUnit)
-Pakiet 344 testów jednostkowych i integracyjnych pokrywających warstwę domenową (DDD), zapytania CQRS, repozytoria, kalkulacje matematyczne `Money`, importy CSV, autoryzację wielonajemcową, system zaproszeń, logi audytowe oraz API benchmarków:
+Pakiet 346 testów jednostkowych i integracyjnych pokrywających warstwę domenową (DDD), zapytania CQRS, repozytoria, kalkulacje matematyczne `Money`, importy CSV, autoryzację wielonajemcową, system zaproszeń, logi audytowe oraz API benchmarków i analityki:
 ```bash
 docker compose exec app ./vendor/bin/phpunit
 ```
@@ -166,6 +166,7 @@ npm test
 
 ### Analityka Finansowa & KPI (Queries)
 - `GET /api/v1/finance/analytics/metrics` – Syntetyczne wskaźniki P&L, bilansowe, dynamika YoY/MoM oraz ewaluacja celów
+- `GET /api/v1/finance/analytics/years` – Pobranie dostępnych lat obrachunkowych z transakcjami dla spółki
 - `GET /api/v1/finance/analytics/trends` – Chronologiczne trendy miesięczne dla wykresów P&L (Recharts)
 - `GET /api/v1/finance/analytics/breakdown` – Struktura kosztów i przychodów per kategoria z procentami
 - `GET /api/v1/finance/analytics/liquidity` – Dynamika wskaźników płynności (Current & Quick Ratio)
@@ -225,7 +226,7 @@ npm test
   - Testy E2E, audyt bezpieczeństwa izolacji multi-tenant i endpoint diagnostyczny Health Check.
   - Produkcyjny hardening środowiska Docker/Nginx, skrypt automatycznego wdrożenia zero-downtime oraz Runbook operacyjny.
 - [x] **Faza 8: Rozbudowa Autoryzacji i Struktury Firm**
-  - Aktualizacja encji `Role` i enumów dla trójpoziomowej hierarchii uprawnień (SuperAdmin, Advisor, Client).
+  - Aktualizacja encji `Role` i enumów dla trójpoziomowej hierarchii uprawnie (SuperAdmin, Advisor, Client).
   - Implementacja logiki domenowej relacji przypisania doradcy do firmy (`CompanyAdvisorAssignment`, `CompanyAdvisorRepositoryInterface`).
   - Migracja bazy danych dla tabeli pośredniej `advisor_company` i aktualizacja powiązań.
   - Implementacja przypadku użycia `AssignAdvisorToCompanyUseCase` ze ścisłą weryfikacją autoryzacji.
@@ -267,7 +268,7 @@ npm test
   - Interfejs edycji celów finansowych dla Doradcy z dynamicznymi wskaźnikami statusów i semaforami (OPT, WARN, CRIT).
 - [ ] **Faza 15: Dynamiczne Lata Obrachunkowe i Precyzyjne Rozbicie OPEX**
   - [x] Implementacja zapytania domenowego `GetAvailableFiscalYearsQuery` oraz metody repozytorium do dynamicznego wyciągania aktywnych lat obrachunkowych spółki.
-  - [ ] Endpoint REST API `GET /api/v1/finance/analytics/years`.
+  - [x] Endpoint REST API `GET /api/v1/finance/analytics/years`.
   - [ ] Rozszerzenie zapytania `GetCategoryBreakdownQuery` o filtrowanie `category_type` (OPEX vs COGS/TAX).
   - [ ] Testy jednostkowe i integracyjne dla dynamicznych lat i filtrowania kategorii.
   - [ ] Integracja `DealContext` z dynamiczną listą lat oraz zaktualizowanie wykresu struktury kosztów.

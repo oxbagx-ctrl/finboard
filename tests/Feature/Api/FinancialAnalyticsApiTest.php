@@ -216,6 +216,41 @@ final class FinancialAnalyticsApiTest extends TestCase
         $this->assertGreaterThan(0.5, (float) $response->json('data.0.quick_ratio'));
     }
 
+    public function test_get_available_fiscal_years_returns_years_for_company(): void
+    {
+        Sanctum::actingAs($this->clientUser);
+
+        $response = $this->getJson('/api/v1/finance/analytics/years');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('status', 'success')
+            ->assertJsonPath('company_id', $this->acmeCompany->id)
+            ->assertJsonStructure([
+                'status',
+                'company_id',
+                'count',
+                'data',
+            ]);
+
+        $years = $response->json('data');
+        $this->assertIsArray($years);
+        $this->assertNotEmpty($years);
+        $this->assertContains(2026, $years);
+    }
+
+    public function test_admin_can_query_available_fiscal_years_for_any_company(): void
+    {
+        Sanctum::actingAs($this->adminUser);
+
+        $response = $this->getJson('/api/v1/finance/analytics/years?company_id=' . $this->acmeCompany->id);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('status', 'success')
+            ->assertJsonPath('company_id', $this->acmeCompany->id);
+
+        $this->assertNotEmpty($response->json('data'));
+    }
+
     public function test_admin_can_query_metrics_for_any_company(): void
     {
         Sanctum::actingAs($this->adminUser);
