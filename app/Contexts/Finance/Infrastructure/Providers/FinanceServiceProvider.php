@@ -7,10 +7,12 @@ namespace App\Contexts\Finance\Infrastructure\Providers;
 use App\Contexts\Finance\Application\Services\CsvFinancialDataParser;
 use App\Contexts\Finance\Application\Services\KpiEvaluationService;
 use App\Contexts\Finance\Domain\Repositories\CategoryRepositoryInterface;
+use App\Contexts\Finance\Domain\Repositories\FinancialAuditLogRepositoryInterface;
 use App\Contexts\Finance\Domain\Repositories\FinancialBenchmarkRepositoryInterface;
 use App\Contexts\Finance\Domain\Repositories\FinancialRecordRepositoryInterface;
 use App\Contexts\Finance\Domain\Services\FinancialCalculator;
 use App\Contexts\Finance\Infrastructure\Repositories\EloquentCategoryRepository;
+use App\Contexts\Finance\Infrastructure\Repositories\EloquentFinancialAuditLogRepository;
 use App\Contexts\Finance\Infrastructure\Repositories\EloquentFinancialBenchmarkRepository;
 use App\Contexts\Finance\Infrastructure\Repositories\EloquentFinancialRecordRepository;
 use Illuminate\Support\ServiceProvider;
@@ -27,6 +29,11 @@ final class FinanceServiceProvider extends ServiceProvider
         $this->app->bind(
             FinancialBenchmarkRepositoryInterface::class,
             EloquentFinancialBenchmarkRepository::class
+        );
+
+        $this->app->bind(
+            FinancialAuditLogRepositoryInterface::class,
+            EloquentFinancialAuditLogRepository::class
         );
 
         $this->app->bind(

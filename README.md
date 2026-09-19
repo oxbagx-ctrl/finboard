@@ -5,7 +5,7 @@
 [![PostgreSQL](https://img.shields.io/badge/postgresql-16-blue.svg)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/redis-alpine-red.svg)](https://redis.io/)
 [![Architecture](https://img.shields.io/badge/architecture-DDD%20%2F%20CQRS-brightgreen.svg)]()
-[![Tests](https://img.shields.io/badge/tests-312%20backend%20%7C%2099%20frontend%20passed-success.svg)]()
+[![Tests](https://img.shields.io/badge/tests-324%20backend%20%7C%2099%20frontend%20passed-success.svg)]()
 
 FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakcyjnego (M&A, Due Diligence, Corporate Finance) oraz ich klientom (CFO, Zarządy). Aplikacja łączy w sobie zaawansowaną analitykę finansową w ujęciu wielo-najemcowym (Multi-Tenant) z bezpiecznym repozytorium dokumentów Virtual Data Room (VDR).
 
@@ -16,9 +16,10 @@ FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakc
 - **Architektura DDD (Domain-Driven Design) & CQRS**:
     - Wyraźny podział na Bounded Contexts: `Identity`, `Finance`, `DocumentManagement`, `Tenant`.
     - Rozdzielenie ścieżki zapisu (Commands) i odczytu (Queries).
-    - Domenowe Value Objects (`Money` z precyzją `bcmath` do 4 miejsc po przecinku, `DateRange`, `FileMetadata`, `CompanyId`, `RoleType`, `Token`, `InvitationId`, `FinancialMetrics`, `FinancialBenchmarkId`, `BenchmarkStatus`, `BenchmarkMetricType`).
+    - Domenowe Value Objects (`Money` z precyzją `bcmath` do 4 miejsc po przecinku, `DateRange`, `FileMetadata`, `CompanyId`, `RoleType`, `Token`, `InvitationId`, `FinancialMetrics`, `FinancialBenchmarkId`, `BenchmarkStatus`, `BenchmarkMetricType`, `FinancialAuditLogId`, `AuditAction`).
     - Domenowy kalkulator finansowy (`FinancialCalculator`) oraz metody domenowe `FinancialRecord` wyliczające wskaźniki P&L (Gross Profit, OPEX, EBIT, EBITDA, Zysk Netto, marże) oraz bilansu i płynności (Current Ratio, Quick Ratio, Debt-to-Assets).
     - Encja domenowa `FinancialBenchmark` realizująca ewaluację wskaźników spółki z przypisaniem flag statusu (`OPT`, `WARN`, `CRIT`, `UNKNOWN`) oraz repozytorium `FinancialBenchmarkRepositoryInterface` trwale zapisujące cele w PostgreSQL.
+    - Encja domenowa `FinancialAuditLog` i repozytorium `FinancialAuditLogRepositoryInterface` zapewniające niezmienny rejestr ścieżki audytowej (Audit Trail) dla operacji finansowych, konfiguracji celów i importów.
     - Serwis aplikacyjny `KpiCalculationService` kalkulujący dynamikę YoY oraz MoM na danych historycznych ze ścisłą ochroną przed dzieleniem przez zero.
     - Serwis aplikacyjny `KpiEvaluationService` ewaluujący dynamicznie metryki finansowe spółki wobec skonfigurowanych celów doradcy (lub rynkowych wartości domyślnych) wraz z wyznaczaniem statusów semaforowych (`OPT`, `WARN`, `CRIT`), syntetycznego wskaźnika `health_score` i zagregowanego stanu zdrowia finansowego.
     - Kontroler `BenchmarkController` w warstwie prezentacji REST API obsługujący odczyt, konfigurację progów, masową aktualizację i resetowanie celów finansowych spółek portfelowych przez Doradców i Administratorów.
@@ -76,11 +77,11 @@ app/
 │   │   ├── Domain/             # Agregaty (User, Invitation), Value Objects (Role, Token), Eventy
 │   │   ├── Application/        # Use Cases (InviteUser, AcceptInvitation), DTOs, Listeners
 │   │   └── Infrastructure/     # Repozytoria Eloquent, Hashers, Providers
-│   ├── Finance/                # Bounded Context: Księgowość, Dynamiczne KPI, Importy, Benchmarki
-│   │   ├── Domain/             # Agregaty (FinancialRecord, FinancialBenchmark), Value Objects (Money, DateRange, BenchmarkStatus, BenchmarkMetricType)
+│   ├── Finance/                # Bounded Context: Księgowość, Dynamiczne KPI, Importy, Benchmarki, Logi Audytowe
+│   │   ├── Domain/             # Agregaty (FinancialRecord, FinancialBenchmark, FinancialAuditLog), Value Objects
 │   │   │                       # Serwis domenowy FinancialCalculator, kalkulacje P&L i wskaźników płynności
 │   │   ├── Application/        # Commands/Queries, KpiCalculationService (dynamika YoY/MoM), KpiEvaluationService (flagi OPT/WARN/CRIT), CsvFinancialDataParser, Jobs
-│   │   └── Infrastructure/     # EloquentFinancialRecordRepository, EloquentFinancialBenchmarkRepository, Providers
+│   │   └── Infrastructure/     # Repozytoria Eloquent (FinancialRecord, FinancialBenchmark, FinancialAuditLog), Providers
 │   ├── DocumentManagement/     # Bounded Context: Virtual Data Room (VDR)
 │   │   ├── Domain/             # Agregat Document, Logi audytowe, Value Objects (FileMetadata, Checksum)
 │   │   ├── Application/        # DTOs, Handlers, Zarządzanie wersjami i audytem
@@ -89,7 +90,7 @@ app/
 │       ├── Domain/             # Agregat CompanyAdvisorAssignment, repozytoria powiązań
 │       ├── Application/        # Use Cases przypisywania doradców (AssignAdvisor, RevokeAdvisor)
 │       └── Infrastructure/     # EloquentCompanyAdvisorRepository
-├── Models/                     # Modele Eloquent (User, Company, FinancialRecord, FinancialBenchmark, Document, etc.)
+├── Models/                     # Modele Eloquent (User, Company, FinancialRecord, FinancialBenchmark, FinancialAuditLog, Document, etc.)
 └── Presentation/
     └── Api/Controllers/        # Kontrolery REST API (Auth, Kpi, Benchmark, FinancialRecords, Analytics, VDR, Invitations, Advisors)
 ```
@@ -334,7 +335,7 @@ Baza danych zasilona jest danymi demonstracyjnymi (21 miesięcy historii finanso
   - [x] Endpointy REST API do pobierania i konfiguracji benchmarków dla doradców.
   - [x] Testy jednostkowe i integracyjne modułu benchmarków oraz weryfikacja uprawnień.
 - [ ] **Faza 14: Logi Audytowe i Dynamiczny Frontend (Finance & Deal Advisory)**
-  - [ ] Encja `AuditLog`, migracja bazy danych i repozytorium dla operacji finansowych i konfiguracji celów.
+  - [x] Encja `FinancialAuditLog`, migracja bazy danych i repozytorium dla operacji finansowych i konfiguracji celów.
   - [ ] Rejestracja listenerów zdarzeń domenowych utrwalających wpisy w dzienniku audytowym.
   - [ ] Endpointy REST API do pobierania logów audytowych przypisanych do spółki.
   - [ ] Zastąpienie statycznych wartości na Pulpicie Zarządczym i w Analityce P&L dynamicznymi danymi z API.
