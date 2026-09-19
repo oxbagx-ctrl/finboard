@@ -64,9 +64,19 @@ final class Category extends Entity
         return new self('cat-inventory', 'Zapasy', CategoryType::INVENTORY, 'INV', 'Towary, materiały i produkty w toku');
     }
 
+    public static function fixedAssets(): self
+    {
+        return new self('cat-fixed-assets', 'Aktywa trwałe', CategoryType::FIXED_ASSETS, 'FIX', 'Rzeczowe aktywa trwałe i wartości niematerialne');
+    }
+
     public static function currentLiabilities(): self
     {
         return new self('cat-cur-liab', 'Zobowiązania krótkoterminowe', CategoryType::CURRENT_LIABILITIES, 'CLIAB', 'Zobowiązania wobec dostawców i banków płatne w ciągu roku');
+    }
+
+    public static function longTermLiabilities(): self
+    {
+        return new self('cat-lt-liab', 'Zobowiązania długoterminowe', CategoryType::LONG_TERM_LIABILITIES, 'LTLIAB', 'Kredyty i pożyczki długoterminowe powyżej 1 roku');
     }
 
     public function id(): string

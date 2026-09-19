@@ -56,8 +56,26 @@ enum CategoryType: string
         ], true);
     }
 
+    public function isFixedAsset(): bool
+    {
+        return $this === self::FIXED_ASSETS;
+    }
+
     public function isCurrentLiability(): bool
     {
         return $this === self::CURRENT_LIABILITIES;
+    }
+
+    public function isLongTermLiability(): bool
+    {
+        return $this === self::LONG_TERM_LIABILITIES;
+    }
+
+    public function isDebt(): bool
+    {
+        return in_array($this, [
+            self::CURRENT_LIABILITIES,
+            self::LONG_TERM_LIABILITIES,
+        ], true);
     }
 }

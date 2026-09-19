@@ -29,7 +29,10 @@ final class FinancialMetrics implements ValueObject
         private readonly Money $currentLiabilities,
         private readonly ?float $currentRatio,
         private readonly ?float $quickRatio,
-        private readonly ?DateRange $period = null
+        private readonly ?DateRange $period = null,
+        private readonly ?Money $totalAssets = null,
+        private readonly ?Money $totalDebt = null,
+        private readonly ?float $debtToAssets = null
     ) {
     }
 
@@ -133,6 +136,21 @@ final class FinancialMetrics implements ValueObject
         return $this->quickRatio;
     }
 
+    public function totalAssets(): ?Money
+    {
+        return $this->totalAssets;
+    }
+
+    public function totalDebt(): ?Money
+    {
+        return $this->totalDebt;
+    }
+
+    public function debtToAssets(): ?float
+    {
+        return $this->debtToAssets;
+    }
+
     public function period(): ?DateRange
     {
         return $this->period;
@@ -148,7 +166,8 @@ final class FinancialMetrics implements ValueObject
             && $this->netProfit->equals($other->netProfit)
             && $this->ebitda->equals($other->ebitda)
             && $this->currentRatio === $other->currentRatio
-            && $this->quickRatio === $other->quickRatio;
+            && $this->quickRatio === $other->quickRatio
+            && $this->debtToAssets === $other->debtToAssets;
     }
 
     /**
@@ -225,10 +244,19 @@ final class FinancialMetrics implements ValueObject
                     'amount' => $this->currentLiabilities->toDecimal(),
                     'formatted' => $this->currentLiabilities->format(),
                 ],
+                'total_assets' => $this->totalAssets ? [
+                    'amount' => $this->totalAssets->toDecimal(),
+                    'formatted' => $this->totalAssets->format(),
+                ] : null,
+                'total_debt' => $this->totalDebt ? [
+                    'amount' => $this->totalDebt->toDecimal(),
+                    'formatted' => $this->totalDebt->format(),
+                ] : null,
             ],
             'ratios' => [
                 'current_ratio' => $this->currentRatio !== null ? round($this->currentRatio, 2) : null,
                 'quick_ratio' => $this->quickRatio !== null ? round($this->quickRatio, 2) : null,
+                'debt_to_assets' => $this->debtToAssets !== null ? round($this->debtToAssets, 4) : null,
             ],
         ];
     }

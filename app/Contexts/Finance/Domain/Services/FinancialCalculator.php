@@ -32,7 +32,9 @@ final class FinancialCalculator
 
         $currentAssets = Money::zero($currency);
         $inventory = Money::zero($currency);
+        $fixedAssets = Money::zero($currency);
         $currentLiabilities = Money::zero($currency);
+        $longTermLiabilities = Money::zero($currency);
 
         foreach ($records as $record) {
             // If period filter is specified, skip out-of-period records
@@ -55,7 +57,7 @@ final class FinancialCalculator
             };
 
             // Balance sheet classifications
-            if ($categoryType->isCurrentAsset()) {
+            if ($record->isCurrentAsset()) {
                 $currentAssets = $currentAssets->add($amount);
             }
 
@@ -63,8 +65,16 @@ final class FinancialCalculator
                 $inventory = $inventory->add($amount);
             }
 
-            if ($categoryType->isCurrentLiability()) {
+            if ($record->isFixedAsset()) {
+                $fixedAssets = $fixedAssets->add($amount);
+            }
+
+            if ($record->isCurrentLiability()) {
                 $currentLiabilities = $currentLiabilities->add($amount);
+            }
+
+            if ($record->isLongTermLiability()) {
+                $longTermLiabilities = $longTermLiabilities->add($amount);
             }
         }
 
@@ -84,10 +94,14 @@ final class FinancialCalculator
         $netProfit = $ebit->subtract($financialCosts)->subtract($tax);
         $netMargin = $this->calculateMargin($netProfit, $revenue);
 
-        // Liquidity computations
+        // Liquidity and Solvency computations delegating to FinancialRecord domain logic
         $quickAssets = $currentAssets->subtract($inventory);
-        $currentRatio = $this->calculateRatio($currentAssets, $currentLiabilities);
-        $quickRatio = $this->calculateRatio($quickAssets, $currentLiabilities);
+        $totalAssets = $currentAssets->add($fixedAssets);
+        $totalDebt = $currentLiabilities->add($longTermLiabilities);
+
+        $currentRatio = FinancialRecord::calculateCurrentRatio($currentAssets, $currentLiabilities);
+        $quickRatio = FinancialRecord::calculateQuickRatio($quickAssets, $currentLiabilities);
+        $debtToAssets = FinancialRecord::calculateDebtToAssets($totalDebt, $totalAssets);
 
         return new FinancialMetrics(
             revenue: $revenue,
@@ -110,7 +124,10 @@ final class FinancialCalculator
             currentLiabilities: $currentLiabilities,
             currentRatio: $currentRatio,
             quickRatio: $quickRatio,
-            period: $period
+            period: $period,
+            totalAssets: $totalAssets,
+            totalDebt: $totalDebt,
+            debtToAssets: $debtToAssets
         );
     }
 
@@ -136,7 +153,7 @@ final class FinancialCalculator
      */
     public function calculateCurrentRatio(Money $currentAssets, Money $currentLiabilities): ?float
     {
-        return $this->calculateRatio($currentAssets, $currentLiabilities);
+        return FinancialRecord::calculateCurrentRatio($currentAssets, $currentLiabilities);
     }
 
     /**
@@ -144,7 +161,15 @@ final class FinancialCalculator
      */
     public function calculateQuickRatio(Money $quickAssets, Money $currentLiabilities): ?float
     {
-        return $this->calculateRatio($quickAssets, $currentLiabilities);
+        return FinancialRecord::calculateQuickRatio($quickAssets, $currentLiabilities);
+    }
+
+    /**
+     * Calculate Debt-to-Assets Ratio: Total Debt / Total Assets.
+     */
+    public function calculateDebtToAssets(Money $totalDebt, Money $totalAssets): ?float
+    {
+        return FinancialRecord::calculateDebtToAssets($totalDebt, $totalAssets);
     }
 
     private function calculateMargin(Money $numerator, Money $denominator): float
@@ -156,16 +181,5 @@ final class FinancialCalculator
         $result = bcdiv($numerator->amount(), $denominator->amount(), 6);
 
         return (float) $result;
-    }
-
-    private function calculateRatio(Money $numerator, Money $denominator): ?float
-    {
-        if ($denominator->isZero() || $denominator->isNegative()) {
-            return null;
-        }
-
-        $ratio = bcdiv($numerator->amount(), $denominator->amount(), 4);
-
-        return (float) $ratio;
     }
 }

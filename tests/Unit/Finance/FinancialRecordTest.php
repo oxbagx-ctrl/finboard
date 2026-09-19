@@ -110,41 +110,134 @@ final class FinancialRecordTest extends TestCase
 
     public function test_category_classification_predicates(): void
     {
-        $cashRecord = FinancialRecord::create(
-            id: FinancialRecordId::generate(),
-            companyId: self::COMPANY_ID,
-            category: Category::cash(),
-            amount: Money::fromDecimal('50000.0000', Currency::PLN),
-            recordDate: new DateTimeImmutable('2026-01-01'),
-            description: 'Rachunek bieżący'
-        );
-
+        $cashRecord = $this->makeRecord(Category::cash(), '50000.0000');
         $this->assertTrue($cashRecord->isAsset());
         $this->assertTrue($cashRecord->isCurrentAsset());
         $this->assertTrue($cashRecord->isQuickAsset());
+        $this->assertFalse($cashRecord->isFixedAsset());
+        $this->assertFalse($cashRecord->isDebt());
 
-        $invRecord = FinancialRecord::create(
-            id: FinancialRecordId::generate(),
-            companyId: self::COMPANY_ID,
-            category: Category::inventory(),
-            amount: Money::fromDecimal('30000.0000', Currency::PLN),
-            recordDate: new DateTimeImmutable('2026-01-01'),
-            description: 'Magazyn wyrobów gotowych'
-        );
-
+        $invRecord = $this->makeRecord(Category::inventory(), '30000.0000');
         $this->assertTrue($invRecord->isCurrentAsset());
         $this->assertFalse($invRecord->isQuickAsset()); // Inventory excluded from quick ratio!
 
-        $depRecord = FinancialRecord::create(
-            id: FinancialRecordId::generate(),
-            companyId: self::COMPANY_ID,
-            category: Category::depreciation(),
-            amount: Money::fromDecimal('4000.0000', Currency::PLN),
-            recordDate: new DateTimeImmutable('2026-01-01'),
-            description: 'Odpis amortyzacyjny maszyny CNC'
-        );
+        $fixedRecord = $this->makeRecord(Category::fixedAssets(), '150000.0000');
+        $this->assertTrue($fixedRecord->isAsset());
+        $this->assertTrue($fixedRecord->isFixedAsset());
+        $this->assertFalse($fixedRecord->isCurrentAsset());
 
+        $curLiabRecord = $this->makeRecord(Category::currentLiabilities(), '40000.0000');
+        $this->assertTrue($curLiabRecord->isLiability());
+        $this->assertTrue($curLiabRecord->isCurrentLiability());
+        $this->assertTrue($curLiabRecord->isDebt());
+        $this->assertFalse($curLiabRecord->isLongTermLiability());
+
+        $ltLiabRecord = $this->makeRecord(Category::longTermLiabilities(), '60000.0000');
+        $this->assertTrue($ltLiabRecord->isLiability());
+        $this->assertTrue($ltLiabRecord->isLongTermLiability());
+        $this->assertTrue($ltLiabRecord->isDebt());
+        $this->assertFalse($ltLiabRecord->isCurrentLiability());
+
+        $depRecord = $this->makeRecord(Category::depreciation(), '4000.0000');
         $this->assertTrue($depRecord->isExpense());
         $this->assertTrue($depRecord->isDepreciation());
+    }
+
+    public function test_calculate_current_ratio_domain_logic(): void
+    {
+        $currentAssets = Money::fromDecimal('200000.0000', Currency::PLN);
+        $currentLiabilities = Money::fromDecimal('100000.0000', Currency::PLN);
+
+        $ratio = FinancialRecord::calculateCurrentRatio($currentAssets, $currentLiabilities);
+        $this->assertSame(2.0, $ratio);
+
+        // Edge case: zero liabilities returns null (not error or division by zero)
+        $this->assertNull(
+            FinancialRecord::calculateCurrentRatio($currentAssets, Money::zero(Currency::PLN))
+        );
+    }
+
+    public function test_calculate_quick_ratio_domain_logic(): void
+    {
+        $quickAssets = Money::fromDecimal('150000.0000', Currency::PLN);
+        $currentLiabilities = Money::fromDecimal('100000.0000', Currency::PLN);
+
+        $ratio = FinancialRecord::calculateQuickRatio($quickAssets, $currentLiabilities);
+        $this->assertSame(1.5, $ratio);
+
+        // Edge case: zero liabilities returns null
+        $this->assertNull(
+            FinancialRecord::calculateQuickRatio($quickAssets, Money::zero(Currency::PLN))
+        );
+    }
+
+    public function test_calculate_debt_to_assets_domain_logic(): void
+    {
+        // Total Debt (100k) / Total Assets (400k) = 0.25
+        $totalDebt = Money::fromDecimal('100000.0000', Currency::PLN);
+        $totalAssets = Money::fromDecimal('400000.0000', Currency::PLN);
+
+        $ratio = FinancialRecord::calculateDebtToAssets($totalDebt, $totalAssets);
+        $this->assertSame(0.25, $ratio);
+
+        // Edge case: zero assets returns null
+        $this->assertNull(
+            FinancialRecord::calculateDebtToAssets($totalDebt, Money::zero(Currency::PLN))
+        );
+    }
+
+    public function test_calculate_balance_ratios_from_records_collection(): void
+    {
+        $records = [
+            $this->makeRecord(Category::cash(), '50000.0000'),
+            $this->makeRecord(Category::receivables(), '100000.0000'),
+            $this->makeRecord(Category::inventory(), '50000.0000'),
+            $this->makeRecord(Category::fixedAssets(), '200000.0000'),
+            $this->makeRecord(Category::currentLiabilities(), '100000.0000'),
+            $this->makeRecord(Category::longTermLiabilities(), '50000.0000'),
+        ];
+
+        $ratios = FinancialRecord::calculateBalanceRatiosFromRecords($records, Currency::PLN);
+
+        // Current Assets: 50k + 100k + 50k = 200k
+        $this->assertSame('200000.0000', $ratios['current_assets']->amount());
+        // Quick Assets: 50k + 100k = 150k
+        $this->assertSame('150000.0000', $ratios['quick_assets']->amount());
+        // Current Liabilities: 100k
+        $this->assertSame('100000.0000', $ratios['current_liabilities']->amount());
+        // Total Assets: 200k + 200k = 400k
+        $this->assertSame('400000.0000', $ratios['total_assets']->amount());
+        // Total Debt: 100k + 50k = 150k
+        $this->assertSame('150000.0000', $ratios['total_debt']->amount());
+
+        // Current Ratio: 200k / 100k = 2.0
+        $this->assertSame(2.0, $ratios['current_ratio']);
+        // Quick Ratio: 150k / 100k = 1.5
+        $this->assertSame(1.5, $ratios['quick_ratio']);
+        // Debt to Assets: 150k / 400k = 0.375
+        $this->assertSame(0.375, $ratios['debt_to_assets']);
+    }
+
+    public function test_empty_records_collection_returns_null_ratios(): void
+    {
+        $ratios = FinancialRecord::calculateBalanceRatiosFromRecords([], Currency::PLN);
+
+        $this->assertNull($ratios['current_ratio']);
+        $this->assertNull($ratios['quick_ratio']);
+        $this->assertNull($ratios['debt_to_assets']);
+        $this->assertSame('0.0000', $ratios['total_assets']->amount());
+        $this->assertSame('0.0000', $ratios['total_debt']->amount());
+    }
+
+    private function makeRecord(Category $category, string $amount): FinancialRecord
+    {
+        return FinancialRecord::create(
+            id: FinancialRecordId::generate(),
+            companyId: self::COMPANY_ID,
+            category: $category,
+            amount: Money::fromDecimal($amount, Currency::PLN),
+            recordDate: new DateTimeImmutable('2026-01-01'),
+            description: 'Balance test record'
+        );
     }
 }

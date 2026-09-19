@@ -40,7 +40,9 @@ final class FinancialCalculatorTest extends TestCase
             $this->createRecord(Category::cash(), '50000.0000'),
             $this->createRecord(Category::receivables(), '100000.0000'),
             $this->createRecord(Category::inventory(), '50000.0000'),
+            $this->createRecord(Category::fixedAssets(), '200000.0000'),
             $this->createRecord(Category::currentLiabilities(), '100000.0000'),
+            $this->createRecord(Category::longTermLiabilities(), '60000.0000'),
         ];
 
         $period = DateRange::forQuarter(2026, 1);
@@ -73,11 +75,22 @@ final class FinancialCalculatorTest extends TestCase
         $this->assertSame('150000.0000', $metrics->quickAssets()->amount());
         $this->assertSame('100000.0000', $metrics->currentLiabilities()->amount());
 
+        // Solvency / Balance sheet:
+        // Total Assets: 200k (current) + 200k (fixed) = 400k
+        $this->assertNotNull($metrics->totalAssets());
+        $this->assertSame('400000.0000', $metrics->totalAssets()->amount());
+        // Total Debt: 100k (current) + 60k (long term) = 160k
+        $this->assertNotNull($metrics->totalDebt());
+        $this->assertSame('160000.0000', $metrics->totalDebt()->amount());
+
         // Current Ratio = 200k / 100k = 2.0
         $this->assertSame(2.0, $metrics->currentRatio());
 
         // Quick Ratio = 150k / 100k = 1.5
         $this->assertSame(1.5, $metrics->quickRatio());
+
+        // Debt-to-Assets = 160k / 400k = 0.4
+        $this->assertSame(0.4, $metrics->debtToAssets());
 
         // Serialization structure check
         $array = $metrics->toArray();
@@ -86,6 +99,9 @@ final class FinancialCalculatorTest extends TestCase
         $this->assertSame(26.0, $array['pnl']['net_margin_pct']);
         $this->assertSame(2.0, $array['ratios']['current_ratio']);
         $this->assertSame(1.5, $array['ratios']['quick_ratio']);
+        $this->assertSame(0.4, $array['ratios']['debt_to_assets']);
+        $this->assertSame(400000.0, $array['balance_sheet']['total_assets']['amount']);
+        $this->assertSame(160000.0, $array['balance_sheet']['total_debt']['amount']);
     }
 
     public function test_zero_liabilities_handles_liquidity_gracefully(): void
@@ -98,6 +114,7 @@ final class FinancialCalculatorTest extends TestCase
 
         $this->assertNull($metrics->currentRatio());
         $this->assertNull($metrics->quickRatio());
+        $this->assertSame(0.0, $metrics->debtToAssets());
     }
 
     public function test_individual_ratio_calculator_methods(): void
@@ -115,9 +132,12 @@ final class FinancialCalculatorTest extends TestCase
         $curAssets = Money::fromDecimal('250000.0000', Currency::PLN);
         $quickAssets = Money::fromDecimal('180000.0000', Currency::PLN);
         $liabilities = Money::fromDecimal('100000.0000', Currency::PLN);
+        $totalDebt = Money::fromDecimal('120000.0000', Currency::PLN);
+        $totalAssets = Money::fromDecimal('400000.0000', Currency::PLN);
 
         $this->assertSame(2.5, $this->calculator->calculateCurrentRatio($curAssets, $liabilities));
         $this->assertSame(1.8, $this->calculator->calculateQuickRatio($quickAssets, $liabilities));
+        $this->assertSame(0.3, $this->calculator->calculateDebtToAssets($totalDebt, $totalAssets));
     }
 
     private function createRecord(Category $category, string $amount): FinancialRecord

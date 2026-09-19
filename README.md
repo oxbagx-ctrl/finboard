@@ -5,7 +5,7 @@
 [![PostgreSQL](https://img.shields.io/badge/postgresql-16-blue.svg)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/redis-alpine-red.svg)](https://redis.io/)
 [![Architecture](https://img.shields.io/badge/architecture-DDD%20%2F%20CQRS-brightgreen.svg)]()
-[![Tests](https://img.shields.io/badge/tests-245%20backend%20%7C%2099%20frontend%20passed-success.svg)]()
+[![Tests](https://img.shields.io/badge/tests-250%20backend%20%7C%2099%20frontend%20passed-success.svg)]()
 
 FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakcyjnego (M&A, Due Diligence, Corporate Finance) oraz ich klientom (CFO, Zarządy). Aplikacja łączy w sobie zaawansowaną analitykę finansową w ujęciu wielo-najemcowym (Multi-Tenant) z bezpiecznym repozytorium dokumentów Virtual Data Room (VDR).
 
@@ -16,8 +16,8 @@ FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakc
 - **Architektura DDD (Domain-Driven Design) & CQRS**:
     - Wyraźny podział na Bounded Contexts: `Identity`, `Finance`, `DocumentManagement`, `Tenant`.
     - Rozdzielenie ścieżki zapisu (Commands) i odczytu (Queries).
-    - Domenowe Value Objects (`Money` z precyzją `bcmath` do 4 miejsc po przecinku, `DateRange`, `FileMetadata`, `CompanyId`, `RoleType`, `Token`, `InvitationId`).
-    - Domenowy kalkulator finansowy (`FinancialCalculator`) wyliczający wskaźniki P&L (Gross Profit, OPEX, EBIT, EBITDA, Zysk Netto, marże) oraz bilansu i płynności (Current Ratio, Quick Ratio).
+    - Domenowe Value Objects (`Money` z precyzją `bcmath` do 4 miejsc po przecinku, `DateRange`, `FileMetadata`, `CompanyId`, `RoleType`, `Token`, `InvitationId`, `FinancialMetrics`).
+    - Domenowy kalkulator finansowy (`FinancialCalculator`) oraz metody domenowe `FinancialRecord` wyliczające wskaźniki P&L (Gross Profit, OPEX, EBIT, EBITDA, Zysk Netto, marże) oraz bilansu i płynności (Current Ratio, Quick Ratio, Debt-to-Assets).
 - **Bezpieczeństwo i Izolacja Multi-Tenant**:
     - Pełna separacja danych pomiędzy firmami (Tenant Isolation).
     - Hierarchiczny model uprawnień: **Super Admin** (Partner z globalnym zarządzaniem), **Doradca** (Advisor przypisany do wybranych spółek portfela) oraz **Klient** (Client ze ścisłym dostępem wyłącznie do własnej spółki).
@@ -80,7 +80,7 @@ app/
 │   │   └── Infrastructure/       # EloquentCompanyAdvisorRepository, EloquentCompanyRepository, TenantServiceProvider
 │   │
 │   ├── Finance/                  # Bounded Context: Finanse, Raportowanie i Analityka
-│   │   ├── Domain/               # FinancialRecord Aggregate, Category, Money VO (bcmath), DateRange VO, FinancialCalculator
+│   │   ├── Domain/               # FinancialRecord Aggregate, Category, Money VO (bcmath), DateRange VO, FinancialCalculator, FinancialMetrics VO
 │   │   ├── Application/          # CQRS Commands & Handlers (CRUD transakcji), CQRS Queries & Handlers (KPI, Trends, Solvency), Parser CSV, Jobs
 │   │   └── Infrastructure/       # EloquentFinancialRecordRepository, EloquentCategoryRepository
 │   │
@@ -314,10 +314,16 @@ Baza danych zasilona jest danymi demonstracyjnymi (21 miesięcy historii finanso
   - Modal zapraszania użytkownika z wyborem roli i przypisaniem firm dla doradców.
   - Bezpieczna strona aktywacji konta / ustawienia hasła na podstawie tokenu z linku e-mail.
 - [x] **Faza 11: Zarządzanie Portfelem Spółek (Portfolio Management)**
-  - [x] Endpoint rejestracji spółek portfelowych i walidacji danych (Backend API).
-  - [x] Interfejs dodawania nowej spółki portfelowej z matrycy spółek (Frontend UI).
-  - [x] Reaktywna synchronizacja listy spółek w modalach zaproszeń i kontekstu bez przeładowania strony (Frontend UI).
-  - [x] Integracja kontenera Mailpit (Mailcatcher) dla testowania wysyłki e-maili i linków aktywacyjnych w środowisku lokalnym.
+  - Endpoint rejestracji spółek portfelowych i walidacji danych (Backend API).
+  - Interfejs dodawania nowej spółki portfelowej z matrycy spółek (Frontend UI).
+  - Reaktywna synchronizacja listy spółek w modalach zaproszeń i kontekstu bez przeładowania strony (Frontend UI).
+  - Integracja kontenera Mailpit (Mailcatcher) dla testowania wysyłki e-maili i linków aktywacyjnych w środowisku lokalnym.
+- [ ] **Faza 12: Dynamiczne Obliczenia Wskaźników i Dynamiki (Finance)**
+  - [x] Implementacja logiki domenowej w `FinancialRecord` do wyliczania wskaźników płynności i zadłużenia (Current, Quick Ratios, Debt-to-Assets).
+  - [ ] Implementacja logiki domenowej dla kalkulacji marż (Gross, EBITDA, EBIT, Net Margin).
+  - [ ] Serwis aplikacyjny `KpiCalculationService` z dynamiczną kalkulacją dynamiki YoY i MoM z danych historycznych.
+  - [ ] Testy jednostkowe dla kalkulacji wskaźników i dynamiki z uwzględnieniem edge-cases.
+  - [ ] Aktualizacja kontrolera `KpiController` do zwracania dynamicznie wyliczonych wskaźników.
 
 ---
 
