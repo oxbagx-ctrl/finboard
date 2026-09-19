@@ -76,6 +76,10 @@ final class AdvisorManagementApiTest extends TestCase
     {
         $this->getJson('/api/v1/admin/advisors')->assertStatus(401);
         $this->getJson('/api/v1/admin/companies')->assertStatus(401);
+        $this->postJson('/api/v1/admin/companies', [
+            'name' => 'Test Company',
+            'code' => 'TEST',
+        ])->assertStatus(401);
     }
 
     public function test_non_admin_users_are_forbidden(): void
@@ -84,11 +88,19 @@ final class AdvisorManagementApiTest extends TestCase
         Sanctum::actingAs($this->client);
         $this->getJson('/api/v1/admin/advisors')->assertStatus(403);
         $this->getJson('/api/v1/admin/companies')->assertStatus(403);
+        $this->postJson('/api/v1/admin/companies', [
+            'name' => 'Test Company',
+            'code' => 'TEST',
+        ])->assertStatus(403);
 
         // Advisor forbidden from admin endpoints
         Sanctum::actingAs($this->advisor);
         $this->getJson('/api/v1/admin/advisors')->assertStatus(403);
         $this->getJson('/api/v1/admin/companies')->assertStatus(403);
+        $this->postJson('/api/v1/admin/companies', [
+            'name' => 'Test Company',
+            'code' => 'TEST',
+        ])->assertStatus(403);
     }
 
     public function test_superadmin_can_list_advisors_with_assigned_companies_and_search(): void
@@ -308,5 +320,88 @@ final class AdvisorManagementApiTest extends TestCase
         $this->assertNotNull($companyAData);
         $this->assertGreaterThanOrEqual(1, $companyAData['assigned_advisors_count']);
         $this->assertGreaterThanOrEqual(1, $companyAData['clients_count']);
+    }
+
+    public function test_superadmin_can_create_new_company(): void
+    {
+        Sanctum::actingAs($this->superAdmin);
+
+        $response = $this->postJson('/api/v1/admin/companies', [
+            'name' => 'Nordic Logistics Sp. z o.o.',
+            'code' => 'nordic',
+            'tax_id' => 'PL5251234567',
+        ]);
+
+        $response->assertStatus(201)
+            ->assertJsonPath('data.name', 'Nordic Logistics Sp. z o.o.')
+            ->assertJsonPath('data.code', 'NORDIC')
+            ->assertJsonPath('data.tax_id', 'PL5251234567')
+            ->assertJsonPath('message', 'Spółka portfelowa została pomyślnie zarejestrowana.');
+
+        $this->assertDatabaseHas('companies', [
+            'name' => 'Nordic Logistics Sp. z o.o.',
+            'code' => 'NORDIC',
+            'tax_id' => 'PL5251234567',
+        ]);
+    }
+
+    public function test_superadmin_can_create_company_with_initial_assigned_advisors(): void
+    {
+        Sanctum::actingAs($this->superAdmin);
+
+        $response = $this->postJson('/api/v1/admin/companies', [
+            'name' => 'Solar Energy Ventures S.A.',
+            'code' => 'SOLAR',
+            'tax_id' => '9998887766',
+            'assigned_advisor_ids' => [(string) $this->advisor->id],
+        ]);
+
+        $response->assertStatus(201)
+            ->assertJsonPath('data.name', 'Solar Energy Ventures S.A.')
+            ->assertJsonPath('data.code', 'SOLAR')
+            ->assertJsonPath('data.assigned_advisors_count', 1);
+
+        $companyId = (string) $response->json('data.id');
+
+        $this->assertDatabaseHas('advisor_company', [
+            'company_id' => $companyId,
+            'advisor_id' => (string) $this->advisor->id,
+            'assigned_by' => (string) $this->superAdmin->id,
+        ]);
+    }
+
+    public function test_create_company_validation_rules(): void
+    {
+        Sanctum::actingAs($this->superAdmin);
+
+        // Missing required fields
+        $response = $this->postJson('/api/v1/admin/companies', []);
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['name', 'code']);
+
+        // Duplicate code
+        $duplicateResponse = $this->postJson('/api/v1/admin/companies', [
+            'name' => 'Duplicate ACME',
+            'code' => 'acme',
+        ]);
+        $duplicateResponse->assertStatus(422)
+            ->assertJsonValidationErrors(['code']);
+
+        // Invalid code format (special characters)
+        $invalidCodeResponse = $this->postJson('/api/v1/admin/companies', [
+            'name' => 'Special Chars Sp. z o.o.',
+            'code' => 'BAD CODE!',
+        ]);
+        $invalidCodeResponse->assertStatus(422)
+            ->assertJsonValidationErrors(['code']);
+
+        // Invalid assigned advisor id
+        $invalidAdvisorResponse = $this->postJson('/api/v1/admin/companies', [
+            'name' => 'Valid Name Sp. z o.o.',
+            'code' => 'VALIDCODE',
+            'assigned_advisor_ids' => ['00000000-0000-0000-0000-000000000000'],
+        ]);
+        $invalidAdvisorResponse->assertStatus(422)
+            ->assertJsonValidationErrors(['assigned_advisor_ids.0']);
     }
 }

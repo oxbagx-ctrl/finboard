@@ -5,7 +5,7 @@
 [![PostgreSQL](https://img.shields.io/badge/postgresql-16-blue.svg)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/redis-alpine-red.svg)](https://redis.io/)
 [![Architecture](https://img.shields.io/badge/architecture-DDD%20%2F%20CQRS-brightgreen.svg)]()
-[![Tests](https://img.shields.io/badge/tests-240%20backend%20%7C%2088%20frontend%20passed-success.svg)]()
+[![Tests](https://img.shields.io/badge/tests-243%20backend%20%7C%2088%20frontend%20passed-success.svg)]()
 
 FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakcyjnego (M&A, Due Diligence, Corporate Finance) oraz ich klientom (CFO, Zarządy). Aplikacja łączy w sobie zaawansowaną analitykę finansową w ujęciu wielo-najemcowym (Multi-Tenant) z bezpiecznym repozytorium dokumentów Virtual Data Room (VDR).
 
@@ -94,7 +94,7 @@ app/
 │   └── Api/
 │       ├── Controllers/          # Kontrolery REST API (Auth, FinancialRecord, FinancialCategory, FinancialImport, FinancialAnalytics, Document, Health, Invitation, AdvisorManagement)
 │       ├── Middleware/           # RoleMiddleware, RequireCompanyAccessMiddleware (Tenant Isolation Guard)
-│       ├── Requests/             # FormRequests z walidacją (StoreInvitationRequest, AcceptInvitationRequest, AssignCompanyRequest, SyncAdvisorCompaniesRequest)
+│       ├── Requests/             # FormRequests z walidacją (StoreInvitationRequest, AcceptInvitationRequest, AssignCompanyRequest, SyncAdvisorCompaniesRequest, StoreCompanyRequest)
 │       ├── Resources/            # API Resources (InvitationResource, AdvisorResource, CompanyAssignmentResource, FinancialRecordResource, DocumentResource)
 │       └── Traits/               # ResolvesCompanyContext (Multi-Tenant Context Resolver)
 └── Shared/                       # Klasy bazowe architektury (ValueObject, AggregateRoot, DomainEvent, Entity)
@@ -204,6 +204,7 @@ Baza danych zasilona jest danymi demonstracyjnymi (21 miesięcy historii finanso
 - `PUT /api/v1/admin/advisors/{id}/companies` – Synchronizacja pełnej listy spółek przypisanych doradcy
 - `PATCH /api/v1/admin/advisors/{id}/toggle-status` – Zmiana statusu aktywności konta doradcy (aktywacja/dezaktywacja)
 - `GET /api/v1/admin/companies` – Przegląd wszystkich firm w systemie z liczbą doradców i klientów
+- `POST /api/v1/admin/companies` – Rejestracja nowej spółki portfelowej wraz z opcjonalnym przypisaniem początkowych doradców
 
 ### Zarządzanie Zaproszeniami i Aktywacja Konta (Invitation System)
 - `POST /api/v1/invitations` – Utworzenie i wysyłka nowego zaproszenia użytkownika (SuperAdmin, Advisor)
@@ -301,11 +302,14 @@ Baza danych zasilona jest danymi demonstracyjnymi (21 miesięcy historii finanso
   - Klasy Mailable i listenery zdarzeń do asynchronicznej wysyłki e-maili z zaproszeniami.
   - Przypadek użycia `AcceptInvitationUseCase` z walidacją tokenu i bezpiecznym ustawieniem hasła.
 - [x] **Faza 10: API i Frontend dla Zarządzania Użytkownikami**
-  - [x] Kontroler `InvitationController` mapujący endpointy REST dla zaproszeń.
-  - [x] Kontroler `AdvisorManagementController` dla SuperAdmina do zarządzania doradcami i przypisaniami.
-  - [x] Widok dashboardu SuperAdmina do zarządzania doradcami i przypisaniami spółek.
-  - [x] Modal zapraszania użytkownika z wyborem roli i przypisaniem firm dla doradców.
-  - [x] Bezpieczna strona aktywacji konta / ustawienia hasła na podstawie tokenu z linku e-mail.
+  - Kontroler `InvitationController` mapujący endpointy REST dla zaproszeń.
+  - Kontroler `AdvisorManagementController` dla SuperAdmina do zarządzania doradcami i przypisaniami.
+  - Widok dashboardu SuperAdmina do zarządzania doradcami i przypisaniami spółek.
+  - Modal zapraszania użytkownika z wyborem roli i przypisaniem firm dla doradców.
+  - Bezpieczna strona aktywacji konta / ustawienia hasła na podstawie tokenu z linku e-mail.
+- [ ] **Faza 11: Zarządzanie Portfelem Spółek (Portfolio Management)**
+  - [x] Endpoint rejestracji spółek portfelowych i walidacji danych (Backend API).
+  - [ ] Interfejs dodawania nowej spółki portfelowej z matrycy spółek (Frontend UI).
 
 ---
 

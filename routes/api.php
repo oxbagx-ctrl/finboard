@@ -45,6 +45,7 @@ Route::prefix('v1')->group(function () {
             Route::put('/advisors/{id}/companies', [AdvisorManagementController::class, 'syncCompanies'])->name('api.admin.advisors.sync-companies');
             Route::patch('/advisors/{id}/toggle-status', [AdvisorManagementController::class, 'toggleStatus'])->name('api.admin.advisors.toggle-status');
             Route::get('/companies', [AdvisorManagementController::class, 'companies'])->name('api.admin.companies.index');
+            Route::post('/companies', [AdvisorManagementController::class, 'storeCompany'])->name('api.admin.companies.store');
         });
 
         // Invitation Management Endpoints

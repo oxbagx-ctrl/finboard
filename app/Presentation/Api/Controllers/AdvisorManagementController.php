@@ -15,6 +15,7 @@ use App\Contexts\Tenant\Application\UseCases\RevokeAdvisorFromCompanyUseCase;
 use App\Models\Company;
 use App\Models\User;
 use App\Presentation\Api\Requests\AssignCompanyRequest;
+use App\Presentation\Api\Requests\StoreCompanyRequest;
 use App\Presentation\Api\Requests\SyncAdvisorCompaniesRequest;
 use App\Presentation\Api\Resources\AdvisorResource;
 use App\Presentation\Api\Resources\CompanyAssignmentResource;
@@ -24,6 +25,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -282,5 +284,43 @@ final class AdvisorManagementController extends Controller
             ->get();
 
         return CompanyAssignmentResource::collection($companies);
+    }
+
+    /**
+     * Store a new portfolio company in the system.
+     */
+    public function storeCompany(StoreCompanyRequest $request): JsonResponse
+    {
+        /** @var User $currentUser */
+        $currentUser = $request->user();
+        $validated = $request->validated();
+
+        $code = strtoupper(trim((string) $validated['code']));
+
+        $company = Company::create([
+            'id' => (string) Str::uuid(),
+            'name' => trim((string) $validated['name']),
+            'code' => $code,
+            'tax_id' => !empty($validated['tax_id']) ? trim((string) $validated['tax_id']) : null,
+        ]);
+
+        if (!empty($validated['assigned_advisor_ids'])) {
+            foreach ($validated['assigned_advisor_ids'] as $advisorId) {
+                $company->assignedAdvisors()->attach($advisorId, [
+                    'assigned_by' => (string) $currentUser->id,
+                ]);
+            }
+        }
+
+        $company->load(['assignedAdvisors:id,name,email,is_active']);
+        $company->loadCount([
+            'assignedAdvisors',
+            'users as clients_count' => fn ($q) => $q->where('role', 'client'),
+        ]);
+
+        return (new CompanyAssignmentResource($company))
+            ->additional(['message' => 'Spółka portfelowa została pomyślnie zarejestrowana.'])
+            ->response()
+            ->setStatusCode(Response::HTTP_CREATED);
     }
 }
