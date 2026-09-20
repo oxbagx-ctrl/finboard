@@ -145,6 +145,9 @@ const mockExpenseBreakdown = [
         category_name: 'Wynagrodzenia i świadczenia',
         amount: 270000,
         percentage: 54.0,
+        previous_amount: 300000,
+        amount_change: -30000,
+        yoy_growth_pct: -10.0,
     },
     {
         category_id: 'cat-it',
@@ -152,6 +155,9 @@ const mockExpenseBreakdown = [
         category_name: 'Infrastruktura IT i SaaS',
         amount: 80000,
         percentage: 16.0,
+        previous_amount: 60000,
+        amount_change: 20000,
+        yoy_growth_pct: 33.3,
     },
 ];
 
@@ -162,6 +168,9 @@ const mockRevenueBreakdown = [
         category_name: 'Sprzedaż maszyn i urządzeń',
         amount: 1440000,
         percentage: 72.0,
+        previous_amount: 1200000,
+        amount_change: 240000,
+        yoy_growth_pct: 20.0,
     },
     {
         category_id: 'rev-serv',
@@ -169,6 +178,9 @@ const mockRevenueBreakdown = [
         category_name: 'Usługi serwisowe SLA',
         amount: 560000,
         percentage: 28.0,
+        previous_amount: 560000,
+        amount_change: 0,
+        yoy_growth_pct: 0.0,
     },
 ];
 
@@ -391,5 +403,68 @@ describe('DashboardView Component', () => {
             expect(screen.getByText('Wynagrodzenia i świadczenia')).toBeInTheDocument();
             expect(screen.getByText('Infrastruktura IT i SaaS')).toBeInTheDocument();
         });
+    });
+
+    it("renders expandable P&L rows and displays category-level YoY badges with correct polarization", async () => {
+        renderWithProviders(<DashboardView />);
+
+        await waitFor(() => {
+            expect(screen.getByText("Rachunek Zysków i Strat (P&L Konsolidowany)")).toBeInTheDocument();
+        });
+
+        const pnlTable = screen.getByText("Rachunek Zysków i Strat (P&L Konsolidowany)").closest("div.bg-zinc-900");
+        expect(pnlTable).toBeInTheDocument();
+
+        // Verify Revenue group child items exist in P&L table
+        const rev1Element = Array.from(pnlTable.querySelectorAll("tr")).find(tr => tr.textContent.includes("Sprzedaż maszyn i urządzeń"));
+        expect(rev1Element).toBeInTheDocument();
+
+        // Revenue sub-row 1: +20.0% growth -> should have emerald styling (good)
+        const revProdBadge = rev1Element.querySelector("[data-testid=\"percentage-badge\"]");
+        expect(revProdBadge).toBeInTheDocument();
+        expect(revProdBadge).toHaveTextContent("+20.0%");
+        expect(revProdBadge.className).toContain("text-emerald-300");
+        expect(revProdBadge).toHaveAttribute("title", expect.stringContaining("Poprzednio:"));
+
+        // Revenue sub-row 2: 0.0% growth -> should display 0.0% with minus icon
+        const rev2Element = Array.from(pnlTable.querySelectorAll("tr")).find(tr => tr.textContent.includes("Usługi serwisowe SLA"));
+        expect(rev2Element).toBeInTheDocument();
+        const revServBadge = rev2Element.querySelector("[data-testid=\"percentage-badge\"]");
+        expect(revServBadge).toBeInTheDocument();
+        expect(revServBadge).toHaveTextContent("0.0%");
+
+        // OPEX group child items in P&L table
+        const salRow = Array.from(pnlTable.querySelectorAll("tr")).find(tr => tr.textContent.includes("Wynagrodzenia i świadczenia"));
+        expect(salRow).toBeInTheDocument();
+
+        // OPEX sub-row 1: -10.0% cost decrease -> with reverseChange: true, it should have emerald styling (good)
+        const salBadge = salRow.querySelector("[data-testid=\"percentage-badge\"]");
+        expect(salBadge).toBeInTheDocument();
+        expect(salBadge).toHaveTextContent("-10.0%");
+        expect(salBadge.className).toContain("text-emerald-300");
+        expect(salBadge).toHaveAttribute("title", expect.stringContaining("Poprzednio:"));
+
+        // OPEX sub-row 2: +33.3% cost increase -> with reverseChange: true, it should have rose styling (bad)
+        const itRow = Array.from(pnlTable.querySelectorAll("tr")).find(tr => tr.textContent.includes("Infrastruktura IT i SaaS"));
+        expect(itRow).toBeInTheDocument();
+        const itBadge = itRow.querySelector("[data-testid=\"percentage-badge\"]");
+        expect(itBadge).toBeInTheDocument();
+        expect(itBadge).toHaveTextContent("+33.3%");
+        expect(itBadge.className).toContain("text-rose-300");
+        expect(itBadge).toHaveAttribute("title", expect.stringContaining("Poprzednio:"));
+
+        // Test expanding and collapsing group
+        const opexGroupRow = Array.from(pnlTable.querySelectorAll("tr")).find(tr => tr.textContent.includes("4. Koszty Działalności Operacyjnej (OPEX)"));
+        expect(opexGroupRow).toBeInTheDocument();
+
+        // Click to collapse
+        fireEvent.click(opexGroupRow);
+        const collapsedSalRow = Array.from(pnlTable.querySelectorAll("tr")).find(tr => tr.textContent.includes("Wynagrodzenia i świadczenia"));
+        expect(collapsedSalRow).toBeUndefined();
+
+        // Click to re-expand
+        fireEvent.click(opexGroupRow);
+        const reexpandedSalRow = Array.from(pnlTable.querySelectorAll("tr")).find(tr => tr.textContent.includes("Wynagrodzenia i świadczenia"));
+        expect(reexpandedSalRow).toBeInTheDocument();
     });
 });
