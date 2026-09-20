@@ -355,7 +355,7 @@ npm test
   - Dokumentacja wytycznych bezpieczeństwa operacji masowych i ścieżki audytowej w changelogu.
 - [ ] **Faza 29: Komponent Modalu Szczegółów Audytu i Architektura Zakładek**
   - [x] Utworzenie komponentu `FinancialAuditDetailModal` z inspekcją zrzutów JSON dla `old_values` i `new_values`.
-  - [ ] Implementacja terminalowego przełącznika zakładek (Audyt Finansowy vs Audyt VDR) w `AuditLogsView`.
+  - [x] Implementacja terminalowego przełącznika zakładek (Audyt Finansowy vs Audyt VDR) w `AuditLogsView`.
   - [ ] Implementacja kafelków podsumowujących KPI dla statystyk audytu (`/finance/audit-logs/stats`).
   - [ ] Dodanie pigułek filtrów akcji finansowych ze wskaźnikami liczbowymi i stylami aktywnego stanu.
   - [ ] Testy jednostkowe dla `FinancialAuditDetailModal` renderującego metadane i diffy `old_values`/`new_values`.
