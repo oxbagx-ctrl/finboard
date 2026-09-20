@@ -336,13 +336,13 @@ npm test
   - Testy regresyjne E2E w `DashboardView.test.jsx` po przełączeniu roku i firmy.
   - Aktualizacja dokumentacji design systemu UI i changeloga pod kątem instytucjonalnych standardów tabelarycznych P&L.
 - [x] **Faza 26: Architektura Domenowa i Bezpieczne API Masowego Usuwania (Commity 126–130)**
-  - [x] Wprowadzenie komendy CQRS `BatchDeleteFinancialRecordsCommand` i handlera domenowego z izolacją tenanta.
-  - [x] Rozszerzenie interfejsu `FinancialRecordRepositoryInterface` i implementacji Eloquent o usuwanie masowe.
-  - [x] Rejestracja zdarzenia domenowego `FinancialRecordsBatchDeleted` i listenera audytu `financial_audit_logs`.
-  - [x] Wystawienie endpointu `DELETE /api/v1/finance/records/batch` z walidacją `BatchDeleteFinancialRecordsRequest`.
-  - [x] Testy jednostkowe i integracyjne weryfikujące masowe usuwanie, izolację spółek i audyt.
+  - Wprowadzenie komendy CQRS `BatchDeleteFinancialRecordsCommand` i handlera domenowego z izolacją tenanta.
+  - Rozszerzenie interfejsu `FinancialRecordRepositoryInterface` i implementacji Eloquent o usuwanie masowe.
+  - Rejestracja zdarzenia domenowego `FinancialRecordsBatchDeleted` i listenera audytu `financial_audit_logs`.
+  - Wystawienie endpointu `DELETE /api/v1/finance/records/batch` z walidacją `BatchDeleteFinancialRecordsRequest`.
+  - Testy jednostkowe i integracyjne weryfikujące masowe usuwanie, izolację spółek i audyt.
 - [ ] **Faza 27: Interfejs Zaznaczania i Pasek Akcji Masowych w Księdze**
-  - [ ] Stan zaznaczenia, checkboxy wierszy i master-checkbox w nagłówku tabeli `RecordsView`.
+  - [x] Stan zaznaczenia, checkboxy wierszy i master-checkbox w nagłówku tabeli `RecordsView`.
   - [ ] Pływający pasek akcji masowych `BatchActionBar` z sumowaniem kwot i liczbą zaznaczonych pozycji.
   - [ ] Dwuetapowy modal potwierdzenia `BatchDeleteConfirmationModal` z podsumowaniem i zabezpieczeniem "USUŃ".
   - [ ] Integracja wywołania API masowego usuwania z optymistycznym czyszczeniem i powiadomieniami.

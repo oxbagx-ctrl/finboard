@@ -62,6 +62,38 @@ export const RecordsView = () => {
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [recordToDelete, setRecordToDelete] = useState(null);
 
+    // Selection state for batch operations
+    const [selectedRecordIds, setSelectedRecordIds] = useState([]);
+
+    const selectedSet = useMemo(() => new Set(selectedRecordIds), [selectedRecordIds]);
+
+    const currentPageIds = useMemo(() => records.map((r) => r.id), [records]);
+
+    const allSelected = useMemo(
+        () => currentPageIds.length > 0 && currentPageIds.every((id) => selectedSet.has(id)),
+        [currentPageIds, selectedSet]
+    );
+
+    const someSelected = useMemo(
+        () => currentPageIds.some((id) => selectedSet.has(id)) && !allSelected,
+        [currentPageIds, selectedSet, allSelected]
+    );
+
+    const handleToggleSelectRow = useCallback((id) => {
+        setSelectedRecordIds((prev) =>
+            prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+        );
+    }, []);
+
+    const handleToggleSelectAll = useCallback(() => {
+        if (allSelected) {
+            setSelectedRecordIds((prev) => prev.filter((id) => !currentPageIds.includes(id)));
+        } else {
+            setSelectedRecordIds((prev) => Array.from(new Set([...prev, ...currentPageIds])));
+        }
+    }, [allSelected, currentPageIds]);
+
+
     // Fetch Categories
     useEffect(() => {
         const fetchCategories = async () => {
@@ -400,6 +432,18 @@ export const RecordsView = () => {
                     <table className="w-full text-left border-collapse font-mono text-xs">
                         <thead>
                             <tr className="bg-zinc-950 border-b border-zinc-800 text-[10px] text-zinc-400 uppercase tracking-wider">
+                                <th className="py-2.5 px-3 w-10 text-center">
+                                    <input
+                                        type="checkbox"
+                                        ref={(el) => {
+                                            if (el) el.indeterminate = someSelected;
+                                        }}
+                                        checked={allSelected}
+                                        onChange={handleToggleSelectAll}
+                                        aria-label="Zaznacz wszystkie transakcje na stronie"
+                                        className="rounded border-zinc-750 bg-zinc-900 text-emerald-500 focus:ring-emerald-500/20 focus:ring-offset-0 cursor-pointer w-3.5 h-3.5 accent-emerald-500 align-middle"
+                                    />
+                                </th>
                                 <th className="py-2.5 px-3.5 font-semibold w-28">Data</th>
                                 <th className="py-2.5 px-3.5 font-semibold w-36">Kategoria</th>
                                 <th className="py-2.5 px-3.5 font-semibold">Tytuł / Opis Transakcji</th>
@@ -411,13 +455,13 @@ export const RecordsView = () => {
                         <tbody className="divide-y divide-zinc-850">
                             {loading ? (
                                 <tr>
-                                    <td colSpan={6} className="py-12 text-center text-zinc-500">
+                                    <td colSpan={7} className="py-12 text-center text-zinc-500">
                                         Wczytywanie zapisów księgowych...
                                     </td>
                                 </tr>
                             ) : records.length === 0 ? (
                                 <tr>
-                                    <td colSpan={6} className="py-12 text-center text-zinc-500">
+                                    <td colSpan={7} className="py-12 text-center text-zinc-500">
                                         Brak transakcji spełniających wybrane kryteria filtrów.
                                     </td>
                                 </tr>
@@ -425,15 +469,28 @@ export const RecordsView = () => {
                                 records.map((record) => {
                                     const convertedAmt = convertAmount(Number(record.amount));
                                     const isIncome = record.record_type === 'INCOME';
+                                    const isSelected = selectedSet.has(record.id);
 
                                     return (
                                         <tr
                                             key={record.id}
-                                            className="hover:bg-zinc-850/50 transition-colors group"
+                                            className={`hover:bg-zinc-850/50 transition-colors group ${
+                                                isSelected ? 'bg-emerald-950/20' : ''
+                                            }`}
                                         >
+                                            <td className="py-2.5 px-3 text-center whitespace-nowrap">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={isSelected}
+                                                    onChange={() => handleToggleSelectRow(record.id)}
+                                                    aria-label={`Zaznacz transakcję ${record.description}`}
+                                                    className="rounded border-zinc-750 bg-zinc-900 text-emerald-500 focus:ring-emerald-500/20 focus:ring-offset-0 cursor-pointer w-3.5 h-3.5 accent-emerald-500 align-middle"
+                                                />
+                                            </td>
                                             <td className="py-2.5 px-3.5 text-zinc-400 text-[11px] whitespace-nowrap">
                                                 {record.record_date}
                                             </td>
+
 
                                             <td className="py-2.5 px-3.5 whitespace-nowrap">
                                                 <span className="font-semibold text-zinc-200">
