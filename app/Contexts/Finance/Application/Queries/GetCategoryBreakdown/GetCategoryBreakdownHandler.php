@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Contexts\Finance\Application\Queries\GetCategoryBreakdown;
 
+use App\Contexts\Finance\Application\Services\KpiCalculationService;
 use App\Contexts\Finance\Domain\Repositories\FinancialRecordRepositoryInterface;
+use App\Contexts\Finance\Domain\Services\FinancialCalculator;
 use App\Contexts\Finance\Domain\ValueObjects\CategoryType;
 use App\Contexts\Finance\Domain\ValueObjects\Currency;
 use App\Contexts\Finance\Domain\ValueObjects\DateRange;
@@ -13,9 +15,13 @@ use App\Contexts\Finance\Domain\ValueObjects\RecordType;
 
 final class GetCategoryBreakdownHandler
 {
+    private readonly KpiCalculationService $kpiService;
+
     public function __construct(
-        private readonly FinancialRecordRepositoryInterface $recordRepository
+        private readonly FinancialRecordRepositoryInterface $recordRepository,
+        ?KpiCalculationService $kpiService = null
     ) {
+        $this->kpiService = $kpiService ?? new KpiCalculationService($this->recordRepository, new FinancialCalculator());
     }
 
     /**
@@ -26,7 +32,14 @@ final class GetCategoryBreakdownHandler
      *     category_type: string,
      *     amount: float,
      *     formatted_amount: string,
-     *     percentage: float
+     *     percentage: float,
+     *     previous_amount: ?float,
+     *     formatted_previous_amount: ?string,
+     *     amount_change: ?float,
+     *     formatted_amount_change: ?string,
+     *     yoy_growth_pct: ?float,
+     *     previous_percentage: ?float,
+     *     percentage_point_diff: ?float
      * }>
      */
     public function handle(GetCategoryBreakdownQuery $query): array
@@ -52,7 +65,7 @@ final class GetCategoryBreakdownHandler
 
         $records = $this->recordRepository->findByCompanyId($query->companyId, $period);
 
-        // Filter and aggregate per category
+        // Filter and aggregate per category for current period
         $totalsPerCategory = [];
         $categoryDetails = [];
         $grandTotal = Money::zero($currency);
@@ -84,6 +97,47 @@ final class GetCategoryBreakdownHandler
             $grandTotal = $grandTotal->add($record->amount());
         }
 
+        // Determine comparative period for YoY dynamics
+        $comparativePeriod = null;
+        if ($query->includeYoY) {
+            if ($query->comparisonStartDate !== null && $query->comparisonEndDate !== null) {
+                $comparativePeriod = DateRange::fromStrings($query->comparisonStartDate, $query->comparisonEndDate);
+            } elseif ($period !== null) {
+                $comparativePeriod = $period->previousYear();
+            }
+        }
+
+        // Aggregate comparative period records if comparative period is active
+        $prevTotalsPerCategory = [];
+        $prevGrandTotal = Money::zero($currency);
+        $hasComparativeRecords = false;
+
+        if ($comparativePeriod !== null) {
+            $prevRecords = $this->recordRepository->findByCompanyId($query->companyId, $comparativePeriod);
+            if (!empty($prevRecords)) {
+                $hasComparativeRecords = true;
+                foreach ($prevRecords as $prevRecord) {
+                    $prevCategory = $prevRecord->category();
+
+                    if ($filterType !== null && $prevCategory->recordType() !== $filterType) {
+                        continue;
+                    }
+
+                    if (!empty($allowedCategoryTypes) && !in_array($prevCategory->type(), $allowedCategoryTypes, true)) {
+                        continue;
+                    }
+
+                    $pCatId = $prevCategory->id();
+                    if (!isset($prevTotalsPerCategory[$pCatId])) {
+                        $prevTotalsPerCategory[$pCatId] = Money::zero($currency);
+                    }
+
+                    $prevTotalsPerCategory[$pCatId] = $prevTotalsPerCategory[$pCatId]->add($prevRecord->amount());
+                    $prevGrandTotal = $prevGrandTotal->add($prevRecord->amount());
+                }
+            }
+        }
+
         $items = [];
         foreach ($totalsPerCategory as $catId => $categoryMoney) {
             $amountFloat = (float) $categoryMoney->amount();
@@ -94,6 +148,46 @@ final class GetCategoryBreakdownHandler
                 $percentage = (float) $pctBc;
             }
 
+            // Calculate comparative values and YoY dynamics
+            $previousAmountFloat = null;
+            $formattedPreviousAmount = null;
+            $amountChangeFloat = null;
+            $formattedAmountChange = null;
+            $yoyGrowthPct = null;
+            $previousPercentage = null;
+            $percentagePointDiff = null;
+
+            if ($hasComparativeRecords) {
+                $prevMoney = $prevTotalsPerCategory[$catId] ?? null;
+
+                if ($prevMoney !== null) {
+                    $previousAmountFloat = (float) $prevMoney->amount();
+                    $formattedPreviousAmount = $prevMoney->format();
+                    $yoyGrowthPct = $this->kpiService->calculateGrowthPercentage($categoryMoney, $prevMoney);
+
+                    if (!$prevGrandTotal->isZero()) {
+                        $prevPctBc = bcmul(bcdiv($prevMoney->amount(), $prevGrandTotal->amount(), 6), '100', 2);
+                        $previousPercentage = (float) $prevPctBc;
+                    } else {
+                        $previousPercentage = 0.0;
+                    }
+                } else {
+                    // Category did not exist in comparative period
+                    $previousAmountFloat = 0.0;
+                    $formattedPreviousAmount = Money::zero($currency)->format();
+                    $yoyGrowthPct = null;
+                    $previousPercentage = 0.0;
+                }
+
+                $amountChangeFloat = round($amountFloat - $previousAmountFloat, 2);
+                $changeMoney = Money::fromDecimal((string) $amountChangeFloat, $currency);
+                $formattedAmountChange = $changeMoney->format();
+
+                if ($previousPercentage !== null) {
+                    $percentagePointDiff = round($percentage - $previousPercentage, 2);
+                }
+            }
+
             $items[] = [
                 'category_id' => $catId,
                 'category_name' => $categoryDetails[$catId]['name'],
@@ -102,6 +196,13 @@ final class GetCategoryBreakdownHandler
                 'amount' => $amountFloat,
                 'formatted_amount' => $categoryMoney->format(),
                 'percentage' => $percentage,
+                'previous_amount' => $previousAmountFloat,
+                'formatted_previous_amount' => $formattedPreviousAmount,
+                'amount_change' => $amountChangeFloat,
+                'formatted_amount_change' => $formattedAmountChange,
+                'yoy_growth_pct' => $yoyGrowthPct,
+                'previous_percentage' => $previousPercentage,
+                'percentage_point_diff' => $percentagePointDiff,
             ];
         }
 

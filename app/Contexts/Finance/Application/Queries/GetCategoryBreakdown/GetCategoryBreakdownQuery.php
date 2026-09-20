@@ -12,7 +12,10 @@ final readonly class GetCategoryBreakdownQuery
         public ?string $endDate = null,
         public string $recordType = 'EXPENSE', // EXPENSE, REVENUE, ASSET, LIABILITY
         public string $currency = 'PLN',
-        public ?string $categoryType = null // e.g. 'OPEX', 'COGS', 'TAX' or comma-separated list
+        public ?string $categoryType = null, // e.g. 'OPEX', 'COGS', 'TAX' or comma-separated list
+        public bool $includeYoY = true,
+        public ?string $comparisonStartDate = null,
+        public ?string $comparisonEndDate = null
     ) {
     }
 }

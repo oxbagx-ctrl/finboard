@@ -307,6 +307,42 @@ final class QueriesTest extends TestCase
         $this->assertEqualsWithDelta(100.0, $totalPercentage, 0.5);
     }
 
+    public function test_get_category_breakdown_handler_computes_comparative_amounts_and_yoy_dynamics_per_category(): void
+    {
+        $handler = new GetCategoryBreakdownHandler($this->repo);
+
+        $query = new GetCategoryBreakdownQuery(
+            companyId: self::ACME_COMPANY_ID,
+            startDate: '2026-01-01',
+            endDate: '2026-03-31',
+            recordType: 'EXPENSE',
+            categoryType: 'OPEX',
+            includeYoY: true
+        );
+
+        $breakdown = $handler->handle($query);
+
+        $this->assertNotEmpty($breakdown);
+
+        foreach ($breakdown as $item) {
+            $this->assertArrayHasKey('previous_amount', $item);
+            $this->assertArrayHasKey('formatted_previous_amount', $item);
+            $this->assertArrayHasKey('amount_change', $item);
+            $this->assertArrayHasKey('formatted_amount_change', $item);
+            $this->assertArrayHasKey('yoy_growth_pct', $item);
+            $this->assertArrayHasKey('previous_percentage', $item);
+            $this->assertArrayHasKey('percentage_point_diff', $item);
+
+            // Since Acme has seeded data in 2025 Q1, previous amounts and YoY should be populated
+            $this->assertNotNull($item['previous_amount']);
+            $this->assertNotNull($item['yoy_growth_pct']);
+            $this->assertGreaterThan(0, $item['previous_amount']);
+            // In our seed, 2026 Q1 costs grew by ~15% vs 2025 Q1
+            $this->assertEqualsWithDelta(9.52, $item['yoy_growth_pct'], 0.1);
+            $this->assertGreaterThan(0, $item['amount_change']);
+        }
+    }
+
     public function test_get_category_breakdown_handler_filters_by_single_category_type_opex(): void
     {
         $handler = new GetCategoryBreakdownHandler($this->repo);

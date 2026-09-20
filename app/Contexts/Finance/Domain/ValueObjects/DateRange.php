@@ -111,7 +111,9 @@ final class DateRange implements ValueObject
             return self::forYear((int) $this->startDate->format('Y') - 1);
         }
 
-        $isFullMonth = ((int) $this->startDate->format('j') === 1) && ((int) $this->endDate->format('j') === (int) $this->startDate->format('t'));
+        $isFullMonth = ($this->startDate->format('Y-m') === $this->endDate->format('Y-m'))
+            && ((int) $this->startDate->format('j') === 1)
+            && ((int) $this->endDate->format('j') === (int) $this->startDate->format('t'));
         if ($isFullMonth) {
             $prevYear = (int) $this->startDate->format('Y') - 1;
             $month = (int) $this->startDate->format('m');
@@ -127,7 +129,9 @@ final class DateRange implements ValueObject
 
     public function previousMonth(): self
     {
-        $isFullMonth = ((int) $this->startDate->format('j') === 1) && ((int) $this->endDate->format('j') === (int) $this->startDate->format('t'));
+        $isFullMonth = ($this->startDate->format('Y-m') === $this->endDate->format('Y-m'))
+            && ((int) $this->startDate->format('j') === 1)
+            && ((int) $this->endDate->format('j') === (int) $this->startDate->format('t'));
         if ($isFullMonth) {
             $firstOfCurrent = $this->startDate->setDate((int) $this->startDate->format('Y'), (int) $this->startDate->format('m'), 1);
             $lastOfPrev = $firstOfCurrent->modify('-1 day');
