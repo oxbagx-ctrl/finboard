@@ -56,8 +56,11 @@ export const FinancialTable = ({
                     </thead>
                     <tbody className="divide-y divide-zinc-850">
                         {data.map((row) => {
-                            const isGroup = Boolean(row.isGroup);
-                            const isExpanded = expandedGroups[row.id] !== false;
+                            const hasChildren = Array.isArray(row.children) && row.children.length > 0;
+                            // A row is expandable only if it has children.
+                            // Single category groups or non-nested items are treated gracefully without expanders.
+                            const isExpandable = hasChildren && Boolean(row.isGroup);
+                            const isExpanded = isExpandable && (expandedGroups[row.id] !== false);
                             const isFinalResult = Boolean(row.isFinalResult);
                             const isSummary = Boolean(row.isSummary) || isFinalResult;
                             const isSubItem = Boolean(row.isSubItem);
@@ -76,16 +79,18 @@ export const FinancialTable = ({
                                                 ? 'bg-zinc-850/80 font-bold border-t-2 border-b-4 border-double border-zinc-600 text-zinc-100'
                                                 : isSummary
                                                 ? 'bg-zinc-850/40 font-bold border-t border-b border-zinc-750 text-zinc-100'
-                                                : isGroup
+                                                : isExpandable
                                                 ? 'bg-zinc-950/40 font-semibold cursor-pointer hover:bg-zinc-800/40 text-zinc-200'
+                                                : row.isGroup
+                                                ? 'bg-zinc-950/30 font-semibold text-zinc-200'
                                                 : 'hover:bg-zinc-850/50 text-zinc-300'
                                         }`}
-                                        onClick={isGroup ? () => toggleGroup(row.id) : undefined}
+                                        onClick={isExpandable ? () => toggleGroup(row.id) : undefined}
                                     >
                                         <td className={`py-2 px-4 flex items-center gap-2 ${
-                                            isSubItem ? 'pl-8 text-zinc-400' : isDeduction && !isGroup ? 'pl-6 text-zinc-300' : 'text-zinc-200'
+                                            isSubItem ? 'pl-8 text-zinc-400' : isDeduction && !row.isGroup ? 'pl-6 text-zinc-300' : 'text-zinc-200'
                                         }`}>
-                                            {isGroup ? (
+                                            {isExpandable ? (
                                                 <span className="text-zinc-500 hover:text-zinc-300 transition-colors">
                                                     {isExpanded ? (
                                                         <ChevronDown className="w-3.5 h-3.5" />
@@ -108,7 +113,7 @@ export const FinancialTable = ({
                                                     [{row.code}]
                                                 </span>
                                             )}
-                                            {isGroup && row.children && row.children.length > 0 && (
+                                            {hasChildren && (
                                                 <span className="ml-1 px-1.5 py-0.2 rounded text-[9px] font-mono bg-zinc-800/80 text-zinc-400 border border-zinc-700/60">
                                                     {row.children.length} {row.children.length === 1 ? 'poz.' : 'kat.'}
                                                 </span>
@@ -150,7 +155,7 @@ export const FinancialTable = ({
                                     </tr>
 
                                     {/* Render Sub-items if group is expanded */}
-                                    {isGroup && isExpanded && row.children && row.children.map((child) => {
+                                    {isExpanded && row.children.map((child) => {
                                         const childRevShare = revenueTotal > 0 && child.amount != null && !isNaN(Number(child.amount))
                                             ? (Number(child.amount) / revenueTotal) * 100
                                             : null;

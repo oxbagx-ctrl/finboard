@@ -305,12 +305,12 @@ npm test
   - Optymalizacja wykresu `CostBreakdownChart` z auto-sortowaniem, paletą wielokategorialną i czytelną legendą.
   - Testy komponentów frontendowych w `DashboardView.test.jsx` weryfikujące rozwijane wiersze P&L i odznaki YoY.
   - Testy integracyjne weryfikujące poprawną izolację kategorii w zestawieniu przychodów.
-- [ ] **Faza 21: Spójność Danych Historycznych OPEX i Strumienie Przychodów**
+- [x] **Faza 21: Spójność Danych Historycznych OPEX i Strumienie Przychodów**
   - [x] Migracja danych rekwalifikująca archiwalne rekordy `cat-opex` do granularnych podkategorii OPEX.
   - [x] Wprowadzenie granularnych podkategorii przychodowych (SaaS, Usługi, Doradztwo) w encji domenowej `Category` i schemacie.
   - [x] Aktualizacja seedera `FinancialDataSeeder` i zbiorów danych o realne strumienie przychodowe.
   - [x] Testy weryfikujące eliminację rekordów sierocych `cat-opex` i pełną spójność analityczną.
-  - [ ] Refaktoryzacja `CategoryBreakdown` pod kątem obsługi grup jedno- i wielokategorialnych.
+  - [x] Refaktoryzacja `CategoryBreakdown` pod kątem obsługi grup jedno- i wielokategorialnych.
 
 ---
 

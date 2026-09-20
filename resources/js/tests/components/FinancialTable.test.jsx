@@ -14,7 +14,7 @@ const mockTableData = [
         children: [
             {
                 id: 'rev_1',
-                label: 'Sprzeda\u017c maszyn',
+                label: 'Sprzedaż maszyn',
                 code: 'REV-01',
                 amount: 750000,
                 change: 20.0,
@@ -138,18 +138,18 @@ describe('FinancialTable Component', () => {
         );
 
         // Children are visible initially because expandedGroups is open
-        expect(screen.getByText('Sprzeda\u017c maszyn')).toBeInTheDocument();
+        expect(screen.getByText('Sprzedaż maszyn')).toBeInTheDocument();
 
         // Click to collapse
         const groupRow = screen.getByText('Przychody ze Sprzedaży').closest('tr');
         fireEvent.click(groupRow);
 
         // Children should no longer be in the document
-        expect(screen.queryByText('Sprzeda\u017c maszyn')).not.toBeInTheDocument();
+        expect(screen.queryByText('Sprzedaż maszyn')).not.toBeInTheDocument();
 
         // Click again to expand
         fireEvent.click(groupRow);
-        expect(screen.getByText('Sprzeda\u017c maszyn')).toBeInTheDocument();
+        expect(screen.getByText('Sprzedaż maszyn')).toBeInTheDocument();
     });
 
     it('renders category count badges for groups and deduction indicators for cost lines', () => {
@@ -166,6 +166,54 @@ describe('FinancialTable Component', () => {
 
         // COGS is marked as deduction -> renders '(-)'
         expect(screen.getByText('(-)')).toBeInTheDocument();
+    });
+
+    it('handles single category vs multi-category groups gracefully without broken collapse', () => {
+        const singleCategoryData = [
+            {
+                id: 'single_group',
+                label: 'Pojedyncza Kategoria Wynikowa',
+                code: 'SINGLE-01',
+                amount: 300000,
+                isGroup: true,
+                change: 5.0,
+                children: [
+                    {
+                        id: 'sub_1',
+                        label: 'Jedyny Podtyp',
+                        code: 'SUB-01',
+                        amount: 300000,
+                        change: 5.0,
+                    },
+                ],
+            },
+            {
+                id: 'empty_group',
+                label: 'Grupa Bez Podkategorii',
+                code: 'EMPTY-01',
+                amount: 150000,
+                isGroup: true,
+                change: null,
+                children: [],
+            },
+        ];
+
+        render(
+            <FinancialTable
+                data={singleCategoryData}
+                currency="PLN"
+                revenueTotal={300000}
+            />
+        );
+
+        // Single child is displayed with '1 poz.'
+        expect(screen.getByText('1 poz.')).toBeInTheDocument();
+        expect(screen.getByText('Jedyny Podtyp')).toBeInTheDocument();
+
+        // Empty group does not display count badge and is not expandable
+        expect(screen.getByText('Grupa Bez Podkategorii')).toBeInTheDocument();
+        expect(screen.queryByText('0 kat.')).not.toBeInTheDocument();
+        expect(screen.queryByText('0 poz.')).not.toBeInTheDocument();
     });
 
     it('renders final net result row with prominent styling and WYNIK KOŃCOWY status', () => {
