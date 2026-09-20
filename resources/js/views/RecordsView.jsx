@@ -196,8 +196,14 @@ export const RecordsView = () => {
     const handleBatchDelete = async () => {
         if (selectedRecordIds.length === 0) return;
 
-        setBatchDeleting(true);
         const idsToDelete = [...selectedRecordIds];
+
+        if (idsToDelete.length > 500) {
+            error('Maksymalna wielkość paczki do usunięcia wynosi 500 rekordów.');
+            return;
+        }
+
+        setBatchDeleting(true);
 
         try {
             const res = await apiClient.delete('/finance/records/batch', {

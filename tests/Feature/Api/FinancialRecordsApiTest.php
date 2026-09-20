@@ -293,6 +293,12 @@ final class FinancialRecordsApiTest extends TestCase
         $this->deleteJson('/api/v1/finance/records/batch', ['record_ids' => ['not-a-uuid']])
             ->assertStatus(422)
             ->assertJsonValidationErrors(['record_ids.0']);
+
+        // Exceeding 500 items limit
+        $excessiveIds = array_map(fn ($i) => (string) \Illuminate\Support\Str::uuid(), range(1, 501));
+        $this->deleteJson('/api/v1/finance/records/batch', ['record_ids' => $excessiveIds])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['record_ids']);
     }
 
     public function test_batch_delete_enforces_tenant_isolation(): void

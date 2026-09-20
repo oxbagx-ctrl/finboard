@@ -270,5 +270,20 @@ final class CommandsTest extends TestCase
         // Foreign record intact
         $this->assertNotNull($this->recordRepo->findById(FinancialRecordId::fromString($foreignId)));
     }
+
+    public function test_batch_delete_throws_exception_when_exceeding_500_records(): void
+    {
+        $handler = new BatchDeleteFinancialRecordsHandler($this->recordRepo);
+
+        $fakeIds = array_map(fn ($i) => (string) \Illuminate\Support\Str::uuid(), range(1, 501));
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Maksymalna wielkość paczki do jednorazowego usunięcia wynosi 500 rekordów.');
+
+        $handler->handle(new BatchDeleteFinancialRecordsCommand(
+            companyId: self::COMPANY_ID,
+            recordIds: $fakeIds
+        ));
+    }
 }
 

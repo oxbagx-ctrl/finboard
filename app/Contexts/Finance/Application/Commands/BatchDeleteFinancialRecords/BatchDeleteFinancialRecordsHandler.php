@@ -34,6 +34,10 @@ final class BatchDeleteFinancialRecordsHandler
             );
         }
 
+        if (count($cleanRecordIds) > 500) {
+            throw new \InvalidArgumentException('Maksymalna wielkość paczki do jednorazowego usunięcia wynosi 500 rekordów.');
+        }
+
         // 2. Execute deletion atomically within a database transaction with company tenant isolation
         return DB::transaction(function () use ($command, $cleanRecordIds): BatchDeleteFinancialRecordsResult {
             // Find records strictly belonging to the active company tenant

@@ -3,6 +3,8 @@ import { AlertTriangle, Trash2, X, ShieldAlert } from 'lucide-react';
 import { formatCurrency } from '../../utils/formatters';
 import { Button } from '../ui/Button';
 
+export const MAX_BATCH_DELETE_SIZE = 500;
+
 export const BatchDeleteConfirmationModal = ({
     isOpen,
     onClose,
@@ -15,8 +17,10 @@ export const BatchDeleteConfirmationModal = ({
     loading = false,
 }) => {
     const [confirmText, setConfirmText] = useState('');
-    const requiresKeyword = selectedCount > 10;
+    const isExceeded = selectedCount > MAX_BATCH_DELETE_SIZE;
+    const requiresKeyword = selectedCount > 10 && !isExceeded;
     const isKeywordValid = !requiresKeyword || confirmText.trim().toUpperCase() === 'USUŃ';
+    const canConfirm = !isExceeded && isKeywordValid && !loading;
 
     useEffect(() => {
         if (isOpen) {
@@ -28,7 +32,7 @@ export const BatchDeleteConfirmationModal = ({
 
     const handleFormSubmit = (e) => {
         e.preventDefault();
-        if (isKeywordValid && !loading && onConfirm) {
+        if (canConfirm && onConfirm) {
             onConfirm();
         }
     };
@@ -110,6 +114,19 @@ export const BatchDeleteConfirmationModal = ({
                             </div>
                         </div>
 
+                        {/* Exceeded batch limit warning */}
+                        {isExceeded && (
+                            <div
+                                className="p-3.5 rounded-lg bg-rose-950/40 border border-rose-800 text-rose-300 text-xs flex items-center gap-2.5 font-mono leading-relaxed"
+                                data-testid="batch-limit-exceeded-alert"
+                            >
+                                <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
+                                <span>
+                                    Przekroczono maksymalny limit operacji masowej (500 rekordów). Wybrano {selectedCount} pozycji. Zmniejsz liczbę zaznaczonych transakcji, aby kontynuować.
+                                </span>
+                            </div>
+                        )}
+
                         {/* Keyword Safety Input for batches > 10 */}
                         {requiresKeyword && (
                             <div className="space-y-2 pt-1 border-t border-zinc-800" data-testid="batch-keyword-section">
@@ -148,10 +165,10 @@ export const BatchDeleteConfirmationModal = ({
                             variant="danger"
                             size="sm"
                             loading={loading}
-                            disabled={!isKeywordValid || loading}
+                            disabled={!canConfirm}
                             icon={Trash2}
                             data-testid="batch-confirm-delete-btn"
-                            className={!isKeywordValid ? 'opacity-40 cursor-not-allowed' : 'bg-rose-600 hover:bg-rose-500 text-white font-semibold'}
+                            className={!canConfirm ? 'opacity-40 cursor-not-allowed' : 'bg-rose-600 hover:bg-rose-500 text-white font-semibold'}
                         >
                             {loading ? 'Usuwanie...' : 'Potwierdź usunięcie'}
                         </Button>

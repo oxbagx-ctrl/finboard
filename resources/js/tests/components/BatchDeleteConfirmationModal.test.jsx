@@ -121,4 +121,26 @@ describe('BatchDeleteConfirmationModal Component', () => {
         expect(screen.getByTestId('batch-confirm-delete-btn')).toBeDisabled();
         expect(screen.getByTestId('batch-confirm-delete-btn')).toHaveTextContent('Usuwanie...');
     });
+
+    it('disables confirmation and displays limit exceeded alert when selectedCount exceeds 500', () => {
+        const handleConfirm = vi.fn();
+
+        render(
+            <BatchDeleteConfirmationModal
+                isOpen={true}
+                onClose={vi.fn()}
+                onConfirm={handleConfirm}
+                selectedCount={501}
+                totalAmount={999999}
+            />
+        );
+
+        expect(screen.getByTestId('batch-limit-exceeded-alert')).toBeInTheDocument();
+        expect(screen.getByTestId('batch-confirm-delete-btn')).toBeDisabled();
+        // Keyword section should not be shown when exceeded
+        expect(screen.queryByTestId('batch-keyword-section')).toBeNull();
+
+        fireEvent.click(screen.getByTestId('batch-confirm-delete-btn'));
+        expect(handleConfirm).not.toHaveBeenCalled();
+    });
 });
