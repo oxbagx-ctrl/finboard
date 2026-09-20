@@ -195,6 +195,33 @@ final class FinancialAnalyticsApiTest extends TestCase
         $this->assertEqualsWithDelta(100.0, $totalPercentage, 0.5);
     }
 
+    public function test_get_category_breakdown_revenue_filter_excludes_expense_and_balance_categories(): void
+    {
+        Sanctum::actingAs($this->clientUser);
+
+        $response = $this->getJson('/api/v1/finance/analytics/breakdown?record_type=REVENUE&start_date=2026-01-01&end_date=2026-03-31');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('status', 'success')
+            ->assertJsonPath('record_type', 'REVENUE');
+
+        $data = $response->json('data');
+        $this->assertNotEmpty($data);
+
+        $categoryIds = array_column($data, 'category_id');
+        $this->assertContains('cat-revenue', $categoryIds);
+
+        // Ensure no expense or balance categories exist in the revenue breakdown
+        $this->assertNotContains('cat-cogs', $categoryIds);
+        $this->assertNotContains('cat-opex-payroll', $categoryIds);
+        $this->assertNotContains('cat-cash', $categoryIds);
+        $this->assertNotContains('cat-current-liabilities', $categoryIds);
+
+        foreach ($data as $item) {
+            $this->assertSame('revenue', $item['category_type']);
+        }
+    }
+
     public function test_get_category_breakdown_with_category_type_opex_filter(): void
     {
         Sanctum::actingAs($this->clientUser);

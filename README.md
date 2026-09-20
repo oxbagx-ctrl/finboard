@@ -291,7 +291,7 @@ npm test
   - [x] Usunięcie błędu wielkości liter w `GetCategoryBreakdownHandler` blokującego filtrowanie `record_type`.
   - [x] Wprowadzenie dedykowanych kodów kategorii rodzajowych OPEX w encji domenowej `Category` i seederze bazy danych.
   - [x] Aktualizacja `FinancialDataSeeder` i zbiorów danych o dystrybucję kosztów operacyjnych na subkategorie rodzajowe.
-  - [ ] Testy jednostkowe izolacji kategorii REVENUE od EXPENSE i rekordów bilansowych.
+  - [x] Testy jednostkowe izolacji kategorii REVENUE od EXPENSE i rekordów bilansowych.
   - [ ] Weryfikacja różnorodnego rozkładu kategorii OPEX na wykresie kołowym zamiast pojedynczego wpisu 100%.
 - [ ] **Faza 19: Domenowe Obliczanie Dynamiki R/R dla Podpozycji Kategorii**
   - [ ] Rozszerzenie `GetCategoryBreakdownQuery` i Handlera o kalkulację kwot porównawczych i dynamiki YoY per kategoria.

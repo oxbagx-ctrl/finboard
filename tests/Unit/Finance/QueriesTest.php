@@ -111,6 +111,164 @@ final class QueriesTest extends TestCase
         }
     }
 
+    public function test_get_category_breakdown_handler_strictly_isolates_revenue_from_expense_and_asset_records(): void
+    {
+        $handler = new GetCategoryBreakdownHandler($this->repo);
+
+        $query = new GetCategoryBreakdownQuery(
+            companyId: self::ACME_COMPANY_ID,
+            startDate: '2026-01-01',
+            endDate: '2026-03-31',
+            recordType: 'REVENUE'
+        );
+
+        $breakdown = $handler->handle($query);
+
+        $this->assertNotEmpty($breakdown);
+        $categoryIds = array_column($breakdown, 'category_id');
+        $categoryTypes = array_column($breakdown, 'category_type');
+
+        // Verify only REVENUE categories are present
+        foreach ($breakdown as $item) {
+            $this->assertSame('revenue', $item['category_type']);
+            $this->assertGreaterThan(0, $item['amount']);
+        }
+
+        // Verify EXPENSE categories never leak into revenue query
+        $this->assertNotContains('cat-cogs', $categoryIds);
+        $this->assertNotContains('cat-opex', $categoryIds);
+        $this->assertNotContains('cat-opex-payroll', $categoryIds);
+        $this->assertNotContains('cat-opex-services', $categoryIds);
+        $this->assertNotContains('cat-opex-office', $categoryIds);
+        $this->assertNotContains('cat-depreciation', $categoryIds);
+        $this->assertNotContains('cat-financial', $categoryIds);
+        $this->assertNotContains('cat-tax', $categoryIds);
+        $this->assertNotContains('opex', $categoryTypes);
+        $this->assertNotContains('cogs', $categoryTypes);
+
+        // Verify ASSET / LIABILITY balance sheet categories never leak into revenue query
+        $this->assertNotContains('cat-cash', $categoryIds);
+        $this->assertNotContains('cat-receivables', $categoryIds);
+        $this->assertNotContains('cat-inventory', $categoryIds);
+        $this->assertNotContains('cat-fixed-assets', $categoryIds);
+        $this->assertNotContains('cat-current-liabilities', $categoryIds);
+        $this->assertNotContains('cat-long-term-liabilities', $categoryIds);
+        $this->assertNotContains('asset', $categoryTypes);
+        $this->assertNotContains('liability', $categoryTypes);
+
+        $totalPercentage = array_sum(array_column($breakdown, 'percentage'));
+        $this->assertEqualsWithDelta(100.0, $totalPercentage, 0.5);
+    }
+
+    public function test_get_category_breakdown_handler_strictly_isolates_expense_from_revenue_and_asset_records(): void
+    {
+        $handler = new GetCategoryBreakdownHandler($this->repo);
+
+        $query = new GetCategoryBreakdownQuery(
+            companyId: self::ACME_COMPANY_ID,
+            startDate: '2026-01-01',
+            endDate: '2026-03-31',
+            recordType: 'EXPENSE'
+        );
+
+        $breakdown = $handler->handle($query);
+
+        $this->assertNotEmpty($breakdown);
+        $categoryIds = array_column($breakdown, 'category_id');
+        $categoryTypes = array_column($breakdown, 'category_type');
+
+        // Verify all items are expense categories
+        $allowedExpenseTypes = ['opex', 'cogs', 'depreciation', 'financial', 'tax'];
+        foreach ($breakdown as $item) {
+            $this->assertContains($item['category_type'], $allowedExpenseTypes);
+            $this->assertGreaterThan(0, $item['amount']);
+        }
+
+        // Verify REVENUE never leaks into expense query
+        $this->assertNotContains('cat-revenue', $categoryIds);
+        $this->assertNotContains('revenue', $categoryTypes);
+
+        // Verify ASSET / LIABILITY balance sheet records never leak into expense query
+        $this->assertNotContains('cat-cash', $categoryIds);
+        $this->assertNotContains('cat-receivables', $categoryIds);
+        $this->assertNotContains('cat-inventory', $categoryIds);
+        $this->assertNotContains('cat-fixed-assets', $categoryIds);
+        $this->assertNotContains('cat-current-liabilities', $categoryIds);
+        $this->assertNotContains('cat-long-term-liabilities', $categoryIds);
+        $this->assertNotContains('asset', $categoryTypes);
+        $this->assertNotContains('liability', $categoryTypes);
+
+        $totalPercentage = array_sum(array_column($breakdown, 'percentage'));
+        $this->assertEqualsWithDelta(100.0, $totalPercentage, 0.5);
+    }
+
+    public function test_get_category_breakdown_handler_strictly_isolates_asset_and_liability_records(): void
+    {
+        $handler = new GetCategoryBreakdownHandler($this->repo);
+
+        // 1. Query ASSET records
+        $assetQuery = new GetCategoryBreakdownQuery(
+            companyId: self::ACME_COMPANY_ID,
+            startDate: '2026-01-01',
+            endDate: '2026-03-31',
+            recordType: 'ASSET'
+        );
+        $assetBreakdown = $handler->handle($assetQuery);
+
+        $this->assertNotEmpty($assetBreakdown);
+        $assetCategoryIds = array_column($assetBreakdown, 'category_id');
+        $this->assertContains('cat-cash', $assetCategoryIds);
+        $this->assertNotContains('cat-revenue', $assetCategoryIds);
+        $this->assertNotContains('cat-cogs', $assetCategoryIds);
+        $this->assertNotContains('cat-current-liabilities', $assetCategoryIds);
+
+        // 2. Query LIABILITY records
+        $liabilityQuery = new GetCategoryBreakdownQuery(
+            companyId: self::ACME_COMPANY_ID,
+            startDate: '2026-01-01',
+            endDate: '2026-03-31',
+            recordType: 'LIABILITY'
+        );
+        $liabilityBreakdown = $handler->handle($liabilityQuery);
+
+        $this->assertNotEmpty($liabilityBreakdown);
+        $liabilityCategoryIds = array_column($liabilityBreakdown, 'category_id');
+        $this->assertContains('cat-current-liabilities', $liabilityCategoryIds);
+        $this->assertNotContains('cat-revenue', $liabilityCategoryIds);
+        $this->assertNotContains('cat-cogs', $liabilityCategoryIds);
+        $this->assertNotContains('cat-cash', $liabilityCategoryIds);
+    }
+
+    public function test_get_category_breakdown_handler_case_insensitive_record_type_matching(): void
+    {
+        $handler = new GetCategoryBreakdownHandler($this->repo);
+
+        $breakdownUpper = $handler->handle(new GetCategoryBreakdownQuery(
+            companyId: self::ACME_COMPANY_ID,
+            startDate: '2026-01-01',
+            endDate: '2026-03-31',
+            recordType: 'REVENUE'
+        ));
+
+        $breakdownLower = $handler->handle(new GetCategoryBreakdownQuery(
+            companyId: self::ACME_COMPANY_ID,
+            startDate: '2026-01-01',
+            endDate: '2026-03-31',
+            recordType: 'revenue'
+        ));
+
+        $breakdownMixed = $handler->handle(new GetCategoryBreakdownQuery(
+            companyId: self::ACME_COMPANY_ID,
+            startDate: '2026-01-01',
+            endDate: '2026-03-31',
+            recordType: 'ReVeNuE '
+        ));
+
+        $this->assertNotEmpty($breakdownUpper);
+        $this->assertSame($breakdownUpper, $breakdownLower);
+        $this->assertSame($breakdownUpper, $breakdownMixed);
+    }
+
     public function test_get_category_breakdown_handler_filters_by_single_category_type_opex(): void
     {
         $handler = new GetCategoryBreakdownHandler($this->repo);
