@@ -323,20 +323,39 @@ npm test
   - Formatowanie ujemnych potrąceń w `FinancialValue` bez zaburzania numeracji wierszy.
   - Aktualizacja testów komponentu `FinancialTable`.
   - Testy regresyjne E2E w `DashboardView.test.jsx` dla czystej hierarchii P&L.
-- [x] **Faza 24: Perfekcyjna Typografia i Wyrównanie Siatki P&L (Commity 116–120)**
+- [x] **Faza 24: Perfekcyjna Typografia i Wyrównanie Siatki P&L**
   - Wyrównanie wierszy głównych (1–9) P&L do jednolitego dopełnienia bazowego (`px-4`) i usunięcie wcięcia `pl-6`.
   - Standaryzacja odstępów i typografii znacznika potrącenia `(-)` przy kodach kategorii.
   - Wyrównanie pikselowe szerokości expandera chevron i elementu placeholder spacer (`w-3.5`).
   - Aktualizacja testów jednostkowych `FinancialTable.test.jsx` weryfikujących ścisłe pionowe wyrównanie pozycji głównych (1–9).
   - Dodanie testu weryfikującego, że wcięcia (`pl-8` / `pl-10`) posiadają wyłącznie elementy podrzędne.
-- [x] **Faza 25: Spójność Raportów i Regresja Wizualna (Commity 121–125)**
-  - [x] Synchronizacja styli `ExecutivePdfReport` z ujednoliconą siatką tabeli `FinancialTable`.
-  - [x] Weryfikacja stabelaryzowanego wyrównania liczb monospace o wysokiej gęstości w `FinancialValue` dla wierszy potrąceń.
-  - [x] Aktualizacja testów komponentu `ExecutivePdfReport` dla spójnej hierarchii wierszy P&L i czystej typografii.
-  - [x] Testy regresyjne E2E w `DashboardView.test.jsx` po przełączeniu roku i firmy.
-  - [x] Aktualizacja dokumentacji design systemu UI i changeloga pod kątem instytucjonalnych standardów tabelarycznych P&L.
+- [x] **Faza 25: Spójność Raportów i Regresja Wizualna**
+  - Synchronizacja styli `ExecutivePdfReport` z ujednoliconą siatką tabeli `FinancialTable`.
+  - Weryfikacja stabelaryzowanego wyrównania liczb monospace o wysokiej gęstości w `FinancialValue` dla wierszy potrąceń.
+  - Aktualizacja testów komponentu `ExecutivePdfReport` dla spójnej hierarchii wierszy P&L i czystej typografii.
+  - Testy regresyjne E2E w `DashboardView.test.jsx` po przełączeniu roku i firmy.
+  - Aktualizacja dokumentacji design systemu UI i changeloga pod kątem instytucjonalnych standardów tabelarycznych P&L.
+- [ ] **Faza 26: Architektura Domenowa i Bezpieczne API Masowego Usuwania**
+  - [x] Wprowadzenie komendy CQRS `BatchDeleteFinancialRecordsCommand` i handlera domenowego z izolacją tenanta.
+  - [ ] Rozszerzenie interfejsu `FinancialRecordRepositoryInterface` i implementacji Eloquent o usuwanie masowe.
+  - [ ] Rejestracja zdarzenia domenowego `FinancialRecordsBatchDeleted` i listenera audytu `financial_audit_logs`.
+  - [ ] Wystawienie endpointu `DELETE /api/v1/finance/records/batch` z walidacją `BatchDeleteFinancialRecordsRequest`.
+  - [ ] Testy jednostkowe i integracyjne weryfikujące masowe usuwanie, izolację spółek i audyt.
+- [ ] **Faza 27: Interfejs Zaznaczania i Pasek Akcji Masowych w Księdze**
+  - [ ] Stan zaznaczenia, checkboxy wierszy i master-checkbox w nagłówku tabeli `RecordsView`.
+  - [ ] Pływający pasek akcji masowych `BatchActionBar` z sumowaniem kwot i liczbą zaznaczonych pozycji.
+  - [ ] Dwuetapowy modal potwierdzenia `BatchDeleteConfirmationModal` z podsumowaniem i zabezpieczeniem "USUŃ".
+  - [ ] Integracja wywołania API masowego usuwania z optymistycznym czyszczeniem i powiadomieniami.
+  - [ ] Testy komponentów w `RecordsView.test.jsx` dla interakcji zaznaczania i modalu usuwania.
+- [ ] **Faza 28: Zaawansowane Czyszczenie Zbiorów i Testy Regresji**
+  - [ ] Walidacja limitu masowego usuwania (max 500 rekordów) i obsługa skrajnych payloadów.
+  - [ ] Utrzymanie/reset stanu zaznaczeń przy paginacji i przełączaniu kontekstu spółki/filtrów.
+  - [ ] Testy integracyjne przypadków brzegowych (obce ID spółek, puste paczki, rollback DB).
+  - [ ] Testy E2E w `RecordsView.test.jsx` dla pełnego przepływu masowego usuwania.
+  - [ ] Dokumentacja wytycznych bezpieczeństwa operacji masowych i ścieżki audytowej w changelogu.
 
 ---
 
 ## 📜 Licencja
 Projekt objęty licencją własną dla platformy FinBoard.
+
