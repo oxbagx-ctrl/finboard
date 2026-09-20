@@ -619,4 +619,70 @@ final class FinancialAnalyticsApiTest extends TestCase
 
         $response->assertStatus(403);
     }
+
+    public function test_get_category_breakdown_with_null_dates_returns_valid_yoy_growth_for_opex_subcategories(): void
+    {
+        Sanctum::actingAs($this->clientUser);
+
+        // Call breakdown with no date filters (Full history / all-time) and include_yoy=true
+        $response = $this->getJson('/api/v1/finance/analytics/breakdown?category_type=OPEX&include_yoy=true');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('status', 'success')
+            ->assertJsonPath('include_yoy', true)
+            ->assertJsonPath('category_type', 'OPEX')
+            ->assertJsonPath('company_id', $this->acmeCompany->id);
+
+        $data = $response->json('data');
+        $this->assertNotEmpty($data);
+        $this->assertGreaterThanOrEqual(5, count($data));
+
+        $categoryCodes = array_column($data, 'category_code');
+        $this->assertContains('PAYROLL', $categoryCodes);
+        $this->assertContains('SRV', $categoryCodes);
+        $this->assertContains('OFFICE', $categoryCodes);
+
+        foreach ($data as $item) {
+            $this->assertSame('opex', $item['category_type']);
+            $this->assertNotNull($item['previous_amount']);
+            $this->assertGreaterThan(0, $item['amount']);
+            $this->assertGreaterThan(0, $item['previous_amount']);
+            $this->assertNotNull($item['yoy_growth_pct']);
+            $this->assertNotNull($item['amount_change']);
+            $this->assertNotNull($item['formatted_previous_amount']);
+            $this->assertNotNull($item['formatted_amount_change']);
+        }
+    }
+
+    public function test_get_category_breakdown_with_null_dates_returns_valid_yoy_growth_for_revenue_subcategories(): void
+    {
+        Sanctum::actingAs($this->clientUser);
+
+        // Call breakdown for REVENUE with no date filters (Full history) and include_yoy=true
+        $response = $this->getJson('/api/v1/finance/analytics/breakdown?record_type=REVENUE&include_yoy=true');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('status', 'success')
+            ->assertJsonPath('include_yoy', true)
+            ->assertJsonPath('record_type', 'REVENUE')
+            ->assertJsonPath('company_id', $this->acmeCompany->id);
+
+        $data = $response->json('data');
+        $this->assertNotEmpty($data);
+        $this->assertGreaterThanOrEqual(3, count($data));
+
+        $categoryCodes = array_column($data, 'category_code');
+        $this->assertContains('REV-SRV', $categoryCodes);
+        $this->assertContains('REV-SAAS', $categoryCodes);
+        $this->assertContains('REV-CON', $categoryCodes);
+
+        foreach ($data as $item) {
+            $this->assertSame('revenue', $item['category_type']);
+            $this->assertNotNull($item['previous_amount']);
+            $this->assertGreaterThan(0, $item['amount']);
+            $this->assertGreaterThan(0, $item['previous_amount']);
+            $this->assertNotNull($item['yoy_growth_pct']);
+            $this->assertNotNull($item['amount_change']);
+        }
+    }
 }
