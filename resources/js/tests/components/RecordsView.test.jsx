@@ -424,3 +424,304 @@ describe('RecordsView - Batch Selection and Deletion Integration', () => {
         });
     });
 });
+
+describe('RecordsView - Complete Batch Delete End-to-End Workflow', () => {
+    let mockE2ERecords;
+    let recordsUpdatedEventFired;
+
+    beforeEach(() => {
+        vi.clearAllMocks();
+        recordsUpdatedEventFired = false;
+        window.addEventListener(
+            'finboard:records-updated',
+            () => {
+                recordsUpdatedEventFired = true;
+            },
+            { once: true }
+        );
+
+        mockE2ERecords = [
+            {
+                id: 'e2e-rec-001',
+                company_id: 'comp-acme-1',
+                record_date: '2026-03-01',
+                category_id: 'cat-rev-1',
+                category: mockCategories[0],
+                record_type: 'INCOME',
+                amount: 30000,
+                currency: 'PLN',
+                description: 'Sprzedaż systemów SaaS',
+                source: 'manual',
+            },
+            {
+                id: 'e2e-rec-002',
+                company_id: 'comp-acme-1',
+                record_date: '2026-03-05',
+                category_id: 'cat-opex-1',
+                category: mockCategories[1],
+                record_type: 'EXPENSE',
+                amount: 12000,
+                currency: 'PLN',
+                description: 'Wynagrodzenia zespołu inżynierów',
+                source: 'manual',
+            },
+            {
+                id: 'e2e-rec-003',
+                company_id: 'comp-acme-1',
+                record_date: '2026-03-10',
+                category_id: 'cat-opex-1',
+                category: mockCategories[1],
+                record_type: 'EXPENSE',
+                amount: 5000,
+                currency: 'PLN',
+                description: 'Licencje chmurowe AWS',
+                source: 'manual',
+            },
+        ];
+
+        apiClient.get.mockImplementation((url) => {
+            if (url === '/finance/categories') {
+                return Promise.resolve({ data: { data: mockCategories } });
+            }
+            if (url.startsWith('/finance/records')) {
+                return Promise.resolve({
+                    data: {
+                        data: mockE2ERecords,
+                        meta: {
+                            current_page: 1,
+                            last_page: 1,
+                            per_page: 25,
+                            total: mockE2ERecords.length,
+                            from: mockE2ERecords.length ? 1 : 0,
+                            to: mockE2ERecords.length,
+                        },
+                    },
+                });
+            }
+            return Promise.resolve({ data: {} });
+        });
+
+        apiClient.delete.mockImplementation((url, config) => {
+            if (url === '/finance/records/batch') {
+                const idsToDelete = config?.data?.record_ids || [];
+                mockE2ERecords = mockE2ERecords.filter((r) => !idsToDelete.includes(r.id));
+                return Promise.resolve({
+                    data: {
+                        status: 'deleted',
+                        count: idsToDelete.length,
+                        total_amount: 42000,
+                        message: `Pomyślnie usunięto ${idsToDelete.length} operacji finansowych.`,
+                    },
+                });
+            }
+            return Promise.resolve({ data: {} });
+        });
+    });
+
+    it('orchestrates complete end-to-end batch deletion lifecycle with metrics aggregation, confirmation modal, optimistic removal, notification toast, and domain event dispatch', async () => {
+        renderWithProviders(<RecordsView />);
+
+        // Step 1: Initial Render & Verification
+        await waitFor(() => {
+            expect(screen.getByText('Sprzedaż systemów SaaS')).toBeInTheDocument();
+            expect(screen.getByText('Wynagrodzenia zespołu inżynierów')).toBeInTheDocument();
+            expect(screen.getByText('Licencje chmurowe AWS')).toBeInTheDocument();
+        });
+
+        // Quick metrics ribbon shows total entries
+        expect(screen.getByText('Łącznie Pozycji')).toBeInTheDocument();
+        expect(screen.queryByTestId('batch-action-bar')).toBeNull();
+
+        // Step 2: User selects two records (1 income, 1 expense)
+        const check1 = screen.getByTestId('record-checkbox-e2e-rec-001');
+        const check2 = screen.getByTestId('record-checkbox-e2e-rec-002');
+        fireEvent.click(check1);
+        fireEvent.click(check2);
+
+        // Step 3: Floating Action Bar appears with correct aggregates
+        expect(screen.getByTestId('batch-action-bar')).toBeInTheDocument();
+        expect(screen.getByTestId('batch-selected-count')).toHaveTextContent('2');
+        // 30,000 + 12,000 = 42,000
+        expect(screen.getByTestId('batch-total-amount')).toHaveTextContent(/42[\s\u00A0]?000,00[\s\u00A0]?zł/);
+        expect(screen.getByText(/\+30[\s\u00A0]?000,00[\s\u00A0]?zł/)).toBeInTheDocument();
+        expect(screen.getByText(/-12[\s\u00A0]?000,00[\s\u00A0]?zł/)).toBeInTheDocument();
+
+        // Step 4: User clicks batch delete button in floating action bar
+        const batchDeleteBtn = screen.getByTestId('batch-delete-btn');
+        fireEvent.click(batchDeleteBtn);
+
+        // Step 5: BatchDeleteConfirmationModal opens with detailed breakdown
+        expect(screen.getByTestId('batch-delete-modal')).toBeInTheDocument();
+        expect(screen.getByTestId('batch-modal-count')).toHaveTextContent('2');
+        expect(screen.getByTestId('batch-modal-total')).toHaveTextContent(/42[\s\u00A0]?000,00[\s\u00A0]?zł/);
+        expect(screen.getByTestId('batch-modal-income')).toHaveTextContent(/30[\s\u00A0]?000,00[\s\u00A0]?zł/);
+        expect(screen.getByTestId('batch-modal-expense')).toHaveTextContent(/12[\s\u00A0]?000,00[\s\u00A0]?zł/);
+        // Safety keyword not required for <= 10 items
+        expect(screen.queryByTestId('batch-keyword-section')).toBeNull();
+
+        // Step 6: User clicks confirm deletion
+        const confirmBtn = screen.getByTestId('batch-confirm-delete-btn');
+        fireEvent.click(confirmBtn);
+
+        // Step 7: API DELETE call is executed with exact IDs
+        await waitFor(() => {
+            expect(apiClient.delete).toHaveBeenCalledWith('/finance/records/batch', {
+                data: { record_ids: ['e2e-rec-001', 'e2e-rec-002'] },
+            });
+        });
+
+        // Step 8: Success notification toast is displayed
+        await waitFor(() => {
+            expect(screen.getByText('Potwierdzenie')).toBeInTheDocument();
+            expect(screen.getByText('Pomyślnie usunięto 2 operacji finansowych.')).toBeInTheDocument();
+        });
+
+        // Step 9: Domain event finboard:records-updated was dispatched
+        expect(recordsUpdatedEventFired).toBe(true);
+
+        // Step 10: Optimistic & server UI update: records removed, modal & action bar unmounted
+        await waitFor(() => {
+            expect(screen.queryByTestId('batch-delete-modal')).toBeNull();
+            expect(screen.queryByTestId('batch-action-bar')).toBeNull();
+            expect(screen.queryByText('Sprzedaż systemów SaaS')).toBeNull();
+            expect(screen.queryByText('Wynagrodzenia zespołu inżynierów')).toBeNull();
+            expect(screen.getByText('Licencje chmurowe AWS')).toBeInTheDocument();
+        });
+    });
+
+    it('executes high-volume batch deletion end-to-end requiring and validating safety keyword confirmation before deletion', async () => {
+        // Setup 15 records to trigger high-volume safety threshold (> 10)
+        const bulkRecords = Array.from({ length: 15 }, (_, i) => ({
+            id: `bulk-rec-${i + 1}`,
+            company_id: 'comp-acme-1',
+            record_date: '2026-03-01',
+            category_id: 'cat-rev-1',
+            category: mockCategories[0],
+            record_type: 'INCOME',
+            amount: 2000,
+            currency: 'PLN',
+            description: `Transakcja hurtowa #${i + 1}`,
+            source: 'manual',
+        }));
+
+        apiClient.get.mockImplementation((url) => {
+            if (url === '/finance/categories') return Promise.resolve({ data: { data: mockCategories } });
+            if (url.startsWith('/finance/records')) {
+                return Promise.resolve({
+                    data: {
+                        data: bulkRecords,
+                        meta: { current_page: 1, last_page: 1, per_page: 25, total: 15, from: 1, to: 15 },
+                    },
+                });
+            }
+            return Promise.resolve({ data: {} });
+        });
+
+        renderWithProviders(<RecordsView />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Transakcja hurtowa #1')).toBeInTheDocument();
+        });
+
+        // Master checkbox selects all 15 records
+        fireEvent.click(screen.getByTestId('batch-master-checkbox'));
+        expect(screen.getByTestId('batch-selected-count')).toHaveTextContent('15');
+
+        // Open modal
+        fireEvent.click(screen.getByTestId('batch-delete-btn'));
+        expect(screen.getByTestId('batch-delete-modal')).toBeInTheDocument();
+        expect(screen.getByTestId('batch-keyword-section')).toBeInTheDocument();
+
+        const confirmBtn = screen.getByTestId('batch-confirm-delete-btn');
+        expect(confirmBtn).toBeDisabled();
+
+        // Type incorrect keyword -> button remains disabled
+        const input = screen.getByTestId('batch-confirm-input');
+        fireEvent.change(input, { target: { value: 'USUN' } });
+        expect(confirmBtn).toBeDisabled();
+
+        // Type valid keyword "USUŃ" -> button becomes enabled
+        fireEvent.change(input, { target: { value: 'USUŃ' } });
+        expect(confirmBtn).not.toBeDisabled();
+
+        // Submit deletion
+        fireEvent.click(confirmBtn);
+
+        await waitFor(() => {
+            expect(apiClient.delete).toHaveBeenCalledWith('/finance/records/batch', {
+                data: { record_ids: bulkRecords.map((r) => r.id) },
+            });
+        });
+
+        await waitFor(() => {
+            expect(screen.queryByTestId('batch-delete-modal')).toBeNull();
+            expect(screen.queryByTestId('batch-action-bar')).toBeNull();
+        });
+    });
+
+    it('handles batch delete server errors with error toast notification and rollback resilience', async () => {
+        apiClient.delete.mockImplementation(() =>
+            Promise.reject({
+                response: {
+                    data: {
+                        message: 'Błąd serwera: transakcja bazodanowa wycofana z powodu blokady tabeli.',
+                    },
+                },
+            })
+        );
+
+        renderWithProviders(<RecordsView />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Sprzedaż systemów SaaS')).toBeInTheDocument();
+        });
+
+        // Select record 1
+        fireEvent.click(screen.getByTestId('record-checkbox-e2e-rec-001'));
+        fireEvent.click(screen.getByTestId('batch-delete-btn'));
+
+        // Confirm deletion
+        fireEvent.click(screen.getByTestId('batch-confirm-delete-btn'));
+
+        // Error notification toast appears
+        await waitFor(() => {
+            expect(screen.getByText('Błąd operacji')).toBeInTheDocument();
+            expect(
+                screen.getByText('Błąd serwera: transakcja bazodanowa wycofana z powodu blokady tabeli.')
+            ).toBeInTheDocument();
+        });
+
+        // Record is preserved in table
+        expect(screen.getByText('Sprzedaż systemów SaaS')).toBeInTheDocument();
+    });
+
+    it('allows cancelling deletion from modal and deselecting from action bar without invoking API', async () => {
+        renderWithProviders(<RecordsView />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Sprzedaż systemów SaaS')).toBeInTheDocument();
+        });
+
+        // Select record 1
+        const check1 = screen.getByTestId('record-checkbox-e2e-rec-001');
+        fireEvent.click(check1);
+        expect(screen.getByTestId('batch-action-bar')).toBeInTheDocument();
+
+        // Open modal and click cancel
+        fireEvent.click(screen.getByTestId('batch-delete-btn'));
+        expect(screen.getByTestId('batch-delete-modal')).toBeInTheDocument();
+        fireEvent.click(screen.getByTestId('batch-modal-cancel-btn'));
+
+        // Modal closes, selection stays
+        expect(screen.queryByTestId('batch-delete-modal')).toBeNull();
+        expect(screen.getByTestId('batch-action-bar')).toBeInTheDocument();
+
+        // Click clear in action bar
+        fireEvent.click(screen.getByTestId('batch-clear-btn'));
+        expect(screen.queryByTestId('batch-action-bar')).toBeNull();
+        expect(check1).not.toBeChecked();
+
+        // Ensure delete API was never invoked
+        expect(apiClient.delete).not.toHaveBeenCalled();
+    });
+});
