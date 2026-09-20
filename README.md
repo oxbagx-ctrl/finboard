@@ -320,7 +320,7 @@ npm test
 - [ ] **Faza 23: Poprawa Typografii Tabeli P&L i Warunkowej Grupowalności**
   - [x] Usunięcie prefiksu `(-)` przed numeracją pozycji w `FinancialTable` z zachowaniem semantyki kosztu.
   - [x] Warunkowa obsługa rozwijania wierszy (chevron tylko dla grup posiadających więcej niż 1 pozycję).
-  - [ ] Formatowanie ujemnych potrąceń w `FinancialValue` bez zaburzania numeracji wierszy.
+  - [x] Formatowanie ujemnych potrąceń w `FinancialValue` bez zaburzania numeracji wierszy.
   - [ ] Aktualizacja testów komponentu `FinancialTable`.
   - [ ] Testy regresyjne E2E w `DashboardView.test.jsx` dla czystej hierarchii P&L.
 

@@ -8,6 +8,8 @@ export const FinancialValue = ({
     color = 'neutral', // 'neutral' | 'profit' | 'loss' | 'auto'
     size = 'md',       // 'sm' | 'md' | 'lg' | 'xl' | '2xl'
     align = 'right',   // 'left' | 'right' | 'center'
+    isDeduction = false,
+    bracketNegative = false,
     className = '',
 }) => {
     const num = Number(amount || 0);
@@ -33,11 +35,18 @@ export const FinancialValue = ({
         textColor = 'text-rose-400';
     }
 
-    const formatted = formatCurrency(num, currency, compact);
+    const shouldUseBracket = bracketNegative || (isDeduction && num > 0);
+    const displayNum = isDeduction && num > 0 ? num : (shouldUseBracket && num < 0 ? Math.abs(num) : num);
+
+    const formatted = formatCurrency(displayNum, currency, compact);
     // Split formatted text into number and currency suffix
     const parts = formatted.split(/\s(?=[^\s]+$)/);
-    const valuePart = parts[0] || formatted;
+    let valuePart = parts[0] || formatted;
     const currencyPart = parts[1] || currency;
+
+    if (shouldUseBracket) {
+        valuePart = `(${valuePart})`;
+    }
 
     return (
         <span
