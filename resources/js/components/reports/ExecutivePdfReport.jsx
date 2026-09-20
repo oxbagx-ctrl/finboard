@@ -248,7 +248,7 @@ export const ExecutivePdfReport = ({
                                     <td className="py-2 px-3 text-right text-zinc-400 print:text-black tabular-nums">100.0%</td>
                                 </tr>
                                 <tr className="hover:bg-zinc-900/40 text-zinc-400 print:text-zinc-700">
-                                    <td className="py-2 px-3 pl-6">(-) Koszt własny sprzedaży (COGS / Direct Costs)</td>
+                                    <td className="py-2 px-3">(-) Koszt własny sprzedaży (COGS / Direct Costs)</td>
                                     <td className="py-2 px-3 text-center text-[10px] text-zinc-500 print:text-black">COGS</td>
                                     <td className="py-2 px-3 text-right tabular-nums text-rose-400 print:text-black">
                                         -{formatCurrency(cogs, currency)}
@@ -268,7 +268,7 @@ export const ExecutivePdfReport = ({
                                     </td>
                                 </tr>
                                 <tr className="hover:bg-zinc-900/40 text-zinc-400 print:text-zinc-700">
-                                    <td className="py-2 px-3 pl-6">(-) Koszty operacyjne zarządu i sprzedaży (OPEX)</td>
+                                    <td className="py-2 px-3">(-) Koszty operacyjne zarządu i sprzedaży (OPEX)</td>
                                     <td className="py-2 px-3 text-center text-[10px] text-zinc-500 print:text-black">OPEX</td>
                                     <td className="py-2 px-3 text-right tabular-nums text-rose-400 print:text-black">
                                         -{formatCurrency(opex, currency)}
@@ -288,7 +288,7 @@ export const ExecutivePdfReport = ({
                                     </td>
                                 </tr>
                                 <tr className="hover:bg-zinc-900/40 text-zinc-400 print:text-zinc-700">
-                                    <td className="py-2 px-3 pl-6">(-) Odpisy amortyzacyjne (D&A)</td>
+                                    <td className="py-2 px-3">(-) Odpisy amortyzacyjne (D&A)</td>
                                     <td className="py-2 px-3 text-center text-[10px] text-zinc-500 print:text-black">D&A</td>
                                     <td className="py-2 px-3 text-right tabular-nums text-zinc-400 print:text-black">
                                         -{formatCurrency(depreciation, currency)}
@@ -308,7 +308,7 @@ export const ExecutivePdfReport = ({
                                     </td>
                                 </tr>
                                 <tr className="hover:bg-zinc-900/40 text-zinc-400 print:text-zinc-700">
-                                    <td className="py-2 px-3 pl-6">(-) Podatki dochodowe & koszty finansowe</td>
+                                    <td className="py-2 px-3">(-) Podatki dochodowe & koszty finansowe</td>
                                     <td className="py-2 px-3 text-center text-[10px] text-zinc-500 print:text-black">TAX / FIN</td>
                                     <td className="py-2 px-3 text-right tabular-nums text-zinc-400 print:text-black">
                                         -{formatCurrency(taxesFinance, currency)}
