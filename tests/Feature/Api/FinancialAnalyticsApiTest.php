@@ -222,6 +222,34 @@ final class FinancialAnalyticsApiTest extends TestCase
         }
     }
 
+    public function test_get_category_breakdown_opex_api_returns_diverse_distribution_instead_of_single_entry(): void
+    {
+        Sanctum::actingAs($this->clientUser);
+
+        $response = $this->getJson('/api/v1/finance/analytics/breakdown?category_type=OPEX&start_date=2026-01-01&end_date=2026-03-31');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('status', 'success')
+            ->assertJsonPath('category_type', 'OPEX');
+
+        $data = $response->json('data');
+        $this->assertGreaterThanOrEqual(6, count($data));
+
+        $categoryCodes = array_column($data, 'category_code');
+        $this->assertContains('PAYROLL', $categoryCodes);
+        $this->assertContains('SRV', $categoryCodes);
+        $this->assertContains('OFFICE', $categoryCodes);
+
+        foreach ($data as $item) {
+            $this->assertLessThan(100.0, $item['percentage']);
+            $this->assertGreaterThan(0.0, $item['percentage']);
+            $this->assertSame('opex', $item['category_type']);
+        }
+
+        $totalPercentage = array_sum(array_column($data, 'percentage'));
+        $this->assertEqualsWithDelta(100.0, $totalPercentage, 0.5);
+    }
+
     public function test_get_category_breakdown_with_category_type_opex_filter(): void
     {
         Sanctum::actingAs($this->clientUser);

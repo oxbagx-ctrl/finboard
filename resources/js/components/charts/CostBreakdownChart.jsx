@@ -78,9 +78,9 @@ export const CostBreakdownChart = ({ data = [], currency = 'PLN', title = 'SUMA 
 
             {/* Monospace Micro-Legend */}
             <div className="mt-2 flex-1 overflow-y-auto space-y-1 pr-1 font-mono text-[10px]">
-                {formattedData.slice(0, 5).map((item, idx) => (
+                {formattedData.map((item, idx) => (
                     <div
-                        key={idx}
+                        key={item.category_id || idx}
                         className="flex items-center justify-between p-1 rounded hover:bg-zinc-850/50 transition-colors"
                     >
                         <div className="flex items-center gap-2 truncate pr-2">

@@ -269,6 +269,44 @@ final class QueriesTest extends TestCase
         $this->assertSame($breakdownUpper, $breakdownMixed);
     }
 
+    public function test_get_category_breakdown_handler_opex_returns_diverse_distribution_instead_of_single_entry(): void
+    {
+        $handler = new GetCategoryBreakdownHandler($this->repo);
+
+        $query = new GetCategoryBreakdownQuery(
+            companyId: self::ACME_COMPANY_ID,
+            startDate: '2026-01-01',
+            endDate: '2026-03-31',
+            recordType: 'EXPENSE',
+            categoryType: 'OPEX'
+        );
+
+        $breakdown = $handler->handle($query);
+
+        // Verify there are multiple categories (at least 6 granular subcategories)
+        $this->assertGreaterThanOrEqual(6, count($breakdown));
+
+        // Verify no single category occupies 100% of OPEX
+        foreach ($breakdown as $item) {
+            $this->assertLessThan(100.0, $item['percentage']);
+            $this->assertGreaterThan(0.0, $item['percentage']);
+            $this->assertSame('opex', $item['category_type']);
+        }
+
+        // Verify all 6 granular categories exist in the breakdown
+        $categoryIds = array_column($breakdown, 'category_id');
+        $this->assertContains('cat-opex-payroll', $categoryIds);
+        $this->assertContains('cat-opex-services', $categoryIds);
+        $this->assertContains('cat-opex-office', $categoryIds);
+        $this->assertContains('cat-opex-software', $categoryIds);
+        $this->assertContains('cat-opex-marketing', $categoryIds);
+        $this->assertContains('cat-opex-legal', $categoryIds);
+
+        // Sum should equal 100%
+        $totalPercentage = array_sum(array_column($breakdown, 'percentage'));
+        $this->assertEqualsWithDelta(100.0, $totalPercentage, 0.5);
+    }
+
     public function test_get_category_breakdown_handler_filters_by_single_category_type_opex(): void
     {
         $handler = new GetCategoryBreakdownHandler($this->repo);

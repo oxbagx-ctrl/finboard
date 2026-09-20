@@ -5,7 +5,7 @@
 [![PostgreSQL](https://img.shields.io/badge/postgresql-16-blue.svg)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/redis-alpine-red.svg)](https://redis.io/)
 [![Architecture](https://img.shields.io/badge/architecture-DDD%20%2F%20CQRS-brightgreen.svg)]()
-[![Tests](https://img.shields.io/badge/tests-370%20backend%20%7C%20146%20frontend%20passed-success.svg)]()
+[![Tests](https://img.shields.io/badge/tests-377%20backend%20%7C%20147%20frontend%20passed-success.svg)]()
 
 FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakcyjnego (M&A, Due Diligence, Corporate Finance) oraz ich klientom (CFO, Zarządy). Aplikacja łączy w sobie zaawansowaną analitykę finansową w ujęciu wielo-najemcowym (Multi-Tenant) z bezpiecznym repozytorium dokumentów Virtual Data Room (VDR).
 
@@ -120,13 +120,13 @@ Pulpit Mailpit (podgląd e-maili deweloperskich): `http://localhost:8025`.
 ## 🧪 Uruchamianie Testów
 
 ### Testy Backendowe (PHPUnit)
-Pakiet 369 testów jednostkowych i integracyjnych pokrywających warstwę domenową (DDD), zapytania CQRS, repozytoria, kalkulacje matematyczne `Money`, importy CSV, autoryzację wielonajemcową, system zaproszeń, logi audytowe oraz API benchmarków i analityki:
+Pakiet 377 testów jednostkowych i integracyjnych pokrywających warstwę domenową (DDD), zapytania CQRS, repozytoria, kalkulacje matematyczne `Money`, importy CSV, autoryzację wielonajemcową, system zaproszeń, logi audytowe oraz API benchmarków i analityki:
 ```bash
 docker compose exec app ./vendor/bin/phpunit
 ```
 
 ### Testy Frontendowe (Vitest)
-Pakiet 146 testów jednostkowych i integracyjnych dla komponentów React, kontekstu transakcyjnego, walidacji danych, kalkulatorów walutowych, konfiguratora celów benchmarkowych oraz przepływów integracyjnych E2E:
+Pakiet 147 testów jednostkowych i integracyjnych dla komponentów React, kontekstu transakcyjnego, walidacji danych, kalkulatorów walutowych, konfiguratora celów benchmarkowych oraz przepływów integracyjnych E2E:
 ```bash
 npm test
 ```
@@ -287,12 +287,12 @@ npm test
   - [x] Standaryzacja hierarchii i formatowania wierszy w zestawieniu Rachunku Zysków i Strat (P&L Table).
   - [x] Testy jednostkowe i integracyjne dla precyzji obliczeń dynamiki oraz weryfikacji stanów brzegowych.
   - [x] Weryfikacja spójności całego pulpitu zarządczego (Executive Overview) oraz generowanie pełnego buildu produkcyjnego.
-- [ ] **Faza 18: Naprawa Filtrowania RecordType i Układ Rodzajowy OPEX**
+- [x] **Faza 18: Naprawa Filtrowania RecordType i Układ Rodzajowy OPEX**
   - [x] Usunięcie błędu wielkości liter w `GetCategoryBreakdownHandler` blokującego filtrowanie `record_type`.
   - [x] Wprowadzenie dedykowanych kodów kategorii rodzajowych OPEX w encji domenowej `Category` i seederze bazy danych.
   - [x] Aktualizacja `FinancialDataSeeder` i zbiorów danych o dystrybucję kosztów operacyjnych na subkategorie rodzajowe.
   - [x] Testy jednostkowe izolacji kategorii REVENUE od EXPENSE i rekordów bilansowych.
-  - [ ] Weryfikacja różnorodnego rozkładu kategorii OPEX na wykresie kołowym zamiast pojedynczego wpisu 100%.
+  - [x] Weryfikacja różnorodnego rozkładu kategorii OPEX na wykresie kołowym zamiast pojedynczego wpisu 100%.
 - [ ] **Faza 19: Domenowe Obliczanie Dynamiki R/R dla Podpozycji Kategorii**
   - [ ] Rozszerzenie `GetCategoryBreakdownQuery` i Handlera o kalkulację kwot porównawczych i dynamiki YoY per kategoria.
   - [ ] Ekspozycja dynamiki YoY na poziomie kategorii (`previous_amount`, `yoy_growth_pct`) w endpoincie `/finance/analytics/breakdown`.
