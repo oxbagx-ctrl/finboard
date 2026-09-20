@@ -383,4 +383,77 @@ describe('FinancialTable Component', () => {
         expect(opexDownBadge).toHaveTextContent("-5.0%");
         expect(opexDownBadge.className).toContain("text-emerald-300");
     });
+
+    it('verifies that only sub-items receive indentation classes (pl-8 / pl-10)', () => {
+        const hierarchyData = [
+            {
+                id: 'rev_group',
+                label: '1. Przychody ze Sprzedaży (Total Revenue)',
+                code: 'REV-TOT',
+                amount: 1000000,
+                isGroup: true,
+                children: [
+                    { id: 'rev_sub_1', label: 'Sprzedaż Licencji SaaS', code: 'REV-SAAS', amount: 600000 },
+                    { id: 'rev_sub_2', label: 'Usługi Wdrożeniowe', code: 'REV-SERV', amount: 400000 },
+                ],
+            },
+            {
+                id: 'cogs',
+                label: '2. Koszt Wytworzenia Sprzedanych Produktów (COGS)',
+                code: 'COGS',
+                amount: 400000,
+                isDeduction: true,
+            },
+            {
+                id: 'direct_sub',
+                label: 'Pozycja pomocnicza',
+                isSubItem: true,
+                amount: 50000,
+            },
+            {
+                id: 'gross_profit',
+                label: '3. ZYSK BRUTTO ZE SPRZEDAŻY (GROSS PROFIT)',
+                code: 'GP',
+                amount: 600000,
+                isSummary: true,
+            },
+        ];
+
+        render(
+            <FinancialTable
+                data={hierarchyData}
+                currency="PLN"
+                revenueTotal={1000000}
+            />
+        );
+
+        // 1. Verify top-level level-0 items do NOT have any indentation (pl-6, pl-8, pl-10)
+        const topLevelRows = [
+            '1. Przychody ze Sprzedaży (Total Revenue)',
+            '2. Koszt Wytworzenia Sprzedanych Produktów (COGS)',
+            '3. ZYSK BRUTTO ZE SPRZEDAŻY (GROSS PROFIT)',
+        ];
+
+        topLevelRows.forEach(label => {
+            const cell = screen.getByText(label).closest('td');
+            expect(cell.className).toContain('px-4');
+            expect(cell.className).not.toContain('pl-6');
+            expect(cell.className).not.toContain('pl-8');
+            expect(cell.className).not.toContain('pl-10');
+        });
+
+        // 2. Verify child items rendered via children tree receive pl-10 and tree symbol ↳
+        const child1Cell = screen.getByText('Sprzedaż Licencji SaaS').closest('td');
+        expect(child1Cell.className).toContain('pl-10');
+        expect(child1Cell.textContent).toContain('↳');
+
+        const child2Cell = screen.getByText('Usługi Wdrożeniowe').closest('td');
+        expect(child2Cell.className).toContain('pl-10');
+        expect(child2Cell.textContent).toContain('↳');
+
+        // 3. Verify standalone sub-item with isSubItem flag receives pl-8
+        const directSubCell = screen.getByText('Pozycja pomocnicza').closest('td');
+        expect(directSubCell.className).toContain('pl-8');
+        expect(directSubCell.className).not.toContain('pl-6');
+    });
 });
