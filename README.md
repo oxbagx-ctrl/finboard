@@ -306,14 +306,14 @@ npm test
   - Testy komponentów frontendowych w `DashboardView.test.jsx` weryfikujące rozwijane wiersze P&L i odznaki YoY.
   - Testy integracyjne weryfikujące poprawną izolację kategorii w zestawieniu przychodów.
 - [x] **Faza 21: Spójność Danych Historycznych OPEX i Strumienie Przychodów**
-  - [x] Migracja danych rekwalifikująca archiwalne rekordy `cat-opex` do granularnych podkategorii OPEX.
-  - [x] Wprowadzenie granularnych podkategorii przychodowych (SaaS, Usługi, Doradztwo) w encji domenowej `Category` i schemacie.
-  - [x] Aktualizacja seedera `FinancialDataSeeder` i zbiorów danych o realne strumienie przychodowe.
-  - [x] Testy weryfikujące eliminację rekordów sierocych `cat-opex` i pełną spójność analityczną.
-  - [x] Refaktoryzacja `CategoryBreakdown` pod kątem obsługi grup jedno- i wielokategorialnych.
+  - Migracja danych rekwalifikująca archiwalne rekordy `cat-opex` do granularnych podkategorii OPEX.
+  - Wprowadzenie granularnych podkategorii przychodowych (SaaS, Usługi, Doradztwo) w encji domenowej `Category` i schemacie.
+  - Aktualizacja seedera `FinancialDataSeeder` i zbiorów danych o realne strumienie przychodowe.
+  - Testy weryfikujące eliminację rekordów sierocych `cat-opex` i pełną spójność analityczną.
+  - Refaktoryzacja `CategoryBreakdown` pod kątem obsługi grup jedno- i wielokategorialnych.
 - [ ] **Faza 22: Naprawa Dynamiki R/R dla Okresów Otwartych i Podpozycji**
   - [x] Wyliczanie dynamicznego zakresu porównawczego w `GetCategoryBreakdownHandler` przy braku jawnego zakresu dat (`startDate === null`, `endDate === null`).
-  - [ ] Ciągłość historyczna kategorii w repozytorium analitycznym i kalkulatorze domenowym.
+  - [x] Ciągłość historyczna kategorii w repozytorium analitycznym i kalkulatorze domenowym.
   - [ ] Testy jednostkowe kalkulacji YoY dla otwartych zakresów dat (Pełna historia).
   - [ ] Testy integracyjne weryfikujące endpoint `GET /finance/analytics/breakdown` dla podkategorii OPEX i przychodów.
   - [ ] Weryfikacja spójności formatu danych porównawczych między metrykami a breakdown.

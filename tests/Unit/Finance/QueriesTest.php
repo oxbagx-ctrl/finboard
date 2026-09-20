@@ -612,6 +612,58 @@ final class QueriesTest extends TestCase
         }
     }
 
+    public function test_get_category_breakdown_handler_matches_comparative_period_by_category_code_continuity(): void
+    {
+        // Insert a historical category and record with identical category_code (PAYROLL) in 2025
+        \Illuminate\Support\Facades\DB::table("financial_categories")->insert([
+            "id" => "cat-opex-payroll-legacy",
+            "name" => "Wynagrodzenia Legacy",
+            "code" => "PAYROLL",
+            "type" => "opex",
+            "created_at" => now(),
+            "updated_at" => now(),
+        ]);
+
+        \Illuminate\Support\Facades\DB::table("financial_records")->insert([
+            "id" => (string) \Illuminate\Support\Str::uuid(),
+            "company_id" => self::ACME_COMPANY_ID,
+            "category_id" => "cat-opex-payroll-legacy",
+            "record_type" => "EXPENSE",
+            "description" => "Wynagrodzenia historyczne o innym ID kategorii",
+            "amount" => 10000.00,
+            "currency" => "PLN",
+            "record_date" => "2025-01-15",
+            "created_at" => now(),
+            "updated_at" => now(),
+        ]);
+
+        $handler = new GetCategoryBreakdownHandler($this->repo);
+
+        $query = new GetCategoryBreakdownQuery(
+            companyId: self::ACME_COMPANY_ID,
+            startDate: "2026-01-01",
+            endDate: "2026-01-31",
+            recordType: "EXPENSE",
+            categoryType: "OPEX",
+            includeYoY: true
+        );
+
+        $breakdown = $handler->handle($query);
+
+        $this->assertNotEmpty($breakdown);
+        $payrollItem = null;
+        foreach ($breakdown as $item) {
+            if ($item["category_code"] === "PAYROLL") {
+                $payrollItem = $item;
+                break;
+            }
+        }
+
+        $this->assertNotNull($payrollItem);
+        $this->assertNotNull($payrollItem["previous_amount"]);
+        $this->assertGreaterThan(0, $payrollItem["previous_amount"]);
+    }
+
     public function test_get_available_fiscal_years_handler_falls_back_to_current_year_when_empty(): void
     {
         $emptyCompanyId = '00000000-0000-0000-0000-000000000000';

@@ -136,6 +136,7 @@ final class GetCategoryBreakdownHandler
 
         // Aggregate comparative period records if comparative period is active
         $prevTotalsPerCategory = [];
+        $prevTotalsByCode = [];
         $prevGrandTotal = Money::zero($currency);
         $hasComparativeRecords = false;
 
@@ -160,11 +161,20 @@ final class GetCategoryBreakdownHandler
                     }
 
                     $pCatId = $prevCategory->id();
+                    $pCode = strtoupper(trim($prevCategory->code()));
+
                     if (!isset($prevTotalsPerCategory[$pCatId])) {
                         $prevTotalsPerCategory[$pCatId] = Money::zero($currency);
                     }
-
                     $prevTotalsPerCategory[$pCatId] = $prevTotalsPerCategory[$pCatId]->add($prevRecord->amount());
+
+                    if ($pCode !== '') {
+                        if (!isset($prevTotalsByCode[$pCode])) {
+                            $prevTotalsByCode[$pCode] = Money::zero($currency);
+                        }
+                        $prevTotalsByCode[$pCode] = $prevTotalsByCode[$pCode]->add($prevRecord->amount());
+                    }
+
                     $prevGrandTotal = $prevGrandTotal->add($prevRecord->amount());
                 }
             }
@@ -190,7 +200,9 @@ final class GetCategoryBreakdownHandler
             $percentagePointDiff = null;
 
             if ($hasComparativeRecords) {
-                $prevMoney = $prevTotalsPerCategory[$catId] ?? null;
+                $currentCode = strtoupper(trim($categoryDetails[$catId]['code']));
+                // Match by primary category ID or by standardized category code for cross-year continuity
+                $prevMoney = $prevTotalsPerCategory[$catId] ?? ($prevTotalsByCode[$currentCode] ?? null);
 
                 if ($prevMoney !== null) {
                     $previousAmountFloat = (float) $prevMoney->amount();
