@@ -50,10 +50,10 @@ export const FinancialValue = ({
 
     return (
         <span
-            className={`inline-flex items-baseline font-mono tabular-nums tracking-tight ${sizeClasses[size]} ${textColor} ${alignClasses[align]} ${className}`}
+            className={`inline-flex items-baseline font-mono tabular-nums tracking-tight whitespace-nowrap ${sizeClasses[size]} ${textColor} ${alignClasses[align]} ${className}`}
         >
-            <span>{valuePart}</span>
-            <span className="ml-1 text-[0.8em] font-sans font-normal text-zinc-500 tracking-normal uppercase">
+            <span className="font-mono tabular-nums">{valuePart}</span>
+            <span className="ml-1 text-[0.8em] font-mono font-normal text-zinc-500 tracking-normal uppercase shrink-0">
                 {currencyPart}
             </span>
         </span>

@@ -331,7 +331,7 @@ npm test
   - Dodanie testu weryfikującego, że wcięcia (`pl-8` / `pl-10`) posiadają wyłącznie elementy podrzędne.
 - [ ] **Faza 25: Spójność Raportów i Regresja Wizualna (Commity 121–125)**
   - [x] Synchronizacja styli `ExecutivePdfReport` z ujednoliconą siatką tabeli `FinancialTable`.
-  - [ ] Weryfikacja stabelaryzowanego wyrównania liczb monospace o wysokiej gęstości w `FinancialValue` dla wierszy potrąceń.
+  - [x] Weryfikacja stabelaryzowanego wyrównania liczb monospace o wysokiej gęstości w `FinancialValue` dla wierszy potrąceń.
   - [ ] Aktualizacja testów komponentu `ExecutivePdfReport` dla spójnej hierarchii wierszy P&L i czystej typografii.
   - [ ] Testy regresyjne E2E w `DashboardView.test.jsx` po przełączeniu roku i firmy.
   - [ ] Aktualizacja dokumentacji design systemu UI i changeloga pod kątem instytucjonalnych standardów tabelarycznych P&L.
