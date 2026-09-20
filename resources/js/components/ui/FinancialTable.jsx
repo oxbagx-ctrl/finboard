@@ -57,9 +57,9 @@ export const FinancialTable = ({
                     <tbody className="divide-y divide-zinc-850">
                         {data.map((row) => {
                             const hasChildren = Array.isArray(row.children) && row.children.length > 0;
-                            // A row is expandable only if it has children.
-                            // Single category groups or non-nested items are treated gracefully without expanders.
-                            const isExpandable = hasChildren && Boolean(row.isGroup);
+                            // A row is expandable only if it has more than 1 child.
+                            // Groups with exactly 1 subcategory or no children do not need interactive expanding/collapsing.
+                            const isExpandable = hasChildren && row.children.length > 1 && Boolean(row.isGroup);
                             const isExpanded = isExpandable && (expandedGroups[row.id] !== false);
                             const isFinalResult = Boolean(row.isFinalResult);
                             const isSummary = Boolean(row.isSummary) || isFinalResult;
@@ -100,14 +100,15 @@ export const FinancialTable = ({
                                                 </span>
                                             ) : isSubItem ? (
                                                 <span className="w-1.5 h-1.5 rounded-full bg-zinc-700 mr-1 shrink-0"></span>
-                                            ) : isDeduction ? (
-                                                <span className="text-[10px] font-mono text-zinc-500 font-semibold mr-0.5">(-)</span>
                                             ) : (
                                                 <span className="w-3.5" />
                                             )}
                                             <span className={isFinalResult ? 'text-zinc-100 font-bold text-[13px] tracking-tight' : isSummary ? 'text-zinc-100 tracking-tight' : ''}>
                                                 {row.label}
                                             </span>
+                                            {isDeduction && !row.isGroup && !isSummary && (
+                                                <span className="text-[10px] font-mono text-zinc-500 font-normal select-none" title="Pozycja pomniejszająca wynik">(-)</span>
+                                            )}
                                             {row.code && (
                                                 <span className="text-[10px] text-zinc-500 font-normal">
                                                     [{row.code}]
@@ -154,8 +155,8 @@ export const FinancialTable = ({
                                         </td>
                                     </tr>
 
-                                    {/* Render Sub-items if group is expanded */}
-                                    {isExpanded && row.children.map((child) => {
+                                    {/* Render Sub-items if group is expanded (or if single child group where no collapse is needed) */}
+                                    {((isExpandable && isExpanded) || (hasChildren && !isExpandable)) && row.children.map((child) => {
                                         const childRevShare = revenueTotal > 0 && child.amount != null && !isNaN(Number(child.amount))
                                             ? (Number(child.amount) / revenueTotal) * 100
                                             : null;
