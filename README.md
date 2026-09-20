@@ -347,12 +347,12 @@ npm test
   - Dwuetapowy modal potwierdzenia `BatchDeleteConfirmationModal` z podsumowaniem i zabezpieczeniem "USUŃ".
   - Integracja wywołania API masowego usuwania z optymistycznym czyszczeniem i powiadomieniami.
   - Testy komponentów w `RecordsView.test.jsx` dla interakcji zaznaczania i modalu usuwania.
-- [ ] **Faza 28: Zaawansowane Czyszczenie Zbiorów i Testy Regresji**
+- [x] **Faza 28: Zaawansowane Czyszczenie Zbiorów i Testy Regresji**
   - [x] Walidacja limitu masowego usuwania (max 500 rekordów) i obsługa skrajnych payloadów.
   - [x] Utrzymanie/reset stanu zaznaczeń przy paginacji i przełączaniu kontekstu spółki/filtrów.
   - [x] Testy integracyjne przypadków brzegowych (obce ID spółek, puste paczki, rollback DB).
   - [x] Testy E2E w `RecordsView.test.jsx` dla pełnego przepływu masowego usuwania.
-  - [ ] Dokumentacja wytycznych bezpieczeństwa operacji masowych i ścieżki audytowej w changelogu.
+  - [x] Dokumentacja wytycznych bezpieczeństwa operacji masowych i ścieżki audytowej w changelogu.
 
 ---
 
