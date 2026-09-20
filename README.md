@@ -312,16 +312,16 @@ npm test
   - Testy weryfikujące eliminację rekordów sierocych `cat-opex` i pełną spójność analityczną.
   - Refaktoryzacja `CategoryBreakdown` pod kątem obsługi grup jedno- i wielokategorialnych.
 - [x] **Faza 22: Naprawa Dynamiki R/R dla Okresów Otwartych i Podpozycji**
-  - [x] Wyliczanie dynamicznego zakresu porównawczego w `GetCategoryBreakdownHandler` przy braku jawnego zakresu dat (`startDate === null`, `endDate === null`).
-  - [x] Ciągłość historyczna kategorii w repozytorium analitycznym i kalkulatorze domenowym.
-  - [x] Testy jednostkowe kalkulacji YoY dla otwartych zakresów dat (Pełna historia).
-  - [x] Testy integracyjne weryfikujące endpoint `GET /finance/analytics/breakdown` dla podkategorii OPEX i przychodów.
-  - [x] Weryfikacja spójności formatu danych porównawczych między metrykami a breakdown.
+  - Wyliczanie dynamicznego zakresu porównawczego w `GetCategoryBreakdownHandler` przy braku jawnego zakresu dat (`startDate === null`, `endDate === null`).
+  - Ciągłość historyczna kategorii w repozytorium analitycznym i kalkulatorze domenowym.
+  - Testy jednostkowe kalkulacji YoY dla otwartych zakresów dat (Pełna historia).
+  - Testy integracyjne weryfikujące endpoint `GET /finance/analytics/breakdown` dla podkategorii OPEX i przychodów.
+  - Weryfikacja spójności formatu danych porównawczych między metrykami a breakdown.
 - [ ] **Faza 23: Poprawa Typografii Tabeli P&L i Warunkowej Grupowalności**
   - [x] Usunięcie prefiksu `(-)` przed numeracją pozycji w `FinancialTable` z zachowaniem semantyki kosztu.
   - [x] Warunkowa obsługa rozwijania wierszy (chevron tylko dla grup posiadających więcej niż 1 pozycję).
   - [x] Formatowanie ujemnych potrąceń w `FinancialValue` bez zaburzania numeracji wierszy.
-  - [ ] Aktualizacja testów komponentu `FinancialTable`.
+  - [x] Aktualizacja testów komponentu `FinancialTable`.
   - [ ] Testy regresyjne E2E w `DashboardView.test.jsx` dla czystej hierarchii P&L.
 
 ---

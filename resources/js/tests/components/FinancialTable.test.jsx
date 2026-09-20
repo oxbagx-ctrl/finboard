@@ -6,7 +6,7 @@ import { FinancialTable } from '../../components/ui/FinancialTable';
 const mockTableData = [
     {
         id: 'revenue_group',
-        label: 'Przychody ze Sprzedaży',
+        label: '1. Przychody ze Sprzedaży (Revenues)',
         code: 'REV-TOT',
         amount: 1000000,
         isGroup: true,
@@ -30,7 +30,7 @@ const mockTableData = [
     },
     {
         id: 'cogs',
-        label: 'Koszt Wytworzenia (COGS)',
+        label: '2. Koszt Wytworzenia Sprzedanych Produktów (COGS)',
         code: 'COGS',
         amount: 550000,
         isDeduction: true,
@@ -39,7 +39,7 @@ const mockTableData = [
     },
     {
         id: 'gross_profit',
-        label: 'Zysk Brutto',
+        label: '3. Zysk Brutto ze Sprzedaży (Gross Profit)',
         code: 'GP',
         amount: 450000,
         isSummary: true,
@@ -47,7 +47,7 @@ const mockTableData = [
     },
     {
         id: 'net_profit',
-        label: 'Zysk Netto Okresu',
+        label: '9. Zysk Netto Okresu (EAT)',
         code: 'EAT',
         amount: 200000,
         isSummary: true,
@@ -88,7 +88,7 @@ describe('FinancialTable Component', () => {
         );
 
         // COGS has change: null -> must render fallback "—"
-        const cogsRow = screen.getByText('Koszt Wytworzenia (COGS)').closest('tr');
+        const cogsRow = screen.getByText('2. Koszt Wytworzenia Sprzedanych Produktów (COGS)').closest('tr');
         expect(cogsRow).toBeInTheDocument();
         expect(cogsRow).toHaveTextContent('—'); // in Dynamika R/R
         expect(cogsRow).not.toHaveTextContent('0.0%');
@@ -99,11 +99,11 @@ describe('FinancialTable Component', () => {
         expect(slaRow).toHaveTextContent('0.0%');
 
         // Revenue row has +14.5%
-        const revRow = screen.getByText('Przychody ze Sprzedaży').closest('tr');
+        const revRow = screen.getByText('1. Przychody ze Sprzedaży (Revenues)').closest('tr');
         expect(revRow).toHaveTextContent('+14.5%');
 
         // Gross Profit has -5.2%
-        const gpRow = screen.getByText('Zysk Brutto').closest('tr');
+        const gpRow = screen.getByText('3. Zysk Brutto ze Sprzedaży (Gross Profit)').closest('tr');
         expect(gpRow).toHaveTextContent('-5.2%');
     });
 
@@ -128,7 +128,7 @@ describe('FinancialTable Component', () => {
         expect(screen.getByText('25.0%')).toBeInTheDocument();
     });
 
-    it('toggles expandable group rows on click', () => {
+    it('renders clean row labels without prefix and preserves deduction indicator after label', () => {
         render(
             <FinancialTable
                 data={mockTableData}
@@ -137,14 +137,41 @@ describe('FinancialTable Component', () => {
             />
         );
 
-        // Children are visible initially because expandedGroups is open
+        // Line 2 has clean label starting directly with '2. '
+        const cogsLabel = screen.getByText('2. Koszt Wytworzenia Sprzedanych Produktów (COGS)');
+        expect(cogsLabel).toBeInTheDocument();
+
+        // Deduction indicator '(-)' is rendered next to deduction row
+        const deductionIndicator = screen.getByText('(-)');
+        expect(deductionIndicator).toBeInTheDocument();
+        expect(deductionIndicator).toHaveAttribute('title', 'Pozycja pomniejszająca wynik');
+
+        // Verify the deduction row has proper indentation class pl-6
+        const cogsCell = cogsLabel.closest('td');
+        expect(cogsCell.className).toContain('pl-6');
+    });
+
+    it('toggles expandable multi-category group rows on click and displays chevron only for >1 children', () => {
+        render(
+            <FinancialTable
+                data={mockTableData}
+                currency="PLN"
+                revenueTotal={1000000}
+            />
+        );
+
+        // Revenue group has 2 children -> renders category count badge '2 kat.'
+        expect(screen.getByText('2 kat.')).toBeInTheDocument();
+
+        // Multi-category group row has cursor-pointer
+        const groupRow = screen.getByText('1. Przychody ze Sprzedaży (Revenues)').closest('tr');
+        expect(groupRow.className).toContain('cursor-pointer');
+
+        // Children are visible initially
         expect(screen.getByText('Sprzedaż maszyn')).toBeInTheDocument();
 
         // Click to collapse
-        const groupRow = screen.getByText('Przychody ze Sprzedaży').closest('tr');
         fireEvent.click(groupRow);
-
-        // Children should no longer be in the document
         expect(screen.queryByText('Sprzedaż maszyn')).not.toBeInTheDocument();
 
         // Click again to expand
@@ -152,27 +179,11 @@ describe('FinancialTable Component', () => {
         expect(screen.getByText('Sprzedaż maszyn')).toBeInTheDocument();
     });
 
-    it('renders category count badges for groups and deduction indicators for cost lines', () => {
-        render(
-            <FinancialTable
-                data={mockTableData}
-                currency="PLN"
-                revenueTotal={1000000}
-            />
-        );
-
-        // Group has 2 children -> renders '2 kat.'
-        expect(screen.getByText('2 kat.')).toBeInTheDocument();
-
-        // COGS is marked as deduction -> renders '(-)'
-        expect(screen.getByText('(-)')).toBeInTheDocument();
-    });
-
     it('handles single category vs multi-category groups gracefully without broken collapse', () => {
         const singleCategoryData = [
             {
                 id: 'single_group',
-                label: 'Pojedyncza Kategoria Wynikowa',
+                label: '4. Pojedyncza Kategoria Wynikowa',
                 code: 'SINGLE-01',
                 amount: 300000,
                 isGroup: true,
@@ -189,7 +200,7 @@ describe('FinancialTable Component', () => {
             },
             {
                 id: 'empty_group',
-                label: 'Grupa Bez Podkategorii',
+                label: '5. Grupa Bez Podkategorii',
                 code: 'EMPTY-01',
                 amount: 150000,
                 isGroup: true,
@@ -210,8 +221,14 @@ describe('FinancialTable Component', () => {
         expect(screen.getByText('1 poz.')).toBeInTheDocument();
         expect(screen.getByText('Jedyny Podtyp')).toBeInTheDocument();
 
+        // Single child group should NOT have interactive cursor-pointer
+        const singleGroupRow = screen.getByText('4. Pojedyncza Kategoria Wynikowa').closest('tr');
+        expect(singleGroupRow.className).not.toContain('cursor-pointer');
+
         // Empty group does not display count badge and is not expandable
-        expect(screen.getByText('Grupa Bez Podkategorii')).toBeInTheDocument();
+        const emptyGroupRow = screen.getByText('5. Grupa Bez Podkategorii').closest('tr');
+        expect(emptyGroupRow).toBeInTheDocument();
+        expect(emptyGroupRow.className).not.toContain('cursor-pointer');
         expect(screen.queryByText('0 kat.')).not.toBeInTheDocument();
         expect(screen.queryByText('0 poz.')).not.toBeInTheDocument();
     });
@@ -225,7 +242,7 @@ describe('FinancialTable Component', () => {
             />
         );
 
-        const netRow = screen.getByText('Zysk Netto Okresu').closest('tr');
+        const netRow = screen.getByText('9. Zysk Netto Okresu (EAT)').closest('tr');
         expect(netRow).toBeInTheDocument();
         expect(netRow).toHaveClass('border-b-4');
         expect(screen.getByText('WYNIK KOŃCOWY')).toBeInTheDocument();
