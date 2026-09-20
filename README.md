@@ -353,12 +353,12 @@ npm test
   - Testy integracyjne przypadków brzegowych (obce ID spółek, puste paczki, rollback DB).
   - Testy E2E w `RecordsView.test.jsx` dla pełnego przepływu masowego usuwania.
   - Dokumentacja wytycznych bezpieczeństwa operacji masowych i ścieżki audytowej w changelogu.
-- [ ] **Faza 29: Komponent Modalu Szczegółów Audytu i Architektura Zakładek**
+- [x] **Faza 29: Komponent Modalu Szczegółów Audytu i Architektura Zakładek**
   - [x] Utworzenie komponentu `FinancialAuditDetailModal` z inspekcją zrzutów JSON dla `old_values` i `new_values`.
   - [x] Implementacja terminalowego przełącznika zakładek (Audyt Finansowy vs Audyt VDR) w `AuditLogsView`.
   - [x] Implementacja kafelków podsumowujących KPI dla statystyk audytu (`/finance/audit-logs/stats`).
   - [x] Dodanie pigułek filtrów akcji finansowych ze wskaźnikami liczbowymi i stylami aktywnego stanu.
-  - [ ] Testy jednostkowe dla `FinancialAuditDetailModal` renderującego metadane i diffy `old_values`/`new_values`.
+  - [x] Testy jednostkowe dla `FinancialAuditDetailModal` renderującego metadane i diffy `old_values`/`new_values`.
 - [ ] **Faza 30: Integracja Tabeli Audytu Finansowego, Wyszukiwarki i Paginacji**
   - [ ] Implementacja tabeli audytu finansowego wysokiej gęstości z czasem CET, profilami operatorów i badge'ami akcji.
   - [ ] Połączenie tabeli audytu z wyszukiwarką tekstową (debounce) i paginacją backendową.
