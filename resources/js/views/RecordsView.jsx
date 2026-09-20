@@ -192,6 +192,37 @@ export const RecordsView = () => {
         return () => window.removeEventListener('finboard:company-changed', handleCompanyChange);
     }, [fetchRecords]);
 
+    // Handle batch deletion of selected records
+    const handleBatchDelete = async () => {
+        if (selectedRecordIds.length === 0) return;
+
+        setBatchDeleting(true);
+        const idsToDelete = [...selectedRecordIds];
+
+        try {
+            const res = await apiClient.delete('/finance/records/batch', {
+                data: { record_ids: idsToDelete },
+            });
+
+            // Optimistic UI update: remove deleted records from current table view
+            setRecords((prev) => prev.filter((r) => !idsToDelete.includes(r.id)));
+            setSelectedRecordIds([]);
+            setBatchDeleteModalOpen(false);
+
+            const deletedCount = res.data?.count ?? idsToDelete.length;
+            success(res.data?.message || `Pomyślnie usunięto ${deletedCount} operacji finansowych.`);
+
+            window.dispatchEvent(new CustomEvent('finboard:records-updated'));
+
+            await fetchRecords();
+        } catch (err) {
+            const errMsg = err.response?.data?.message || 'Nie udało się usunąć zaznaczonych rekordów.';
+            error(errMsg);
+        } finally {
+            setBatchDeleting(false);
+        }
+    };
+
     // Summary calculations for current page / batch
     const summary = useMemo(() => {
         let income = 0;
@@ -668,9 +699,7 @@ export const RecordsView = () => {
             <BatchDeleteConfirmationModal
                 isOpen={batchDeleteModalOpen}
                 onClose={() => setBatchDeleteModalOpen(false)}
-                onConfirm={() => {
-                    setBatchDeleteModalOpen(false);
-                }}
+                onConfirm={handleBatchDelete}
                 selectedCount={selectedRecordIds.length}
                 totalAmount={selectedMetrics.total}
                 incomeAmount={selectedMetrics.income}
