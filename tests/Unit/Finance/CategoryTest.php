@@ -37,6 +37,31 @@ final class CategoryTest extends TestCase
         $this->assertTrue($cliab->type()->isCurrentLiability());
     }
 
+    public function test_granular_revenue_categories(): void
+    {
+        $categories = Category::defaultRevenueCategories();
+
+        $this->assertCount(3, $categories);
+
+        $services = Category::revenueServices();
+        $this->assertSame('cat-revenue-services', $services->id());
+        $this->assertSame('REV-SRV', $services->code());
+        $this->assertSame(CategoryType::REVENUE, $services->type());
+        $this->assertSame(RecordType::REVENUE, $services->recordType());
+
+        $saas = Category::revenueSaas();
+        $this->assertSame('cat-revenue-saas', $saas->id());
+        $this->assertSame('REV-SAAS', $saas->code());
+        $this->assertSame(CategoryType::REVENUE, $saas->type());
+        $this->assertSame(RecordType::REVENUE, $saas->recordType());
+
+        $consulting = Category::revenueConsulting();
+        $this->assertSame('cat-revenue-consulting', $consulting->id());
+        $this->assertSame('REV-CON', $consulting->code());
+        $this->assertSame(CategoryType::REVENUE, $consulting->type());
+        $this->assertSame(RecordType::REVENUE, $consulting->recordType());
+    }
+
     public function test_granular_opex_categories(): void
     {
         $categories = Category::defaultOpexCategories();

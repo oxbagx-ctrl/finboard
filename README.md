@@ -309,7 +309,7 @@ npm test
   - [x] Migracja danych rekwalifikująca archiwalne rekordy `cat-opex` do granularnych podkategorii OPEX.
   - [x] Wprowadzenie granularnych podkategorii przychodowych (SaaS, Usługi, Doradztwo) w encji domenowej `Category` i schemacie.
   - [x] Aktualizacja seedera `FinancialDataSeeder` i zbiorów danych o realne strumienie przychodowe.
-  - [ ] Testy weryfikujące eliminację rekordów sierocych `cat-opex` i pełną spójność analityczną.
+  - [x] Testy weryfikujące eliminację rekordów sierocych `cat-opex` i pełną spójność analityczną.
   - [ ] Refaktoryzacja `CategoryBreakdown` pod kątem obsługi grup jedno- i wielokategorialnych.
 
 ---
