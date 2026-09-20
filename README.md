@@ -357,7 +357,7 @@ npm test
   - [x] Utworzenie komponentu `FinancialAuditDetailModal` z inspekcją zrzutów JSON dla `old_values` i `new_values`.
   - [x] Implementacja terminalowego przełącznika zakładek (Audyt Finansowy vs Audyt VDR) w `AuditLogsView`.
   - [x] Implementacja kafelków podsumowujących KPI dla statystyk audytu (`/finance/audit-logs/stats`).
-  - [ ] Dodanie pigułek filtrów akcji finansowych ze wskaźnikami liczbowymi i stylami aktywnego stanu.
+  - [x] Dodanie pigułek filtrów akcji finansowych ze wskaźnikami liczbowymi i stylami aktywnego stanu.
   - [ ] Testy jednostkowe dla `FinancialAuditDetailModal` renderującego metadane i diffy `old_values`/`new_values`.
 - [ ] **Faza 30: Integracja Tabeli Audytu Finansowego, Wyszukiwarki i Paginacji**
   - [ ] Implementacja tabeli audytu finansowego wysokiej gęstości z czasem CET, profilami operatorów i badge'ami akcji.

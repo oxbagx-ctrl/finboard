@@ -38,6 +38,97 @@ const VDR_ACTION_FILTERS = [
     { id: 'unarchive', label: 'Przywrócenia' },
 ];
 
+const FINANCE_ACTION_PILLS = [
+    {
+        id: '',
+        label: 'Wszystkie',
+        testId: 'action-pill-all',
+        color: 'zinc',
+        getCount: (stats) => stats?.total_events ?? 0,
+    },
+    {
+        id: 'RECORD_DELETED,RECORDS_BATCH_DELETED',
+        label: 'Usunięcia',
+        testId: 'action-pill-deletions',
+        color: 'rose',
+        getCount: (stats) =>
+            (stats?.by_action?.RECORD_DELETED?.count || 0) +
+            (stats?.by_action?.RECORDS_BATCH_DELETED?.count || 0),
+    },
+    {
+        id: 'RECORD_UPDATED',
+        label: 'Modyfikacje',
+        testId: 'action-pill-updates',
+        color: 'blue',
+        getCount: (stats) => stats?.by_action?.RECORD_UPDATED?.count || 0,
+    },
+    {
+        id: 'RECORD_CREATED',
+        label: 'Tworzenie',
+        testId: 'action-pill-creates',
+        color: 'emerald',
+        getCount: (stats) => stats?.by_action?.RECORD_CREATED?.count || 0,
+    },
+    {
+        id: 'CSV_IMPORT_PROCESSED,CSV_IMPORT_FAILED',
+        label: 'Importy CSV',
+        testId: 'action-pill-imports',
+        color: 'cyan',
+        getCount: (stats) =>
+            (stats?.by_action?.CSV_IMPORT_PROCESSED?.count || 0) +
+            (stats?.by_action?.CSV_IMPORT_FAILED?.count || 0),
+    },
+    {
+        id: 'BENCHMARK_CONFIGURED,BENCHMARK_RESET',
+        label: 'Cele benchmarkowe',
+        testId: 'action-pill-benchmarks',
+        color: 'indigo',
+        getCount: (stats) =>
+            (stats?.by_action?.BENCHMARK_CONFIGURED?.count || 0) +
+            (stats?.by_action?.BENCHMARK_RESET?.count || 0),
+    },
+];
+
+const getPillClasses = (pill, isActive) => {
+    if (!isActive) {
+        return 'bg-zinc-950 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/80 border border-zinc-800';
+    }
+    switch (pill.color) {
+        case 'rose':
+            return 'bg-rose-950/80 border-rose-600 text-rose-200 shadow-sm';
+        case 'blue':
+            return 'bg-blue-950/80 border-blue-600 text-blue-200 shadow-sm';
+        case 'emerald':
+            return 'bg-emerald-950/80 border-emerald-600 text-emerald-200 shadow-sm';
+        case 'cyan':
+            return 'bg-cyan-950/80 border-cyan-600 text-cyan-200 shadow-sm';
+        case 'indigo':
+            return 'bg-indigo-950/80 border-indigo-600 text-indigo-200 shadow-sm';
+        default:
+            return 'bg-zinc-100 text-zinc-900 border-zinc-100 shadow-sm';
+    }
+};
+
+const getPillCountBadgeClasses = (pill, isActive) => {
+    if (!isActive) {
+        return 'bg-zinc-850 text-zinc-400 border border-zinc-750';
+    }
+    switch (pill.color) {
+        case 'rose':
+            return 'bg-rose-900/60 text-rose-200 border border-rose-700/60';
+        case 'blue':
+            return 'bg-blue-900/60 text-blue-200 border border-blue-700/60';
+        case 'emerald':
+            return 'bg-emerald-900/60 text-emerald-200 border border-emerald-700/60';
+        case 'cyan':
+            return 'bg-cyan-900/60 text-cyan-200 border border-cyan-700/60';
+        case 'indigo':
+            return 'bg-indigo-900/60 text-indigo-200 border border-indigo-700/60';
+        default:
+            return 'bg-zinc-300 text-zinc-900';
+    }
+};
+
 export const AuditLogsView = () => {
     const { activeCompany } = useAuth();
     const { error } = useNotification();
@@ -257,6 +348,11 @@ export const AuditLogsView = () => {
     const vdrDownloadEventsCount = vdrLogs.filter((l) => l.action === 'download').length;
     const vdrUploadEventsCount = vdrLogs.filter((l) => l.action === 'upload').length;
 
+    const handleSelectFinanceAction = (actionId) => {
+        setFinanceActionFilter(actionId);
+        setFinancePagination((prev) => ({ ...prev, currentPage: 1 }));
+    };
+
     // Financial audit stats derived counts
     const singleDeletionsCount = financeStats?.by_action?.RECORD_DELETED?.count || 0;
     const batchDeletionsCount = financeStats?.by_action?.RECORDS_BATCH_DELETED?.count || 0;
@@ -437,7 +533,39 @@ export const AuditLogsView = () => {
                         </div>
                     </div>
 
-                    {/* Placeholder container for Commits 144, 146 */}
+                    {/* Financial Action Filter Pills Bar */}
+                    <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3" data-testid="finance-filters-bar">
+                        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
+                            {FINANCE_ACTION_PILLS.map((pill) => {
+                                const isActive = financeActionFilter === pill.id;
+                                const count = pill.getCount(financeStats);
+                                return (
+                                    <button
+                                        key={pill.id}
+                                        type="button"
+                                        data-testid={pill.testId}
+                                        onClick={() => handleSelectFinanceAction(pill.id)}
+                                        className={`px-3 py-1.5 rounded text-xs font-semibold whitespace-nowrap transition-colors flex items-center gap-1.5 cursor-pointer border ${getPillClasses(
+                                            pill,
+                                            isActive
+                                        )}`}
+                                    >
+                                        <span>{pill.label}</span>
+                                        <span
+                                            className={`px-1.5 py-0.5 rounded-full text-[10px] font-mono tabular-nums ${getPillCountBadgeClasses(
+                                                pill,
+                                                isActive
+                                            )}`}
+                                        >
+                                            {count}
+                                        </span>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    {/* Placeholder container for Commit 146 */}
                     <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6 text-center text-zinc-400 font-mono text-xs">
                         <Activity className="w-8 h-8 mx-auto text-emerald-400 mb-2 opacity-80" />
                         <div className="text-zinc-200 font-bold text-sm">Eksplorator Transakcji Finansowych</div>

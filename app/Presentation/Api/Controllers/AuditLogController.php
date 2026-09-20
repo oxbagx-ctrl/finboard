@@ -32,8 +32,15 @@ final class AuditLogController
             ->orderBy('created_at', 'desc');
 
         if ($request->filled('action')) {
-            $action = (string) $request->input('action');
-            $query->where('action', $action);
+            $action = $request->input('action');
+            if (is_array($action)) {
+                $query->whereIn('action', $action);
+            } elseif (str_contains((string) $action, ',')) {
+                $actions = array_map('trim', explode(',', (string) $action));
+                $query->whereIn('action', $actions);
+            } else {
+                $query->where('action', (string) $action);
+            }
         }
 
         if ($request->filled('entity_type')) {
