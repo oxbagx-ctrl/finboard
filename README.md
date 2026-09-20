@@ -299,12 +299,18 @@ npm test
   - Testy jednostkowe kalkulacji dynamiki YoY na poziomie kategorii z przypadkami brzegowymi (nowe kategorie, baza zerowa).
   - Testy integracyjne endpointu breakdown weryfikujące strukturę payloadu YoY.
   - Optymalizacja agregacji rekordów i zapytań bazodanowych dla okresów porównawczych.
-- [ ] **Faza 20: Integracja UI Tabeli P&L i Wykresu Struktury Kosztów**
-  - [x] Podpięcie dynamicznej dynamiki YoY per kategoria do podwierszy (children) przychodów i OPEX w `DashboardView`.
-  - [x] Zapewnienie ścisłej polaryzacji `reverseChange` dla kosztów OPEX i jej brak dla przychodów.
-  - [x] Optymalizacja wykresu `CostBreakdownChart` z auto-sortowaniem, paletą wielokategorialną i czytelną legendą.
-  - [x] Testy komponentów frontendowych w `DashboardView.test.jsx` weryfikujące rozwijane wiersze P&L i odznaki YoY.
-  - [x] Testy integracyjne weryfikujące poprawną izolację kategorii w zestawieniu przychodów.
+- [x] **Faza 20: Integracja UI Tabeli P&L i Wykresu Struktury Kosztów**
+  - Podpięcie dynamicznej dynamiki YoY per kategoria do podwierszy (children) przychodów i OPEX w `DashboardView`.
+  - Zapewnienie ścisłej polaryzacji `reverseChange` dla kosztów OPEX i jej brak dla przychodów.
+  - Optymalizacja wykresu `CostBreakdownChart` z auto-sortowaniem, paletą wielokategorialną i czytelną legendą.
+  - Testy komponentów frontendowych w `DashboardView.test.jsx` weryfikujące rozwijane wiersze P&L i odznaki YoY.
+  - Testy integracyjne weryfikujące poprawną izolację kategorii w zestawieniu przychodów.
+- [ ] **Faza 21: Spójność Danych Historycznych OPEX i Strumienie Przychodów**
+  - [x] Migracja danych rekwalifikująca archiwalne rekordy `cat-opex` do granularnych podkategorii OPEX.
+  - [ ] Wprowadzenie granularnych podkategorii przychodowych (SaaS, Usługi, Doradztwo) w encji domenowej `Category` i schemacie.
+  - [ ] Aktualizacja seedera `FinancialDataSeeder` i zbiorów danych o realne strumienie przychodowe.
+  - [ ] Testy weryfikujące eliminację rekordów sierocych `cat-opex` i pełną spójność analityczną.
+  - [ ] Refaktoryzacja `CategoryBreakdown` pod kątem obsługi grup jedno- i wielokategorialnych.
 
 ---
 
