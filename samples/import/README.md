@@ -26,7 +26,7 @@ Zestaw przygotowanych plików demonstracyjnych na potrzeby testów modułu impor
 
 ### 3. [`03_monthly_batch_payroll_and_opex.csv`](03_monthly_batch_payroll_and_opex.csv)
 - **Przeznaczenie**: Wsadowy pakiet szczegółowych kosztów operacyjnych (OPEX) i płacowych.
-- **Format**: Rozdzielany przecinkami (`,`), kategoria `cat-opex`, waluta `PLN`.
+- **Format**: Rozdzielany przecinkami (`,`), kategorie rodzajowe OPEX (`cat-opex-payroll`, `cat-opex-software`, `cat-opex-office`, `cat-opex-services`, `cat-opex-marketing`, `cat-opex-legal`), waluta `PLN`.
 - **Liczba wierszy**: 12 operacji.
 - **Zawartość**: Wypłaty wynagrodzeń, składki ZUS, chmura AWS, licencje Microsoft 365, monitoring obiektu, obsługa księgowa, rekrutacja i audyt SOC2.
 - **Oczekiwany wynik**: **100% Poprawny (Dry-Run Pass)**. Zaksięgowanie wszystkich 12 pozycji kosztowych.

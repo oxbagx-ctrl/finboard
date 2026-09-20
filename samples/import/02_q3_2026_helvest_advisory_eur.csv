@@ -3,19 +3,19 @@ REV;75000,00;2026-07-05;EUR;Success fee za zamknięcie transakcji sprzedaży sp�
 REV;22500,00;2026-07-15;EUR;Miesięczny ryczałt doradczy (retainer) - proces M&A dla funduszu Enterprise IV
 COGS;14000,00;2026-07-20;EUR;Wynagrodzenie kancelarii prawnej Clifford Chance za przygotowanie SPA i SHA
 COGS;9500,00;2026-07-25;EUR;Raport Vendor Due Diligence finansowego przygotowany przez PwC
-OPEX;18500,00;2026-07-28;EUR;Wynagrodzenia partnerów i dyrektorów transakcyjnych Helvest za czerwiec 2026
-OPEX;4200,00;2026-07-29;EUR;Koszty podróży służbowych i spotkań z inwestorami w Londynie i Frankfurcie
-OPEX;3100,00;2026-07-30;EUR;Subskrypcja terminali Bloomberg Professional i licencji FactSet
+PAYROLL;18500,00;2026-07-28;EUR;Wynagrodzenia partnerów i dyrektorów transakcyjnych Helvest za czerwiec 2026
+MKT;4200,00;2026-07-29;EUR;Koszty podróży służbowych i spotkań z inwestorami w Londynie i Frankfurcie
+CLOUD;3100,00;2026-07-30;EUR;Subskrypcja terminali Bloomberg Professional i licencji FactSet
 REV;110000,00;2026-08-08;EUR;Prowizja transakcyjna (Advisory Completion Fee) - przejęcie MedTech Poland
 REV;22500,00;2026-08-15;EUR;Miesięczny ryczałt doradczy (retainer) - proces M&A dla funduszu Enterprise IV
 COGS;16200,00;2026-08-20;EUR;Ekspertyza wyceny rynkowej i analizy synergii operacyjnych
-OPEX;19200,00;2026-08-25;EUR;Wynagrodzenia zespołu Deal Advisory i analityków finansowych za lipiec 2026
-OPEX;2800,00;2026-08-28;EUR;Obsługa Wirtualnych Pokojów Danych VDR (Datasite & Intralinks)
+PAYROLL;19200,00;2026-08-25;EUR;Wynagrodzenia zespołu Deal Advisory i analityków finansowych za lipiec 2026
+CLOUD;2800,00;2026-08-28;EUR;Obsługa Wirtualnych Pokojów Danych VDR (Datasite & Intralinks)
 DEP;1100,00;2026-08-31;EUR;Amortyzacja sprzętu IT i serwerów infrastruktury szyfrowanej
 FIN;850,00;2026-08-31;EUR;Opłaty za transgraniczne transfery bankowe i przewalutowania
 REV;68000,00;2026-09-12;EUR;Doradztwo przy pozyskaniu finansowania dłużnego Mezzanine dla Grupy OZE
 REV;22500,00;2026-09-15;EUR;Miesięczny ryczałt doradczy (retainer) - proces M&A dla funduszu Enterprise IV
 COGS;8500,00;2026-09-22;EUR;Wynagrodzenie doradców podatkowych za strukturę transakcji transgranicznej
-OPEX;18900,00;2026-09-25;EUR;Wynagrodzenia analityków i asystentów transakcyjnych za sierpień 2026
-OPEX;3400,00;2026-09-28;EUR;Najem reprezentacyjnego biura w Warszawie (Rondo Daszyńskiego)
+PAYROLL;18900,00;2026-09-25;EUR;Wynagrodzenia analityków i asystentów transakcyjnych za sierpień 2026
+OFFICE;3400,00;2026-09-28;EUR;Najem reprezentacyjnego biura w Warszawie (Rondo Daszyńskiego)
 FIN;920,00;2026-09-30;EUR;Prowizje brokerskie i ubezpieczenie odpowiedzialności zawodowej D&O

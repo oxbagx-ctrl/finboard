@@ -145,7 +145,22 @@ final class FinancialDataSeeder extends Seeder
                 // P&L entries
                 $records[] = $this->makeRecord(self::ACME_ID, 'cat-revenue', 'revenue', (string) $revenue, $dateStr, 'Przychody ze sprzedaży produktów');
                 $records[] = $this->makeRecord(self::ACME_ID, 'cat-cogs', 'expense', (string) $cogs, $dateStr, 'Koszt wytworzenia sprzedanych wyrobów (COGS)');
-                $records[] = $this->makeRecord(self::ACME_ID, 'cat-opex', 'expense', (string) $opex, $dateStr, 'Koszty operacyjne i zarządu (OPEX)');
+
+                // Granular OPEX breakdown across subcategories
+                $opexPayroll = round($opex * 0.46, 4);
+                $opexServices = round($opex * 0.18, 4);
+                $opexOffice = round($opex * 0.14, 4);
+                $opexSoftware = round($opex * 0.08, 4);
+                $opexMarketing = round($opex * 0.09, 4);
+                $opexLegal = round($opex - $opexPayroll - $opexServices - $opexOffice - $opexSoftware - $opexMarketing, 4);
+
+                $records[] = $this->makeRecord(self::ACME_ID, FinancialCategory::OPEX_PAYROLL, 'expense', (string) $opexPayroll, $dateStr, 'Wynagrodzenia zasadnicze i świadczenia pracownicze');
+                $records[] = $this->makeRecord(self::ACME_ID, FinancialCategory::OPEX_SERVICES, 'expense', (string) $opexServices, $dateStr, 'Usługi serwisowe, logistyczne i podwykonawcy B2B');
+                $records[] = $this->makeRecord(self::ACME_ID, FinancialCategory::OPEX_OFFICE, 'expense', (string) $opexOffice, $dateStr, 'Czynsz hal biurowych, media i utrzymanie obiektów');
+                $records[] = $this->makeRecord(self::ACME_ID, FinancialCategory::OPEX_SOFTWARE, 'expense', (string) $opexSoftware, $dateStr, 'Licencje CAD/ERP i infrastruktura chmurowa');
+                $records[] = $this->makeRecord(self::ACME_ID, FinancialCategory::OPEX_MARKETING, 'expense', (string) $opexMarketing, $dateStr, 'Marketing przemysłowy, targi B2B i katalogi');
+                $records[] = $this->makeRecord(self::ACME_ID, FinancialCategory::OPEX_LEGAL, 'expense', (string) $opexLegal, $dateStr, 'Obsługa prawna, audyt finansowy i doradztwo podatkowe');
+
                 $records[] = $this->makeRecord(self::ACME_ID, 'cat-depreciation', 'expense', (string) $depreciation, $dateStr, 'Amortyzacja parku maszynowego i linii');
                 $records[] = $this->makeRecord(self::ACME_ID, 'cat-financial', 'expense', (string) $financial, $dateStr, 'Odsetki od kredytów inwestycyjnych');
                 $records[] = $this->makeRecord(self::ACME_ID, 'cat-tax', 'expense', (string) $tax, $dateStr, 'Podatek dochodowy od osób prawnych CIT');
@@ -189,7 +204,22 @@ final class FinancialDataSeeder extends Seeder
 
                 $records[] = $this->makeRecord(self::HELVEST_ID, 'cat-revenue', 'revenue', (string) $revenue, $dateStr, 'Przychody z doradztwa M&A i transakcyjnego');
                 $records[] = $this->makeRecord(self::HELVEST_ID, 'cat-cogs', 'expense', (string) $cogs, $dateStr, 'Wynagrodzenia zewnętrznych audytorów i rzeczoznawców');
-                $records[] = $this->makeRecord(self::HELVEST_ID, 'cat-opex', 'expense', (string) $opex, $dateStr, 'Koszty biura w Warszawie, systemów IT i zespołu');
+
+                // Granular OPEX breakdown across subcategories
+                $opexPayroll = round($opex * 0.52, 4);
+                $opexOffice = round($opex * 0.18, 4);
+                $opexSoftware = round($opex * 0.12, 4);
+                $opexMarketing = round($opex * 0.08, 4);
+                $opexServices = round($opex * 0.06, 4);
+                $opexLegal = round($opex - $opexPayroll - $opexOffice - $opexSoftware - $opexMarketing - $opexServices, 4);
+
+                $records[] = $this->makeRecord(self::HELVEST_ID, FinancialCategory::OPEX_PAYROLL, 'expense', (string) $opexPayroll, $dateStr, 'Wynagrodzenia zespołu doradczego i analityków');
+                $records[] = $this->makeRecord(self::HELVEST_ID, FinancialCategory::OPEX_OFFICE, 'expense', (string) $opexOffice, $dateStr, 'Wynajem biura w Warszawie i recepcja');
+                $records[] = $this->makeRecord(self::HELVEST_ID, FinancialCategory::OPEX_SOFTWARE, 'expense', (string) $opexSoftware, $dateStr, 'Terminale finansowe, bazy transakcyjne i chmura');
+                $records[] = $this->makeRecord(self::HELVEST_ID, FinancialCategory::OPEX_MARKETING, 'expense', (string) $opexMarketing, $dateStr, 'Konferencje M&A, business development i PR');
+                $records[] = $this->makeRecord(self::HELVEST_ID, FinancialCategory::OPEX_SERVICES, 'expense', (string) $opexServices, $dateStr, 'Zewnętrzne ekspertyzy techniczne i rzeczoznawcy');
+                $records[] = $this->makeRecord(self::HELVEST_ID, FinancialCategory::OPEX_LEGAL, 'expense', (string) $opexLegal, $dateStr, 'Doradztwo regulacyjne, compliance i obsługa prawna');
+
                 $records[] = $this->makeRecord(self::HELVEST_ID, 'cat-depreciation', 'expense', (string) $depreciation, $dateStr, 'Amortyzacja sprzętu biurowego i licencji');
                 $records[] = $this->makeRecord(self::HELVEST_ID, 'cat-financial', 'expense', (string) $financial, $dateStr, 'Prowizje bankowe i opłaty transakcyjne');
                 $records[] = $this->makeRecord(self::HELVEST_ID, 'cat-tax', 'expense', (string) $tax, $dateStr, 'Podatek dochodowy CIT');

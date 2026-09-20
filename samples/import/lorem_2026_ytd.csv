@@ -4,11 +4,11 @@ cat-revenue,219869.09,2026-01-12,PLN,Faktura FV/2026/01/002 - Architektura chmur
 cat-revenue,149930.91,2026-01-22,PLN,Faktura FV/2026/01/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
 cat-cogs,206796.36,2026-01-08,PLN,Podwykonawstwo B2B: Zespół Senior Fullstack / Python / DevOps inżynierów kontraktowych za styczeń 2026
 cat-cogs,61276.36,2026-01-24,PLN,Dedykowane klastry Kubernetes AWS/GCP oraz licencje środowisk klienckich
-cat-opex,140518.18,2026-01-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za styczeń 2026"
-cat-opex,20681.82,2026-01-14,PLN,Czynsz i koszty eksploatacji biura i przestrzeni technologicznej LoremIpsumCODE Hub
-cat-opex,15145.45,2026-01-20,PLN,"Licencje i infrastruktura deweloperska: GitHub Enterprise, JetBrains, Datadog, Slack, Google Workspace"
-cat-opex,10385.45,2026-01-25,PLN,"Koszty procesów rekrutacyjnych IT, szkoleń certyfikacyjnych AWS/GCP i konferencji branżowych"
-cat-opex,6077.27,2026-01-27,PLN,"Obsługa księgowo-kadrowa, doradztwo podatkowe IP Box oraz audyt prawny umów ramowych"
+cat-opex-payroll,140518.18,2026-01-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za styczeń 2026"
+cat-opex-office,20681.82,2026-01-14,PLN,Czynsz i koszty eksploatacji biura i przestrzeni technologicznej LoremIpsumCODE Hub
+cat-opex-software,15145.45,2026-01-20,PLN,"Licencje i infrastruktura deweloperska: GitHub Enterprise, JetBrains, Datadog, Slack, Google Workspace"
+cat-opex-marketing,10385.45,2026-01-25,PLN,"Koszty procesów rekrutacyjnych IT, szkoleń certyfikacyjnych AWS/GCP i konferencji branżowych"
+cat-opex-legal,6077.27,2026-01-27,PLN,"Obsługa księgowo-kadrowa, doradztwo podatkowe IP Box oraz audyt prawny umów ramowych"
 cat-depreciation,8152.73,2026-01-31,PLN,"Odpis amortyzacyjny stacji roboczych Apple MacBook Pro M-series, serwerów testowych i osprzętu sieciowego"
 cat-financial,1820.00,2026-01-31,PLN,"Prowizje bankowe, obsługa transakcji wielowalutowych i raty leasingu sprzętu"
 cat-tax,23918.97,2026-01-31,PLN,Zaliczka na podatek dochodowy CIT-8 (z uwzględnieniem preferencji B+R / IP Box) za styczeń 2026
@@ -20,11 +20,11 @@ cat-revenue,218315.45,2026-02-12,PLN,Faktura FV/2026/02/002 - Architektura chmur
 cat-revenue,153084.55,2026-02-22,PLN,Faktura FV/2026/02/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
 cat-cogs,210951.82,2026-02-08,PLN,Podwykonawstwo B2B: Zespół Senior Fullstack / Python / DevOps inżynierów kontraktowych za luty 2026
 cat-cogs,62611.82,2026-02-24,PLN,Dedykowane klastry Kubernetes AWS/GCP oraz licencje środowisk klienckich
-cat-opex,143340.91,2026-02-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za luty 2026"
-cat-opex,20909.09,2026-02-14,PLN,Czynsz i koszty eksploatacji biura i przestrzeni technologicznej LoremIpsumCODE Hub
-cat-opex,15377.27,2026-02-20,PLN,"Licencje i infrastruktura deweloperska: GitHub Enterprise, JetBrains, Datadog, Slack, Google Workspace"
-cat-opex,10557.27,2026-02-25,PLN,"Koszty procesów rekrutacyjnych IT, szkoleń certyfikacyjnych AWS/GCP i konferencji branżowych"
-cat-opex,6148.86,2026-02-27,PLN,"Obsługa księgowo-kadrowa, doradztwo podatkowe IP Box oraz audyt prawny umów ramowych"
+cat-opex-payroll,143340.91,2026-02-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za luty 2026"
+cat-opex-office,20909.09,2026-02-14,PLN,Czynsz i koszty eksploatacji biura i przestrzeni technologicznej LoremIpsumCODE Hub
+cat-opex-software,15377.27,2026-02-20,PLN,"Licencje i infrastruktura deweloperska: GitHub Enterprise, JetBrains, Datadog, Slack, Google Workspace"
+cat-opex-marketing,10557.27,2026-02-25,PLN,"Koszty procesów rekrutacyjnych IT, szkoleń certyfikacyjnych AWS/GCP i konferencji branżowych"
+cat-opex-legal,6148.86,2026-02-27,PLN,"Obsługa księgowo-kadrowa, doradztwo podatkowe IP Box oraz audyt prawny umów ramowych"
 cat-depreciation,8273.64,2026-02-28,PLN,"Odpis amortyzacyjny stacji roboczych Apple MacBook Pro M-series, serwerów testowych i osprzętu sieciowego"
 cat-financial,1840.00,2026-02-28,PLN,"Prowizje bankowe, obsługa transakcji wielowalutowych i raty leasingu sprzętu"
 cat-tax,23902.14,2026-02-28,PLN,Zaliczka na podatek dochodowy CIT-8 (z uwzględnieniem preferencji B+R / IP Box) za luty 2026
@@ -36,11 +36,11 @@ cat-revenue,222961.82,2026-03-12,PLN,Faktura FV/2026/03/002 - Architektura chmur
 cat-revenue,156238.18,2026-03-22,PLN,Faktura FV/2026/03/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
 cat-cogs,215107.27,2026-03-08,PLN,Podwykonawstwo B2B: Zespół Senior Fullstack / Python / DevOps inżynierów kontraktowych za marzec 2026
 cat-cogs,61547.27,2026-03-24,PLN,Dedykowane klastry Kubernetes AWS/GCP oraz licencje środowisk klienckich
-cat-opex,146163.64,2026-03-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za marzec 2026"
-cat-opex,21136.36,2026-03-14,PLN,Czynsz i koszty eksploatacji biura i przestrzeni technologicznej LoremIpsumCODE Hub
-cat-opex,15609.09,2026-03-20,PLN,"Licencje i infrastruktura deweloperska: GitHub Enterprise, JetBrains, Datadog, Slack, Google Workspace"
-cat-opex,10729.09,2026-03-25,PLN,"Koszty procesów rekrutacyjnych IT, szkoleń certyfikacyjnych AWS/GCP i konferencji branżowych"
-cat-opex,6220.45,2026-03-27,PLN,"Obsługa księgowo-kadrowa, doradztwo podatkowe IP Box oraz audyt prawny umów ramowych"
+cat-opex-payroll,146163.64,2026-03-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za marzec 2026"
+cat-opex-office,21136.36,2026-03-14,PLN,Czynsz i koszty eksploatacji biura i przestrzeni technologicznej LoremIpsumCODE Hub
+cat-opex-software,15609.09,2026-03-20,PLN,"Licencje i infrastruktura deweloperska: GitHub Enterprise, JetBrains, Datadog, Slack, Google Workspace"
+cat-opex-marketing,10729.09,2026-03-25,PLN,"Koszty procesów rekrutacyjnych IT, szkoleń certyfikacyjnych AWS/GCP i konferencji branżowych"
+cat-opex-legal,6220.45,2026-03-27,PLN,"Obsługa księgowo-kadrowa, doradztwo podatkowe IP Box oraz audyt prawny umów ramowych"
 cat-depreciation,8394.55,2026-03-31,PLN,"Odpis amortyzacyjny stacji roboczych Apple MacBook Pro M-series, serwerów testowych i osprzętu sieciowego"
 cat-financial,1860.00,2026-03-31,PLN,"Prowizje bankowe, obsługa transakcji wielowalutowych i raty leasingu sprzętu"
 cat-tax,24659.31,2026-03-31,PLN,Zaliczka na podatek dochodowy CIT-8 (z uwzględnieniem preferencji B+R / IP Box) za marzec 2026
@@ -52,11 +52,11 @@ cat-revenue,227608.18,2026-04-12,PLN,Faktura FV/2026/04/002 - Architektura chmur
 cat-revenue,159391.82,2026-04-22,PLN,Faktura FV/2026/04/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
 cat-cogs,219262.73,2026-04-08,PLN,Podwykonawstwo B2B: Zespół Senior Fullstack / Python / DevOps inżynierów kontraktowych za kwiecień 2026
 cat-cogs,62882.73,2026-04-24,PLN,Dedykowane klastry Kubernetes AWS/GCP oraz licencje środowisk klienckich
-cat-opex,148986.36,2026-04-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za kwiecień 2026"
-cat-opex,21363.64,2026-04-14,PLN,Czynsz i koszty eksploatacji biura i przestrzeni technologicznej LoremIpsumCODE Hub
-cat-opex,15840.91,2026-04-20,PLN,"Licencje i infrastruktura deweloperska: GitHub Enterprise, JetBrains, Datadog, Slack, Google Workspace"
-cat-opex,10900.91,2026-04-25,PLN,"Koszty procesów rekrutacyjnych IT, szkoleń certyfikacyjnych AWS/GCP i konferencji branżowych"
-cat-opex,6292.05,2026-04-27,PLN,"Obsługa księgowo-kadrowa, doradztwo podatkowe IP Box oraz audyt prawny umów ramowych"
+cat-opex-payroll,148986.36,2026-04-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za kwiecień 2026"
+cat-opex-office,21363.64,2026-04-14,PLN,Czynsz i koszty eksploatacji biura i przestrzeni technologicznej LoremIpsumCODE Hub
+cat-opex-software,15840.91,2026-04-20,PLN,"Licencje i infrastruktura deweloperska: GitHub Enterprise, JetBrains, Datadog, Slack, Google Workspace"
+cat-opex-marketing,10900.91,2026-04-25,PLN,"Koszty procesów rekrutacyjnych IT, szkoleń certyfikacyjnych AWS/GCP i konferencji branżowych"
+cat-opex-legal,6292.05,2026-04-27,PLN,"Obsługa księgowo-kadrowa, doradztwo podatkowe IP Box oraz audyt prawny umów ramowych"
 cat-depreciation,8515.45,2026-04-30,PLN,"Odpis amortyzacyjny stacji roboczych Apple MacBook Pro M-series, serwerów testowych i osprzętu sieciowego"
 cat-financial,1880.00,2026-04-30,PLN,"Prowizje bankowe, obsługa transakcji wielowalutowych i raty leasingu sprzętu"
 cat-tax,25200.47,2026-04-30,PLN,Zaliczka na podatek dochodowy CIT-8 (z uwzględnieniem preferencji B+R / IP Box) za kwiecień 2026
@@ -68,11 +68,11 @@ cat-revenue,232254.55,2026-05-12,PLN,Faktura FV/2026/05/002 - Architektura chmur
 cat-revenue,162545.45,2026-05-22,PLN,Faktura FV/2026/05/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
 cat-cogs,223418.18,2026-05-08,PLN,Podwykonawstwo B2B: Zespół Senior Fullstack / Python / DevOps inżynierów kontraktowych za maj 2026
 cat-cogs,64218.18,2026-05-24,PLN,Dedykowane klastry Kubernetes AWS/GCP oraz licencje środowisk klienckich
-cat-opex,151809.09,2026-05-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za maj 2026"
-cat-opex,21590.91,2026-05-14,PLN,Czynsz i koszty eksploatacji biura i przestrzeni technologicznej LoremIpsumCODE Hub
-cat-opex,16072.73,2026-05-20,PLN,"Licencje i infrastruktura deweloperska: GitHub Enterprise, JetBrains, Datadog, Slack, Google Workspace"
-cat-opex,11072.73,2026-05-25,PLN,"Koszty procesów rekrutacyjnych IT, szkoleń certyfikacyjnych AWS/GCP i konferencji branżowych"
-cat-opex,6363.64,2026-05-27,PLN,"Obsługa księgowo-kadrowa, doradztwo podatkowe IP Box oraz audyt prawny umów ramowych"
+cat-opex-payroll,151809.09,2026-05-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za maj 2026"
+cat-opex-office,21590.91,2026-05-14,PLN,Czynsz i koszty eksploatacji biura i przestrzeni technologicznej LoremIpsumCODE Hub
+cat-opex-software,16072.73,2026-05-20,PLN,"Licencje i infrastruktura deweloperska: GitHub Enterprise, JetBrains, Datadog, Slack, Google Workspace"
+cat-opex-marketing,11072.73,2026-05-25,PLN,"Koszty procesów rekrutacyjnych IT, szkoleń certyfikacyjnych AWS/GCP i konferencji branżowych"
+cat-opex-legal,6363.64,2026-05-27,PLN,"Obsługa księgowo-kadrowa, doradztwo podatkowe IP Box oraz audyt prawny umów ramowych"
 cat-depreciation,8636.36,2026-05-31,PLN,"Odpis amortyzacyjny stacji roboczych Apple MacBook Pro M-series, serwerów testowych i osprzętu sieciowego"
 cat-financial,1900.00,2026-05-31,PLN,"Prowizje bankowe, obsługa transakcji wielowalutowych i raty leasingu sprzętu"
 cat-tax,25741.64,2026-05-31,PLN,Zaliczka na podatek dochodowy CIT-8 (z uwzględnieniem preferencji B+R / IP Box) za maj 2026
@@ -84,11 +84,11 @@ cat-revenue,236900.91,2026-06-12,PLN,Faktura FV/2026/06/002 - Architektura chmur
 cat-revenue,165699.09,2026-06-22,PLN,Faktura FV/2026/06/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
 cat-cogs,227573.64,2026-06-08,PLN,Podwykonawstwo B2B: Zespół Senior Fullstack / Python / DevOps inżynierów kontraktowych za czerwiec 2026
 cat-cogs,65553.64,2026-06-24,PLN,Dedykowane klastry Kubernetes AWS/GCP oraz licencje środowisk klienckich
-cat-opex,154631.82,2026-06-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za czerwiec 2026"
-cat-opex,21818.18,2026-06-14,PLN,Czynsz i koszty eksploatacji biura i przestrzeni technologicznej LoremIpsumCODE Hub
-cat-opex,16304.55,2026-06-20,PLN,"Licencje i infrastruktura deweloperska: GitHub Enterprise, JetBrains, Datadog, Slack, Google Workspace"
-cat-opex,11244.55,2026-06-25,PLN,"Koszty procesów rekrutacyjnych IT, szkoleń certyfikacyjnych AWS/GCP i konferencji branżowych"
-cat-opex,6435.23,2026-06-27,PLN,"Obsługa księgowo-kadrowa, doradztwo podatkowe IP Box oraz audyt prawny umów ramowych"
+cat-opex-payroll,154631.82,2026-06-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za czerwiec 2026"
+cat-opex-office,21818.18,2026-06-14,PLN,Czynsz i koszty eksploatacji biura i przestrzeni technologicznej LoremIpsumCODE Hub
+cat-opex-software,16304.55,2026-06-20,PLN,"Licencje i infrastruktura deweloperska: GitHub Enterprise, JetBrains, Datadog, Slack, Google Workspace"
+cat-opex-marketing,11244.55,2026-06-25,PLN,"Koszty procesów rekrutacyjnych IT, szkoleń certyfikacyjnych AWS/GCP i konferencji branżowych"
+cat-opex-legal,6435.23,2026-06-27,PLN,"Obsługa księgowo-kadrowa, doradztwo podatkowe IP Box oraz audyt prawny umów ramowych"
 cat-depreciation,8757.27,2026-06-30,PLN,"Odpis amortyzacyjny stacji roboczych Apple MacBook Pro M-series, serwerów testowych i osprzętu sieciowego"
 cat-financial,1920.00,2026-06-30,PLN,"Prowizje bankowe, obsługa transakcji wielowalutowych i raty leasingu sprzętu"
 cat-tax,26282.80,2026-06-30,PLN,Zaliczka na podatek dochodowy CIT-8 (z uwzględnieniem preferencji B+R / IP Box) za czerwiec 2026
@@ -100,11 +100,11 @@ cat-revenue,241547.27,2026-07-12,PLN,Faktura FV/2026/07/002 - Architektura chmur
 cat-revenue,168852.73,2026-07-22,PLN,Faktura FV/2026/07/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
 cat-cogs,231729.09,2026-07-08,PLN,Podwykonawstwo B2B: Zespół Senior Fullstack / Python / DevOps inżynierów kontraktowych za lipiec 2026
 cat-cogs,66889.09,2026-07-24,PLN,Dedykowane klastry Kubernetes AWS/GCP oraz licencje środowisk klienckich
-cat-opex,154354.55,2026-07-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za lipiec 2026"
-cat-opex,22045.45,2026-07-14,PLN,Czynsz i koszty eksploatacji biura i przestrzeni technologicznej LoremIpsumCODE Hub
-cat-opex,16536.36,2026-07-20,PLN,"Licencje i infrastruktura deweloperska: GitHub Enterprise, JetBrains, Datadog, Slack, Google Workspace"
-cat-opex,11416.36,2026-07-25,PLN,"Koszty procesów rekrutacyjnych IT, szkoleń certyfikacyjnych AWS/GCP i konferencji branżowych"
-cat-opex,6506.82,2026-07-27,PLN,"Obsługa księgowo-kadrowa, doradztwo podatkowe IP Box oraz audyt prawny umów ramowych"
+cat-opex-payroll,154354.55,2026-07-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za lipiec 2026"
+cat-opex-office,22045.45,2026-07-14,PLN,Czynsz i koszty eksploatacji biura i przestrzeni technologicznej LoremIpsumCODE Hub
+cat-opex-software,16536.36,2026-07-20,PLN,"Licencje i infrastruktura deweloperska: GitHub Enterprise, JetBrains, Datadog, Slack, Google Workspace"
+cat-opex-marketing,11416.36,2026-07-25,PLN,"Koszty procesów rekrutacyjnych IT, szkoleń certyfikacyjnych AWS/GCP i konferencji branżowych"
+cat-opex-legal,6506.82,2026-07-27,PLN,"Obsługa księgowo-kadrowa, doradztwo podatkowe IP Box oraz audyt prawny umów ramowych"
 cat-depreciation,8878.18,2026-07-31,PLN,"Odpis amortyzacyjny stacji roboczych Apple MacBook Pro M-series, serwerów testowych i osprzętu sieciowego"
 cat-financial,1940.00,2026-07-31,PLN,"Prowizje bankowe, obsługa transakcji wielowalutowych i raty leasingu sprzętu"
 cat-tax,27102.97,2026-07-31,PLN,Zaliczka na podatek dochodowy CIT-8 (z uwzględnieniem preferencji B+R / IP Box) za lipiec 2026
@@ -116,11 +116,11 @@ cat-revenue,246193.64,2026-08-12,PLN,Faktura FV/2026/08/002 - Architektura chmur
 cat-revenue,172006.36,2026-08-22,PLN,Faktura FV/2026/08/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
 cat-cogs,235884.55,2026-08-08,PLN,Podwykonawstwo B2B: Zespół Senior Fullstack / Python / DevOps inżynierów kontraktowych za sierpień 2026
 cat-cogs,68224.55,2026-08-24,PLN,Dedykowane klastry Kubernetes AWS/GCP oraz licencje środowisk klienckich
-cat-opex,157177.27,2026-08-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za sierpień 2026"
-cat-opex,22272.73,2026-08-14,PLN,Czynsz i koszty eksploatacji biura i przestrzeni technologicznej LoremIpsumCODE Hub
-cat-opex,16768.18,2026-08-20,PLN,"Licencje i infrastruktura deweloperska: GitHub Enterprise, JetBrains, Datadog, Slack, Google Workspace"
-cat-opex,11588.18,2026-08-25,PLN,"Koszty procesów rekrutacyjnych IT, szkoleń certyfikacyjnych AWS/GCP i konferencji branżowych"
-cat-opex,6578.41,2026-08-27,PLN,"Obsługa księgowo-kadrowa, doradztwo podatkowe IP Box oraz audyt prawny umów ramowych"
+cat-opex-payroll,157177.27,2026-08-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za sierpień 2026"
+cat-opex-office,22272.73,2026-08-14,PLN,Czynsz i koszty eksploatacji biura i przestrzeni technologicznej LoremIpsumCODE Hub
+cat-opex-software,16768.18,2026-08-20,PLN,"Licencje i infrastruktura deweloperska: GitHub Enterprise, JetBrains, Datadog, Slack, Google Workspace"
+cat-opex-marketing,11588.18,2026-08-25,PLN,"Koszty procesów rekrutacyjnych IT, szkoleń certyfikacyjnych AWS/GCP i konferencji branżowych"
+cat-opex-legal,6578.41,2026-08-27,PLN,"Obsługa księgowo-kadrowa, doradztwo podatkowe IP Box oraz audyt prawny umów ramowych"
 cat-depreciation,8999.09,2026-08-31,PLN,"Odpis amortyzacyjny stacji roboczych Apple MacBook Pro M-series, serwerów testowych i osprzętu sieciowego"
 cat-financial,1960.00,2026-08-31,PLN,"Prowizje bankowe, obsługa transakcji wielowalutowych i raty leasingu sprzętu"
 cat-tax,27644.13,2026-08-31,PLN,Zaliczka na podatek dochodowy CIT-8 (z uwzględnieniem preferencji B+R / IP Box) za sierpień 2026
@@ -132,11 +132,11 @@ cat-revenue,250840.00,2026-09-12,PLN,Faktura FV/2026/09/002 - Architektura chmur
 cat-revenue,175160.00,2026-09-18,PLN,Faktura FV/2026/09/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
 cat-cogs,240040.00,2026-09-08,PLN,Podwykonawstwo B2B: Zespół Senior Fullstack / Python / DevOps inżynierów kontraktowych za wrzesień 2026
 cat-cogs,69560.00,2026-09-16,PLN,Dedykowane klastry Kubernetes AWS/GCP oraz licencje środowisk klienckich
-cat-opex,160000.00,2026-09-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za wrzesień 2026"
-cat-opex,22500.00,2026-09-14,PLN,Czynsz i koszty eksploatacji biura i przestrzeni technologicznej LoremIpsumCODE Hub
-cat-opex,17000.00,2026-09-17,PLN,"Licencje i infrastruktura deweloperska: GitHub Enterprise, JetBrains, Datadog, Slack, Google Workspace"
-cat-opex,11760.00,2026-09-18,PLN,"Koszty procesów rekrutacyjnych IT, szkoleń certyfikacyjnych AWS/GCP i konferencji branżowych"
-cat-opex,6650.00,2026-09-19,PLN,"Obsługa księgowo-kadrowa, doradztwo podatkowe IP Box oraz audyt prawny umów ramowych"
+cat-opex-payroll,160000.00,2026-09-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za wrzesień 2026"
+cat-opex-office,22500.00,2026-09-14,PLN,Czynsz i koszty eksploatacji biura i przestrzeni technologicznej LoremIpsumCODE Hub
+cat-opex-software,17000.00,2026-09-17,PLN,"Licencje i infrastruktura deweloperska: GitHub Enterprise, JetBrains, Datadog, Slack, Google Workspace"
+cat-opex-marketing,11760.00,2026-09-18,PLN,"Koszty procesów rekrutacyjnych IT, szkoleń certyfikacyjnych AWS/GCP i konferencji branżowych"
+cat-opex-legal,6650.00,2026-09-19,PLN,"Obsługa księgowo-kadrowa, doradztwo podatkowe IP Box oraz audyt prawny umów ramowych"
 cat-depreciation,9120.00,2026-09-19,PLN,"Odpis amortyzacyjny stacji roboczych Apple MacBook Pro M-series, serwerów testowych i osprzętu sieciowego"
 cat-financial,1980.00,2026-09-19,PLN,"Prowizje bankowe, obsługa transakcji wielowalutowych i raty leasingu sprzętu"
 cat-tax,28185.30,2026-09-19,PLN,Zaliczka na podatek dochodowy CIT-8 (z uwzględnieniem preferencji B+R / IP Box) za wrzesień 2026

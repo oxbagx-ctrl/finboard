@@ -290,7 +290,7 @@ npm test
 - [ ] **Faza 18: Naprawa Filtrowania RecordType i Układ Rodzajowy OPEX**
   - [x] Usunięcie błędu wielkości liter w `GetCategoryBreakdownHandler` blokującego filtrowanie `record_type`.
   - [x] Wprowadzenie dedykowanych kodów kategorii rodzajowych OPEX w encji domenowej `Category` i seederze bazy danych.
-  - [ ] Aktualizacja `FinancialDataSeeder` i zbiorów danych o dystrybucję kosztów operacyjnych na subkategorie rodzajowe.
+  - [x] Aktualizacja `FinancialDataSeeder` i zbiorów danych o dystrybucję kosztów operacyjnych na subkategorie rodzajowe.
   - [ ] Testy jednostkowe izolacji kategorii REVENUE od EXPENSE i rekordów bilansowych.
   - [ ] Weryfikacja różnorodnego rozkładu kategorii OPEX na wykresie kołowym zamiast pojedynczego wpisu 100%.
 - [ ] **Faza 19: Domenowe Obliczanie Dynamiki R/R dla Podpozycji Kategorii**
