@@ -191,15 +191,19 @@ export const AuditLogsView = () => {
     // Fetch VDR logs
     const fetchVdrLogs = useCallback(
         async (page = 1) => {
+            if (!activeCompany?.id) {
+                setVdrLogs([]);
+                setVdrPagination({ currentPage: 1, lastPage: 1, total: 0, perPage: 25 });
+                setVdrLoading(false);
+                return;
+            }
             setVdrLoading(true);
             try {
                 const params = {
                     page,
                     per_page: 25,
+                    company_id: activeCompany.id,
                 };
-                if (activeCompany?.id) {
-                    params.company_id = activeCompany.id;
-                }
 
                 const res = await apiClient.get('/documents/audit-logs', { params });
                 let records = res.data.data || [];
@@ -240,11 +244,12 @@ export const AuditLogsView = () => {
 
     // Fetch Finance stats
     const fetchFinanceStats = useCallback(async () => {
+        if (!activeCompany?.id) {
+            setFinanceStats(null);
+            return;
+        }
         try {
-            const params = {};
-            if (activeCompany?.id) {
-                params.company_id = activeCompany.id;
-            }
+            const params = { company_id: activeCompany.id };
             const res = await apiClient.get('/finance/audit-logs/stats', { params });
             if (res.data?.data) {
                 setFinanceStats(res.data.data);
@@ -257,15 +262,19 @@ export const AuditLogsView = () => {
     // Fetch Finance logs
     const fetchFinanceLogs = useCallback(
         async (page = 1) => {
+            if (!activeCompany?.id) {
+                setFinanceLogs([]);
+                setFinancePagination({ currentPage: 1, lastPage: 1, total: 0, perPage: 25 });
+                setFinanceLoading(false);
+                return;
+            }
             setFinanceLoading(true);
             try {
                 const params = {
                     page,
                     per_page: 25,
+                    company_id: activeCompany.id,
                 };
-                if (activeCompany?.id) {
-                    params.company_id = activeCompany.id;
-                }
                 if (financeActionFilter) {
                     params.action = financeActionFilter;
                 }
@@ -293,31 +302,54 @@ export const AuditLogsView = () => {
         [financeActionFilter, financeSearchQuery, activeCompany?.id, error]
     );
 
+    // Tenant context switch: reset transient filters, search and modal when company changes
+    useEffect(() => {
+        setSelectedDetailLog(null);
+        setIsDetailModalOpen(false);
+        setFinanceSearchInput('');
+        setFinanceSearchQuery('');
+        setFinanceActionFilter('');
+        setVdrSearchQuery('');
+        setVdrSelectedAction('');
+    }, [activeCompany?.id]);
+
     // Initial load and company change sync
     useEffect(() => {
-        if (activeTab === 'finance') {
-            fetchFinanceLogs(1);
-            fetchFinanceStats();
-        } else {
-            fetchVdrLogs(1);
-        }
-    }, [activeTab, fetchFinanceLogs, fetchFinanceStats, fetchVdrLogs, activeCompany?.id]);
-
-    // Listen to global company change event
-    useEffect(() => {
-        const handleCompanyChanged = () => {
+        if (activeCompany?.id) {
             if (activeTab === 'finance') {
                 fetchFinanceLogs(1);
                 fetchFinanceStats();
             } else {
                 fetchVdrLogs(1);
             }
+        }
+    }, [activeTab, fetchFinanceLogs, fetchFinanceStats, fetchVdrLogs, activeCompany?.id]);
+
+    // Listen to global company change event
+    useEffect(() => {
+        const handleCompanyChanged = () => {
+            setSelectedDetailLog(null);
+            setIsDetailModalOpen(false);
+            setFinanceSearchInput('');
+            setFinanceSearchQuery('');
+            setFinanceActionFilter('');
+            setVdrSearchQuery('');
+            setVdrSelectedAction('');
+
+            if (activeCompany?.id) {
+                if (activeTab === 'finance') {
+                    fetchFinanceLogs(1);
+                    fetchFinanceStats();
+                } else {
+                    fetchVdrLogs(1);
+                }
+            }
         };
         window.addEventListener('finboard:company-changed', handleCompanyChanged);
         return () => {
             window.removeEventListener('finboard:company-changed', handleCompanyChanged);
         };
-    }, [activeTab, fetchFinanceLogs, fetchFinanceStats, fetchVdrLogs]);
+    }, [activeTab, fetchFinanceLogs, fetchFinanceStats, fetchVdrLogs, activeCompany?.id]);
 
     // Debounce search query input (300ms)
     useEffect(() => {
@@ -413,8 +445,11 @@ export const AuditLogsView = () => {
                             <h1 className="text-sm font-bold uppercase tracking-wider text-zinc-100">
                                 Dziennik Nadzoru & Ścieżka Audytowa (Audit Trail)
                             </h1>
-                            <span className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-zinc-950 border border-zinc-750 text-zinc-400">
-                                {activeCompany?.name || 'Spółka'}
+                            <span
+                                className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-zinc-950 border border-zinc-750 text-zinc-400"
+                                data-testid="audit-active-company-badge"
+                            >
+                                {activeCompany?.name || 'Brak wybranej spółki'}
                             </span>
                         </div>
                         <p className="text-[10px] text-zinc-400 mt-0.5">
@@ -430,8 +465,10 @@ export const AuditLogsView = () => {
                         variant="secondary"
                         size="sm"
                         icon={RefreshCw}
+                        disabled={!activeCompany?.id || (activeTab === 'finance' ? financeLoading : vdrLoading)}
                         loading={activeTab === 'finance' ? financeLoading : vdrLoading}
                         onClick={() => {
+                            if (!activeCompany?.id) return;
                             if (activeTab === 'finance') {
                                 fetchFinanceLogs(financePagination.currentPage);
                                 fetchFinanceStats();
@@ -444,6 +481,24 @@ export const AuditLogsView = () => {
                     </Button>
                 </div>
             </div>
+
+            {/* If no company selected, show informative tenant warning banner */}
+            {!activeCompany?.id && (
+                <div
+                    className="bg-amber-950/30 border border-amber-800/60 rounded-lg p-4 text-xs font-mono text-amber-200 flex items-center justify-between gap-3 shadow-md"
+                    data-testid="audit-no-company-state"
+                >
+                    <div className="flex items-center gap-2.5">
+                        <ShieldCheck className="w-5 h-5 text-amber-400 shrink-0" />
+                        <div>
+                            <div className="font-bold">Brak wybranego podmiotu (spółki portfelowej)</div>
+                            <div className="text-[11px] text-amber-300/70">
+                                Wybierz spółkę z menu wyboru kontekstu w nawigacji, aby załadować dedykowaną księgę audytową i rejestr zdarzeń nadzorczych.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Terminal-Styled Tab Switcher */}
             <div className="flex border-b border-zinc-800 bg-zinc-900/60 rounded-t-lg px-2 pt-2 gap-1 overflow-x-auto text-xs">
@@ -638,9 +693,30 @@ export const AuditLogsView = () => {
                         ) : financeLogs.length === 0 ? (
                             <div className="p-12 text-center text-zinc-500" data-testid="finance-audit-empty">
                                 <ShieldCheck className="w-10 h-10 mx-auto text-zinc-600 mb-2 opacity-80" />
-                                <div className="text-zinc-300 font-bold">Brak zdarzeń audytowych w wybranym zakresie</div>
+                                <div className="text-zinc-300 font-bold">
+                                    {financeSearchQuery || financeActionFilter
+                                        ? 'Brak zdarzeń audytowych pasujących do wybranych filtrów'
+                                        : 'Brak zdarzeń audytowych w wybranym podmiocie'}
+                                </div>
                                 <div className="text-[10px] text-zinc-500 mt-1">
-                                    Wszystkie operacje finansowe, modyfikacje i importy pojawią się w tym rejestrze w czasie rzeczywistym.
+                                    {financeSearchQuery || financeActionFilter ? (
+                                        <div className="flex items-center justify-center gap-2 mt-2">
+                                            <span>Kryteria wyszukiwania nie zwróciły żadnych wyników.</span>
+                                            <button
+                                                type="button"
+                                                data-testid="finance-clear-filters-btn"
+                                                onClick={() => {
+                                                    handleClearFinanceSearch();
+                                                    setFinanceActionFilter('');
+                                                }}
+                                                className="px-2 py-0.5 rounded bg-zinc-800 hover:bg-zinc-700 text-emerald-400 font-semibold cursor-pointer border border-zinc-700"
+                                            >
+                                                Wyczyść filtry
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        'Wszystkie operacje finansowe, modyfikacje i importy pojawią się w tym rejestrze w czasie rzeczywistym.'
+                                    )}
                                 </div>
                             </div>
                         ) : (
@@ -878,11 +954,32 @@ export const AuditLogsView = () => {
                                 Pobieranie rejestru operacji audytowych VDR...
                             </div>
                         ) : vdrLogs.length === 0 ? (
-                            <div className="p-12 text-center text-zinc-500">
+                            <div className="p-12 text-center text-zinc-500" data-testid="vdr-audit-empty">
                                 <ShieldCheck className="w-10 h-10 mx-auto text-zinc-600 mb-2 opacity-80" />
-                                <div className="text-zinc-300 font-bold">Brak zdarzeń audytowych VDR</div>
+                                <div className="text-zinc-300 font-bold">
+                                    {vdrSearchQuery || vdrSelectedAction
+                                        ? 'Brak zdarzeń audytowych VDR pasujących do wybranych filtrów'
+                                        : 'Brak zdarzeń audytowych VDR'}
+                                </div>
                                 <div className="text-[10px] text-zinc-500 mt-1">
-                                    Operacje uploadu i pobrań dokumentów pojawią się w tym rejestrze automatycznie.
+                                    {vdrSearchQuery || vdrSelectedAction ? (
+                                        <div className="flex items-center justify-center gap-2 mt-2">
+                                            <span>Kryteria wyszukiwania nie zwróciły żadnych operacji VDR.</span>
+                                            <button
+                                                type="button"
+                                                data-testid="vdr-clear-filters-btn"
+                                                onClick={() => {
+                                                    setVdrSearchQuery('');
+                                                    setVdrSelectedAction('');
+                                                }}
+                                                className="px-2 py-0.5 rounded bg-zinc-800 hover:bg-zinc-700 text-emerald-400 font-semibold cursor-pointer border border-zinc-700"
+                                            >
+                                                Wyczyść filtry
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        'Operacje uploadu i pobrań dokumentów pojawią się w tym rejestrze automatycznie.'
+                                    )}
                                 </div>
                             </div>
                         ) : (

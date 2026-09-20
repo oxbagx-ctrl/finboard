@@ -363,7 +363,7 @@ npm test
   - [x] Implementacja tabeli audytu finansowego wysokiej gęstości z czasem CET, profilami operatorów i badge'ami akcji.
   - [x] Połączenie tabeli audytu z wyszukiwarką tekstową (debounce) i paginacją backendową.
   - [x] Powiązanie przycisku inspekcji wiersza z otwarciem modalu `FinancialAuditDetailModal`.
-  - [ ] Rygorystyczna synchronizacja kontekstu `activeCompany` oraz obsługa stanów ładowania i pustych wyników.
+  - [x] Rygorystyczna synchronizacja kontekstu `activeCompany` oraz obsługa stanów ładowania i pustych wyników.
   - [ ] Testy komponentów w `AuditLogsView.test.jsx` dla zakładki finansowej, przełączania VDR, filtrów i modalu.
 - [ ] **Faza 31: Testy Integracyjne, Bezpieczeństwo i Dokumentacja**
   - [ ] Testy integracyjne E2E dla filtrowania zdarzeń audytowych według akcji usunięcia, modyfikacji i importu CSV.
