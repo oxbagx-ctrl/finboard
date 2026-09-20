@@ -12,6 +12,7 @@ use App\Contexts\Finance\Domain\ValueObjects\Currency;
 use App\Contexts\Finance\Domain\ValueObjects\DateRange;
 use App\Contexts\Finance\Domain\ValueObjects\FinancialRecordId;
 use App\Contexts\Finance\Domain\ValueObjects\Money;
+use App\Contexts\Finance\Domain\ValueObjects\RecordType;
 use App\Models\FinancialRecord as EloquentFinancialRecord;
 use DateTimeImmutable;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -37,10 +38,15 @@ final class EloquentFinancialRecordRepository implements FinancialRecordReposito
     }
 
     /**
+     * @param array<CategoryType> $categoryTypes
      * @return array<FinancialRecord>
      */
-    public function findByCompanyId(string $companyId, ?DateRange $period = null): array
-    {
+    public function findByCompanyId(
+        string $companyId,
+        ?DateRange $period = null,
+        ?RecordType $recordType = null,
+        array $categoryTypes = []
+    ): array {
         $query = EloquentFinancialRecord::with('category')
             ->where('company_id', $companyId)
             ->orderBy('record_date', 'asc');
@@ -50,6 +56,18 @@ final class EloquentFinancialRecordRepository implements FinancialRecordReposito
                 $period->startDate()->format('Y-m-d'),
                 $period->endDate()->format('Y-m-d'),
             ]);
+        }
+
+        if ($recordType !== null) {
+            $val = strtolower($recordType->value);
+            $query->whereIn('record_type', [$val, strtoupper($val)]);
+        }
+
+        if (!empty($categoryTypes)) {
+            $typeValues = array_map(fn (CategoryType $t) => $t->value, $categoryTypes);
+            $query->whereHas('category', function ($q) use ($typeValues) {
+                $q->whereIn('type', $typeValues);
+            });
         }
 
         return $query->get()

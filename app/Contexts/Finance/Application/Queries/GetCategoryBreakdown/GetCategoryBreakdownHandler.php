@@ -63,7 +63,12 @@ final class GetCategoryBreakdownHandler
             $period = DateRange::fromStrings($query->startDate, $query->endDate);
         }
 
-        $records = $this->recordRepository->findByCompanyId($query->companyId, $period);
+        $records = $this->recordRepository->findByCompanyId(
+            $query->companyId,
+            $period,
+            $filterType,
+            $allowedCategoryTypes
+        );
 
         // Filter and aggregate per category for current period
         $totalsPerCategory = [];
@@ -73,7 +78,7 @@ final class GetCategoryBreakdownHandler
         foreach ($records as $record) {
             $category = $record->category();
 
-            // Match requested record type if provided
+            // Guard against domain mismatch
             if ($filterType !== null && $category->recordType() !== $filterType) {
                 continue;
             }
@@ -97,6 +102,11 @@ final class GetCategoryBreakdownHandler
             $grandTotal = $grandTotal->add($record->amount());
         }
 
+        // Optimization: If no records match for current period, short-circuit immediately
+        if (empty($totalsPerCategory)) {
+            return [];
+        }
+
         // Determine comparative period for YoY dynamics
         $comparativePeriod = null;
         if ($query->includeYoY) {
@@ -113,7 +123,12 @@ final class GetCategoryBreakdownHandler
         $hasComparativeRecords = false;
 
         if ($comparativePeriod !== null) {
-            $prevRecords = $this->recordRepository->findByCompanyId($query->companyId, $comparativePeriod);
+            $prevRecords = $this->recordRepository->findByCompanyId(
+                $query->companyId,
+                $comparativePeriod,
+                $filterType,
+                $allowedCategoryTypes
+            );
             if (!empty($prevRecords)) {
                 $hasComparativeRecords = true;
                 foreach ($prevRecords as $prevRecord) {

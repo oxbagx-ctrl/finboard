@@ -5,7 +5,7 @@
 [![PostgreSQL](https://img.shields.io/badge/postgresql-16-blue.svg)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/redis-alpine-red.svg)](https://redis.io/)
 [![Architecture](https://img.shields.io/badge/architecture-DDD%20%2F%20CQRS-brightgreen.svg)]()
-[![Tests](https://img.shields.io/badge/tests-378%20backend%20%7C%20147%20frontend%20passed-success.svg)]()
+[![Tests](https://img.shields.io/badge/tests-389%20backend%20%7C%20147%20frontend%20passed-success.svg)]()
 
 FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakcyjnego (M&A, Due Diligence, Corporate Finance) oraz ich klientom (CFO, Zarządy). Aplikacja łączy w sobie zaawansowaną analitykę finansową w ujęciu wielo-najemcowym (Multi-Tenant) z bezpiecznym repozytorium dokumentów Virtual Data Room (VDR).
 
@@ -120,7 +120,7 @@ Pulpit Mailpit (podgląd e-maili deweloperskich): `http://localhost:8025`.
 ## 🧪 Uruchamianie Testów
 
 ### Testy Backendowe (PHPUnit)
-Pakiet 378 testów jednostkowych i integracyjnych pokrywających warstwę domenową (DDD), zapytania CQRS, repozytoria, kalkulacje matematyczne `Money`, importy CSV, autoryzację wielonajemcową, system zaproszeń, logi audytowe oraz API benchmarków i analityki:
+Pakiet 389 testów jednostkowych i integracyjnych pokrywających warstwę domenową (DDD), zapytania CQRS, repozytoria, kalkulacje matematyczne `Money`, importy CSV, autoryzację wielonajemcową, system zaproszeń, logi audytowe oraz API benchmarków i analityki:
 ```bash
 docker compose exec app ./vendor/bin/phpunit
 ```
@@ -293,12 +293,12 @@ npm test
   - Aktualizacja `FinancialDataSeeder` i zbiorów danych o dystrybucję kosztów operacyjnych na subkategorie rodzajowe.
   - Testy jednostkowe izolacji kategorii REVENUE od EXPENSE i rekordów bilansowych.
   - Weryfikacja różnorodnego rozkładu kategorii OPEX na wykresie kołowym zamiast pojedynczego wpisu 100%.
-- [ ] **Faza 19: Domenowe Obliczanie Dynamiki R/R dla Podpozycji Kategorii**
+- [x] **Faza 19: Domenowe Obliczanie Dynamiki R/R dla Podpozycji Kategorii**
   - [x] Rozszerzenie `GetCategoryBreakdownQuery` i Handlera o kalkulację kwot porównawczych i dynamiki YoY per kategoria.
   - [x] Ekspozycja dynamiki YoY na poziomie kategorii (`previous_amount`, `yoy_growth_pct`) w endpoincie `/finance/analytics/breakdown`.
   - [x] Testy jednostkowe kalkulacji dynamiki YoY na poziomie kategorii z przypadkami brzegowymi (nowe kategorie, baza zerowa).
   - [x] Testy integracyjne endpointu breakdown weryfikujące strukturę payloadu YoY.
-  - [ ] Optymalizacja agregacji rekordów i zapytań bazodanowych dla okresów porównawczych.
+  - [x] Optymalizacja agregacji rekordów i zapytań bazodanowych dla okresów porównawczych.
 - [ ] **Faza 20: Integracja UI Tabeli P&L i Wykresu Struktury Kosztów**
   - [ ] Podpięcie dynamicznej dynamiki YoY per kategoria do podwierszy (children) przychodów i OPEX w `DashboardView`.
   - [ ] Zapewnienie ścisłej polaryzacji `reverseChange` dla kosztów OPEX i jej brak dla przychodów.

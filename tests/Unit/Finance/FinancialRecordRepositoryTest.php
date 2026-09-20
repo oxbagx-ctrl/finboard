@@ -7,10 +7,12 @@ namespace Tests\Unit\Finance;
 use App\Contexts\Finance\Domain\Entities\Category;
 use App\Contexts\Finance\Domain\Model\FinancialRecord;
 use App\Contexts\Finance\Domain\Repositories\FinancialRecordRepositoryInterface;
+use App\Contexts\Finance\Domain\ValueObjects\CategoryType;
 use App\Contexts\Finance\Domain\ValueObjects\Currency;
 use App\Contexts\Finance\Domain\ValueObjects\DateRange;
 use App\Contexts\Finance\Domain\ValueObjects\FinancialRecordId;
 use App\Contexts\Finance\Domain\ValueObjects\Money;
+use App\Contexts\Finance\Domain\ValueObjects\RecordType;
 use DateTimeImmutable;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
@@ -22,7 +24,7 @@ final class FinancialRecordRepositoryTest extends TestCase
     private const COMPANY_ID = '22222222-2222-2222-2222-222222222222';
     private FinancialRecordRepositoryInterface $repository;
 
-    protected function setUp(): void
+        protected function setUp(): void
     {
         parent::setUp();
         $this->repository = $this->app->make(FinancialRecordRepositoryInterface::class);
@@ -66,6 +68,47 @@ final class FinancialRecordRepositoryTest extends TestCase
                 DateRange::forQuarter(2026, 1)->contains($record->recordDate()),
                 sprintf('Record date %s must be within Q1 2026', $record->recordDate()->format('Y-m-d'))
             );
+        }
+    }
+
+    public function test_repository_filters_by_record_type(): void
+    {
+        $expenseRecords = $this->repository->findByCompanyId(
+            self::COMPANY_ID,
+            DateRange::forQuarter(2026, 1),
+            RecordType::EXPENSE
+        );
+
+        $this->assertNotEmpty($expenseRecords);
+        foreach ($expenseRecords as $record) {
+            $this->assertSame(RecordType::EXPENSE, $record->recordType());
+        }
+
+        $revenueRecords = $this->repository->findByCompanyId(
+            self::COMPANY_ID,
+            DateRange::forQuarter(2026, 1),
+            RecordType::REVENUE
+        );
+
+        $this->assertNotEmpty($revenueRecords);
+        foreach ($revenueRecords as $record) {
+            $this->assertSame(RecordType::REVENUE, $record->recordType());
+        }
+    }
+
+    public function test_repository_filters_by_category_types(): void
+    {
+        $opexRecords = $this->repository->findByCompanyId(
+            self::COMPANY_ID,
+            DateRange::forQuarter(2026, 1),
+            RecordType::EXPENSE,
+            [CategoryType::OPEX]
+        );
+
+        $this->assertNotEmpty($opexRecords);
+        foreach ($opexRecords as $record) {
+            $this->assertSame(RecordType::EXPENSE, $record->recordType());
+            $this->assertSame(CategoryType::OPEX, $record->category()->type());
         }
     }
 

@@ -5,17 +5,25 @@ declare(strict_types=1);
 namespace App\Contexts\Finance\Domain\Repositories;
 
 use App\Contexts\Finance\Domain\Model\FinancialRecord;
+use App\Contexts\Finance\Domain\ValueObjects\CategoryType;
 use App\Contexts\Finance\Domain\ValueObjects\DateRange;
 use App\Contexts\Finance\Domain\ValueObjects\FinancialRecordId;
+use App\Contexts\Finance\Domain\ValueObjects\RecordType;
 
 interface FinancialRecordRepositoryInterface
 {
     public function findById(FinancialRecordId $id): ?FinancialRecord;
 
     /**
+     * @param array<CategoryType> $categoryTypes
      * @return array<FinancialRecord>
      */
-    public function findByCompanyId(string $companyId, ?DateRange $period = null): array;
+    public function findByCompanyId(
+        string $companyId,
+        ?DateRange $period = null,
+        ?RecordType $recordType = null,
+        array $categoryTypes = []
+    ): array;
 
     /**
      * @return array<int> List of distinct fiscal years with financial records for company, sorted descending (e.g. [2026, 2025, 2024])
