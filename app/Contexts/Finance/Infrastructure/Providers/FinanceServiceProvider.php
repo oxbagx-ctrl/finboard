@@ -12,6 +12,7 @@ use App\Contexts\Finance\Domain\Events\FinancialBenchmarkConfigured;
 use App\Contexts\Finance\Domain\Events\FinancialBenchmarkReset;
 use App\Contexts\Finance\Domain\Events\FinancialRecordCreated;
 use App\Contexts\Finance\Domain\Events\FinancialRecordDeleted;
+use App\Contexts\Finance\Domain\Events\FinancialRecordsBatchDeleted;
 use App\Contexts\Finance\Domain\Events\FinancialRecordUpdated;
 use App\Contexts\Finance\Domain\Repositories\CategoryRepositoryInterface;
 use App\Contexts\Finance\Domain\Repositories\FinancialAuditLogRepositoryInterface;
@@ -23,8 +24,10 @@ use App\Contexts\Finance\Infrastructure\Listeners\LogBenchmarkResetListener;
 use App\Contexts\Finance\Infrastructure\Listeners\LogCsvImportAuditListener;
 use App\Contexts\Finance\Infrastructure\Listeners\LogFinancialRecordCreatedListener;
 use App\Contexts\Finance\Infrastructure\Listeners\LogFinancialRecordDeletedListener;
+use App\Contexts\Finance\Infrastructure\Listeners\LogFinancialRecordsBatchDeletedListener;
 use App\Contexts\Finance\Infrastructure\Listeners\LogFinancialRecordUpdatedListener;
 use App\Contexts\Finance\Infrastructure\Repositories\EloquentCategoryRepository;
+
 use App\Contexts\Finance\Infrastructure\Repositories\EloquentFinancialAuditLogRepository;
 use App\Contexts\Finance\Infrastructure\Repositories\EloquentFinancialBenchmarkRepository;
 use App\Contexts\Finance\Infrastructure\Repositories\EloquentFinancialRecordRepository;
@@ -73,7 +76,9 @@ final class FinanceServiceProvider extends ServiceProvider
         Event::listen(FinancialRecordCreated::class, LogFinancialRecordCreatedListener::class);
         Event::listen(FinancialRecordUpdated::class, LogFinancialRecordUpdatedListener::class);
         Event::listen(FinancialRecordDeleted::class, LogFinancialRecordDeletedListener::class);
+        Event::listen(FinancialRecordsBatchDeleted::class, LogFinancialRecordsBatchDeletedListener::class);
         Event::listen(FinancialBenchmarkConfigured::class, LogBenchmarkConfiguredListener::class);
+
         Event::listen(FinancialBenchmarkReset::class, LogBenchmarkResetListener::class);
         Event::listen(CsvImportCompleted::class, [LogCsvImportAuditListener::class, 'handleImportCompleted']);
         Event::listen(CsvImportFailed::class, [LogCsvImportAuditListener::class, 'handleImportFailed']);

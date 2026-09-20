@@ -338,7 +338,7 @@ npm test
 - [ ] **Faza 26: Architektura Domenowa i Bezpieczne API Masowego Usuwania**
   - [x] Wprowadzenie komendy CQRS `BatchDeleteFinancialRecordsCommand` i handlera domenowego z izolacją tenanta.
   - [x] Rozszerzenie interfejsu `FinancialRecordRepositoryInterface` i implementacji Eloquent o usuwanie masowe.
-  - [ ] Rejestracja zdarzenia domenowego `FinancialRecordsBatchDeleted` i listenera audytu `financial_audit_logs`.
+  - [x] Rejestracja zdarzenia domenowego `FinancialRecordsBatchDeleted` i listenera audytu `financial_audit_logs`.
   - [ ] Wystawienie endpointu `DELETE /api/v1/finance/records/batch` z walidacją `BatchDeleteFinancialRecordsRequest`.
   - [ ] Testy jednostkowe i integracyjne weryfikujące masowe usuwanie, izolację spółek i audyt.
 - [ ] **Faza 27: Interfejs Zaznaczania i Pasek Akcji Masowych w Księdze**

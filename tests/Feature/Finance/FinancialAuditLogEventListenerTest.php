@@ -10,6 +10,8 @@ use App\Contexts\Finance\Domain\Entities\Category;
 use App\Contexts\Finance\Domain\Events\CsvImportCompleted;
 use App\Contexts\Finance\Domain\Events\CsvImportFailed;
 use App\Contexts\Finance\Domain\Events\FinancialBenchmarkReset;
+use App\Contexts\Finance\Domain\Events\FinancialRecordsBatchDeleted;
+
 use App\Contexts\Finance\Domain\Model\FinancialBenchmark;
 use App\Contexts\Finance\Domain\Model\FinancialRecord;
 use App\Contexts\Finance\Domain\Repositories\FinancialAuditLogRepositoryInterface;
@@ -257,4 +259,34 @@ final class FinancialAuditLogEventListenerTest extends TestCase
         $this->assertSame($failedImportId, $failedLogs[0]->entityId());
         $this->assertSame(3, $failedLogs[0]->newValues()['error_count']);
     }
+
+    public function test_persists_audit_log_when_financial_records_are_batch_deleted(): void
+    {
+        $recordIds = [(string) Str::uuid(), (string) Str::uuid(), (string) Str::uuid()];
+        $totalAmount = 14500.50;
+
+        Event::dispatch(new FinancialRecordsBatchDeleted(
+            companyId: $this->company->id,
+            recordIds: $recordIds,
+            deletedCount: 3,
+            totalAmount: $totalAmount,
+            userId: (string) $this->user->id,
+            ipAddress: '192.168.1.100'
+        ));
+
+        $logs = $this->auditLogRepository->findByCompanyId($this->company->id, action: AuditAction::RECORDS_BATCH_DELETED);
+        $this->assertNotEmpty($logs);
+        $log = $logs[0];
+
+        $this->assertSame($this->company->id, $log->companyId());
+        $this->assertSame(AuditAction::RECORDS_BATCH_DELETED, $log->action());
+        $this->assertSame('financial_record', $log->entityType());
+        $this->assertSame((string) $this->user->id, $log->userId());
+        $this->assertSame('192.168.1.100', $log->ipAddress());
+        $this->assertStringContainsString('3', $log->description());
+        $this->assertSame(3, $log->oldValues()['count']);
+        $this->assertSame($totalAmount, $log->oldValues()['total_amount']);
+        $this->assertSame($recordIds, $log->oldValues()['record_ids']);
+    }
 }
+

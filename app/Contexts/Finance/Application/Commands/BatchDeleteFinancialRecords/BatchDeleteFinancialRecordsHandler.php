@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Contexts\Finance\Application\Commands\BatchDeleteFinancialRecords;
 
+use App\Contexts\Finance\Domain\Events\FinancialRecordsBatchDeleted;
 use App\Contexts\Finance\Domain\Repositories\FinancialRecordRepositoryInterface;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Facades\DB;
+
 
 final class BatchDeleteFinancialRecordsHandler
 {
@@ -72,18 +74,16 @@ final class BatchDeleteFinancialRecordsHandler
 
             // Dispatch domain event if available
             if ($deletedCount > 0 && $this->dispatcher !== null) {
-                $eventClass = 'App\Contexts\Finance\Domain\Events\FinancialRecordsBatchDeleted';
-                if (class_exists($eventClass)) {
-                    $this->dispatcher->dispatch(new $eventClass(
-                        companyId: $command->companyId,
-                        recordIds: $matchingIds,
-                        deletedCount: $deletedCount,
-                        totalAmount: $roundedAmount,
-                        userId: $command->userId,
-                        ipAddress: $command->ipAddress
-                    ));
-                }
+                $this->dispatcher->dispatch(new FinancialRecordsBatchDeleted(
+                    companyId: $command->companyId,
+                    recordIds: $matchingIds,
+                    deletedCount: $deletedCount,
+                    totalAmount: $roundedAmount,
+                    userId: $command->userId,
+                    ipAddress: $command->ipAddress
+                ));
             }
+
 
             return new BatchDeleteFinancialRecordsResult(
                 deletedCount: $deletedCount,
