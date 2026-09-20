@@ -29,6 +29,10 @@ import {
 } from 'lucide-react';
 import { formatDateTime } from '../utils/formatters';
 import { FinancialAuditDetailModal } from '../components/audit/FinancialAuditDetailModal';
+import {
+    AuditActionBadge,
+    getAuditBadgeColorClass as getFinanceActionBadgeClass,
+} from '../components/audit/AuditActionBadge';
 
 const VDR_ACTION_FILTERS = [
     { id: '', label: 'Wszystkie Zdarzenia' },
@@ -126,28 +130,6 @@ const getPillCountBadgeClasses = (pill, isActive) => {
             return 'bg-indigo-900/60 text-indigo-200 border border-indigo-700/60';
         default:
             return 'bg-zinc-300 text-zinc-900';
-    }
-};
-
-const getFinanceActionBadgeClass = (color) => {
-    switch (color) {
-        case 'emerald':
-            return 'bg-emerald-950/70 border-emerald-800 text-emerald-300';
-        case 'blue':
-            return 'bg-blue-950/70 border-blue-800 text-blue-300';
-        case 'rose':
-        case 'red':
-            return 'bg-rose-950/70 border-rose-800 text-rose-300';
-        case 'amber':
-            return 'bg-amber-950/70 border-amber-800 text-amber-300';
-        case 'indigo':
-            return 'bg-indigo-950/70 border-indigo-800 text-indigo-300';
-        case 'cyan':
-            return 'bg-cyan-950/70 border-cyan-800 text-cyan-300';
-        case 'violet':
-            return 'bg-violet-950/70 border-violet-800 text-violet-300';
-        default:
-            return 'bg-zinc-800/80 border-zinc-700 text-zinc-300';
     }
 };
 
@@ -374,44 +356,9 @@ export const AuditLogsView = () => {
         setIsDetailModalOpen(false);
     };
 
-    const getVdrActionBadge = (action) => {
-        switch (action) {
-            case 'upload':
-                return (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-950/60 border border-emerald-800 text-emerald-300">
-                        <UploadCloud className="w-3 h-3" />
-                        Upload
-                    </span>
-                );
-            case 'download':
-                return (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-blue-950/60 border border-blue-800 text-blue-300">
-                        <DownloadCloud className="w-3 h-3" />
-                        Pobranie
-                    </span>
-                );
-            case 'archive':
-                return (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-amber-950/60 border border-amber-800 text-amber-300">
-                        <Archive className="w-3 h-3" />
-                        Archiwizacja
-                    </span>
-                );
-            case 'unarchive':
-                return (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-zinc-800 border border-zinc-700 text-zinc-200">
-                        <RotateCcw className="w-3 h-3" />
-                        Przywrócenie
-                    </span>
-                );
-            default:
-                return (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-zinc-850 border border-zinc-750 text-zinc-300">
-                        {action}
-                    </span>
-                );
-        }
-    };
+    const getVdrActionBadge = (action) => (
+        <AuditActionBadge action={action} testId={`vdr-audit-badge-${action}`} />
+    );
 
     const vdrDownloadEventsCount = vdrLogs.filter((l) => l.action === 'download').length;
     const vdrUploadEventsCount = vdrLogs.filter((l) => l.action === 'upload').length;
@@ -748,15 +695,14 @@ export const AuditLogsView = () => {
                                                     </div>
                                                 </td>
 
-                                                {/* Action Badge */}
                                                 <td className="py-2.5 px-3 whitespace-nowrap">
-                                                    <span
-                                                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${getFinanceActionBadgeClass(
-                                                            log.action_color
-                                                        )}`}
-                                                    >
-                                                        {log.action_label || log.action}
-                                                    </span>
+                                                    <AuditActionBadge
+                                                        action={log.action}
+                                                        label={log.action_label}
+                                                        color={log.action_color}
+                                                        category={log.action_category}
+                                                        testId={`finance-audit-badge-${log.id}`}
+                                                    />
                                                 </td>
 
                                                 {/* Description & Entity */}

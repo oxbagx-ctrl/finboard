@@ -18,31 +18,7 @@ import {
 } from 'lucide-react';
 import { formatDateTime, formatCurrency } from '../../utils/formatters';
 import { Button } from '../ui/Button';
-
-/**
- * Returns terminal-styled badge classes based on audit action color.
- */
-const getActionBadgeClass = (color) => {
-    switch (color) {
-        case 'emerald':
-            return 'bg-emerald-950/70 border-emerald-800 text-emerald-300';
-        case 'blue':
-            return 'bg-blue-950/70 border-blue-800 text-blue-300';
-        case 'rose':
-        case 'red':
-            return 'bg-rose-950/70 border-rose-800 text-rose-300';
-        case 'amber':
-            return 'bg-amber-950/70 border-amber-800 text-amber-300';
-        case 'indigo':
-            return 'bg-indigo-950/70 border-indigo-800 text-indigo-300';
-        case 'cyan':
-            return 'bg-cyan-950/70 border-cyan-800 text-cyan-300';
-        case 'violet':
-            return 'bg-violet-950/70 border-violet-800 text-violet-300';
-        default:
-            return 'bg-zinc-800/80 border-zinc-700 text-zinc-300';
-    }
-};
+import { AuditActionBadge, getAuditBadgeColorClass as getActionBadgeClass } from './AuditActionBadge';
 
 /**
  * Pretty-formats JSON value or returns null if empty.
@@ -107,14 +83,13 @@ export const FinancialAuditDetailModal = ({ isOpen, onClose, log }) => {
                                 <h2 className="text-xs font-bold uppercase tracking-wider text-zinc-100 truncate">
                                     Inspekcja Wpisu Audytowego
                                 </h2>
-                                <span
-                                    className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${getActionBadgeClass(
-                                        log.action_color
-                                    )}`}
-                                    data-testid="audit-modal-action-badge"
-                                >
-                                    {log.action_label || log.action}
-                                </span>
+                                <AuditActionBadge
+                                    action={log.action}
+                                    label={log.action_label}
+                                    color={log.action_color}
+                                    category={log.action_category}
+                                    testId="audit-modal-action-badge"
+                                />
                             </div>
                             <div className="flex items-center gap-3 text-[10px] text-zinc-500 mt-0.5 truncate">
                                 <span className="flex items-center gap-1 text-zinc-400">

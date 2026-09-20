@@ -367,7 +367,7 @@ npm test
   - Testy komponentów w `AuditLogsView.test.jsx` dla zakładki finansowej, przełączania VDR, filtrów i modalu.
 - [ ] **Faza 31: Testy Integracyjne, Bezpieczeństwo i Dokumentacja**
   - [x] Testy integracyjne E2E dla filtrowania zdarzeń audytowych według akcji usunięcia, modyfikacji i importu CSV.
-  - [ ] Harmonizacja palety kolorów badge'y i mapowania ikon w kategoriach audytowych.
+  - [x] Harmonizacja palety kolorów badge'y i mapowania ikon w kategoriach audytowych.
   - [ ] Weryfikacja izolacji najemcy (tenant isolation) przy przełączaniu spółek przez DealContext.
   - [ ] Testy regresji weryfikujące paginację i filtrowanie audytu dokumentów VDR.
   - [ ] Aktualizacja dokumentacji systemu audytu i przewodnika po zrzutach JSON w changelogu.

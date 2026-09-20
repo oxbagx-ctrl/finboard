@@ -15,6 +15,7 @@ import {
     FileText
 } from 'lucide-react';
 import { formatDateTime } from '../../utils/formatters';
+import { AuditActionBadge } from '../audit/AuditActionBadge';
 
 export const DocumentAuditModal = ({
     document,
@@ -45,44 +46,7 @@ export const DocumentAuditModal = ({
 
     if (!isOpen || !document) return null;
 
-    const getActionBadge = (action) => {
-        switch (action) {
-            case 'upload':
-                return (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-950/60 border border-emerald-800 text-emerald-300">
-                        <UploadCloud className="w-3 h-3" />
-                        Upload
-                    </span>
-                );
-            case 'download':
-                return (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-blue-950/60 border border-blue-800 text-blue-300">
-                        <DownloadCloud className="w-3 h-3" />
-                        Pobranie
-                    </span>
-                );
-            case 'archive':
-                return (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-amber-950/60 border border-amber-800 text-amber-300">
-                        <Archive className="w-3 h-3" />
-                        Archiwizacja
-                    </span>
-                );
-            case 'unarchive':
-                return (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-zinc-800 border border-zinc-700 text-zinc-200">
-                        <RotateCcw className="w-3 h-3" />
-                        Przywrócenie
-                    </span>
-                );
-            default:
-                return (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-zinc-850 border border-zinc-750 text-zinc-300">
-                        {action}
-                    </span>
-                );
-        }
-    };
+    const getActionBadge = (action) => <AuditActionBadge action={action} />;
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-xs font-mono">
