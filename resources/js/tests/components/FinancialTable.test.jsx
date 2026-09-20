@@ -146,9 +146,43 @@ describe('FinancialTable Component', () => {
         expect(deductionIndicator).toBeInTheDocument();
         expect(deductionIndicator).toHaveAttribute('title', 'Pozycja pomniejszająca wynik');
 
-        // Verify the deduction row has proper indentation class pl-6
+        // Verify the deduction row has uniform baseline padding px-4 without pl-6 deduction indent
         const cogsCell = cogsLabel.closest('td');
-        expect(cogsCell.className).toContain('pl-6');
+        expect(cogsCell.className).toContain('px-4');
+        expect(cogsCell.className).not.toContain('pl-6');
+    });
+
+    it('asserts strict vertical alignment across all top-level line items (1-9)', () => {
+        const completePnlData = [
+            { id: '1', label: '1. Przychody ze Sprzedaży (Total Revenue)', code: 'REV-TOT', amount: 1000000, isGroup: true, children: [{ id: '1a', label: 'Sub 1', amount: 500000 }, { id: '1b', label: 'Sub 2', amount: 500000 }] },
+            { id: '2', label: '2. Koszt Wytworzenia Sprzedanych Produktów (COGS)', code: 'COGS', amount: 500000, isDeduction: true },
+            { id: '3', label: '3. ZYSK BRUTTO ZE SPRZEDAŻY (GROSS PROFIT)', code: 'GP', amount: 500000, isSummary: true },
+            { id: '4', label: '4. Koszty Działalności Operacyjnej (OPEX)', code: 'OPEX', amount: 200000, isGroup: true, isDeduction: true, children: [{ id: '4a', label: 'Sub 3', amount: 200000 }] },
+            { id: '5', label: '5. WYNIK OPERACYJNY EBITDA', code: 'EBITDA', amount: 300000, isSummary: true },
+            { id: '6', label: '6. Amortyzacja Rzeczowa i Niematerialna (D&A)', code: 'D&A', amount: 50000, isDeduction: true },
+            { id: '7', label: '7. ZYSK OPERACYJNY (EBIT)', code: 'EBIT', amount: 250000, isSummary: true },
+            { id: '8', label: '8. Podatek Dochodowy od Osób Prawnych (CIT)', code: 'CIT', amount: 47500, isDeduction: true },
+            { id: '9', label: '9. ZYSK NETTO OKRESU (NET PROFIT / EAT)', code: 'EAT', amount: 202500, isSummary: true, isFinalResult: true },
+        ];
+
+        render(
+            <FinancialTable
+                data={completePnlData}
+                currency="PLN"
+                revenueTotal={1000000}
+            />
+        );
+
+        // Every single top-level row (1-9) must share uniform px-4 padding and no indentation offsets
+        for (let i = 1; i <= 9; i++) {
+            const rowLabel = screen.getByText(new RegExp(`^${i}\\. `));
+            const cell = rowLabel.closest('td');
+            expect(cell).toBeInTheDocument();
+            expect(cell.className).toContain('px-4');
+            expect(cell.className).not.toContain('pl-6');
+            expect(cell.className).not.toContain('pl-8');
+            expect(cell.className).not.toContain('pl-10');
+        }
     });
 
     it('toggles expandable multi-category group rows on click and displays chevron only for >1 children', () => {
