@@ -685,4 +685,48 @@ final class FinancialAnalyticsApiTest extends TestCase
             $this->assertNotNull($item['amount_change']);
         }
     }
+
+    public function test_comparative_data_consistency_between_metrics_dynamics_and_category_breakdown(): void
+    {
+        Sanctum::actingAs($this->clientUser);
+
+        // 1. Query metrics dynamics for Q1 2026
+        $dynamicsResponse = $this->getJson('/api/v1/finance/analytics/dynamics?start_date=2026-01-01&end_date=2026-03-31');
+        $dynamicsResponse->assertStatus(200);
+        $dynamicsData = $dynamicsResponse->json('data');
+
+        $dynamicsOpexGrowth = (float) $dynamicsData['yoy']['opex_growth_pct'];
+        $dynamicsRevGrowth = (float) $dynamicsData['yoy']['revenue_growth_pct'];
+
+        // 2. Query category breakdown for OPEX with YoY
+        $opexBreakdownResponse = $this->getJson('/api/v1/finance/analytics/breakdown?category_type=OPEX&start_date=2026-01-01&end_date=2026-03-31&include_yoy=true');
+        $opexBreakdownResponse->assertStatus(200);
+        $opexBreakdownData = $opexBreakdownResponse->json('data');
+
+        $totalOpexCurrent = 0.0;
+        $totalOpexPrevious = 0.0;
+        foreach ($opexBreakdownData as $item) {
+            $totalOpexCurrent += (float) $item['amount'];
+            $totalOpexPrevious += (float) $item['previous_amount'];
+        }
+
+        $calculatedOpexGrowth = round((($totalOpexCurrent - $totalOpexPrevious) / $totalOpexPrevious) * 100, 2);
+        // Both aggregate and sum of subcategories should exhibit identical YoY growth direction and magnitude
+        $this->assertEqualsWithDelta($dynamicsOpexGrowth, $calculatedOpexGrowth, 0.05);
+
+        // 3. Query category breakdown for REVENUE with YoY
+        $revBreakdownResponse = $this->getJson('/api/v1/finance/analytics/breakdown?record_type=REVENUE&start_date=2026-01-01&end_date=2026-03-31&include_yoy=true');
+        $revBreakdownResponse->assertStatus(200);
+        $revBreakdownData = $revBreakdownResponse->json('data');
+
+        $totalRevCurrent = 0.0;
+        $totalRevPrevious = 0.0;
+        foreach ($revBreakdownData as $item) {
+            $totalRevCurrent += (float) $item['amount'];
+            $totalRevPrevious += (float) $item['previous_amount'];
+        }
+
+        $calculatedRevGrowth = round((($totalRevCurrent - $totalRevPrevious) / $totalRevPrevious) * 100, 2);
+        $this->assertEqualsWithDelta($dynamicsRevGrowth, $calculatedRevGrowth, 0.05);
+    }
 }
