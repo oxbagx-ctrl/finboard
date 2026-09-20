@@ -4,7 +4,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { DashboardView } from '../../views/DashboardView';
 import { NotificationProvider } from '../../context/NotificationContext';
 import { AuthContext } from '../../context/AuthContext';
-import { DealProvider } from '../../context/DealContext';
+import { DealProvider, useDeal } from '../../context/DealContext';
 import apiClient from '../../api/client';
 
 // Mock apiClient
@@ -471,5 +471,98 @@ describe('DashboardView Component', () => {
         fireEvent.click(opexGroupRow);
         const reexpandedSalRow = Array.from(pnlTable.querySelectorAll("tr")).find(tr => tr.textContent.includes("Wynagrodzenia i świadczenia"));
         expect(reexpandedSalRow).toBeInTheDocument();
+    });
+
+    it('verifies pixel-perfect P&L hierarchy and vertical alignment after year and company switches', async () => {
+        const InteractiveWrapper = () => {
+            const { setSelectedYear } = useDeal();
+            return (
+                <div>
+                    <div data-testid="test-controls">
+                        <button data-testid="btn-switch-2025" onClick={() => setSelectedYear('2025')}>
+                            Switch 2025
+                        </button>
+                        <button data-testid="btn-switch-all" onClick={() => setSelectedYear('all')}>
+                            Switch All
+                        </button>
+                    </div>
+                    <DashboardView />
+                </div>
+            );
+        };
+
+        render(
+            <NotificationProvider>
+                <AuthContext.Provider
+                    value={{
+                        user: { id: 'u1', name: 'Jan CFO', role: 'client' },
+                        activeCompany: mockCompany,
+                        isAdmin: false,
+                        isSuperAdmin: false,
+                        isAdvisor: false,
+                        isClient: true,
+                    }}
+                >
+                    <DealProvider>
+                        <InteractiveWrapper />
+                    </DealProvider>
+                </AuthContext.Provider>
+            </NotificationProvider>
+        );
+
+        await waitFor(() => {
+            expect(screen.getByText('Rachunek Zysków i Strat (P&L Konsolidowany)')).toBeInTheDocument();
+        });
+
+        // Helper to check pixel-perfect uniform padding and absence of ragged indentation
+        const verifyStrictTopLevelAlignment = () => {
+            for (let i = 1; i <= 9; i++) {
+                const label = screen.getByText(new RegExp(`^${i}\\. `));
+                const cell = label.closest('td');
+                expect(cell).toBeInTheDocument();
+                expect(cell.className).toContain('px-4');
+                expect(cell.className).not.toContain('pl-6');
+                expect(cell.className).not.toContain('pl-8');
+                expect(cell.className).not.toContain('pl-10');
+            }
+        };
+
+        // 1. Initial render verification
+        verifyStrictTopLevelAlignment();
+
+        // 2. Switch fiscal year to 2025
+        fireEvent.click(screen.getByTestId('btn-switch-2025'));
+
+        await waitFor(() => {
+            expect(apiClient.get).toHaveBeenCalledWith(
+                '/finance/analytics/metrics',
+                expect.objectContaining({
+                    params: expect.objectContaining({
+                        start_date: '2025-01-01',
+                        end_date: '2025-12-31',
+                    }),
+                })
+            );
+        });
+
+        // Verify hierarchy remains intact and pixel-perfect after year change
+        verifyStrictTopLevelAlignment();
+
+        // 3. Trigger company switch event
+        window.dispatchEvent(new CustomEvent('finboard:company-changed'));
+
+        await waitFor(() => {
+            expect(screen.getByText('Rachunek Zysków i Strat (P&L Konsolidowany)')).toBeInTheDocument();
+        });
+
+        // Verify hierarchy remains intact and pixel-perfect after company switch
+        verifyStrictTopLevelAlignment();
+
+        // 4. Verify deduction markers remain aligned without breaking left coordinate
+        const markers = screen.getAllByText('(-)');
+        expect(markers.length).toBeGreaterThanOrEqual(3);
+        markers.forEach(m => {
+            expect(m).toHaveAttribute('title', 'Pozycja pomniejszająca wynik');
+        });
     });
 });

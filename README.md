@@ -333,7 +333,7 @@ npm test
   - [x] Synchronizacja styli `ExecutivePdfReport` z ujednoliconą siatką tabeli `FinancialTable`.
   - [x] Weryfikacja stabelaryzowanego wyrównania liczb monospace o wysokiej gęstości w `FinancialValue` dla wierszy potrąceń.
   - [x] Aktualizacja testów komponentu `ExecutivePdfReport` dla spójnej hierarchii wierszy P&L i czystej typografii.
-  - [ ] Testy regresyjne E2E w `DashboardView.test.jsx` po przełączeniu roku i firmy.
+  - [x] Testy regresyjne E2E w `DashboardView.test.jsx` po przełączeniu roku i firmy.
   - [ ] Aktualizacja dokumentacji design systemu UI i changeloga pod kątem instytucjonalnych standardów tabelarycznych P&L.
 
 ---
