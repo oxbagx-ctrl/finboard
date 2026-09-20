@@ -32,7 +32,7 @@ final class GetCategoryBreakdownHandler
     public function handle(GetCategoryBreakdownQuery $query): array
     {
         $currency = Currency::from($query->currency);
-        $filterType = RecordType::tryFrom(strtoupper($query->recordType));
+        $filterType = RecordType::tryFrom(strtolower(trim((string) $query->recordType)));
 
         $allowedCategoryTypes = [];
         if ($query->categoryType !== null && trim($query->categoryType) !== '') {
