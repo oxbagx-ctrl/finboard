@@ -129,6 +129,28 @@ const getPillCountBadgeClasses = (pill, isActive) => {
     }
 };
 
+const getFinanceActionBadgeClass = (color) => {
+    switch (color) {
+        case 'emerald':
+            return 'bg-emerald-950/70 border-emerald-800 text-emerald-300';
+        case 'blue':
+            return 'bg-blue-950/70 border-blue-800 text-blue-300';
+        case 'rose':
+        case 'red':
+            return 'bg-rose-950/70 border-rose-800 text-rose-300';
+        case 'amber':
+            return 'bg-amber-950/70 border-amber-800 text-amber-300';
+        case 'indigo':
+            return 'bg-indigo-950/70 border-indigo-800 text-indigo-300';
+        case 'cyan':
+            return 'bg-cyan-950/70 border-cyan-800 text-cyan-300';
+        case 'violet':
+            return 'bg-violet-950/70 border-violet-800 text-violet-300';
+        default:
+            return 'bg-zinc-800/80 border-zinc-700 text-zinc-300';
+    }
+};
+
 export const AuditLogsView = () => {
     const { activeCompany } = useAuth();
     const { error } = useNotification();
@@ -565,13 +587,118 @@ export const AuditLogsView = () => {
                         </div>
                     </div>
 
-                    {/* Placeholder container for Commit 146 */}
-                    <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6 text-center text-zinc-400 font-mono text-xs">
-                        <Activity className="w-8 h-8 mx-auto text-emerald-400 mb-2 opacity-80" />
-                        <div className="text-zinc-200 font-bold text-sm">Eksplorator Transakcji Finansowych</div>
-                        <div className="text-[11px] text-zinc-500 mt-1">
-                            Aktywna spółka: {activeCompany?.name || 'Brak'} ({activeCompany?.code || 'PODMIOT'})
-                        </div>
+                    {/* Financial Audit Table */}
+                    <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden shadow-xl font-mono text-xs">
+                        {financeLoading ? (
+                            <div className="p-12 text-center text-zinc-500" data-testid="finance-audit-loading">
+                                <RefreshCw className="w-6 h-6 border-2 border-zinc-600 border-t-emerald-400 rounded-full animate-spin mx-auto mb-2" />
+                                Pobieranie rejestru transakcji finansowych...
+                            </div>
+                        ) : financeLogs.length === 0 ? (
+                            <div className="p-12 text-center text-zinc-500" data-testid="finance-audit-empty">
+                                <ShieldCheck className="w-10 h-10 mx-auto text-zinc-600 mb-2 opacity-80" />
+                                <div className="text-zinc-300 font-bold">Brak zdarzeń audytowych w wybranym zakresie</div>
+                                <div className="text-[10px] text-zinc-500 mt-1">
+                                    Wszystkie operacje finansowe, modyfikacje i importy pojawią się w tym rejestrze w czasie rzeczywistym.
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left border-collapse" data-testid="finance-audit-table">
+                                    <thead>
+                                        <tr className="bg-zinc-950 border-b border-zinc-800 text-[10px] text-zinc-400 uppercase tracking-wider">
+                                            <th className="py-2.5 px-4 font-semibold w-44">Sygnatura Czasowa (CET)</th>
+                                            <th className="py-2.5 px-3 font-semibold w-36">Zdarzenie / Akcja</th>
+                                            <th className="py-2.5 px-4 font-semibold">Opis & Zasób</th>
+                                            <th className="py-2.5 px-3 font-semibold w-56">Operator</th>
+                                            <th className="py-2.5 px-3 font-semibold w-36">Adres IP</th>
+                                            <th className="py-2.5 px-4 font-semibold w-28 text-right">Akcje</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-zinc-850">
+                                        {financeLogs.map((log) => (
+                                            <tr
+                                                key={log.id}
+                                                className="hover:bg-zinc-850/40 transition-colors"
+                                                data-testid={`finance-audit-row-${log.id}`}
+                                            >
+                                                {/* Timestamp */}
+                                                <td className="py-2.5 px-4 whitespace-nowrap text-zinc-300 tabular-nums">
+                                                    <div className="flex items-center gap-1.5">
+                                                        <Clock className="w-3 h-3 text-zinc-500 shrink-0" />
+                                                        <span>{formatDateTime(log.created_at)}</span>
+                                                    </div>
+                                                </td>
+
+                                                {/* Action Badge */}
+                                                <td className="py-2.5 px-3 whitespace-nowrap">
+                                                    <span
+                                                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${getFinanceActionBadgeClass(
+                                                            log.action_color
+                                                        )}`}
+                                                    >
+                                                        {log.action_label || log.action}
+                                                    </span>
+                                                </td>
+
+                                                {/* Description & Entity */}
+                                                <td className="py-2.5 px-4">
+                                                    <div className="font-medium text-zinc-200 truncate max-w-md" title={log.description}>
+                                                        {log.description || 'Brak opisu operacji'}
+                                                    </div>
+                                                    <div className="text-[10px] text-zinc-500 flex items-center gap-2 mt-0.5">
+                                                        <span>
+                                                            Encja: <strong className="text-zinc-400 font-mono">{log.entity_type || 'N/A'}</strong>
+                                                        </span>
+                                                        {log.entity_id && (
+                                                            <span>
+                                                                ID: <strong className="text-zinc-400 font-mono">#{log.entity_id}</strong>
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </td>
+
+                                                {/* Operator */}
+                                                <td className="py-2.5 px-3 whitespace-nowrap">
+                                                    <div className="font-semibold text-zinc-200 flex items-center gap-1">
+                                                        <User className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
+                                                        <span className="truncate max-w-[130px]">{log.user?.name || 'Automat / System'}</span>
+                                                        <span className="text-[10px] text-zinc-500 font-normal">
+                                                            [{log.user?.role || 'SYSTEM'}]
+                                                        </span>
+                                                    </div>
+                                                    <div className="text-[10px] text-zinc-500 truncate max-w-[160px]">
+                                                        {log.user?.email || '—'}
+                                                    </div>
+                                                </td>
+
+                                                {/* IP Address */}
+                                                <td className="py-2.5 px-3 whitespace-nowrap text-zinc-400">
+                                                    <div className="flex items-center gap-1.5">
+                                                        <Globe className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
+                                                        <span className="font-mono text-[11px]">{log.ip_address || '—'}</span>
+                                                    </div>
+                                                </td>
+
+                                                {/* Actions */}
+                                                <td className="py-2.5 px-4 text-right whitespace-nowrap">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleOpenDetailModal(log)}
+                                                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 text-xs font-medium transition-colors cursor-pointer"
+                                                        data-testid={`audit-row-inspect-${log.id}`}
+                                                        title="Podgląd szczegółów i snapshotów JSON"
+                                                    >
+                                                        <Eye className="w-3.5 h-3.5 text-emerald-400" />
+                                                        <span>Szczegóły</span>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
                     </div>
                 </div>
             )}
