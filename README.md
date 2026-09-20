@@ -1,10 +1,11 @@
 # FinBoard – Financial Analytics & Virtual Data Room Platform
 
-[![PHP Version](https://img.shields.io/badge/php-8.2%2B-blue.svg)](https://www.php.net/)\n[![Laravel](https://img.shields.io/badge/laravel-11.x-red.svg)](https://laravel.com/)
+[![PHP Version](https://img.shields.io/badge/php-8.2%2B-blue.svg)](https://www.php.net/)
+[![Laravel](https://img.shields.io/badge/laravel-11.x-red.svg)](https://laravel.com/)
 [![PostgreSQL](https://img.shields.io/badge/postgresql-16-blue.svg)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/redis-alpine-red.svg)](https://redis.io/)
 [![Architecture](https://img.shields.io/badge/architecture-DDD%20%2F%20CQRS-brightgreen.svg)]()
-[![Tests](https://img.shields.io/badge/tests-369%20backend%20%7C%20141%20frontend%20passed-success.svg)]()
+[![Tests](https://img.shields.io/badge/tests-369%20backend%20%7C%20146%20frontend%20passed-success.svg)]()
 
 FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakcyjnego (M&A, Due Diligence, Corporate Finance) oraz ich klientom (CFO, Zarządy). Aplikacja łączy w sobie zaawansowaną analitykę finansową w ujęciu wielo-najemcowym (Multi-Tenant) z bezpiecznym repozytorium dokumentów Virtual Data Room (VDR).
 
@@ -125,7 +126,7 @@ docker compose exec app ./vendor/bin/phpunit
 ```
 
 ### Testy Frontendowe (Vitest)
-Pakiet 141 testów jednostkowych i integracyjnych dla komponentów React, kontekstu transakcyjnego, walidacji danych, kalkulatorów walutowych oraz konfiguratora celów benchmarkowych:
+Pakiet 146 testów jednostkowych i integracyjnych dla komponentów React, kontekstu transakcyjnego, walidacji danych, kalkulatorów walutowych, konfiguratora celów benchmarkowych oraz przepływów integracyjnych E2E:
 ```bash
 npm test
 ```
@@ -228,7 +229,7 @@ npm test
   - Testy E2E, audyt bezpieczeństwa izolacji multi-tenant i endpoint diagnostyczny Health Check.
   - Produkcyjny hardening środowiska Docker/Nginx, skrypt automatycznego wdrożenia zero-downtime oraz Runbook operacyjny.
 - [x] **Faza 8: Rozbudowa Autoryzacji i Struktury Firm**
-  - Aktualizacja encji `Role` i enumów dla trójpoziomowej hierarchii uprawnie (SuperAdmin, Advisor, Client).
+  - Aktualizacja encji `Role` i enumów dla trójpoziomowej hierarchii uprawnień (SuperAdmin, Advisor, Client).
   - Implementacja logiki domenowej relacji przypisania doradcy do firmy (`CompanyAdvisorAssignment`, `CompanyAdvisorRepositoryInterface`).
   - Migracja bazy danych dla tabeli pośredniej `advisor_company` i aktualizacja powiązań.
   - Implementacja przypadku użycia `AssignAdvisorToCompanyUseCase` ze ścisłą weryfikacją autoryzacji.
@@ -280,12 +281,12 @@ npm test
   - Testy jednostkowe serializacji `FinancialMetrics` i ewaluacji wskaźników brzegowych.
   - Refaktoryzacja `DashboardView` i `FinancialMultiplesStrip` pod ujednolicony kontrakt wskaźników.
   - Wprowadzenie estetycznych stanów fallback ("—") dla brakujących danych bilansowych.
-- [ ] **Faza 17: Precyzja Dynamiki R/R i Optymalizacja Prezentacji Finansowej**
+- [x] **Faza 17: Precyzja Dynamiki R/R i Optymalizacja Prezentacji Finansowej**
   - [x] Analiza i rozszerzenie obliczeń dynamiki rok-do-roku (YoY) w `CalculateFinancialDynamicsQuery`.
   - [x] Poprawa `PercentageBadge` i `FinancialTable` pod kątem rozróżnienia braku danych (`null`) od wzrostu `0.0%`.
   - [x] Standaryzacja hierarchii i formatowania wierszy w zestawieniu Rachunku Zysków i Strat (P&L Table).
   - [x] Testy jednostkowe i integracyjne dla precyzji obliczeń dynamiki oraz weryfikacji stanów brzegowych.
-  - [ ] Weryfikacja spójności całego pulpitu zarządczego (Executive Overview) oraz generowanie pełnego buildu produkcyjnego.
+  - [x] Weryfikacja spójności całego pulpitu zarządczego (Executive Overview) oraz generowanie pełnego buildu produkcyjnego.
 
 ---
 
