@@ -1,11 +1,10 @@
 # FinBoard – Financial Analytics & Virtual Data Room Platform
 
-[![PHP Version](https://img.shields.io/badge/php-8.2%2B-blue.svg)](https://www.php.net/)
-[![Laravel](https://img.shields.io/badge/laravel-11.x-red.svg)](https://laravel.com/)
+[![PHP Version](https://img.shields.io/badge/php-8.2%2B-blue.svg)](https://www.php.net/)\n[![Laravel](https://img.shields.io/badge/laravel-11.x-red.svg)](https://laravel.com/)
 [![PostgreSQL](https://img.shields.io/badge/postgresql-16-blue.svg)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/redis-alpine-red.svg)](https://redis.io/)
 [![Architecture](https://img.shields.io/badge/architecture-DDD%20%2F%20CQRS-brightgreen.svg)]()
-[![Tests](https://img.shields.io/badge/tests-362%20backend%20%7C%20140%20frontend%20passed-success.svg)]()
+[![Tests](https://img.shields.io/badge/tests-369%20backend%20%7C%20141%20frontend%20passed-success.svg)]()
 
 FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakcyjnego (M&A, Due Diligence, Corporate Finance) oraz ich klientom (CFO, Zarządy). Aplikacja łączy w sobie zaawansowaną analitykę finansową w ujęciu wielo-najemcowym (Multi-Tenant) z bezpiecznym repozytorium dokumentów Virtual Data Room (VDR).
 
@@ -120,13 +119,13 @@ Pulpit Mailpit (podgląd e-maili deweloperskich): `http://localhost:8025`.
 ## 🧪 Uruchamianie Testów
 
 ### Testy Backendowe (PHPUnit)
-Pakiet 362 testów jednostkowych i integracyjnych pokrywających warstwę domenową (DDD), zapytania CQRS, repozytoria, kalkulacje matematyczne `Money`, importy CSV, autoryzację wielonajemcową, system zaproszeń, logi audytowe oraz API benchmarków i analityki:
+Pakiet 369 testów jednostkowych i integracyjnych pokrywających warstwę domenową (DDD), zapytania CQRS, repozytoria, kalkulacje matematyczne `Money`, importy CSV, autoryzację wielonajemcową, system zaproszeń, logi audytowe oraz API benchmarków i analityki:
 ```bash
 docker compose exec app ./vendor/bin/phpunit
 ```
 
 ### Testy Frontendowe (Vitest)
-Pakiet 140 testów jednostkowych i integracyjnych dla komponentów React, kontekstu transakcyjnego, walidacji danych, kalkulatorów walutowych oraz konfiguratora celów benchmarkowych:
+Pakiet 141 testów jednostkowych i integracyjnych dla komponentów React, kontekstu transakcyjnego, walidacji danych, kalkulatorów walutowych oraz konfiguratora celów benchmarkowych:
 ```bash
 npm test
 ```
@@ -285,7 +284,7 @@ npm test
   - [x] Analiza i rozszerzenie obliczeń dynamiki rok-do-roku (YoY) w `CalculateFinancialDynamicsQuery`.
   - [x] Poprawa `PercentageBadge` i `FinancialTable` pod kątem rozróżnienia braku danych (`null`) od wzrostu `0.0%`.
   - [x] Standaryzacja hierarchii i formatowania wierszy w zestawieniu Rachunku Zysków i Strat (P&L Table).
-  - [ ] Testy jednostkowe i integracyjne dla precyzji obliczeń dynamiki oraz weryfikacji stanów brzegowych.
+  - [x] Testy jednostkowe i integracyjne dla precyzji obliczeń dynamiki oraz weryfikacji stanów brzegowych.
   - [ ] Weryfikacja spójności całego pulpitu zarządczego (Executive Overview) oraz generowanie pełnego buildu produkcyjnego.
 
 ---

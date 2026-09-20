@@ -369,4 +369,73 @@ final class FinancialAnalyticsApiTest extends TestCase
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['end_date']);
     }
+
+    public function test_get_financial_dynamics_returns_yoy_and_mom_calculations(): void
+    {
+        Sanctum::actingAs($this->clientUser);
+
+        $response = $this->getJson('/api/v1/finance/analytics/dynamics');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('status', 'success')
+            ->assertJsonPath('company_id', $this->acmeCompany->id)
+            ->assertJsonStructure([
+                'status',
+                'company_id',
+                'data' => [
+                    'company_id',
+                    'metrics',
+                    'period',
+                    'previous_year_period',
+                    'previous_year_metrics',
+                    'previous_month_period',
+                    'previous_month_metrics',
+                    'yoy' => [
+                        'revenue_growth_pct',
+                        'cogs_growth_pct',
+                        'gross_profit_growth_pct',
+                        'ebitda_growth_pct',
+                        'ebit_growth_pct',
+                        'net_profit_growth_pct',
+                        'opex_growth_pct',
+                        'revenue_diff_amount',
+                    ],
+                    'mom' => [
+                        'revenue_growth_pct',
+                        'revenue_diff_amount',
+                    ],
+                ],
+            ]);
+    }
+
+    public function test_get_financial_dynamics_with_explicit_date_range(): void
+    {
+        Sanctum::actingAs($this->clientUser);
+
+        $response = $this->getJson('/api/v1/finance/analytics/dynamics?start_date=2026-01-01&end_date=2026-03-31');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('status', 'success')
+            ->assertJsonPath('data.period.start', '2026-01-01')
+            ->assertJsonPath('data.period.end', '2026-03-31');
+    }
+
+    public function test_admin_can_query_dynamics_for_specific_company(): void
+    {
+        Sanctum::actingAs($this->adminUser);
+
+        $response = $this->getJson('/api/v1/finance/analytics/dynamics?company_id=' . $this->acmeCompany->id);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('company_id', $this->acmeCompany->id);
+    }
+
+    public function test_client_cannot_query_dynamics_for_another_company(): void
+    {
+        Sanctum::actingAs($this->clientUser);
+
+        $response = $this->getJson('/api/v1/finance/analytics/dynamics?company_id=' . $this->helvestCompany->id);
+
+        $response->assertStatus(403);
+    }
 }

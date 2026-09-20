@@ -116,6 +116,163 @@ final class CalculateFinancialDynamicsHandlerTest extends TestCase
         $this->assertNotNull($array['previous_month_metrics']);
     }
 
+    public function test_handler_calculates_all_pnl_variance_fields_including_ebitda_ebit_and_net_profit(): void
+    {
+        // 2026-01: Rev: 300k, COGS: 120k -> GP: 180k; OPEX: 60k -> EBITDA: 120k; DEP: 20k -> EBIT: 100k; TAX: 19k -> Net: 81k
+        $currentRecords = [
+            $this->makeRecord(Category::revenue(), '300000.0000', '2026-01-10'),
+            $this->makeRecord(Category::cogs(), '120000.0000', '2026-01-15'),
+            $this->makeRecord(Category::opex(), '60000.0000', '2026-01-20'),
+            $this->makeRecord(Category::depreciation(), '20000.0000', '2026-01-25'),
+            $this->makeRecord(Category::tax(), '19000.0000', '2026-01-28'),
+        ];
+
+        // 2025-01: Rev: 200k, COGS: 100k -> GP: 100k; OPEX: 50k -> EBITDA: 50k; DEP: 10k -> EBIT: 40k; TAX: 7.6k -> Net: 32.4k
+        $prevYearRecords = [
+            $this->makeRecord(Category::revenue(), '200000.0000', '2025-01-10'),
+            $this->makeRecord(Category::cogs(), '100000.0000', '2025-01-15'),
+            $this->makeRecord(Category::opex(), '50000.0000', '2025-01-20'),
+            $this->makeRecord(Category::depreciation(), '10000.0000', '2025-01-25'),
+            $this->makeRecord(Category::tax(), '7600.0000', '2025-01-28'),
+        ];
+
+        $this->repositoryMock->expects($this->exactly(3))
+            ->method('findByCompanyId')
+            ->willReturnCallback(function (string $companyId, ?DateRange $period) use ($currentRecords, $prevYearRecords): array {
+                if ($period === null) {
+                    return [];
+                }
+                $ym = $period->startDate()->format('Y-m');
+                if ($ym === '2026-01') {
+                    return $currentRecords;
+                }
+                if ($ym === '2025-01') {
+                    return $prevYearRecords;
+                }
+                return [];
+            });
+
+        $query = new CalculateFinancialDynamicsQuery(
+            companyId: self::COMPANY_ID,
+            startDate: '2026-01-01',
+            endDate: '2026-01-31',
+            currency: 'PLN'
+        );
+
+        $result = $this->handler->handle($query);
+
+        // GP: Current 180k, Prev 100k -> +80.0%
+        $this->assertSame(80.0, $result->yoy['gross_profit_growth_pct']);
+        $this->assertSame(80000.0, $result->yoy['gross_profit_diff_amount']);
+
+        // EBITDA: Current 120k, Prev 50k -> +140.0%
+        $this->assertSame(140.0, $result->yoy['ebitda_growth_pct']);
+        $this->assertSame(70000.0, $result->yoy['ebitda_diff_amount']);
+
+        // EBIT: Current 100k, Prev 40k -> +150.0%
+        $this->assertSame(150.0, $result->yoy['ebit_growth_pct']);
+        $this->assertSame(60000.0, $result->yoy['ebit_diff_amount']);
+
+        // D&A: Current 20k, Prev 10k -> +100.0%
+        $this->assertSame(100.0, $result->yoy['depreciation_growth_pct']);
+
+        // Net Profit: Current 81k, Prev 32.4k -> (81 - 32.4) / 32.4 = +150.0%
+        $this->assertSame(150.0, $result->yoy['net_profit_growth_pct']);
+        $this->assertSame(48600.0, $result->yoy['net_profit_diff_amount']);
+    }
+
+    public function test_handler_calculates_balance_sheet_ratio_variances_when_balance_records_exist(): void
+    {
+        // 2026-01: Cash: 150k, Rec: 50k, Inv: 40k -> CA = 240k; CL = 120k -> CR = 2.0, QR = 1.6667
+        $currentRecords = [
+            $this->makeRecord(Category::cash(), '150000.0000', '2026-01-31'),
+            $this->makeRecord(Category::receivables(), '50000.0000', '2026-01-31'),
+            $this->makeRecord(Category::inventory(), '40000.0000', '2026-01-31'),
+            $this->makeRecord(Category::currentLiabilities(), '120000.0000', '2026-01-31'),
+        ];
+
+        // 2025-01: Cash: 100k, Rec: 20k, Inv: 30k -> CA = 150k; CL = 100k -> CR = 1.5, QR = 1.2
+        $prevYearRecords = [
+            $this->makeRecord(Category::cash(), '100000.0000', '2025-01-31'),
+            $this->makeRecord(Category::receivables(), '20000.0000', '2025-01-31'),
+            $this->makeRecord(Category::inventory(), '30000.0000', '2025-01-31'),
+            $this->makeRecord(Category::currentLiabilities(), '100000.0000', '2025-01-31'),
+        ];
+
+        $this->repositoryMock->expects($this->exactly(3))
+            ->method('findByCompanyId')
+            ->willReturnCallback(function (string $companyId, ?DateRange $period) use ($currentRecords, $prevYearRecords): array {
+                if ($period === null) {
+                    return [];
+                }
+                $ym = $period->startDate()->format('Y-m');
+                if ($ym === '2026-01') {
+                    return $currentRecords;
+                }
+                if ($ym === '2025-01') {
+                    return $prevYearRecords;
+                }
+                return [];
+            });
+
+        $query = new CalculateFinancialDynamicsQuery(
+            companyId: self::COMPANY_ID,
+            startDate: '2026-01-01',
+            endDate: '2026-01-31',
+            currency: 'PLN'
+        );
+
+        $result = $this->handler->handle($query);
+
+        // CR diff: 2.0 - 1.5 = +0.5000
+        $this->assertSame(0.5, $result->yoy['current_ratio_diff']);
+        // QR diff: 1.6667 - 1.2000 = +0.4667
+        $this->assertEqualsWithDelta(0.4667, (float) $result->yoy['quick_ratio_diff'], 0.001);
+    }
+
+    public function test_handler_safely_handles_zero_base_in_previous_period(): void
+    {
+        // 2026-01: Rev: 100k
+        $currentRecords = [
+            $this->makeRecord(Category::revenue(), '100000.0000', '2026-01-15'),
+        ];
+
+        // 2025-01: No revenue, only 0 balance or empty
+        $prevYearRecords = [
+            $this->makeRecord(Category::cash(), '50000.0000', '2025-01-15'),
+        ];
+
+        $this->repositoryMock->expects($this->exactly(3))
+            ->method('findByCompanyId')
+            ->willReturnCallback(function (string $companyId, ?DateRange $period) use ($currentRecords, $prevYearRecords): array {
+                if ($period === null) {
+                    return [];
+                }
+                $ym = $period->startDate()->format('Y-m');
+                if ($ym === '2026-01') {
+                    return $currentRecords;
+                }
+                if ($ym === '2025-01') {
+                    return $prevYearRecords;
+                }
+                return [];
+            });
+
+        $query = new CalculateFinancialDynamicsQuery(
+            companyId: self::COMPANY_ID,
+            startDate: '2026-01-01',
+            endDate: '2026-01-31',
+            currency: 'PLN'
+        );
+
+        $result = $this->handler->handle($query);
+
+        // Previous year revenue was 0, so growth pct must be null to avoid division by zero
+        $this->assertNull($result->yoy['revenue_growth_pct']);
+        // Absolute diff is calculated: 100k - 0 = 100k
+        $this->assertSame(100000.0, $result->yoy['revenue_diff_amount']);
+    }
+
     public function test_handler_derives_dynamic_period_when_dates_are_omitted(): void
     {
         $currentRecords = [

@@ -353,4 +353,43 @@ describe('DashboardView Component', () => {
         expect(screen.getByText('Jan CFO')).toBeInTheDocument();
         expect(screen.getByText('Dodano zapis księgowy przychodów SLA')).toBeInTheDocument();
     });
+
+    it('renders standardized P&L financial table with full PSR/MSR hierarchy and deduction markers', async () => {
+        renderWithProviders(<DashboardView />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Rachunek Zysków i Strat (P&L Konsolidowany)')).toBeInTheDocument();
+        });
+
+        // 1. Check all 9 standardized hierarchy rows
+        expect(screen.getByText(/1\. Przychody ze Sprzedaży/i)).toBeInTheDocument();
+        expect(screen.getByText(/2\. Koszt Wytworzenia Sprzedanych Produktów \(COGS\)/i)).toBeInTheDocument();
+        expect(screen.getByText(/3\. ZYSK BRUTTO ZE SPRZEDAŻY/i)).toBeInTheDocument();
+        expect(screen.getByText(/4\. Koszty Działalności Operacyjnej \(OPEX\)/i)).toBeInTheDocument();
+        expect(screen.getByText(/5\. WYNIK OPERACYJNY EBITDA/i)).toBeInTheDocument();
+        expect(screen.getByText(/6\. Amortyzacja Rzeczowa i Niematerialna \(D&A\)/i)).toBeInTheDocument();
+        expect(screen.getByText(/7\. ZYSK OPERACYJNY \(EBIT\)/i)).toBeInTheDocument();
+        expect(screen.getByText(/8\. Podatek Dochodowy od Osób Prawnych \(CIT\)/i)).toBeInTheDocument();
+        expect(screen.getByText(/9\. ZYSK NETTO OKRESU/i)).toBeInTheDocument();
+
+        // 2. Check deduction indicators (-) for direct operating deductions
+        const deductionMarkers = screen.getAllByText('(-)');
+        expect(deductionMarkers.length).toBeGreaterThanOrEqual(3); // COGS, D&A, CIT
+
+        // 3. Check final net profit result badge
+        expect(screen.getByText('WYNIK KOŃCOWY')).toBeInTheDocument();
+
+        // 4. Check expandable groups with category counters
+        const categoryBadges = screen.getAllByText('2 kat.');
+        expect(categoryBadges.length).toBeGreaterThanOrEqual(1);
+
+        // 5. Expand OPEX group and verify child items with tree branches
+        const opexRow = screen.getByText(/4\. Koszty Działalności Operacyjnej \(OPEX\)/i);
+        fireEvent.click(opexRow);
+
+        await waitFor(() => {
+            expect(screen.getByText('Wynagrodzenia i świadczenia')).toBeInTheDocument();
+            expect(screen.getByText('Infrastruktura IT i SaaS')).toBeInTheDocument();
+        });
+    });
 });
