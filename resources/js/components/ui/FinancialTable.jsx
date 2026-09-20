@@ -91,7 +91,7 @@ export const FinancialTable = ({
                                             isSubItem ? 'pl-8 text-zinc-400' : 'text-zinc-200'
                                         }`}>
                                             {isExpandable ? (
-                                                <span className="text-zinc-500 hover:text-zinc-300 transition-colors">
+                                                <span className="w-3.5 h-3.5 inline-flex items-center justify-center shrink-0 text-zinc-500 hover:text-zinc-300 transition-colors">
                                                     {isExpanded ? (
                                                         <ChevronDown className="w-3.5 h-3.5" />
                                                     ) : (
@@ -101,7 +101,7 @@ export const FinancialTable = ({
                                             ) : isSubItem ? (
                                                 <span className="w-1.5 h-1.5 rounded-full bg-zinc-700 mr-1 shrink-0"></span>
                                             ) : (
-                                                <span className="w-3.5" />
+                                                <span className="w-3.5 h-3.5 inline-flex shrink-0" aria-hidden="true" />
                                             )}
                                             <span className={isFinalResult ? 'text-zinc-100 font-bold text-[13px] tracking-tight' : isSummary ? 'text-zinc-100 tracking-tight' : ''}>
                                                 {row.label}

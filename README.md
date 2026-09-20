@@ -326,7 +326,7 @@ npm test
 - [ ] **Faza 24: Perfekcyjna Typografia i Wyrównanie Siatki P&L (Commity 116–120)**
   - [x] Wyrównanie wierszy głównych (1–9) P&L do jednolitego dopełnienia bazowego (`px-4`) i usunięcie wcięcia `pl-6`.
   - [x] Standaryzacja odstępów i typografii znacznika potrącenia `(-)` przy kodach kategorii.
-  - [ ] Wyrównanie pikselowe szerokości expandera chevron i elementu placeholder spacer (`w-3.5`).
+  - [x] Wyrównanie pikselowe szerokości expandera chevron i elementu placeholder spacer (`w-3.5`).
   - [ ] Aktualizacja testów jednostkowych `FinancialTable.test.jsx` weryfikujących ścisłe pionowe wyrównanie pozycji głównych (1–9).
   - [ ] Dodanie testu weryfikującego, że wcięcia (`pl-8` / `pl-10`) posiadają wyłącznie elementy podrzędne.
 - [ ] **Faza 25: Spójność Raportów i Regresja Wizualna (Commity 121–125)**
