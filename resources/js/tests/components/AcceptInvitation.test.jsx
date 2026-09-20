@@ -227,7 +227,7 @@ describe('AcceptInvitationView Component', () => {
         });
 
         // Banner displayed
-        expect(screen.getByText('Konto Zostało Pomyślnie Aktywowane!')).toBeInTheDocument();
+        expect(await screen.findByText('Konto Zostało Pomyślnie Aktywowane!')).toBeInTheDocument();
 
         // Login callback triggered after timeout
         await waitFor(

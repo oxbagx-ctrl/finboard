@@ -12,6 +12,7 @@ import { BenchmarkConfigModal } from '../components/benchmarks/BenchmarkConfigMo
 import { PnlTrendChart } from '../components/charts/PnlTrendChart';
 import { CostBreakdownChart } from '../components/charts/CostBreakdownChart';
 import { LiquidityTrendChart } from '../components/charts/LiquidityTrendChart';
+import { formatCurrency, formatDelta } from '../utils/formatters';
 import {
     DollarSign,
     TrendingUp,
@@ -200,30 +201,59 @@ export const DashboardView = () => {
         return expenseBreakdown.map((item) => ({
             ...item,
             amount: convertAmount(item.amount || 0),
+            previous_amount: item.previous_amount != null ? convertAmount(item.previous_amount) : null,
+            amount_change: item.amount_change != null ? convertAmount(item.amount_change) : null,
         }));
     }, [expenseBreakdown, convertAmount]);
 
     // Standardized P&L Table Rows with institutional hierarchy (PSR / MSR)
     const pnlRows = useMemo(() => {
         const revenueChildren = revenueBreakdown.length > 0
-            ? revenueBreakdown.map((rev, i) => ({
-                id: rev.category_id || `rev_${i}`,
-                label: rev.category_name,
-                code: rev.category_code || `REV-0${i + 1}`,
-                amount: convertAmount(rev.amount),
-                change: null,
-            }))
+            ? revenueBreakdown.map((rev, i) => {
+                const convertedAmount = convertAmount(rev.amount);
+                const convertedPrev = rev.previous_amount != null ? convertAmount(rev.previous_amount) : null;
+                const convertedChange = rev.amount_change != null ? convertAmount(rev.amount_change) : null;
+                const yoyPct = rev.yoy_growth_pct != null ? Number(rev.yoy_growth_pct) : null;
+                const dynamicsTitle = convertedPrev != null
+                    ? `Poprzednio: ${formatCurrency(convertedPrev, currency)} | Zmiana: ${formatDelta(convertedChange ?? (convertedAmount - convertedPrev), currency)}`
+                    : (yoyPct != null ? `Dynamika R/R: ${yoyPct > 0 ? '+' : ''}${yoyPct.toFixed(1)}%` : undefined);
+
+                return {
+                    id: rev.category_id || `rev_${i}`,
+                    label: rev.category_name,
+                    code: rev.category_code || `REV-0${i + 1}`,
+                    amount: convertedAmount,
+                    previousAmount: convertedPrev,
+                    amountChange: convertedChange,
+                    change: yoyPct,
+                    title: dynamicsTitle,
+                    reverseChange: false,
+                };
+            })
             : [];
 
         const expenseChildren = expenseBreakdown.length > 0
-            ? expenseBreakdown.map((exp, i) => ({
-                id: exp.category_id || `opex_${i}`,
-                label: exp.category_name,
-                code: exp.category_code || `OPEX-0${i + 1}`,
-                amount: convertAmount(exp.amount),
-                change: null,
-                reverseChange: true,
-            }))
+            ? expenseBreakdown.map((exp, i) => {
+                const convertedAmount = convertAmount(exp.amount);
+                const convertedPrev = exp.previous_amount != null ? convertAmount(exp.previous_amount) : null;
+                const convertedChange = exp.amount_change != null ? convertAmount(exp.amount_change) : null;
+                const yoyPct = exp.yoy_growth_pct != null ? Number(exp.yoy_growth_pct) : null;
+                const dynamicsTitle = convertedPrev != null
+                    ? `Poprzednio: ${formatCurrency(convertedPrev, currency)} | Zmiana: ${formatDelta(convertedChange ?? (convertedAmount - convertedPrev), currency)}`
+                    : (yoyPct != null ? `Dynamika R/R: ${yoyPct > 0 ? '+' : ''}${yoyPct.toFixed(1)}%` : undefined);
+
+                return {
+                    id: exp.category_id || `opex_${i}`,
+                    label: exp.category_name,
+                    code: exp.category_code || `OPEX-0${i + 1}`,
+                    amount: convertedAmount,
+                    previousAmount: convertedPrev,
+                    amountChange: convertedChange,
+                    change: yoyPct,
+                    title: dynamicsTitle,
+                    reverseChange: true,
+                };
+            })
             : [];
 
         return [
@@ -335,6 +365,7 @@ export const DashboardView = () => {
         revenueBreakdown,
         expenseBreakdown,
         convertAmount,
+        currency,
     ]);
 
     const crTarget = metrics?.benchmarks?.current_ratio?.target;

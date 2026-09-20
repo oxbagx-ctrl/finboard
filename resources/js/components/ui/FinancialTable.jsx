@@ -134,6 +134,7 @@ export const FinancialTable = ({
                                                 reverse={row.reverseChange}
                                                 decimals={1}
                                                 fallback="—"
+                                                title={row.title}
                                             />
                                         </td>
 
@@ -183,6 +184,7 @@ export const FinancialTable = ({
                                                         reverse={child.reverseChange}
                                                         decimals={1}
                                                         fallback="—"
+                                                        title={child.title}
                                                     />
                                                 </td>
 
@@ -202,7 +204,7 @@ export const FinancialTable = ({
             </div>
 
             {/* Table Footer with Summary Note */}
-            <div className="px-4 py-2 bg-zinc-950 border-t border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[10px] font-mono text-zinc-500">
+            <div className="px-4 py-2 bg-zinc-950 border-t border-zinc-850 flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[10px] font-mono text-zinc-500">
                 <span>STANDARD: POLSKIE STANDARDY RACHUNKOWOŚCI (PSR) / MSR 1</span>
                 <span>DOKŁADNOŚĆ: KALKULATOR DOMENOWY BCMATH (SCALE 4)</span>
             </div>

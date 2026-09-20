@@ -300,7 +300,7 @@ npm test
   - [x] Testy integracyjne endpointu breakdown weryfikujące strukturę payloadu YoY.
   - [x] Optymalizacja agregacji rekordów i zapytań bazodanowych dla okresów porównawczych.
 - [ ] **Faza 20: Integracja UI Tabeli P&L i Wykresu Struktury Kosztów**
-  - [ ] Podpięcie dynamicznej dynamiki YoY per kategoria do podwierszy (children) przychodów i OPEX w `DashboardView`.
+  - [x] Podpięcie dynamicznej dynamiki YoY per kategoria do podwierszy (children) przychodów i OPEX w `DashboardView`.
   - [ ] Zapewnienie ścisłej polaryzacji `reverseChange` dla kosztów OPEX i jej brak dla przychodów.
   - [ ] Optymalizacja wykresu `CostBreakdownChart` z auto-sortowaniem, paletą wielokategorialną i czytelną legendą.
   - [ ] Testy komponentów frontendowych w `DashboardView.test.jsx` weryfikujące rozwijane wiersze P&L i odznaki YoY.
