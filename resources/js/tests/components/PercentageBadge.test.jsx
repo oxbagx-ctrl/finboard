@@ -110,5 +110,28 @@ describe('PercentageBadge Component', () => {
             render(<PercentageBadge value={0.045} decimals={2} />);
             expect(screen.getByTestId('percentage-badge')).toHaveTextContent('+4.50%');
         });
+        it("renders title attribute on badge and fallback when title prop is provided", () => {
+            const { rerender } = render(
+                <PercentageBadge
+                    value={15.4}
+                    title="Poprzednio: 100,00 PLN | Zmiana: +15,40 PLN"
+                />
+            );
+            expect(screen.getByTestId("percentage-badge")).toHaveAttribute(
+                "title",
+                "Poprzednio: 100,00 PLN | Zmiana: +15,40 PLN"
+            );
+
+            rerender(
+                <PercentageBadge
+                    value={null}
+                    title="Brak danych dla roku 2024"
+                />
+            );
+            expect(screen.getByTestId("percentage-badge-fallback")).toHaveAttribute(
+                "title",
+                "Brak danych dla roku 2024"
+            );
+        });
     });
 });

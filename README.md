@@ -294,14 +294,14 @@ npm test
   - Testy jednostkowe izolacji kategorii REVENUE od EXPENSE i rekordów bilansowych.
   - Weryfikacja różnorodnego rozkładu kategorii OPEX na wykresie kołowym zamiast pojedynczego wpisu 100%.
 - [x] **Faza 19: Domenowe Obliczanie Dynamiki R/R dla Podpozycji Kategorii**
-  - [x] Rozszerzenie `GetCategoryBreakdownQuery` i Handlera o kalkulację kwot porównawczych i dynamiki YoY per kategoria.
-  - [x] Ekspozycja dynamiki YoY na poziomie kategorii (`previous_amount`, `yoy_growth_pct`) w endpoincie `/finance/analytics/breakdown`.
-  - [x] Testy jednostkowe kalkulacji dynamiki YoY na poziomie kategorii z przypadkami brzegowymi (nowe kategorie, baza zerowa).
-  - [x] Testy integracyjne endpointu breakdown weryfikujące strukturę payloadu YoY.
-  - [x] Optymalizacja agregacji rekordów i zapytań bazodanowych dla okresów porównawczych.
+  - Rozszerzenie `GetCategoryBreakdownQuery` i Handlera o kalkulację kwot porównawczych i dynamiki YoY per kategoria.
+  - Ekspozycja dynamiki YoY na poziomie kategorii (`previous_amount`, `yoy_growth_pct`) w endpoincie `/finance/analytics/breakdown`.
+  - Testy jednostkowe kalkulacji dynamiki YoY na poziomie kategorii z przypadkami brzegowymi (nowe kategorie, baza zerowa).
+  - Testy integracyjne endpointu breakdown weryfikujące strukturę payloadu YoY.
+  - Optymalizacja agregacji rekordów i zapytań bazodanowych dla okresów porównawczych.
 - [ ] **Faza 20: Integracja UI Tabeli P&L i Wykresu Struktury Kosztów**
   - [x] Podpięcie dynamicznej dynamiki YoY per kategoria do podwierszy (children) przychodów i OPEX w `DashboardView`.
-  - [ ] Zapewnienie ścisłej polaryzacji `reverseChange` dla kosztów OPEX i jej brak dla przychodów.
+  - [x] Zapewnienie ścisłej polaryzacji `reverseChange` dla kosztów OPEX i jej brak dla przychodów.
   - [ ] Optymalizacja wykresu `CostBreakdownChart` z auto-sortowaniem, paletą wielokategorialną i czytelną legendą.
   - [ ] Testy komponentów frontendowych w `DashboardView.test.jsx` weryfikujące rozwijane wiersze P&L i odznaki YoY.
   - [ ] Testy integracyjne weryfikujące poprawną izolację kategorii w zestawieniu przychodów.

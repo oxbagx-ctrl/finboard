@@ -17,6 +17,7 @@ export const PercentageBadge = ({
     showIcon = true,
     className = '',
     fallback = '—',
+    title,
 }) => {
     const isMissing =
         value === null ||
@@ -33,7 +34,7 @@ export const PercentageBadge = ({
             <span
                 data-testid="percentage-badge-fallback"
                 className={`inline-flex items-center justify-center font-mono text-[11px] font-medium px-1.5 py-0.5 rounded border tabular-nums bg-zinc-850/60 text-zinc-500 border-zinc-800 ${className}`}
-                title="Brak danych porównawczych"
+                title={title || "Brak danych porównawczych"}
             >
                 <span>{fallback}</span>
             </span>
@@ -63,6 +64,7 @@ export const PercentageBadge = ({
     return (
         <span
             data-testid="percentage-badge"
+            title={title}
             className={`inline-flex items-center gap-1 font-mono text-[11px] font-medium px-1.5 py-0.5 rounded border tabular-nums ${colorClasses} ${className}`}
         >
             {showIcon && (

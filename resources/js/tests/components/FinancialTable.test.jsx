@@ -182,4 +182,106 @@ describe('FinancialTable Component', () => {
         expect(netRow).toHaveClass('border-b-4');
         expect(screen.getByText('WYNIK KOŃCOWY')).toBeInTheDocument();
     });
+
+    it("strictly applies reverseChange polarization for OPEX expenses vs revenue sub-rows", () => {
+        const polarizationData = [
+            {
+                id: "rev_group",
+                label: "Przychody ze Sprzedaży",
+                code: "REV-TOT",
+                amount: 1000000,
+                isGroup: true,
+                change: 15.0,
+                reverseChange: false,
+                children: [
+                    {
+                        id: "rev_child_up",
+                        label: "Sprzedaż Produktów (+)",
+                        code: "REV-01",
+                        amount: 600000,
+                        change: 25.0, // Revenue increase -> GOOD (emerald)
+                        reverseChange: false,
+                    },
+                    {
+                        id: "rev_child_down",
+                        label: "Sprzedaż Usług (-)",
+                        code: "REV-02",
+                        amount: 400000,
+                        change: -10.0, // Revenue decrease -> BAD (rose)
+                        reverseChange: false,
+                    },
+                ],
+            },
+            {
+                id: "opex_group",
+                label: "Koszty Operacyjne (OPEX)",
+                code: "OPEX-TOT",
+                amount: 500000,
+                isGroup: true,
+                change: 10.0, // Expense increase -> BAD (rose)
+                reverseChange: true,
+                children: [
+                    {
+                        id: "opex_child_up",
+                        label: "Koszty Wynagrodzeń (+)",
+                        code: "OPEX-01",
+                        amount: 300000,
+                        change: 18.0, // Cost increase with reverseChange -> BAD (rose)
+                        reverseChange: true,
+                    },
+                    {
+                        id: "opex_child_down",
+                        label: "Usługi Obce (-)",
+                        code: "OPEX-02",
+                        amount: 200000,
+                        change: -5.0, // Cost decrease with reverseChange -> GOOD (emerald)
+                        reverseChange: true,
+                    },
+                ],
+            },
+        ];
+
+        render(
+            <FinancialTable
+                data={polarizationData}
+                currency="PLN"
+                revenueTotal={1000000}
+            />
+        );
+
+        // Revenue sub-row with +25.0% change should have emerald styling (good)
+        const revChildUp = screen.getByText("Sprzedaż Produktów (+)").closest("tr");
+        const revUpBadge = revChildUp.querySelector("[data-testid=\"percentage-badge\"]");
+        expect(revUpBadge).toBeInTheDocument();
+        expect(revUpBadge).toHaveTextContent("+25.0%");
+        expect(revUpBadge.className).toContain("text-emerald-300");
+
+        // Revenue sub-row with -10.0% change should have rose styling (bad)
+        const revChildDown = screen.getByText("Sprzedaż Usług (-)").closest("tr");
+        const revDownBadge = revChildDown.querySelector("[data-testid=\"percentage-badge\"]");
+        expect(revDownBadge).toBeInTheDocument();
+        expect(revDownBadge).toHaveTextContent("-10.0%");
+        expect(revDownBadge.className).toContain("text-rose-300");
+
+        // OPEX parent row with +10.0% change with reverseChange: true should have rose styling (bad)
+        const opexGroupRow = screen.getByText("Koszty Operacyjne (OPEX)").closest("tr");
+        const opexGroupBadge = opexGroupRow.querySelector("[data-testid=\"percentage-badge\"]");
+        expect(opexGroupBadge).toBeInTheDocument();
+        expect(opexGroupBadge).toHaveTextContent("+10.0%");
+        expect(opexGroupBadge.className).toContain("text-rose-300");
+
+        // OPEX sub-row with +18.0% change with reverseChange: true should have rose styling (bad)
+        const opexChildUp = screen.getByText("Koszty Wynagrodzeń (+)").closest("tr");
+        const opexUpBadge = opexChildUp.querySelector("[data-testid=\"percentage-badge\"]");
+        expect(opexUpBadge).toBeInTheDocument();
+        expect(opexUpBadge).toHaveTextContent("+18.0%");
+        expect(opexUpBadge.className).toContain("text-rose-300");
+
+        // OPEX sub-row with -5.0% change with reverseChange: true should have emerald styling (good)
+        const opexChildDown = screen.getByText("Usługi Obce (-)").closest("tr");
+        const opexDownBadge = opexChildDown.querySelector("[data-testid=\"percentage-badge\"]");
+        expect(opexDownBadge).toBeInTheDocument();
+        expect(opexDownBadge).toHaveTextContent("-5.0%");
+        expect(opexDownBadge.className).toContain("text-emerald-300");
+    });
 });
