@@ -151,6 +151,9 @@ const mockExpenseBreakdown = [
         category_name: 'Wynagrodzenia zespołu inżynierskiego',
         amount: 350000,
         percentage: 58.33,
+        previous_amount: 320000,
+        amount_change: 30000,
+        yoy_growth_pct: 9.38,
     },
     {
         category_id: 'cat-it-1',
@@ -158,6 +161,9 @@ const mockExpenseBreakdown = [
         category_name: 'Usługi Cloud & DevOps AWS',
         amount: 120000,
         percentage: 20.0,
+        previous_amount: 150000,
+        amount_change: -30000,
+        yoy_growth_pct: -20.0,
     },
 ];
 
@@ -168,6 +174,9 @@ const mockRevenueBreakdown = [
         category_name: 'Licencje Enterprise SaaS',
         amount: 1800000,
         percentage: 75.0,
+        previous_amount: 1500000,
+        amount_change: 300000,
+        yoy_growth_pct: 20.0,
     },
     {
         category_id: 'rev-svc-1',
@@ -175,6 +184,9 @@ const mockRevenueBreakdown = [
         category_name: 'Wdrożenia i integracje API',
         amount: 600000,
         percentage: 25.0,
+        previous_amount: 550000,
+        amount_change: 50000,
+        yoy_growth_pct: 9.09,
     },
 ];
 
@@ -421,5 +433,72 @@ describe('E2E DashboardView Integration: Analytics, FX, P&L Hierarchy & Reactive
         await waitFor(() => {
             expect(apiClient.get.mock.calls.length).toBeGreaterThan(initialCallCount);
         });
+    });
+
+    it("verifies strict category isolation and YoY display in financial breakdown between revenue and OPEX", async () => {
+        renderE2EDashboard("advisor");
+
+        await waitFor(() => {
+            expect(screen.getByText("Rachunek Zysków i Strat (P&L Konsolidowany)")).toBeInTheDocument();
+        });
+
+        const pnlTable = screen.getByText("Rachunek Zysków i Strat (P&L Konsolidowany)").closest("div.bg-zinc-900");
+        expect(pnlTable).toBeInTheDocument();
+
+        // 1. Verify revenue sub-rows are strictly categorized under Revenue and NOT under OPEX
+        const revLicRow = Array.from(pnlTable.querySelectorAll("tr")).find(tr => tr.textContent.includes("Licencje Enterprise SaaS"));
+        expect(revLicRow).toBeInTheDocument();
+        expect(revLicRow).toHaveTextContent("[REV-LIC]");
+        expect(revLicRow).toHaveTextContent("1 800 000"); // Converted PLN amount
+        expect(revLicRow).toHaveTextContent("75.0%"); // % of total revenue (1.8m / 2.4m)
+
+        // Revenue YoY badge: +20.0% -> Revenue growth is GOOD -> emerald color
+        const revLicBadge = revLicRow.querySelector("[data-testid=\"percentage-badge\"]");
+        expect(revLicBadge).toBeInTheDocument();
+        expect(revLicBadge).toHaveTextContent("+20.0%");
+        expect(revLicBadge.className).toContain("text-emerald-300");
+        expect(revLicBadge).toHaveAttribute("title", expect.stringContaining("Poprzednio:"));
+
+        const revSvcRow = Array.from(pnlTable.querySelectorAll("tr")).find(tr => tr.textContent.includes("Wdrożenia i integracje API"));
+        expect(revSvcRow).toBeInTheDocument();
+        expect(revSvcRow).toHaveTextContent("[REV-IMPL]");
+        expect(revSvcRow).toHaveTextContent("600 000");
+        expect(revSvcRow).toHaveTextContent("25.0%");
+
+        const revSvcBadge = revSvcRow.querySelector("[data-testid=\"percentage-badge\"]");
+        expect(revSvcBadge).toBeInTheDocument();
+        expect(revSvcBadge).toHaveTextContent("+9.1%");
+        expect(revSvcBadge.className).toContain("text-emerald-300");
+
+        // 2. Verify OPEX sub-rows are strictly categorized under OPEX and isolated from revenue
+        const opexSalRow = Array.from(pnlTable.querySelectorAll("tr")).find(tr => tr.textContent.includes("Wynagrodzenia zespołu inżynierskiego"));
+        expect(opexSalRow).toBeInTheDocument();
+        expect(opexSalRow).toHaveTextContent("[OPEX-HR]");
+        expect(opexSalRow).toHaveTextContent("350 000");
+
+        // OPEX cost increase (+9.4%) -> Expense growth is BAD -> rose color due to reverseChange: true
+        const opexSalBadge = opexSalRow.querySelector("[data-testid=\"percentage-badge\"]");
+        expect(opexSalBadge).toBeInTheDocument();
+        expect(opexSalBadge).toHaveTextContent("+9.4%");
+        expect(opexSalBadge.className).toContain("text-rose-300");
+
+        // OPEX cost decrease (-20.0%) -> Expense reduction is GOOD -> emerald color due to reverseChange: true
+        const opexCloudRow = Array.from(pnlTable.querySelectorAll("tr")).find(tr => tr.textContent.includes("Usługi Cloud & DevOps AWS"));
+        expect(opexCloudRow).toBeInTheDocument();
+        expect(opexCloudRow).toHaveTextContent("[OPEX-CLOUD]");
+        expect(opexCloudRow).toHaveTextContent("120 000");
+
+        const opexCloudBadge = opexCloudRow.querySelector("[data-testid=\"percentage-badge\"]");
+        expect(opexCloudBadge).toBeInTheDocument();
+        expect(opexCloudBadge).toHaveTextContent("-20.0%");
+        expect(opexCloudBadge.className).toContain("text-emerald-300");
+
+        // 3. Verify that Revenue items are NOT present inside the Cost Breakdown Donut Chart
+        const costChartContainer = screen.getByText("Struktura Kosztów Operacyjnych").closest("div.bg-zinc-900");
+        expect(costChartContainer).toBeInTheDocument();
+        expect(costChartContainer).toHaveTextContent("Wynagrodzenia zespołu inżynierskiego");
+        expect(costChartContainer).toHaveTextContent("Usługi Cloud & DevOps AWS");
+        expect(costChartContainer).not.toHaveTextContent("Licencje Enterprise SaaS");
+        expect(costChartContainer).not.toHaveTextContent("Wdrożenia i integracje API");
     });
 });

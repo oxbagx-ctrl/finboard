@@ -304,7 +304,7 @@ npm test
   - [x] Zapewnienie ścisłej polaryzacji `reverseChange` dla kosztów OPEX i jej brak dla przychodów.
   - [x] Optymalizacja wykresu `CostBreakdownChart` z auto-sortowaniem, paletą wielokategorialną i czytelną legendą.
   - [x] Testy komponentów frontendowych w `DashboardView.test.jsx` weryfikujące rozwijane wiersze P&L i odznaki YoY.
-  - [ ] Testy integracyjne weryfikujące poprawną izolację kategorii w zestawieniu przychodów.
+  - [x] Testy integracyjne weryfikujące poprawną izolację kategorii w zestawieniu przychodów.
 
 ---
 
