@@ -329,12 +329,12 @@ npm test
   - Wyrównanie pikselowe szerokości expandera chevron i elementu placeholder spacer (`w-3.5`).
   - Aktualizacja testów jednostkowych `FinancialTable.test.jsx` weryfikujących ścisłe pionowe wyrównanie pozycji głównych (1–9).
   - Dodanie testu weryfikującego, że wcięcia (`pl-8` / `pl-10`) posiadają wyłącznie elementy podrzędne.
-- [ ] **Faza 25: Spójność Raportów i Regresja Wizualna (Commity 121–125)**
+- [x] **Faza 25: Spójność Raportów i Regresja Wizualna (Commity 121–125)**
   - [x] Synchronizacja styli `ExecutivePdfReport` z ujednoliconą siatką tabeli `FinancialTable`.
   - [x] Weryfikacja stabelaryzowanego wyrównania liczb monospace o wysokiej gęstości w `FinancialValue` dla wierszy potrąceń.
   - [x] Aktualizacja testów komponentu `ExecutivePdfReport` dla spójnej hierarchii wierszy P&L i czystej typografii.
   - [x] Testy regresyjne E2E w `DashboardView.test.jsx` po przełączeniu roku i firmy.
-  - [ ] Aktualizacja dokumentacji design systemu UI i changeloga pod kątem instytucjonalnych standardów tabelarycznych P&L.
+  - [x] Aktualizacja dokumentacji design systemu UI i changeloga pod kątem instytucjonalnych standardów tabelarycznych P&L.
 
 ---
 
