@@ -65,9 +65,10 @@ export const RecordsView = () => {
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [recordToDelete, setRecordToDelete] = useState(null);
 
-    // Selection state for batch operations
-    const [selectedRecordIds, setSelectedRecordIds] = useState([]);
+    // Selection state for batch operations (accumulated across pages)
+    const [selectedMap, setSelectedMap] = useState({});
 
+    const selectedRecordIds = useMemo(() => Object.keys(selectedMap), [selectedMap]);
     const selectedSet = useMemo(() => new Set(selectedRecordIds), [selectedRecordIds]);
 
     const currentPageIds = useMemo(() => records.map((r) => r.id), [records]);
@@ -82,34 +83,50 @@ export const RecordsView = () => {
         [currentPageIds, selectedSet, allSelected]
     );
 
-    const handleToggleSelectRow = useCallback((id) => {
-        setSelectedRecordIds((prev) =>
-            prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-        );
-    }, []);
+    const handleToggleSelectRow = useCallback((recordOrId) => {
+        setSelectedMap((prev) => {
+            const next = { ...prev };
+            const id = typeof recordOrId === 'object' && recordOrId !== null ? recordOrId.id : recordOrId;
+            if (next[id]) {
+                delete next[id];
+            } else {
+                const rec = typeof recordOrId === 'object' && recordOrId !== null
+                    ? recordOrId
+                    : records.find((r) => r.id === id) || { id, amount: 0 };
+                next[id] = rec;
+            }
+            return next;
+        });
+    }, [records]);
 
     const handleToggleSelectAll = useCallback(() => {
         if (allSelected) {
-            setSelectedRecordIds((prev) => prev.filter((id) => !currentPageIds.includes(id)));
+            setSelectedMap((prev) => {
+                const next = { ...prev };
+                currentPageIds.forEach((id) => delete next[id]);
+                return next;
+            });
         } else {
-            setSelectedRecordIds((prev) => Array.from(new Set([...prev, ...currentPageIds])));
+            setSelectedMap((prev) => {
+                const next = { ...prev };
+                records.forEach((r) => {
+                    next[r.id] = r;
+                });
+                return next;
+            });
         }
-    }, [allSelected, currentPageIds]);
+    }, [allSelected, currentPageIds, records]);
 
     const [batchDeleteModalOpen, setBatchDeleteModalOpen] = useState(false);
     const [batchDeleting, setBatchDeleting] = useState(false);
 
-    // Dynamic metrics calculation for currently selected records
-    const selectedRecords = useMemo(() => {
-        return records.filter((r) => selectedSet.has(r.id));
-    }, [records, selectedSet]);
-
+    // Dynamic metrics calculation for currently selected records (persisted across pages)
     const selectedMetrics = useMemo(() => {
         let total = 0;
         let income = 0;
         let expense = 0;
 
-        selectedRecords.forEach((r) => {
+        Object.values(selectedMap).forEach((r) => {
             const amt = Number(r.amount || 0);
             total += amt;
             if (r.record_type === 'INCOME') income += amt;
@@ -122,7 +139,7 @@ export const RecordsView = () => {
             income: convertAmount(income),
             expense: convertAmount(expense),
         };
-    }, [selectedRecords, selectedRecordIds.length, convertAmount]);
+    }, [selectedMap, selectedRecordIds.length, convertAmount]);
 
 
 
@@ -186,11 +203,22 @@ export const RecordsView = () => {
 
         const handleCompanyChange = () => {
             setPage(1);
+            setSelectedMap({});
             fetchRecords();
         };
         window.addEventListener('finboard:company-changed', handleCompanyChange);
         return () => window.removeEventListener('finboard:company-changed', handleCompanyChange);
     }, [fetchRecords]);
+
+    // Tenant context switch: clear selections when active company changes
+    useEffect(() => {
+        setSelectedMap({});
+    }, [activeCompany?.id]);
+
+    // Filter switch: clear selections when user alters search, category, type, or date criteria
+    useEffect(() => {
+        setSelectedMap({});
+    }, [search, selectedType, selectedCategory, startDate, endDate, perPage]);
 
     // Handle batch deletion of selected records
     const handleBatchDelete = async () => {
@@ -212,7 +240,7 @@ export const RecordsView = () => {
 
             // Optimistic UI update: remove deleted records from current table view
             setRecords((prev) => prev.filter((r) => !idsToDelete.includes(r.id)));
-            setSelectedRecordIds([]);
+            setSelectedMap({});
             setBatchDeleteModalOpen(false);
 
             const deletedCount = res.data?.count ?? idsToDelete.length;
@@ -252,6 +280,7 @@ export const RecordsView = () => {
         setStartDate('');
         setEndDate('');
         setPage(1);
+        setSelectedMap({});
     };
 
     const handleOpenCreate = () => {
@@ -552,7 +581,7 @@ export const RecordsView = () => {
                                                 <input
                                                     type="checkbox"
                                                     checked={isSelected}
-                                                    onChange={() => handleToggleSelectRow(record.id)}
+                                                    onChange={() => handleToggleSelectRow(record)}
                                                     aria-label={`Zaznacz transakcję ${record.description}`}
                                                     data-testid={`record-checkbox-${record.id}`}
                                                     className="rounded border-zinc-750 bg-zinc-900 text-emerald-500 focus:ring-emerald-500/20 focus:ring-offset-0 cursor-pointer w-3.5 h-3.5 accent-emerald-500 align-middle"
@@ -681,7 +710,7 @@ export const RecordsView = () => {
                 incomeAmount={selectedMetrics.income}
                 expenseAmount={selectedMetrics.expense}
                 currency={currency}
-                onClearSelection={() => setSelectedRecordIds([])}
+                onClearSelection={() => setSelectedMap({})}
                 onOpenBatchDelete={() => setBatchDeleteModalOpen(true)}
             />
 
