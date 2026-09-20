@@ -9,7 +9,16 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 final class FinancialCategory extends Model
 {
+    // Generic categories
+    public const REVENUE_GENERIC = 'cat-revenue';
     public const OPEX_GENERIC = 'cat-opex';
+
+    // Granular Revenue categories
+    public const REVENUE_SERVICES = 'cat-revenue-services';
+    public const REVENUE_SAAS = 'cat-revenue-saas';
+    public const REVENUE_CONSULTING = 'cat-revenue-consulting';
+
+    // Granular OPEX categories
     public const OPEX_PAYROLL = 'cat-opex-payroll';
     public const OPEX_SERVICES = 'cat-opex-services';
     public const OPEX_OFFICE = 'cat-opex-office';

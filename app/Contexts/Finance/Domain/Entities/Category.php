@@ -24,6 +24,33 @@ final class Category extends Entity
         return new self('cat-revenue', 'Przychody ze sprzedaży', CategoryType::REVENUE, 'REV', 'Główne przychody operacyjne ze sprzedaży towarów i usług');
     }
 
+    public static function revenueServices(): self
+    {
+        return new self('cat-revenue-services', 'Usługi programistyczne i inżynieryjne B2B', CategoryType::REVENUE, 'REV-SRV', 'Przychody ze świadczenia dedykowanych usług programistycznych, wdrożeniowych i inżynieryjnych');
+    }
+
+    public static function revenueSaas(): self
+    {
+        return new self('cat-revenue-saas', 'Subskrypcje i licencje SaaS', CategoryType::REVENUE, 'REV-SAAS', 'Przychody powtarzalne (ARR/MRR) z licencji oprogramowania i platform SaaS');
+    }
+
+    public static function revenueConsulting(): self
+    {
+        return new self('cat-revenue-consulting', 'Doradztwo technologiczne i audyty chmurowe', CategoryType::REVENUE, 'REV-CON', 'Przychody z profesjonalnego doradztwa IT, audytów architektury i optymalizacji chmurowych');
+    }
+
+    /**
+     * @return array<string, self>
+     */
+    public static function defaultRevenueCategories(): array
+    {
+        return [
+            'cat-revenue-services' => self::revenueServices(),
+            'cat-revenue-saas' => self::revenueSaas(),
+            'cat-revenue-consulting' => self::revenueConsulting(),
+        ];
+    }
+
     public static function cogs(): self
     {
         return new self('cat-cogs', 'Koszty bezpośrednie (COGS)', CategoryType::COGS, 'COGS', 'Koszt własny sprzedaży i wytworzenia towarów');
