@@ -106,12 +106,21 @@ export const FinancialTable = ({
                                             <span className={isFinalResult ? 'text-zinc-100 font-bold text-[13px] tracking-tight' : isSummary ? 'text-zinc-100 tracking-tight' : ''}>
                                                 {row.label}
                                             </span>
-                                            {isDeduction && !row.isGroup && !isSummary && (
-                                                <span className="text-[10px] font-mono text-zinc-500 font-normal select-none" title="Pozycja pomniejszająca wynik">(-)</span>
-                                            )}
-                                            {row.code && (
-                                                <span className="text-[10px] text-zinc-500 font-normal">
-                                                    [{row.code}]
+                                            {((isDeduction && !row.isGroup && !isSummary) || row.code) && (
+                                                <span className="inline-flex items-center gap-1 shrink-0">
+                                                    {isDeduction && !row.isGroup && !isSummary && (
+                                                        <span
+                                                            className="text-[10px] font-mono text-zinc-500 font-normal select-none"
+                                                            title="Pozycja pomniejszająca wynik"
+                                                        >
+                                                            (-)
+                                                        </span>
+                                                    )}
+                                                    {row.code && (
+                                                        <span className="text-[10px] font-mono text-zinc-500 font-normal">
+                                                            [{row.code}]
+                                                        </span>
+                                                    )}
                                                 </span>
                                             )}
                                             {hasChildren && (
