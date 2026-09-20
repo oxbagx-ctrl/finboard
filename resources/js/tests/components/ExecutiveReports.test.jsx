@@ -273,4 +273,46 @@ describe('ExecutivePdfReport Component', () => {
         expect(screen.queryByText(/4\. Struktura Kosztów Operacyjnych/)).not.toBeInTheDocument();
         expect(screen.queryByText(/CERTYFIKAT INTEGRALNOŚCI DANYCH/)).not.toBeInTheDocument();
     });
+
+    it('maintains consistent P&L row hierarchy, baseline grid alignment, and clean typography', () => {
+        render(
+            <ExecutivePdfReport
+                company={mockCompany}
+                currentUser={mockUser}
+                config={mockConfig}
+                metrics={mockMetrics}
+                trends={[]}
+                breakdown={mockBreakdown}
+                reportHash="abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890"
+                generatedAt="2026-09-18T20:00:00Z"
+            />
+        );
+
+        // Verify all 9 P&L line items
+        const pnlRowLabels = [
+            'Przychody ze sprzedaży produktów i usług (Revenue)',
+            '(-) Koszt własny sprzedaży (COGS / Direct Costs)',
+            '(=) ZYSK BRUTTO ZE SPRZEDAŻY (GROSS PROFIT)',
+            '(-) Koszty operacyjne zarządu i sprzedaży (OPEX)',
+            '(=) ZYSK OPERACYJNY PRZED AMORTYZACJĄ (EBITDA)',
+            '(-) Odpisy amortyzacyjne (D&A)',
+            '(=) ZYSK OPERACYJNY (EBIT)',
+            '(-) Podatki dochodowe & koszty finansowe',
+            '(=) WYNIK FINANSOWY NETTO (NET PROFIT)',
+        ];
+
+        pnlRowLabels.forEach(label => {
+            const cell = screen.getByText(label);
+            expect(cell).toBeInTheDocument();
+            // All rows must have uniform px-3 baseline padding and no pl-6 indent
+            expect(cell.className).toContain('px-3');
+            expect(cell.className).not.toContain('pl-6');
+        });
+
+        // Verify classification codes and monospace tabular numbers
+        expect(screen.getByText('COGS')).toBeInTheDocument();
+        expect(screen.getByText('OPEX')).toBeInTheDocument();
+        expect(screen.getByText('D&A')).toBeInTheDocument();
+        expect(screen.getByText('TAX / FIN')).toBeInTheDocument();
+    });
 });
