@@ -24,7 +24,8 @@ import {
     Database,
     DollarSign,
     Layers,
-    Eye
+    Eye,
+    Trash2
 } from 'lucide-react';
 import { formatDateTime } from '../utils/formatters';
 import { FinancialAuditDetailModal } from '../components/audit/FinancialAuditDetailModal';
@@ -256,6 +257,17 @@ export const AuditLogsView = () => {
     const vdrDownloadEventsCount = vdrLogs.filter((l) => l.action === 'download').length;
     const vdrUploadEventsCount = vdrLogs.filter((l) => l.action === 'upload').length;
 
+    // Financial audit stats derived counts
+    const singleDeletionsCount = financeStats?.by_action?.RECORD_DELETED?.count || 0;
+    const batchDeletionsCount = financeStats?.by_action?.RECORDS_BATCH_DELETED?.count || 0;
+    const totalDeletionsCount = singleDeletionsCount + batchDeletionsCount;
+
+    const updatesCount = financeStats?.by_action?.RECORD_UPDATED?.count || 0;
+    const importsCount =
+        (financeStats?.by_action?.CSV_IMPORT_PROCESSED?.count || 0) +
+        (financeStats?.by_action?.CSV_IMPORT_FAILED?.count || 0);
+    const updatesAndImportsCount = updatesCount + importsCount;
+
     return (
         <div className="space-y-4 font-mono">
             {/* Header */}
@@ -344,10 +356,91 @@ export const AuditLogsView = () => {
             {/* TAB CONTENT: Finance Audit */}
             {activeTab === 'finance' && (
                 <div className="space-y-4" data-testid="finance-audit-container">
-                    {/* Placeholder container for Commits 143, 144, 146 */}
+                    {/* Quick Stats: KPI Summary Cards */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+                        {/* Total Events */}
+                        <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3" data-testid="audit-stat-total">
+                            <div className="text-[10px] uppercase text-zinc-500 font-semibold flex items-center justify-between">
+                                <span className="flex items-center gap-1.5">
+                                    <Activity className="w-3.5 h-3.5 text-emerald-400" />
+                                    Łącznie Zdarzeń
+                                </span>
+                                <span className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-950/60 border border-emerald-800/80 text-emerald-300 font-bold">
+                                    LIVE
+                                </span>
+                            </div>
+                            <div className="text-xl font-bold text-zinc-100 mt-1.5 tabular-nums">
+                                {financeStats?.total_events ?? 0}
+                            </div>
+                            <div className="text-[10px] text-zinc-500 mt-0.5">
+                                Rejestr operacji w księdze głównej
+                            </div>
+                        </div>
+
+                        {/* Deletions */}
+                        <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3" data-testid="audit-stat-deletions">
+                            <div className="text-[10px] uppercase text-zinc-500 font-semibold flex items-center justify-between">
+                                <span className="flex items-center gap-1.5">
+                                    <Trash2 className="w-3.5 h-3.5 text-rose-400" />
+                                    Usunięcia Transakcji
+                                </span>
+                                {batchDeletionsCount > 0 && (
+                                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-rose-950/60 border border-rose-800/80 text-rose-300 font-bold">
+                                        {batchDeletionsCount} MASOWE
+                                    </span>
+                                )}
+                            </div>
+                            <div className="text-xl font-bold text-rose-400 mt-1.5 tabular-nums">
+                                {totalDeletionsCount}
+                            </div>
+                            <div className="text-[10px] text-zinc-500 mt-0.5">
+                                {singleDeletionsCount} pojedynczych | {batchDeletionsCount} masowych
+                            </div>
+                        </div>
+
+                        {/* Updates & Imports */}
+                        <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3" data-testid="audit-stat-updates-imports">
+                            <div className="text-[10px] uppercase text-zinc-500 font-semibold flex items-center justify-between">
+                                <span className="flex items-center gap-1.5">
+                                    <Layers className="w-3.5 h-3.5 text-blue-400" />
+                                    Modyfikacje & Importy
+                                </span>
+                                <span className="text-[9px] px-1.5 py-0.5 rounded bg-blue-950/60 border border-blue-800/80 text-blue-300 font-bold">
+                                    ZAPISY
+                                </span>
+                            </div>
+                            <div className="text-xl font-bold text-blue-400 mt-1.5 tabular-nums">
+                                {updatesAndImportsCount}
+                            </div>
+                            <div className="text-[10px] text-zinc-500 mt-0.5">
+                                {updatesCount} edycji | {importsCount} importów CSV
+                            </div>
+                        </div>
+
+                        {/* Last Event */}
+                        <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3" data-testid="audit-stat-last-event">
+                            <div className="text-[10px] uppercase text-zinc-500 font-semibold flex items-center justify-between">
+                                <span className="flex items-center gap-1.5">
+                                    <Clock className="w-3.5 h-3.5 text-amber-400" />
+                                    Ostatnie Zdarzenie (CET)
+                                </span>
+                                <span className="text-[9px] px-1.5 py-0.5 rounded bg-zinc-800 border border-zinc-750 text-zinc-300 font-mono">
+                                    REAL-TIME
+                                </span>
+                            </div>
+                            <div className="text-xs font-bold text-zinc-200 mt-2 truncate tabular-nums">
+                                {financeStats?.last_event_at ? formatDateTime(financeStats.last_event_at) : 'Brak zdarzeń'}
+                            </div>
+                            <div className="text-[10px] text-zinc-500 mt-0.5">
+                                Precyzyjna sygnatura czasowa
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Placeholder container for Commits 144, 146 */}
                     <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6 text-center text-zinc-400 font-mono text-xs">
                         <Activity className="w-8 h-8 mx-auto text-emerald-400 mb-2 opacity-80" />
-                        <div className="text-zinc-200 font-bold text-sm">Audyt Transakcji Finansowych</div>
+                        <div className="text-zinc-200 font-bold text-sm">Eksplorator Transakcji Finansowych</div>
                         <div className="text-[11px] text-zinc-500 mt-1">
                             Aktywna spółka: {activeCompany?.name || 'Brak'} ({activeCompany?.code || 'PODMIOT'})
                         </div>
