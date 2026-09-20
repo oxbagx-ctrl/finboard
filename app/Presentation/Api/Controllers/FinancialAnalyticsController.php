@@ -106,7 +106,7 @@ final class FinancialAnalyticsController
     }
 
     /**
-     * Get category breakdown distribution for pie / donut charts.
+     * Get category breakdown distribution for pie / donut charts and P&L tables.
      */
     public function breakdown(
         FinancialAnalyticsQueryRequest $request,
@@ -115,6 +115,7 @@ final class FinancialAnalyticsController
         $companyId = $this->resolveCompanyId($request);
 
         $categoryTypeParam = $request->query('category_type');
+        $includeYoY = $request->has('include_yoy') ? $request->boolean('include_yoy') : true;
 
         $query = new GetCategoryBreakdownQuery(
             companyId: $companyId,
@@ -122,7 +123,10 @@ final class FinancialAnalyticsController
             endDate: $request->query('end_date'),
             recordType: (string) $request->query('record_type', 'EXPENSE'),
             currency: (string) $request->query('currency', 'PLN'),
-            categoryType: $categoryTypeParam !== null ? (string) $categoryTypeParam : null
+            categoryType: $categoryTypeParam !== null ? (string) $categoryTypeParam : null,
+            includeYoY: $includeYoY,
+            comparisonStartDate: $request->query('comparison_start_date'),
+            comparisonEndDate: $request->query('comparison_end_date')
         );
 
         $breakdown = $handler->handle($query);
@@ -131,6 +135,7 @@ final class FinancialAnalyticsController
             'status' => 'success',
             'company_id' => $companyId,
             'record_type' => strtoupper((string) $request->query('record_type', 'EXPENSE')),
+            'include_yoy' => $includeYoY,
             'data' => $breakdown,
         ];
 
