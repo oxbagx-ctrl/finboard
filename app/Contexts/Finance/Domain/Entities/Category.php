@@ -34,6 +34,51 @@ final class Category extends Entity
         return new self('cat-opex', 'Koszty operacyjne (OPEX)', CategoryType::OPEX, 'OPEX', 'Koszty ogólnego zarządu, sprzedaży i marketingu');
     }
 
+    public static function opexPayroll(): self
+    {
+        return new self('cat-opex-payroll', 'Wynagrodzenia i świadczenia pracownicze', CategoryType::OPEX, 'PAYROLL', 'Koszty wynagrodzeń, ubezpieczeń społecznych i benefitów pracowniczych');
+    }
+
+    public static function opexServices(): self
+    {
+        return new self('cat-opex-services', 'Usługi obce i podwykonawcy B2B', CategoryType::OPEX, 'SRV', 'Usługi doradcze, konsultingowe, audytorskie i podwykonawstwo B2B');
+    }
+
+    public static function opexOffice(): self
+    {
+        return new self('cat-opex-office', 'Czynsz i utrzymanie infrastruktury biurowej', CategoryType::OPEX, 'OFFICE', 'Wynajem powierzchni biurowych, media, eksploatacja i serwis');
+    }
+
+    public static function opexSoftware(): self
+    {
+        return new self('cat-opex-software', 'Narzędzia IT, licencje i chmura AWS/GCP', CategoryType::OPEX, 'CLOUD', 'Subskrypcje oprogramowania SaaS, hosting i infrastruktura chmurowa');
+    }
+
+    public static function opexMarketing(): self
+    {
+        return new self('cat-opex-marketing', 'Marketing, sprzedaż i pozyskiwanie klientów', CategoryType::OPEX, 'MKT', 'Kampanie reklamowe, lead generation, targi i promocja');
+    }
+
+    public static function opexLegal(): self
+    {
+        return new self('cat-opex-legal', 'Obsługa prawna, księgowa i audyt', CategoryType::OPEX, 'LEGAL', 'Obsługa prawna, notarialna, księgowa i audytorska');
+    }
+
+    /**
+     * @return array<string, self>
+     */
+    public static function defaultOpexCategories(): array
+    {
+        return [
+            'cat-opex-payroll' => self::opexPayroll(),
+            'cat-opex-services' => self::opexServices(),
+            'cat-opex-office' => self::opexOffice(),
+            'cat-opex-software' => self::opexSoftware(),
+            'cat-opex-marketing' => self::opexMarketing(),
+            'cat-opex-legal' => self::opexLegal(),
+        ];
+    }
+
     public static function depreciation(): self
     {
         return new self('cat-depreciation', 'Amortyzacja', CategoryType::DEPRECIATION, 'DEP', 'Odpisy amortyzacyjne środków trwałych i wartości niematerialnych');

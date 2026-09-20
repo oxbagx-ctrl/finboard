@@ -7,6 +7,7 @@ namespace Database\Seeders;
 use App\Contexts\Finance\Domain\ValueObjects\BenchmarkMetricType;
 use App\Models\Company;
 use App\Models\FinancialBenchmark;
+use App\Models\FinancialCategory;
 use App\Models\FinancialRecord;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
@@ -38,12 +39,75 @@ final class FinancialDataSeeder extends Seeder
             ]);
         }
 
+        // Ensure granular OPEX categories exist
+        $this->seedCategories();
+
         // Clean existing records to keep seeding idempotent
         FinancialRecord::whereIn('company_id', [self::ACME_ID, self::HELVEST_ID])->delete();
 
         $this->seedAcmeManufacturing();
         $this->seedHelvestAdvisory();
         $this->seedBenchmarks();
+    }
+
+    private function seedCategories(): void
+    {
+        $categories = [
+            [
+                'id' => FinancialCategory::OPEX_PAYROLL,
+                'name' => 'Wynagrodzenia i świadczenia pracownicze',
+                'type' => 'opex',
+                'code' => 'PAYROLL',
+                'description' => 'Koszty wynagrodzeń, ubezpieczeń społecznych i benefitów pracowniczych',
+            ],
+            [
+                'id' => FinancialCategory::OPEX_SERVICES,
+                'name' => 'Usługi obce i podwykonawcy B2B',
+                'type' => 'opex',
+                'code' => 'SRV',
+                'description' => 'Usługi doradcze, konsultingowe, audytorskie i podwykonawstwo B2B',
+            ],
+            [
+                'id' => FinancialCategory::OPEX_OFFICE,
+                'name' => 'Czynsz i utrzymanie infrastruktury biurowej',
+                'type' => 'opex',
+                'code' => 'OFFICE',
+                'description' => 'Wynajem powierzchni biurowych, media, eksploatacja i serwis',
+            ],
+            [
+                'id' => FinancialCategory::OPEX_SOFTWARE,
+                'name' => 'Narzędzia IT, licencje i chmura AWS/GCP',
+                'type' => 'opex',
+                'code' => 'CLOUD',
+                'description' => 'Subskrypcje oprogramowania SaaS, hosting, infrastruktura chmurowa',
+            ],
+            [
+                'id' => FinancialCategory::OPEX_MARKETING,
+                'name' => 'Marketing, sprzedaż i pozyskiwanie klientów',
+                'type' => 'opex',
+                'code' => 'MKT',
+                'description' => 'Kampanie reklamowe, lead generation, targi i promocja',
+            ],
+            [
+                'id' => FinancialCategory::OPEX_LEGAL,
+                'name' => 'Obsługa prawna, księgowa i audyt',
+                'type' => 'opex',
+                'code' => 'LEGAL',
+                'description' => 'Kancelarie prawne, obsługa podatkowa, księgowa i audytorska',
+            ],
+        ];
+
+        foreach ($categories as $cat) {
+            FinancialCategory::updateOrCreate(
+                ['id' => $cat['id']],
+                [
+                    'name' => $cat['name'],
+                    'type' => $cat['type'],
+                    'code' => $cat['code'],
+                    'description' => $cat['description'],
+                ]
+            );
+        }
     }
 
     private function seedAcmeManufacturing(): void

@@ -9,6 +9,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 final class FinancialCategory extends Model
 {
+    public const OPEX_GENERIC = 'cat-opex';
+    public const OPEX_PAYROLL = 'cat-opex-payroll';
+    public const OPEX_SERVICES = 'cat-opex-services';
+    public const OPEX_OFFICE = 'cat-opex-office';
+    public const OPEX_SOFTWARE = 'cat-opex-software';
+    public const OPEX_MARKETING = 'cat-opex-marketing';
+    public const OPEX_LEGAL = 'cat-opex-legal';
+
     protected $table = 'financial_categories';
 
     protected $primaryKey = 'id';

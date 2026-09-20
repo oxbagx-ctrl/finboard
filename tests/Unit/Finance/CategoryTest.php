@@ -37,6 +37,49 @@ final class CategoryTest extends TestCase
         $this->assertTrue($cliab->type()->isCurrentLiability());
     }
 
+    public function test_granular_opex_categories(): void
+    {
+        $categories = Category::defaultOpexCategories();
+
+        $this->assertCount(6, $categories);
+
+        $payroll = Category::opexPayroll();
+        $this->assertSame('cat-opex-payroll', $payroll->id());
+        $this->assertSame('PAYROLL', $payroll->code());
+        $this->assertSame(CategoryType::OPEX, $payroll->type());
+        $this->assertSame(RecordType::EXPENSE, $payroll->recordType());
+
+        $services = Category::opexServices();
+        $this->assertSame('cat-opex-services', $services->id());
+        $this->assertSame('SRV', $services->code());
+        $this->assertSame(CategoryType::OPEX, $services->type());
+        $this->assertSame(RecordType::EXPENSE, $services->recordType());
+
+        $office = Category::opexOffice();
+        $this->assertSame('cat-opex-office', $office->id());
+        $this->assertSame('OFFICE', $office->code());
+        $this->assertSame(CategoryType::OPEX, $office->type());
+        $this->assertSame(RecordType::EXPENSE, $office->recordType());
+
+        $software = Category::opexSoftware();
+        $this->assertSame('cat-opex-software', $software->id());
+        $this->assertSame('CLOUD', $software->code());
+        $this->assertSame(CategoryType::OPEX, $software->type());
+        $this->assertSame(RecordType::EXPENSE, $software->recordType());
+
+        $marketing = Category::opexMarketing();
+        $this->assertSame('cat-opex-marketing', $marketing->id());
+        $this->assertSame('MKT', $marketing->code());
+        $this->assertSame(CategoryType::OPEX, $marketing->type());
+        $this->assertSame(RecordType::EXPENSE, $marketing->recordType());
+
+        $legal = Category::opexLegal();
+        $this->assertSame('cat-opex-legal', $legal->id());
+        $this->assertSame('LEGAL', $legal->code());
+        $this->assertSame(CategoryType::OPEX, $legal->type());
+        $this->assertSame(RecordType::EXPENSE, $legal->recordType());
+    }
+
     public function test_category_equality(): void
     {
         $cat1 = Category::revenue();
