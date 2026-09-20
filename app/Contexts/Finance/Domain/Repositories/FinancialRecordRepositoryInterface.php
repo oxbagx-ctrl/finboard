@@ -40,4 +40,16 @@ interface FinancialRecordRepositoryInterface
     public function delete(FinancialRecordId $id): void;
 
     public function deleteByCompanyId(string $companyId): int;
+
+    /**
+     * @param array<string> $recordIds
+     * @return array<FinancialRecord>
+     */
+    public function findByIds(string $companyId, array $recordIds): array;
+
+    /**
+     * @param array<string> $recordIds
+     */
+    public function deleteManyByIds(string $companyId, array $recordIds): int;
 }
+

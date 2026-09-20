@@ -145,6 +145,39 @@ final class EloquentFinancialRecordRepository implements FinancialRecordReposito
         return EloquentFinancialRecord::where('company_id', $companyId)->delete();
     }
 
+    /**
+     * @param array<string> $recordIds
+     * @return array<FinancialRecord>
+     */
+    public function findByIds(string $companyId, array $recordIds): array
+    {
+        if (empty($recordIds)) {
+            return [];
+        }
+
+        return EloquentFinancialRecord::with('category')
+            ->where('company_id', $companyId)
+            ->whereIn('id', $recordIds)
+            ->get()
+            ->map(fn (EloquentFinancialRecord $record) => $this->toDomain($record))
+            ->all();
+    }
+
+    /**
+     * @param array<string> $recordIds
+     */
+    public function deleteManyByIds(string $companyId, array $recordIds): int
+    {
+        if (empty($recordIds)) {
+            return 0;
+        }
+
+        return EloquentFinancialRecord::where('company_id', $companyId)
+            ->whereIn('id', $recordIds)
+            ->delete();
+    }
+
+
     private function toDomain(EloquentFinancialRecord $eloquent): FinancialRecord
     {
         $eloquentCategory = $eloquent->category;

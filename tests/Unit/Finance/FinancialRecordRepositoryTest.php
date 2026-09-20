@@ -132,4 +132,73 @@ final class FinancialRecordRepositoryTest extends TestCase
 
         $this->assertSame([], $years);
     }
+
+    public function test_repository_can_find_and_delete_many_records_by_ids_with_tenant_isolation(): void
+    {
+        $foreignCompany = \App\Models\Company::firstOrCreate(
+            ['code' => 'FOREIGN_TEST'],
+            ['name' => 'Foreign Corp', 'tax_id' => 'PL9999999999']
+        );
+        $foreignCompanyId = $foreignCompany->id;
+
+
+        $id1 = FinancialRecordId::generate();
+        $record1 = FinancialRecord::create(
+            id: $id1,
+            companyId: self::COMPANY_ID,
+            category: Category::revenue(),
+            amount: Money::fromDecimal('1000.0000', Currency::PLN),
+            recordDate: new DateTimeImmutable('2026-06-01'),
+            description: 'Transakcja 1',
+            source: 'manual'
+        );
+
+        $id2 = FinancialRecordId::generate();
+        $record2 = FinancialRecord::create(
+            id: $id2,
+            companyId: self::COMPANY_ID,
+            category: Category::revenue(),
+            amount: Money::fromDecimal('2000.0000', Currency::PLN),
+            recordDate: new DateTimeImmutable('2026-06-02'),
+            description: 'Transakcja 2',
+            source: 'manual'
+        );
+
+        $foreignId = FinancialRecordId::generate();
+        $foreignRecord = FinancialRecord::create(
+            id: $foreignId,
+            companyId: $foreignCompanyId,
+            category: Category::revenue(),
+            amount: Money::fromDecimal('5000.0000', Currency::PLN),
+            recordDate: new DateTimeImmutable('2026-06-03'),
+            description: 'Obca transakcja',
+            source: 'manual'
+        );
+
+        $this->repository->saveMany([$record1, $record2, $foreignRecord]);
+
+        // Verify findByIds isolates by company
+        $found = $this->repository->findByIds(self::COMPANY_ID, [$id1->value(), $id2->value(), $foreignId->value()]);
+        $this->assertCount(2, $found);
+        $foundIds = array_map(fn (FinancialRecord $r) => $r->id(), $found);
+        $this->assertContains($id1->value(), $foundIds);
+        $this->assertContains($id2->value(), $foundIds);
+        $this->assertNotContains($foreignId->value(), $foundIds);
+
+        // Verify deleteManyByIds strictly deletes only tenant records
+        $deletedCount = $this->repository->deleteManyByIds(self::COMPANY_ID, [$id1->value(), $id2->value(), $foreignId->value()]);
+        $this->assertSame(2, $deletedCount);
+
+        // Verify tenant records are deleted
+        $this->assertNull($this->repository->findById($id1));
+        $this->assertNull($this->repository->findById($id2));
+
+        // Verify foreign company record was preserved
+        $this->assertNotNull($this->repository->findById($foreignId));
+
+        // Test empty input edge cases
+        $this->assertSame([], $this->repository->findByIds(self::COMPANY_ID, []));
+        $this->assertSame(0, $this->repository->deleteManyByIds(self::COMPANY_ID, []));
+    }
 }
+
