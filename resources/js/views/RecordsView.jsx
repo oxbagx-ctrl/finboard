@@ -504,6 +504,7 @@ export const RecordsView = () => {
                                         checked={allSelected}
                                         onChange={handleToggleSelectAll}
                                         aria-label="Zaznacz wszystkie transakcje na stronie"
+                                        data-testid="batch-master-checkbox"
                                         className="rounded border-zinc-750 bg-zinc-900 text-emerald-500 focus:ring-emerald-500/20 focus:ring-offset-0 cursor-pointer w-3.5 h-3.5 accent-emerald-500 align-middle"
                                     />
                                 </th>
@@ -547,6 +548,7 @@ export const RecordsView = () => {
                                                     checked={isSelected}
                                                     onChange={() => handleToggleSelectRow(record.id)}
                                                     aria-label={`Zaznacz transakcję ${record.description}`}
+                                                    data-testid={`record-checkbox-${record.id}`}
                                                     className="rounded border-zinc-750 bg-zinc-900 text-emerald-500 focus:ring-emerald-500/20 focus:ring-offset-0 cursor-pointer w-3.5 h-3.5 accent-emerald-500 align-middle"
                                                 />
                                             </td>

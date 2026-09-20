@@ -341,12 +341,12 @@ npm test
   - Rejestracja zdarzenia domenowego `FinancialRecordsBatchDeleted` i listenera audytu `financial_audit_logs`.
   - Wystawienie endpointu `DELETE /api/v1/finance/records/batch` z walidacją `BatchDeleteFinancialRecordsRequest`.
   - Testy jednostkowe i integracyjne weryfikujące masowe usuwanie, izolację spółek i audyt.
-- [ ] **Faza 27: Interfejs Zaznaczania i Pasek Akcji Masowych w Księdze**
+- [x] **Faza 27: Interfejs Zaznaczania i Pasek Akcji Masowych w Księdze (Commity 131–135)**
   - [x] Stan zaznaczenia, checkboxy wierszy i master-checkbox w nagłówku tabeli `RecordsView`.
   - [x] Pływający pasek akcji masowych `BatchActionBar` z sumowaniem kwot i liczbą zaznaczonych pozycji.
   - [x] Dwuetapowy modal potwierdzenia `BatchDeleteConfirmationModal` z podsumowaniem i zabezpieczeniem "USUŃ".
   - [x] Integracja wywołania API masowego usuwania z optymistycznym czyszczeniem i powiadomieniami.
-  - [ ] Testy komponentów w `RecordsView.test.jsx` dla interakcji zaznaczania i modalu usuwania.
+  - [x] Testy komponentów w `RecordsView.test.jsx` dla interakcji zaznaczania i modalu usuwania.
 - [ ] **Faza 28: Zaawansowane Czyszczenie Zbiorów i Testy Regresji**
   - [ ] Walidacja limitu masowego usuwania (max 500 rekordów) i obsługa skrajnych payloadów.
   - [ ] Utrzymanie/reset stanu zaznaczeń przy paginacji i przełączaniu kontekstu spółki/filtrów.
