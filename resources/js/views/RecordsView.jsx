@@ -5,7 +5,9 @@ import { useDeal } from '../context/DealContext';
 import { useNotification } from '../context/NotificationContext';
 import { FinancialRecordModal } from '../components/finance/FinancialRecordModal';
 import { DeleteRecordConfirmationModal } from '../components/finance/DeleteRecordConfirmationModal';
+import { BatchActionBar } from '../components/finance/BatchActionBar';
 import { FinancialValue } from '../components/ui/FinancialValue';
+
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import {
@@ -92,6 +94,34 @@ export const RecordsView = () => {
             setSelectedRecordIds((prev) => Array.from(new Set([...prev, ...currentPageIds])));
         }
     }, [allSelected, currentPageIds]);
+
+    const [batchDeleteModalOpen, setBatchDeleteModalOpen] = useState(false);
+
+    // Dynamic metrics calculation for currently selected records
+    const selectedRecords = useMemo(() => {
+        return records.filter((r) => selectedSet.has(r.id));
+    }, [records, selectedSet]);
+
+    const selectedMetrics = useMemo(() => {
+        let total = 0;
+        let income = 0;
+        let expense = 0;
+
+        selectedRecords.forEach((r) => {
+            const amt = Number(r.amount || 0);
+            total += amt;
+            if (r.record_type === 'INCOME') income += amt;
+            if (r.record_type === 'EXPENSE') expense += amt;
+        });
+
+        return {
+            count: selectedRecordIds.length,
+            total: convertAmount(total),
+            income: convertAmount(income),
+            expense: convertAmount(expense),
+        };
+    }, [selectedRecords, selectedRecordIds.length, convertAmount]);
+
 
 
     // Fetch Categories
@@ -603,7 +633,19 @@ export const RecordsView = () => {
                 </div>
             </div>
 
+            {/* Floating Batch Action Bar */}
+            <BatchActionBar
+                selectedCount={selectedRecordIds.length}
+                totalAmount={selectedMetrics.total}
+                incomeAmount={selectedMetrics.income}
+                expenseAmount={selectedMetrics.expense}
+                currency={currency}
+                onClearSelection={() => setSelectedRecordIds([])}
+                onOpenBatchDelete={() => setBatchDeleteModalOpen(true)}
+            />
+
             {/* Create & Edit Modal */}
+
             <FinancialRecordModal
                 isOpen={recordModalOpen}
                 onClose={() => setRecordModalOpen(false)}

@@ -343,7 +343,7 @@ npm test
   - Testy jednostkowe i integracyjne weryfikujące masowe usuwanie, izolację spółek i audyt.
 - [ ] **Faza 27: Interfejs Zaznaczania i Pasek Akcji Masowych w Księdze**
   - [x] Stan zaznaczenia, checkboxy wierszy i master-checkbox w nagłówku tabeli `RecordsView`.
-  - [ ] Pływający pasek akcji masowych `BatchActionBar` z sumowaniem kwot i liczbą zaznaczonych pozycji.
+  - [x] Pływający pasek akcji masowych `BatchActionBar` z sumowaniem kwot i liczbą zaznaczonych pozycji.
   - [ ] Dwuetapowy modal potwierdzenia `BatchDeleteConfirmationModal` z podsumowaniem i zabezpieczeniem "USUŃ".
   - [ ] Integracja wywołania API masowego usuwania z optymistycznym czyszczeniem i powiadomieniami.
   - [ ] Testy komponentów w `RecordsView.test.jsx` dla interakcji zaznaczania i modalu usuwania.
