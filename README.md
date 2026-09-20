@@ -317,12 +317,24 @@ npm test
   - Testy jednostkowe kalkulacji YoY dla otwartych zakresów dat (Pełna historia).
   - Testy integracyjne weryfikujące endpoint `GET /finance/analytics/breakdown` dla podkategorii OPEX i przychodów.
   - Weryfikacja spójności formatu danych porównawczych między metrykami a breakdown.
-- [ ] **Faza 23: Poprawa Typografii Tabeli P&L i Warunkowej Grupowalności**
-  - [x] Usunięcie prefiksu `(-)` przed numeracją pozycji w `FinancialTable` z zachowaniem semantyki kosztu.
-  - [x] Warunkowa obsługa rozwijania wierszy (chevron tylko dla grup posiadających więcej niż 1 pozycję).
-  - [x] Formatowanie ujemnych potrąceń w `FinancialValue` bez zaburzania numeracji wierszy.
-  - [x] Aktualizacja testów komponentu `FinancialTable`.
-  - [x] Testy regresyjne E2E w `DashboardView.test.jsx` dla czystej hierarchii P&L.
+- [x] **Faza 23: Poprawa Typografii Tabeli P&L i Warunkowej Grupowalności**
+  - Usunięcie prefiksu `(-)` przed numeracją pozycji w `FinancialTable` z zachowaniem semantyki kosztu.
+  - Warunkowa obsługa rozwijania wierszy (chevron tylko dla grup posiadających więcej niż 1 pozycję).
+  - Formatowanie ujemnych potrąceń w `FinancialValue` bez zaburzania numeracji wierszy.
+  - Aktualizacja testów komponentu `FinancialTable`.
+  - Testy regresyjne E2E w `DashboardView.test.jsx` dla czystej hierarchii P&L.
+- [ ] **Faza 24: Perfekcyjna Typografia i Wyrównanie Siatki P&L (Commity 116–120)**
+  - [x] Wyrównanie wierszy głównych (1–9) P&L do jednolitego dopełnienia bazowego (`px-4`) i usunięcie wcięcia `pl-6`.
+  - [ ] Standaryzacja odstępów i typografii znacznika potrącenia `(-)` przy kodach kategorii.
+  - [ ] Wyrównanie pikselowe szerokości expandera chevron i elementu placeholder spacer (`w-3.5`).
+  - [ ] Aktualizacja testów jednostkowych `FinancialTable.test.jsx` weryfikujących ścisłe pionowe wyrównanie pozycji głównych (1–9).
+  - [ ] Dodanie testu weryfikującego, że wcięcia (`pl-8` / `pl-10`) posiadają wyłącznie elementy podrzędne.
+- [ ] **Faza 25: Spójność Raportów i Regresja Wizualna (Commity 121–125)**
+  - [ ] Synchronizacja styli `ExecutivePdfReport` z ujednoliconą siatką tabeli `FinancialTable`.
+  - [ ] Weryfikacja stabelaryzowanego wyrównania liczb monospace o wysokiej gęstości w `FinancialValue` dla wierszy potrąceń.
+  - [ ] Aktualizacja testów komponentu `ExecutivePdfReport` dla spójnej hierarchii wierszy P&L i czystej typografii.
+  - [ ] Testy regresyjne E2E w `DashboardView.test.jsx` po przełączeniu roku i firmy.
+  - [ ] Aktualizacja dokumentacji design systemu UI i changeloga pod kątem instytucjonalnych standardów tabelarycznych P&L.
 
 ---
 

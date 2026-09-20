@@ -88,7 +88,7 @@ export const FinancialTable = ({
                                         onClick={isExpandable ? () => toggleGroup(row.id) : undefined}
                                     >
                                         <td className={`py-2 px-4 flex items-center gap-2 ${
-                                            isSubItem ? 'pl-8 text-zinc-400' : isDeduction && !row.isGroup ? 'pl-6 text-zinc-300' : 'text-zinc-200'
+                                            isSubItem ? 'pl-8 text-zinc-400' : 'text-zinc-200'
                                         }`}>
                                             {isExpandable ? (
                                                 <span className="text-zinc-500 hover:text-zinc-300 transition-colors">
