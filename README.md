@@ -296,7 +296,7 @@ npm test
 - [ ] **Faza 19: Domenowe Obliczanie Dynamiki R/R dla Podpozycji Kategorii**
   - [x] Rozszerzenie `GetCategoryBreakdownQuery` i Handlera o kalkulację kwot porównawczych i dynamiki YoY per kategoria.
   - [x] Ekspozycja dynamiki YoY na poziomie kategorii (`previous_amount`, `yoy_growth_pct`) w endpoincie `/finance/analytics/breakdown`.
-  - [ ] Testy jednostkowe kalkulacji dynamiki YoY na poziomie kategorii z przypadkami brzegowymi (nowe kategorie, baza zerowa).
+  - [x] Testy jednostkowe kalkulacji dynamiki YoY na poziomie kategorii z przypadkami brzegowymi (nowe kategorie, baza zerowa).
   - [ ] Testy integracyjne endpointu breakdown weryfikujące strukturę payloadu YoY.
   - [ ] Optymalizacja agregacji rekordów i zapytań bazodanowych dla okresów porównawczych.
 - [ ] **Faza 20: Integracja UI Tabeli P&L i Wykresu Struktury Kosztów**

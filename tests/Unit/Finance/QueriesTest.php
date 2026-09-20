@@ -343,6 +343,156 @@ final class QueriesTest extends TestCase
         }
     }
 
+    public function test_get_category_breakdown_handler_handles_missing_comparative_period_gracefully(): void
+    {
+        $handler = new GetCategoryBreakdownHandler($this->repo);
+
+        // Query Acme for 2025-01-01 to 2025-03-31 where 2024 has no comparative records
+        $query = new GetCategoryBreakdownQuery(
+            companyId: self::ACME_COMPANY_ID,
+            startDate: '2025-01-01',
+            endDate: '2025-03-31',
+            recordType: 'EXPENSE',
+            includeYoY: true
+        );
+
+        $breakdown = $handler->handle($query);
+
+        $this->assertNotEmpty($breakdown);
+        foreach ($breakdown as $item) {
+            $this->assertNull($item['previous_amount']);
+            $this->assertNull($item['formatted_previous_amount']);
+            $this->assertNull($item['amount_change']);
+            $this->assertNull($item['formatted_amount_change']);
+            $this->assertNull($item['yoy_growth_pct']);
+            $this->assertNull($item['previous_percentage']);
+            $this->assertNull($item['percentage_point_diff']);
+            $this->assertGreaterThan(0, $item['amount']);
+            $this->assertGreaterThan(0, $item['percentage']);
+        }
+    }
+
+    public function test_get_category_breakdown_handler_handles_new_category_with_zero_base_gracefully(): void
+    {
+        // Insert a record for 'cat-opex' (which has 0 records in 2025 comparative period)
+        \Illuminate\Support\Facades\DB::table('financial_records')->insert([
+            'id' => (string) \Illuminate\Support\Str::uuid(),
+            'company_id' => self::ACME_COMPANY_ID,
+            'category_id' => 'cat-opex',
+            'record_type' => 'EXPENSE',
+            'description' => 'New OPEX category expense without 2025 history',
+            'amount' => 5000.00,
+            'currency' => 'PLN',
+            'record_date' => '2026-02-15',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $handler = new GetCategoryBreakdownHandler($this->repo);
+
+        $query = new GetCategoryBreakdownQuery(
+            companyId: self::ACME_COMPANY_ID,
+            startDate: '2026-01-01',
+            endDate: '2026-03-31',
+            recordType: 'EXPENSE',
+            categoryType: 'OPEX',
+            includeYoY: true
+        );
+
+        $breakdown = $handler->handle($query);
+
+        $newCategoryItem = null;
+        foreach ($breakdown as $item) {
+            if ($item['category_id'] === 'cat-opex') {
+                $newCategoryItem = $item;
+                break;
+            }
+        }
+
+        $this->assertNotNull($newCategoryItem);
+        $this->assertSame(5000.0, $newCategoryItem['amount']);
+        $this->assertSame('5 000,00 PLN', $newCategoryItem['formatted_amount']);
+        // Previous amount must be 0.0 because comparative period has records for other categories, but 0 for this category
+        $this->assertSame(0.0, $newCategoryItem['previous_amount']);
+        $this->assertSame('0,00 PLN', $newCategoryItem['formatted_previous_amount']);
+        // Growth from zero base is undefined mathematically (null)
+        $this->assertNull($newCategoryItem['yoy_growth_pct']);
+        $this->assertSame(5000.0, $newCategoryItem['amount_change']);
+        $this->assertSame('5 000,00 PLN', $newCategoryItem['formatted_amount_change']);
+        $this->assertSame(0.0, $newCategoryItem['previous_percentage']);
+        $this->assertSame($newCategoryItem['percentage'], $newCategoryItem['percentage_point_diff']);
+    }
+
+    public function test_get_category_breakdown_handler_supports_explicit_custom_comparison_date_range(): void
+    {
+        $handler = new GetCategoryBreakdownHandler($this->repo);
+
+        // Explicit MoM comparison: Feb 2026 vs Jan 2026
+        $query = new GetCategoryBreakdownQuery(
+            companyId: self::ACME_COMPANY_ID,
+            startDate: '2026-02-01',
+            endDate: '2026-02-28',
+            recordType: 'EXPENSE',
+            categoryType: 'OPEX',
+            includeYoY: true,
+            comparisonStartDate: '2026-01-01',
+            comparisonEndDate: '2026-01-31'
+        );
+
+        $breakdown = $handler->handle($query);
+
+        $this->assertNotEmpty($breakdown);
+        foreach ($breakdown as $item) {
+            $this->assertNotNull($item['previous_amount']);
+            $this->assertGreaterThan(0, $item['previous_amount']);
+            $this->assertNotNull($item['yoy_growth_pct']);
+            $this->assertNotNull($item['amount_change']);
+        }
+
+        // PAYROLL in Jan 2026 was 47,895.20 PLN and in Feb 2026 was 48,244.80 PLN
+        $payroll = null;
+        foreach ($breakdown as $item) {
+            if ($item['category_code'] === 'PAYROLL') {
+                $payroll = $item;
+                break;
+            }
+        }
+
+        $this->assertNotNull($payroll);
+        $this->assertEqualsWithDelta(48244.8, $payroll['amount'], 1.0);
+        $this->assertEqualsWithDelta(47895.2, $payroll['previous_amount'], 1.0);
+        $this->assertEqualsWithDelta(349.6, $payroll['amount_change'], 1.0);
+        $this->assertEqualsWithDelta(0.73, $payroll['yoy_growth_pct'], 0.1);
+    }
+
+    public function test_get_category_breakdown_handler_with_include_yoy_disabled_returns_null_comparative_metrics(): void
+    {
+        $handler = new GetCategoryBreakdownHandler($this->repo);
+
+        $query = new GetCategoryBreakdownQuery(
+            companyId: self::ACME_COMPANY_ID,
+            startDate: '2026-01-01',
+            endDate: '2026-03-31',
+            recordType: 'EXPENSE',
+            categoryType: 'OPEX',
+            includeYoY: false
+        );
+
+        $breakdown = $handler->handle($query);
+
+        $this->assertNotEmpty($breakdown);
+        foreach ($breakdown as $item) {
+            $this->assertNull($item['previous_amount']);
+            $this->assertNull($item['formatted_previous_amount']);
+            $this->assertNull($item['amount_change']);
+            $this->assertNull($item['formatted_amount_change']);
+            $this->assertNull($item['yoy_growth_pct']);
+            $this->assertNull($item['previous_percentage']);
+            $this->assertNull($item['percentage_point_diff']);
+            $this->assertGreaterThan(0, $item['amount']);
+        }
+    }
+
     public function test_get_category_breakdown_handler_filters_by_single_category_type_opex(): void
     {
         $handler = new GetCategoryBreakdownHandler($this->repo);
