@@ -348,11 +348,29 @@ npm test
   - Integracja wywołania API masowego usuwania z optymistycznym czyszczeniem i powiadomieniami.
   - Testy komponentów w `RecordsView.test.jsx` dla interakcji zaznaczania i modalu usuwania.
 - [x] **Faza 28: Zaawansowane Czyszczenie Zbiorów i Testy Regresji**
-  - [x] Walidacja limitu masowego usuwania (max 500 rekordów) i obsługa skrajnych payloadów.
-  - [x] Utrzymanie/reset stanu zaznaczeń przy paginacji i przełączaniu kontekstu spółki/filtrów.
-  - [x] Testy integracyjne przypadków brzegowych (obce ID spółek, puste paczki, rollback DB).
-  - [x] Testy E2E w `RecordsView.test.jsx` dla pełnego przepływu masowego usuwania.
-  - [x] Dokumentacja wytycznych bezpieczeństwa operacji masowych i ścieżki audytowej w changelogu.
+  - Walidacja limitu masowego usuwania (max 500 rekordów) i obsługa skrajnych payloadów.
+  - Utrzymanie/reset stanu zaznaczeń przy paginacji i przełączaniu kontekstu spółki/filtrów.
+  - Testy integracyjne przypadków brzegowych (obce ID spółek, puste paczki, rollback DB).
+  - Testy E2E w `RecordsView.test.jsx` dla pełnego przepływu masowego usuwania.
+  - Dokumentacja wytycznych bezpieczeństwa operacji masowych i ścieżki audytowej w changelogu.
+- [ ] **Faza 29: Komponent Modalu Szczegółów Audytu i Architektura Zakładek**
+  - [x] Utworzenie komponentu `FinancialAuditDetailModal` z inspekcją zrzutów JSON dla `old_values` i `new_values`.
+  - [ ] Implementacja terminalowego przełącznika zakładek (Audyt Finansowy vs Audyt VDR) w `AuditLogsView`.
+  - [ ] Implementacja kafelków podsumowujących KPI dla statystyk audytu (`/finance/audit-logs/stats`).
+  - [ ] Dodanie pigułek filtrów akcji finansowych ze wskaźnikami liczbowymi i stylami aktywnego stanu.
+  - [ ] Testy jednostkowe dla `FinancialAuditDetailModal` renderującego metadane i diffy `old_values`/`new_values`.
+- [ ] **Faza 30: Integracja Tabeli Audytu Finansowego, Wyszukiwarki i Paginacji**
+  - [ ] Implementacja tabeli audytu finansowego wysokiej gęstości z czasem CET, profilami operatorów i badge'ami akcji.
+  - [ ] Połączenie tabeli audytu z wyszukiwarką tekstową (debounce) i paginacją backendową.
+  - [ ] Powiązanie przycisku inspekcji wiersza z otwarciem modalu `FinancialAuditDetailModal`.
+  - [ ] Rygorystyczna synchronizacja kontekstu `activeCompany` oraz obsługa stanów ładowania i pustych wyników.
+  - [ ] Testy komponentów w `AuditLogsView.test.jsx` dla zakładki finansowej, przełączania VDR, filtrów i modalu.
+- [ ] **Faza 31: Testy Integracyjne, Bezpieczeństwo i Dokumentacja**
+  - [ ] Testy integracyjne E2E dla filtrowania zdarzeń audytowych według akcji usunięcia, modyfikacji i importu CSV.
+  - [ ] Harmonizacja palety kolorów badge'y i mapowania ikon w kategoriach audytowych.
+  - [ ] Weryfikacja izolacji najemcy (tenant isolation) przy przełączaniu spółek przez DealContext.
+  - [ ] Testy regresji weryfikujące paginację i filtrowanie audytu dokumentów VDR.
+  - [ ] Aktualizacja dokumentacji systemu audytu i przewodnika po zrzutach JSON w changelogu.
 
 ---
 
