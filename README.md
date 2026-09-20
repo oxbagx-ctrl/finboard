@@ -5,7 +5,7 @@
 [![PostgreSQL](https://img.shields.io/badge/postgresql-16-blue.svg)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/redis-alpine-red.svg)](https://redis.io/)
 [![Architecture](https://img.shields.io/badge/architecture-DDD%20%2F%20CQRS-brightgreen.svg)]()
-[![Tests](https://img.shields.io/badge/tests-362%20backend%20%7C%20124%20frontend%20passed-success.svg)]()
+[![Tests](https://img.shields.io/badge/tests-362%20backend%20%7C%20138%20frontend%20passed-success.svg)]()
 
 FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakcyjnego (M&A, Due Diligence, Corporate Finance) oraz ich klientom (CFO, Zarządy). Aplikacja łączy w sobie zaawansowaną analitykę finansową w ujęciu wielo-najemcowym (Multi-Tenant) z bezpiecznym repozytorium dokumentów Virtual Data Room (VDR).
 
@@ -125,7 +125,7 @@ docker compose exec app ./vendor/bin/phpunit
 ```
 
 ### Testy Frontendowe (Vitest)
-Pakiet 124 testów jednostkowych i integracyjnych dla komponentów React, kontekstu transakcyjnego, walidacji danych, kalkulatorów walutowych oraz konfiguratora celów benchmarkowych:
+Pakiet 138 testów jednostkowych i integracyjnych dla komponentów React, kontekstu transakcyjnego, walidacji danych, kalkulatorów walutowych oraz konfiguratora celów benchmarkowych:
 ```bash
 npm test
 ```
@@ -282,7 +282,7 @@ npm test
   - [x] Wprowadzenie estetycznych stanów fallback ("—") dla brakujących danych bilansowych.
 - [ ] **Faza 17: Precyzja Dynamiki R/R i Optymalizacja Prezentacji Finansowej**
   - [x] Analiza i rozszerzenie obliczeń dynamiki rok-do-roku (YoY) w `CalculateFinancialDynamicsQuery`.
-  - [ ] Poprawa `PercentageBadge` i `FinancialTable` pod kątem rozróżnienia braku danych (`null`) od wzrostu `0.0%`.
+  - [x] Poprawa `PercentageBadge` i `FinancialTable` pod kątem rozróżnienia braku danych (`null`) od wzrostu `0.0%`.
   - [ ] Standaryzacja hierarchii i formatowania wierszy w zestawieniu Rachunku Zysków i Strat (P&L Table).
   - [ ] Testy jednostkowe i integracyjne dla precyzji obliczeń dynamiki oraz weryfikacji stanów brzegowych.
   - [ ] Weryfikacja spójności całego pulpitu zarządczego (Executive Overview) oraz generowanie pełnego buildu produkcyjnego.

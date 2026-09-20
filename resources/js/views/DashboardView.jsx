@@ -174,11 +174,14 @@ export const DashboardView = () => {
     // Dynamic YoY / MoM changes from API
     const dynamics = metrics?.dynamics || {};
     const yoyRevenueGrowth = dynamics?.yoy?.revenue_growth_pct != null ? Number(dynamics.yoy.revenue_growth_pct) : null;
-    const yoyEbitdaGrowth = dynamics?.yoy?.ebitda_growth_pct != null ? Number(dynamics.yoy.ebitda_growth_pct) : null;
-    const yoyEbitGrowth = dynamics?.yoy?.ebit_growth_pct != null ? Number(dynamics.yoy.ebit_growth_pct) : null;
-    const yoyNetProfitGrowth = dynamics?.yoy?.net_profit_growth_pct != null ? Number(dynamics.yoy.net_profit_growth_pct) : null;
-    const yoyOpexGrowth = dynamics?.yoy?.opex_growth_pct != null ? Number(dynamics.yoy.opex_growth_pct) : null;
+    const yoyCogsGrowth = dynamics?.yoy?.cogs_growth_pct != null ? Number(dynamics.yoy.cogs_growth_pct) : null;
     const yoyGrossProfitGrowth = dynamics?.yoy?.gross_profit_growth_pct != null ? Number(dynamics.yoy.gross_profit_growth_pct) : null;
+    const yoyOpexGrowth = dynamics?.yoy?.opex_growth_pct != null ? Number(dynamics.yoy.opex_growth_pct) : null;
+    const yoyEbitdaGrowth = dynamics?.yoy?.ebitda_growth_pct != null ? Number(dynamics.yoy.ebitda_growth_pct) : null;
+    const yoyDaGrowth = dynamics?.yoy?.depreciation_growth_pct != null ? Number(dynamics.yoy.depreciation_growth_pct) : null;
+    const yoyEbitGrowth = dynamics?.yoy?.ebit_growth_pct != null ? Number(dynamics.yoy.ebit_growth_pct) : null;
+    const yoyTaxGrowth = dynamics?.yoy?.tax_growth_pct != null ? Number(dynamics.yoy.tax_growth_pct) : null;
+    const yoyNetProfitGrowth = dynamics?.yoy?.net_profit_growth_pct != null ? Number(dynamics.yoy.net_profit_growth_pct) : null;
     const yoyCurrentRatioDiff = dynamics?.yoy?.current_ratio_diff != null ? Number(dynamics.yoy.current_ratio_diff) : null;
 
     // Converted Trends Data for Charts
@@ -239,7 +242,7 @@ export const DashboardView = () => {
                 code: 'COGS',
                 amount: cogsVal,
                 reverseChange: true,
-                change: null,
+                change: yoyCogsGrowth,
             },
             {
                 id: 'gross_profit',
@@ -274,7 +277,7 @@ export const DashboardView = () => {
                 label: '6. Amortyzacja Rzeczowa i Niematerialna (D&A)',
                 code: 'D&A',
                 amount: daVal,
-                change: null,
+                change: yoyDaGrowth,
                 reverseChange: true,
             },
             {
@@ -291,7 +294,7 @@ export const DashboardView = () => {
                 label: '8. Podatek Dochodowy od Osób Prawnych (CIT)',
                 code: 'CIT',
                 amount: taxVal,
-                change: null,
+                change: yoyTaxGrowth,
                 reverseChange: true,
             },
             {
@@ -315,10 +318,13 @@ export const DashboardView = () => {
         taxVal,
         netProfitVal,
         yoyRevenueGrowth,
+        yoyCogsGrowth,
         yoyGrossProfitGrowth,
         yoyOpexGrowth,
         yoyEbitdaGrowth,
+        yoyDaGrowth,
         yoyEbitGrowth,
+        yoyTaxGrowth,
         yoyNetProfitGrowth,
         revenueBreakdown,
         expenseBreakdown,

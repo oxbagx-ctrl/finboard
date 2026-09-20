@@ -39,9 +39,9 @@ export const formatCurrency = (amount, currency = 'PLN', compact = false) => {
  * Formats a financial margin or percentage change.
  * e.g. 0.245 -> "+24.5%" or -0.032 -> "-3.2%"
  */
-export const formatPercent = (value, decimals = 1, showSign = true) => {
+export const formatPercent = (value, decimals = 1, showSign = true, fallback = null) => {
     if (value === undefined || value === null || isNaN(Number(value))) {
-        return '0.0%';
+        return fallback !== null ? fallback : '0.0%';
     }
 
     const num = Number(value);

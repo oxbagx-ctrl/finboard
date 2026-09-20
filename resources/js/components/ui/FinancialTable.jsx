@@ -15,15 +15,12 @@ export const FinancialTable = ({
     revenueTotal = 0,
     className = '',
 }) => {
-    const [expandedGroups, setExpandedGroups] = useState({
-        revenue: true,
-        opex: true,
-    });
+    const [expandedGroups, setExpandedGroups] = useState({});
 
     const toggleGroup = (groupId) => {
         setExpandedGroups((prev) => ({
             ...prev,
-            [groupId]: !prev[groupId],
+            [groupId]: prev[groupId] === undefined ? false : !prev[groupId],
         }));
     };
 
@@ -59,12 +56,12 @@ export const FinancialTable = ({
                     <tbody className="divide-y divide-zinc-850">
                         {data.map((row) => {
                             const isGroup = Boolean(row.isGroup);
-                            const isExpanded = expandedGroups[row.id];
+                            const isExpanded = expandedGroups[row.id] !== false;
                             const isSummary = Boolean(row.isSummary);
                             const isSubItem = Boolean(row.isSubItem);
 
                             // Calculate % of Revenue if total revenue is positive
-                            const revShare = revenueTotal > 0 && row.amount
+                            const revShare = revenueTotal > 0 && row.amount != null && !isNaN(Number(row.amount))
                                 ? (Number(row.amount) / revenueTotal) * 100
                                 : null;
 
@@ -118,15 +115,12 @@ export const FinancialTable = ({
                                         </td>
 
                                         <td className="py-2 px-3 text-right">
-                                            {row.change !== undefined ? (
-                                                <PercentageBadge
-                                                    value={row.change}
-                                                    reverse={row.reverseChange}
-                                                    decimals={1}
-                                                />
-                                            ) : (
-                                                <span className="text-zinc-600">—</span>
-                                            )}
+                                            <PercentageBadge
+                                                value={row.change}
+                                                reverse={row.reverseChange}
+                                                decimals={1}
+                                                fallback="—"
+                                            />
                                         </td>
 
                                         <td className="py-2 px-4 text-center">
@@ -138,7 +132,7 @@ export const FinancialTable = ({
 
                                     {/* Render Sub-items if group is expanded */}
                                     {isGroup && isExpanded && row.children && row.children.map((child) => {
-                                        const childRevShare = revenueTotal > 0 && child.amount
+                                        const childRevShare = revenueTotal > 0 && child.amount != null && !isNaN(Number(child.amount))
                                             ? (Number(child.amount) / revenueTotal) * 100
                                             : null;
 
@@ -165,15 +159,12 @@ export const FinancialTable = ({
                                                 </td>
 
                                                 <td className="py-1.5 px-3 text-right">
-                                                    {child.change !== undefined ? (
-                                                        <PercentageBadge
-                                                            value={child.change}
-                                                            reverse={child.reverseChange}
-                                                            decimals={1}
-                                                        />
-                                                    ) : (
-                                                        <span className="text-zinc-600">—</span>
-                                                    )}
+                                                    <PercentageBadge
+                                                        value={child.change}
+                                                        reverse={child.reverseChange}
+                                                        decimals={1}
+                                                        fallback="—"
+                                                    />
                                                 </td>
 
                                                 <td className="py-1.5 px-4 text-center">
