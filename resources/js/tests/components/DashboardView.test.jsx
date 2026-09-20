@@ -366,27 +366,31 @@ describe('DashboardView Component', () => {
         expect(screen.getByText('Dodano zapis księgowy przychodów SLA')).toBeInTheDocument();
     });
 
-    it('renders standardized P&L financial table with full PSR/MSR hierarchy and deduction markers', async () => {
+    it('renders standardized P&L financial table with clean typography, full PSR/MSR hierarchy and deduction markers', async () => {
         renderWithProviders(<DashboardView />);
 
         await waitFor(() => {
             expect(screen.getByText('Rachunek Zysków i Strat (P&L Konsolidowany)')).toBeInTheDocument();
         });
 
-        // 1. Check all 9 standardized hierarchy rows
-        expect(screen.getByText(/1\. Przychody ze Sprzedaży/i)).toBeInTheDocument();
-        expect(screen.getByText(/2\. Koszt Wytworzenia Sprzedanych Produktów \(COGS\)/i)).toBeInTheDocument();
-        expect(screen.getByText(/3\. ZYSK BRUTTO ZE SPRZEDAŻY/i)).toBeInTheDocument();
-        expect(screen.getByText(/4\. Koszty Działalności Operacyjnej \(OPEX\)/i)).toBeInTheDocument();
-        expect(screen.getByText(/5\. WYNIK OPERACYJNY EBITDA/i)).toBeInTheDocument();
-        expect(screen.getByText(/6\. Amortyzacja Rzeczowa i Niematerialna \(D&A\)/i)).toBeInTheDocument();
-        expect(screen.getByText(/7\. ZYSK OPERACYJNY \(EBIT\)/i)).toBeInTheDocument();
-        expect(screen.getByText(/8\. Podatek Dochodowy od Osób Prawnych \(CIT\)/i)).toBeInTheDocument();
-        expect(screen.getByText(/9\. ZYSK NETTO OKRESU/i)).toBeInTheDocument();
+        // 1. Check all 9 standardized hierarchy rows - clean labels without subtraction prefixes
+        const cogsLabel = screen.getByText('2. Koszt Wytworzenia Sprzedanych Produktów (COGS)');
+        expect(cogsLabel).toBeInTheDocument();
+        expect(screen.getByText('1. Przychody ze Sprzedaży (Total Revenue)')).toBeInTheDocument();
+        expect(screen.getByText('3. ZYSK BRUTTO ZE SPRZEDAŻY (GROSS PROFIT)')).toBeInTheDocument();
+        expect(screen.getByText('4. Koszty Działalności Operacyjnej (OPEX)')).toBeInTheDocument();
+        expect(screen.getByText('5. WYNIK OPERACYJNY EBITDA')).toBeInTheDocument();
+        expect(screen.getByText('6. Amortyzacja Rzeczowa i Niematerialna (D&A)')).toBeInTheDocument();
+        expect(screen.getByText('7. ZYSK OPERACYJNY (EBIT)')).toBeInTheDocument();
+        expect(screen.getByText('8. Podatek Dochodowy od Osób Prawnych (CIT)')).toBeInTheDocument();
+        expect(screen.getByText('9. ZYSK NETTO OKRESU (NET PROFIT / EAT)')).toBeInTheDocument();
 
-        // 2. Check deduction indicators (-) for direct operating deductions
+        // 2. Check deduction indicators (-) rendered with proper title after labels
         const deductionMarkers = screen.getAllByText('(-)');
         expect(deductionMarkers.length).toBeGreaterThanOrEqual(3); // COGS, D&A, CIT
+        deductionMarkers.forEach(marker => {
+            expect(marker).toHaveAttribute('title', 'Pozycja pomniejszająca wynik');
+        });
 
         // 3. Check final net profit result badge
         expect(screen.getByText('WYNIK KOŃCOWY')).toBeInTheDocument();
@@ -396,7 +400,7 @@ describe('DashboardView Component', () => {
         expect(categoryBadges.length).toBeGreaterThanOrEqual(1);
 
         // 5. Expand OPEX group and verify child items with tree branches
-        const opexRow = screen.getByText(/4\. Koszty Działalności Operacyjnej \(OPEX\)/i);
+        const opexRow = screen.getByText('4. Koszty Działalności Operacyjnej (OPEX)');
         fireEvent.click(opexRow);
 
         await waitFor(() => {
@@ -410,6 +414,7 @@ describe('DashboardView Component', () => {
 
         await waitFor(() => {
             expect(screen.getByText("Rachunek Zysków i Strat (P&L Konsolidowany)")).toBeInTheDocument();
+            expect(screen.getByText("Sprzedaż maszyn i urządzeń")).toBeInTheDocument();
         });
 
         const pnlTable = screen.getByText("Rachunek Zysków i Strat (P&L Konsolidowany)").closest("div.bg-zinc-900");

@@ -322,7 +322,7 @@ npm test
   - [x] Warunkowa obsługa rozwijania wierszy (chevron tylko dla grup posiadających więcej niż 1 pozycję).
   - [x] Formatowanie ujemnych potrąceń w `FinancialValue` bez zaburzania numeracji wierszy.
   - [x] Aktualizacja testów komponentu `FinancialTable`.
-  - [ ] Testy regresyjne E2E w `DashboardView.test.jsx` dla czystej hierarchii P&L.
+  - [x] Testy regresyjne E2E w `DashboardView.test.jsx` dla czystej hierarchii P&L.
 
 ---
 
