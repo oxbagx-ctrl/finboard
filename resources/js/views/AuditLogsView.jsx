@@ -304,12 +304,18 @@ export const AuditLogsView = () => {
             } else {
                 fetchVdrLogs(1);
             }
+        } else {
+            setFinanceLogs([]);
+            setFinanceStats(null);
+            setVdrLogs([]);
+            setFinanceLoading(false);
+            setVdrLoading(false);
         }
     }, [activeTab, fetchFinanceLogs, fetchFinanceStats, fetchVdrLogs, activeCompany?.id]);
 
     // Listen to global company change event
     useEffect(() => {
-        const handleCompanyChanged = () => {
+        const handleCompanyChanged = (e) => {
             setSelectedDetailLog(null);
             setIsDetailModalOpen(false);
             setFinanceSearchInput('');
@@ -318,13 +324,20 @@ export const AuditLogsView = () => {
             setVdrSearchQuery('');
             setVdrSelectedAction('');
 
-            if (activeCompany?.id) {
+            const targetId = e?.detail?.id || activeCompany?.id;
+            if (targetId) {
                 if (activeTab === 'finance') {
                     fetchFinanceLogs(1);
                     fetchFinanceStats();
                 } else {
                     fetchVdrLogs(1);
                 }
+            } else {
+                setFinanceLogs([]);
+                setFinanceStats(null);
+                setVdrLogs([]);
+                setFinanceLoading(false);
+                setVdrLoading(false);
             }
         };
         window.addEventListener('finboard:company-changed', handleCompanyChanged);

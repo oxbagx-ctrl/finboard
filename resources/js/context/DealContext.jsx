@@ -62,8 +62,14 @@ export const DealProvider = ({ children, initialYears = ['2026', '2025'] }) => {
     }, [activeCompanyId, fetchAvailableYears, auth?.token]);
 
     useEffect(() => {
-        const handleCompanyChange = () => {
+        const handleCompanyChange = (e) => {
             fetchAvailableYears();
+            if (e?.detail?.code) {
+                setDealMetadata(prev => ({
+                    ...prev,
+                    code: `PROJECT-${e.detail.code}`,
+                }));
+            }
         };
         window.addEventListener('finboard:company-changed', handleCompanyChange);
         return () => window.removeEventListener('finboard:company-changed', handleCompanyChange);
@@ -132,6 +138,9 @@ export const DealProvider = ({ children, initialYears = ['2026', '2025'] }) => {
     }, []);
 
     const value = useMemo(() => ({
+        activeCompany: auth?.activeCompany || null,
+        activeCompanyId: auth?.activeCompany?.id || null,
+        switchCompany: auth?.switchCompany || (() => {}),
         availableYears,
         setAvailableYears,
         loadingYears,
@@ -149,6 +158,8 @@ export const DealProvider = ({ children, initialYears = ['2026', '2025'] }) => {
         setDealMetadata,
         resetFilters,
     }), [
+        auth?.activeCompany,
+        auth?.switchCompany,
         availableYears,
         loadingYears,
         fetchAvailableYears,
