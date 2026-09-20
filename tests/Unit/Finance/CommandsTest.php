@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Finance;
 
+use App\Contexts\Finance\Application\Commands\BatchDeleteFinancialRecords\BatchDeleteFinancialRecordsCommand;
+use App\Contexts\Finance\Application\Commands\BatchDeleteFinancialRecords\BatchDeleteFinancialRecordsHandler;
 use App\Contexts\Finance\Application\Commands\BatchIngestFinancialRecords\BatchIngestFinancialRecordsCommand;
 use App\Contexts\Finance\Application\Commands\BatchIngestFinancialRecords\BatchIngestFinancialRecordsHandler;
 use App\Contexts\Finance\Application\Commands\CreateFinancialRecord\CreateFinancialRecordCommand;
+
 use App\Contexts\Finance\Application\Commands\CreateFinancialRecord\CreateFinancialRecordHandler;
 use App\Contexts\Finance\Application\Commands\DeleteFinancialRecord\DeleteFinancialRecordCommand;
 use App\Contexts\Finance\Application\Commands\DeleteFinancialRecord\DeleteFinancialRecordHandler;
@@ -171,4 +174,101 @@ final class CommandsTest extends TestCase
             categoryId: 'cat-revenue'
         ));
     }
+
+    public function test_batch_delete_financial_records_handler_deletes_records_atomically(): void
+    {
+        $createHandler = new CreateFinancialRecordHandler($this->recordRepo, $this->categoryRepo);
+
+        $id1 = $createHandler->handle(new CreateFinancialRecordCommand(
+            companyId: self::COMPANY_ID,
+            categoryId: 'cat-revenue',
+            amount: '3500.0000',
+            currency: 'PLN',
+            recordDate: '2026-06-01',
+            description: 'Przychód 1'
+        ));
+
+        $id2 = $createHandler->handle(new CreateFinancialRecordCommand(
+            companyId: self::COMPANY_ID,
+            categoryId: 'cat-revenue',
+            amount: '1500.0000',
+            currency: 'PLN',
+            recordDate: '2026-06-02',
+            description: 'Przychód 2'
+        ));
+
+        $handler = new BatchDeleteFinancialRecordsHandler($this->recordRepo);
+        $result = $handler->handle(new BatchDeleteFinancialRecordsCommand(
+            companyId: self::COMPANY_ID,
+            recordIds: [$id1, $id2],
+            userId: '00000000-0000-0000-0000-000000000001',
+            ipAddress: '127.0.0.1'
+        ));
+
+        $this->assertSame(2, $result->deletedCount);
+        $this->assertEquals(5000.0, $result->totalAmount);
+        $this->assertContains($id1, $result->deletedRecordIds);
+        $this->assertContains($id2, $result->deletedRecordIds);
+
+        $this->assertNull($this->recordRepo->findById(FinancialRecordId::fromString($id1)));
+        $this->assertNull($this->recordRepo->findById(FinancialRecordId::fromString($id2)));
+    }
+
+    public function test_batch_delete_financial_records_handler_with_empty_or_whitespace_ids(): void
+    {
+        $handler = new BatchDeleteFinancialRecordsHandler($this->recordRepo);
+        $result = $handler->handle(new BatchDeleteFinancialRecordsCommand(
+            companyId: self::COMPANY_ID,
+            recordIds: ['', '   ', '']
+        ));
+
+        $this->assertSame(0, $result->deletedCount);
+        $this->assertSame(0.0, $result->totalAmount);
+        $this->assertSame([], $result->deletedRecordIds);
+    }
+
+    public function test_batch_delete_financial_records_handler_enforces_company_isolation(): void
+    {
+        $foreignCompany = \App\Models\Company::firstOrCreate(
+            ['code' => 'FOREIGN_ISOL'],
+            ['name' => 'Foreign Isol Corp', 'tax_id' => 'PL8888888888']
+        );
+
+        $createHandler = new CreateFinancialRecordHandler($this->recordRepo, $this->categoryRepo);
+
+        $targetId = $createHandler->handle(new CreateFinancialRecordCommand(
+            companyId: self::COMPANY_ID,
+            categoryId: 'cat-revenue',
+            amount: '4000.0000',
+            currency: 'PLN',
+            recordDate: '2026-06-03',
+            description: 'Nasz rekord'
+        ));
+
+        $foreignId = $createHandler->handle(new CreateFinancialRecordCommand(
+            companyId: $foreignCompany->id,
+            categoryId: 'cat-revenue',
+            amount: '8000.0000',
+            currency: 'PLN',
+            recordDate: '2026-06-03',
+            description: 'Obcy rekord'
+        ));
+
+        $handler = new BatchDeleteFinancialRecordsHandler($this->recordRepo);
+        $result = $handler->handle(new BatchDeleteFinancialRecordsCommand(
+            companyId: self::COMPANY_ID,
+            recordIds: [$targetId, $foreignId]
+        ));
+
+        $this->assertSame(1, $result->deletedCount);
+        $this->assertEquals(4000.0, $result->totalAmount);
+        $this->assertSame([$targetId], $result->deletedRecordIds);
+
+        // Target record deleted
+        $this->assertNull($this->recordRepo->findById(FinancialRecordId::fromString($targetId)));
+
+        // Foreign record intact
+        $this->assertNotNull($this->recordRepo->findById(FinancialRecordId::fromString($foreignId)));
+    }
 }
+
