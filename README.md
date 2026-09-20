@@ -164,7 +164,9 @@ npm test
 - `POST /api/v1/finance/benchmarks/reset` – Przywrócenie domyślnych standardów rynkowych spółki
 
 ### Ścieżka Audytowa (Audit Trail)
-- `GET /api/v1/finance/audit-logs` – Rejestr zdarzeń audytowych operacji finansowych i celów ze statystykami zagregowanymi
+- `GET /api/v1/finance/audit-logs` – Rejestr zdarzeń audytowych z filtrami (`action`, `entity_type`, `user_id`, `search`, `from_date`, `to_date`, `page`, `per_page`)
+- `GET /api/v1/finance/audit-logs/stats` – Zagregowane metryki KPI audytu (łączna liczba, usunięcia pojedyncze i masowe, rozbicie po akcjach)
+- `GET /api/v1/finance/audit-logs/{id}` – Szczegóły pojedynczego wpisu audytowego ze zrzutami `old_values` i `new_values`
 
 ### Analityka Finansowa & KPI (Queries)
 - `GET /api/v1/finance/analytics/metrics` – Syntetyczne wskaźniki P&L, bilansowe, dynamika YoY/MoM oraz ewaluacja celów
@@ -365,12 +367,12 @@ npm test
   - Powiązanie przycisku inspekcji wiersza z otwarciem modalu `FinancialAuditDetailModal`.
   - Rygorystyczna synchronizacja kontekstu `activeCompany` oraz obsługa stanów ładowania i pustych wyników.
   - Testy komponentów w `AuditLogsView.test.jsx` dla zakładki finansowej, przełączania VDR, filtrów i modalu.
-- [ ] **Faza 31: Testy Integracyjne, Bezpieczeństwo i Dokumentacja**
+- [x] **Faza 31: Testy Integracyjne, Bezpieczeństwo i Dokumentacja**
   - [x] Testy integracyjne E2E dla filtrowania zdarzeń audytowych według akcji usunięcia, modyfikacji i importu CSV.
   - [x] Harmonizacja palety kolorów badge'y i mapowania ikon w kategoriach audytowych.
   - [x] Weryfikacja izolacji najemcy (tenant isolation) przy przełączaniu spółek przez DealContext.
   - [x] Testy regresji weryfikujące paginację i filtrowanie audytu dokumentów VDR.
-  - [ ] Aktualizacja dokumentacji systemu audytu i przewodnika po zrzutach JSON w changelogu.
+  - [x] Aktualizacja dokumentacji systemu audytu i przewodnika po zrzutach JSON w changelogu.
 
 ---
 
