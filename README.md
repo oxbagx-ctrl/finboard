@@ -311,6 +311,18 @@ npm test
   - [x] Aktualizacja seedera `FinancialDataSeeder` i zbiorów danych o realne strumienie przychodowe.
   - [x] Testy weryfikujące eliminację rekordów sierocych `cat-opex` i pełną spójność analityczną.
   - [x] Refaktoryzacja `CategoryBreakdown` pod kątem obsługi grup jedno- i wielokategorialnych.
+- [ ] **Faza 22: Naprawa Dynamiki R/R dla Okresów Otwartych i Podpozycji**
+  - [x] Wyliczanie dynamicznego zakresu porównawczego w `GetCategoryBreakdownHandler` przy braku jawnego zakresu dat (`startDate === null`, `endDate === null`).
+  - [ ] Ciągłość historyczna kategorii w repozytorium analitycznym i kalkulatorze domenowym.
+  - [ ] Testy jednostkowe kalkulacji YoY dla otwartych zakresów dat (Pełna historia).
+  - [ ] Testy integracyjne weryfikujące endpoint `GET /finance/analytics/breakdown` dla podkategorii OPEX i przychodów.
+  - [ ] Weryfikacja spójności formatu danych porównawczych między metrykami a breakdown.
+- [ ] **Faza 23: Poprawa Typografii Tabeli P&L i Warunkowej Grupowalności**
+  - [ ] Usunięcie prefiksu `(-)` przed numeracją pozycji w `FinancialTable` z zachowaniem semantyki kosztu.
+  - [ ] Warunkowa obsługa rozwijania wierszy (chevron tylko dla grup posiadających więcej niż 1 pozycję).
+  - [ ] Formatowanie ujemnych potrąceń w `FinancialValue` bez zaburzania numeracji wierszy.
+  - [ ] Aktualizacja testów komponentu `FinancialTable`.
+  - [ ] Testy regresyjne E2E w `DashboardView.test.jsx` dla czystej hierarchii P&L.
 
 ---
 

@@ -582,6 +582,36 @@ final class QueriesTest extends TestCase
         $this->assertSame($expected, $years);
     }
 
+    public function test_get_category_breakdown_handler_computes_comparative_period_dynamically_when_date_range_is_null(): void
+    {
+        $handler = new GetCategoryBreakdownHandler($this->repo);
+
+        // All-time / null date range query
+        $query = new GetCategoryBreakdownQuery(
+            companyId: self::ACME_COMPANY_ID,
+            startDate: null,
+            endDate: null,
+            recordType: 'EXPENSE',
+            categoryType: 'OPEX',
+            includeYoY: true
+        );
+
+        $breakdown = $handler->handle($query);
+
+        $this->assertNotEmpty($breakdown);
+        foreach ($breakdown as $item) {
+            $this->assertArrayHasKey('previous_amount', $item);
+            $this->assertArrayHasKey('formatted_previous_amount', $item);
+            $this->assertArrayHasKey('amount_change', $item);
+            $this->assertArrayHasKey('formatted_amount_change', $item);
+            $this->assertArrayHasKey('yoy_growth_pct', $item);
+
+            // With Acme having 2025 and 2026 data, the derived baseline should yield previous amounts
+            $this->assertNotNull($item['previous_amount']);
+            $this->assertGreaterThan(0, $item['amount']);
+        }
+    }
+
     public function test_get_available_fiscal_years_handler_falls_back_to_current_year_when_empty(): void
     {
         $emptyCompanyId = '00000000-0000-0000-0000-000000000000';

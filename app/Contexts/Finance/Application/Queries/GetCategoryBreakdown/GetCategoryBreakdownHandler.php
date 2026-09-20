@@ -75,6 +75,9 @@ final class GetCategoryBreakdownHandler
         $categoryDetails = [];
         $grandTotal = Money::zero($currency);
 
+        $minDate = null;
+        $maxDate = null;
+
         foreach ($records as $record) {
             $category = $record->category();
 
@@ -100,6 +103,14 @@ final class GetCategoryBreakdownHandler
 
             $totalsPerCategory[$catId] = $totalsPerCategory[$catId]->add($record->amount());
             $grandTotal = $grandTotal->add($record->amount());
+
+            $rDate = $record->recordDate();
+            if ($minDate === null || $rDate < $minDate) {
+                $minDate = $rDate;
+            }
+            if ($maxDate === null || $rDate > $maxDate) {
+                $maxDate = $rDate;
+            }
         }
 
         // Optimization: If no records match for current period, short-circuit immediately
@@ -107,13 +118,19 @@ final class GetCategoryBreakdownHandler
             return [];
         }
 
+        // Determine effective period for YoY dynamics
+        $effectivePeriod = $period;
+        if ($effectivePeriod === null && $minDate !== null && $maxDate !== null) {
+            $effectivePeriod = DateRange::fromDates($minDate, $maxDate);
+        }
+
         // Determine comparative period for YoY dynamics
         $comparativePeriod = null;
         if ($query->includeYoY) {
             if ($query->comparisonStartDate !== null && $query->comparisonEndDate !== null) {
                 $comparativePeriod = DateRange::fromStrings($query->comparisonStartDate, $query->comparisonEndDate);
-            } elseif ($period !== null) {
-                $comparativePeriod = $period->previousYear();
+            } elseif ($effectivePeriod !== null) {
+                $comparativePeriod = $effectivePeriod->previousYear();
             }
         }
 

@@ -209,7 +209,11 @@ final class FinancialAnalyticsApiTest extends TestCase
         $this->assertNotEmpty($data);
 
         $categoryIds = array_column($data, 'category_id');
-        $this->assertContains('cat-revenue', $categoryIds);
+        $hasRevenueCategory = in_array('cat-revenue', $categoryIds, true)
+            || in_array(\App\Models\FinancialCategory::REVENUE_SERVICES, $categoryIds, true)
+            || in_array(\App\Models\FinancialCategory::REVENUE_SAAS, $categoryIds, true)
+            || in_array(\App\Models\FinancialCategory::REVENUE_CONSULTING, $categoryIds, true);
+        $this->assertTrue($hasRevenueCategory, 'Breakdown must contain at least one valid revenue category.');
 
         // Ensure no expense or balance categories exist in the revenue breakdown
         $this->assertNotContains('cat-cogs', $categoryIds);

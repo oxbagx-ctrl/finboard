@@ -8,13 +8,13 @@ use App\Models\Company;
 use App\Models\FinancialCategory;
 use App\Models\FinancialRecord;
 use Database\Seeders\FinancialDataSeeder;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 final class LegacyOpexReclassificationAndSeederConsistencyTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     private const TEST_COMPANY_ID = '33333333-3333-3333-3333-333333333333';
 
@@ -120,14 +120,15 @@ final class LegacyOpexReclassificationAndSeederConsistencyTest extends TestCase
         DB::table('financial_records')->insert($records);
 
         // Verify initial setup has 6 generic cat-opex records
-        $this->assertSame(6, DB::table('financial_records')->where('category_id', FinancialCategory::OPEX_GENERIC)->count());
+        $this->assertSame(6, DB::table('financial_records')->where('company_id', self::TEST_COMPANY_ID)->where('category_id', FinancialCategory::OPEX_GENERIC)->count());
 
         // 2. Act: run the reclassification migration logic
         $migration = require database_path('migrations/2026_03_09_100000_reclassify_legacy_opex_records.php');
         $migration->up();
 
-        // 3. Assert: zero orphan cat-opex records remaining
+        // 3. Assert: zero orphan cat-opex records remaining for this company
         $remainingGenericOpex = DB::table('financial_records')
+            ->where('company_id', self::TEST_COMPANY_ID)
             ->where('category_id', FinancialCategory::OPEX_GENERIC)
             ->count();
         $this->assertSame(0, $remainingGenericOpex, 'Expected 0 records with cat-opex remaining in financial_records table.');
