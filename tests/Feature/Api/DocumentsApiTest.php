@@ -314,4 +314,33 @@ final class DocumentsApiTest extends TestCase
         $allLogsResponse->assertStatus(200);
         $this->assertNotEmpty($allLogsResponse->json('data'));
     }
+
+    public function test_vdr_audit_logs_pagination_and_query_parameters(): void
+    {
+        Sanctum::actingAs($this->clientUser);
+
+        // Upload multiple documents to generate audit entries
+        for ($i = 1; $i <= 3; $i++) {
+            $file = UploadedFile::fake()->createWithContent("doc_pag_{$i}.pdf", "CONTENT {$i}");
+            $this->postJson('/api/v1/documents', [
+                'file' => $file,
+                'title' => "Dokument Paginacji {$i}",
+                'type' => 'other',
+            ]);
+        }
+
+        // Test pagination with per_page=2
+        $page1Response = $this->getJson('/api/v1/documents/audit-logs?per_page=2&page=1');
+        $page1Response->assertStatus(200)
+            ->assertJsonPath('meta.current_page', 1)
+            ->assertJsonPath('meta.per_page', 2);
+
+        $this->assertLessThanOrEqual(2, count($page1Response->json('data')));
+
+        $page2Response = $this->getJson('/api/v1/documents/audit-logs?per_page=2&page=2');
+        $page2Response->assertStatus(200)
+            ->assertJsonPath('meta.current_page', 2)
+            ->assertJsonPath('meta.per_page', 2);
+    }
 }
+

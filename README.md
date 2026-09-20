@@ -369,7 +369,7 @@ npm test
   - [x] Testy integracyjne E2E dla filtrowania zdarzeń audytowych według akcji usunięcia, modyfikacji i importu CSV.
   - [x] Harmonizacja palety kolorów badge'y i mapowania ikon w kategoriach audytowych.
   - [x] Weryfikacja izolacji najemcy (tenant isolation) przy przełączaniu spółek przez DealContext.
-  - [ ] Testy regresji weryfikujące paginację i filtrowanie audytu dokumentów VDR.
+  - [x] Testy regresji weryfikujące paginację i filtrowanie audytu dokumentów VDR.
   - [ ] Aktualizacja dokumentacji systemu audytu i przewodnika po zrzutach JSON w changelogu.
 
 ---
