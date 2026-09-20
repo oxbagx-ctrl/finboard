@@ -306,6 +306,128 @@ final class FinancialAnalyticsApiTest extends TestCase
         }
     }
 
+    public function test_get_category_breakdown_endpoint_exposes_yoy_dynamics_and_comparative_amounts(): void
+    {
+        Sanctum::actingAs($this->clientUser);
+
+        $response = $this->getJson('/api/v1/finance/analytics/breakdown?category_type=OPEX&start_date=2026-01-01&end_date=2026-03-31&include_yoy=true');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('status', 'success')
+            ->assertJsonPath('include_yoy', true)
+            ->assertJsonPath('company_id', $this->acmeCompany->id)
+            ->assertJsonStructure([
+                'status',
+                'company_id',
+                'record_type',
+                'category_type',
+                'include_yoy',
+                'data' => [
+                    '*' => [
+                        'category_id',
+                        'category_name',
+                        'category_code',
+                        'category_type',
+                        'amount',
+                        'formatted_amount',
+                        'percentage',
+                        'previous_amount',
+                        'formatted_previous_amount',
+                        'amount_change',
+                        'formatted_amount_change',
+                        'yoy_growth_pct',
+                        'previous_percentage',
+                        'percentage_point_diff',
+                    ],
+                ],
+            ]);
+
+        $data = $response->json('data');
+        $this->assertNotEmpty($data);
+        foreach ($data as $item) {
+            $this->assertNotNull($item['previous_amount']);
+            $this->assertNotNull($item['formatted_previous_amount']);
+            $this->assertNotNull($item['yoy_growth_pct']);
+            $this->assertNotNull($item['amount_change']);
+            $this->assertNotNull($item['formatted_amount_change']);
+            $this->assertGreaterThan(0, $item['previous_amount']);
+            $this->assertEqualsWithDelta(9.52, (float) $item['yoy_growth_pct'], 0.1);
+            $this->assertGreaterThan(0, $item['amount_change']);
+        }
+    }
+
+    public function test_get_category_breakdown_with_include_yoy_disabled(): void
+    {
+        Sanctum::actingAs($this->clientUser);
+
+        $response = $this->getJson('/api/v1/finance/analytics/breakdown?category_type=OPEX&start_date=2026-01-01&end_date=2026-03-31&include_yoy=false');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('status', 'success')
+            ->assertJsonPath('include_yoy', false);
+
+        $data = $response->json('data');
+        $this->assertNotEmpty($data);
+        foreach ($data as $item) {
+            $this->assertNull($item['previous_amount']);
+            $this->assertNull($item['formatted_previous_amount']);
+            $this->assertNull($item['amount_change']);
+            $this->assertNull($item['formatted_amount_change']);
+            $this->assertNull($item['yoy_growth_pct']);
+            $this->assertNull($item['previous_percentage']);
+            $this->assertNull($item['percentage_point_diff']);
+            $this->assertGreaterThan(0, $item['amount']);
+        }
+    }
+
+    public function test_get_category_breakdown_with_explicit_comparison_date_range(): void
+    {
+        Sanctum::actingAs($this->clientUser);
+
+        $response = $this->getJson('/api/v1/finance/analytics/breakdown?category_type=OPEX&start_date=2026-02-01&end_date=2026-02-28&comparison_start_date=2026-01-01&comparison_end_date=2026-01-31&include_yoy=true');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('status', 'success')
+            ->assertJsonPath('include_yoy', true);
+
+        $data = $response->json('data');
+        $this->assertNotEmpty($data);
+
+        $payroll = null;
+        foreach ($data as $item) {
+            if ($item['category_code'] === 'PAYROLL') {
+                $payroll = $item;
+                break;
+            }
+        }
+
+        $this->assertNotNull($payroll);
+        // Feb 2026 vs Jan 2026
+        $this->assertEqualsWithDelta(48244.8, (float) $payroll['amount'], 1.0);
+        $this->assertEqualsWithDelta(47895.2, (float) $payroll['previous_amount'], 1.0);
+        $this->assertEqualsWithDelta(349.6, (float) $payroll['amount_change'], 1.0);
+        $this->assertEqualsWithDelta(0.73, (float) $payroll['yoy_growth_pct'], 0.1);
+    }
+
+    public function test_get_category_breakdown_comparison_date_validation_errors(): void
+    {
+        Sanctum::actingAs($this->clientUser);
+
+        $response = $this->getJson('/api/v1/finance/analytics/breakdown?start_date=2026-02-01&end_date=2026-02-28&comparison_start_date=2026-03-01&comparison_end_date=2026-01-01');
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['comparison_end_date']);
+    }
+
+    public function test_client_cannot_query_breakdown_for_another_company(): void
+    {
+        Sanctum::actingAs($this->clientUser);
+
+        $response = $this->getJson('/api/v1/finance/analytics/breakdown?company_id=' . $this->helvestCompany->id);
+
+        $response->assertStatus(403);
+    }
+
     public function test_get_liquidity_trends_returns_solvency_ratios(): void
     {
         Sanctum::actingAs($this->clientUser);
