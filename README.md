@@ -360,13 +360,13 @@ npm test
   - Dodanie pigułek filtrów akcji finansowych ze wskaźnikami liczbowymi i stylami aktywnego stanu.
   - Testy jednostkowe dla `FinancialAuditDetailModal` renderującego metadane i diffy `old_values`/`new_values`.
 - [x] **Faza 30: Integracja Tabeli Audytu Finansowego, Wyszukiwarki i Paginacji**
-  - [x] Implementacja tabeli audytu finansowego wysokiej gęstości z czasem CET, profilami operatorów i badge'ami akcji.
-  - [x] Połączenie tabeli audytu z wyszukiwarką tekstową (debounce) i paginacją backendową.
-  - [x] Powiązanie przycisku inspekcji wiersza z otwarciem modalu `FinancialAuditDetailModal`.
-  - [x] Rygorystyczna synchronizacja kontekstu `activeCompany` oraz obsługa stanów ładowania i pustych wyników.
-  - [x] Testy komponentów w `AuditLogsView.test.jsx` dla zakładki finansowej, przełączania VDR, filtrów i modalu.
+  - Implementacja tabeli audytu finansowego wysokiej gęstości z czasem CET, profilami operatorów i badge'ami akcji.
+  - Połączenie tabeli audytu z wyszukiwarką tekstową (debounce) i paginacją backendową.
+  - Powiązanie przycisku inspekcji wiersza z otwarciem modalu `FinancialAuditDetailModal`.
+  - Rygorystyczna synchronizacja kontekstu `activeCompany` oraz obsługa stanów ładowania i pustych wyników.
+  - Testy komponentów w `AuditLogsView.test.jsx` dla zakładki finansowej, przełączania VDR, filtrów i modalu.
 - [ ] **Faza 31: Testy Integracyjne, Bezpieczeństwo i Dokumentacja**
-  - [ ] Testy integracyjne E2E dla filtrowania zdarzeń audytowych według akcji usunięcia, modyfikacji i importu CSV.
+  - [x] Testy integracyjne E2E dla filtrowania zdarzeń audytowych według akcji usunięcia, modyfikacji i importu CSV.
   - [ ] Harmonizacja palety kolorów badge'y i mapowania ikon w kategoriach audytowych.
   - [ ] Weryfikacja izolacji najemcy (tenant isolation) przy przełączaniu spółek przez DealContext.
   - [ ] Testy regresji weryfikujące paginację i filtrowanie audytu dokumentów VDR.
