@@ -122,6 +122,8 @@ Route::prefix('v1')->group(function () {
             Route::prefix('analytics')->group(function () {
                 Route::get('/metrics', [KpiController::class, 'metrics']
                     )->name('api.finance.analytics.metrics');
+                Route::get('/dynamics', [FinancialAnalyticsController::class, 'dynamics']
+                    )->name('api.finance.analytics.dynamics');
                 Route::get('/years', [FinancialAnalyticsController::class, 'years']
                     )->name('api.finance.analytics.years');
                 Route::get('/trends', [FinancialAnalyticsController::class, 'trends']

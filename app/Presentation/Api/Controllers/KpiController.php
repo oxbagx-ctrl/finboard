@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace App\Presentation\Api\Controllers;
 
-use App\Contexts\Finance\Application\Services\KpiCalculationService;
+use App\Contexts\Finance\Application\Queries\CalculateFinancialDynamics\CalculateFinancialDynamicsHandler;
+use App\Contexts\Finance\Application\Queries\CalculateFinancialDynamics\CalculateFinancialDynamicsQuery;
 use App\Contexts\Finance\Application\Services\KpiEvaluationService;
-use App\Contexts\Finance\Domain\Repositories\FinancialRecordRepositoryInterface;
-use App\Contexts\Finance\Domain\Services\FinancialCalculator;
 use App\Contexts\Finance\Domain\ValueObjects\Currency;
-use App\Contexts\Finance\Domain\ValueObjects\DateRange;
 use App\Presentation\Api\Requests\FinancialAnalyticsQueryRequest;
 use App\Presentation\Api\Traits\ResolvesCompanyContext;
 use Illuminate\Http\JsonResponse;
@@ -20,9 +18,7 @@ final class KpiController
     use ResolvesCompanyContext;
 
     public function __construct(
-        private readonly FinancialRecordRepositoryInterface $recordRepository,
-        private readonly FinancialCalculator $calculator,
-        private readonly KpiCalculationService $kpiService,
+        private readonly CalculateFinancialDynamicsHandler $dynamicsHandler,
         private readonly KpiEvaluationService $evaluationService
     ) {
     }
@@ -38,69 +34,16 @@ final class KpiController
         $startDate = $request->query('start_date');
         $endDate = $request->query('end_date');
 
-        $period = null;
-        if ($startDate !== null && $endDate !== null) {
-            $period = DateRange::fromStrings($startDate, $endDate);
-        }
+        $dynamicsQuery = new CalculateFinancialDynamicsQuery(
+            companyId: $companyId,
+            startDate: $startDate,
+            endDate: $endDate,
+            currency: $currency->value
+        );
 
-        $records = $this->recordRepository->findByCompanyId($companyId, $period);
-        $metrics = $this->calculator->calculateMetrics($records, $currency, $period);
-
-        // Derive comparative period for dynamics if not explicitly given
-        $dynamicsPeriod = $period;
-        if ($dynamicsPeriod === null && count($records) > 0) {
-            $minDate = null;
-            $maxDate = null;
-            foreach ($records as $record) {
-                $rDate = $record->recordDate();
-                if ($minDate === null || $rDate < $minDate) {
-                    $minDate = $rDate;
-                }
-                if ($maxDate === null || $rDate > $maxDate) {
-                    $maxDate = $rDate;
-                }
-            }
-            if ($minDate !== null && $maxDate !== null) {
-                $dynamicsPeriod = DateRange::fromDates($minDate, $maxDate);
-            }
-        }
-
-        $dynamics = $dynamicsPeriod !== null
-            ? $this->kpiService->calculateKpiDynamics($companyId, $dynamicsPeriod, $currency)
-            : [
-                'previous_year_metrics' => null,
-                'previous_month_metrics' => null,
-                'yoy' => [
-                    'revenue_growth_pct' => null,
-                    'gross_profit_growth_pct' => null,
-                    'ebitda_growth_pct' => null,
-                    'ebit_growth_pct' => null,
-                    'net_profit_growth_pct' => null,
-                    'opex_growth_pct' => null,
-                    'current_ratio_diff' => null,
-                    'quick_ratio_diff' => null,
-                    'debt_to_assets_diff' => null,
-                    'gross_margin_diff_pct' => null,
-                    'operating_margin_diff_pct' => null,
-                    'ebitda_margin_diff_pct' => null,
-                    'net_margin_diff_pct' => null,
-                ],
-                'mom' => [
-                    'revenue_growth_pct' => null,
-                    'gross_profit_growth_pct' => null,
-                    'ebitda_growth_pct' => null,
-                    'ebit_growth_pct' => null,
-                    'net_profit_growth_pct' => null,
-                    'opex_growth_pct' => null,
-                    'current_ratio_diff' => null,
-                    'quick_ratio_diff' => null,
-                    'debt_to_assets_diff' => null,
-                    'gross_margin_diff_pct' => null,
-                    'operating_margin_diff_pct' => null,
-                    'ebitda_margin_diff_pct' => null,
-                    'net_margin_diff_pct' => null,
-                ],
-            ];
+        $dynamicsResult = $this->dynamicsHandler->handle($dynamicsQuery);
+        $metrics = $dynamicsResult->currentMetrics();
+        $dynamics = $dynamicsResult->toArray();
 
         $yoyRevenueGrowth = isset($dynamics['yoy']['revenue_growth_pct']) && $dynamics['yoy']['revenue_growth_pct'] !== null
             ? (float) $dynamics['yoy']['revenue_growth_pct']

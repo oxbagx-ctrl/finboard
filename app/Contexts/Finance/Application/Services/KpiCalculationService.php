@@ -71,6 +71,18 @@ final class KpiCalculationService
     }
 
     /**
+     * Calculate absolute monetary difference between two Money amounts in currency units.
+     */
+    public function calculateAmountDifference(?Money $current, ?Money $previous): ?float
+    {
+        if ($current === null || $previous === null) {
+            return null;
+        }
+
+        return round((float) bcsub($current->amount(), $previous->amount(), 4), 2);
+    }
+
+    /**
      * Calculate complete KPI metrics along with YoY and MoM dynamics for a company.
      *
      * @return array{
@@ -166,21 +178,7 @@ final class KpiCalculationService
     /**
      * Compute comparative dynamics between current metrics and comparison metrics.
      *
-     * @return array{
-     *     revenue_growth_pct: ?float,
-     *     gross_profit_growth_pct: ?float,
-     *     ebitda_growth_pct: ?float,
-     *     ebit_growth_pct: ?float,
-     *     net_profit_growth_pct: ?float,
-     *     opex_growth_pct: ?float,
-     *     current_ratio_diff: ?float,
-     *     quick_ratio_diff: ?float,
-     *     debt_to_assets_diff: ?float,
-     *     gross_margin_diff_pct: ?float,
-     *     operating_margin_diff_pct: ?float,
-     *     ebitda_margin_diff_pct: ?float,
-     *     net_margin_diff_pct: ?float
-     * }
+     * @return array<string, ?float>
      */
     public function computeComparativeDynamics(
         FinancialMetrics $current,
@@ -189,35 +187,55 @@ final class KpiCalculationService
         if ($previous === null) {
             return [
                 'revenue_growth_pct' => null,
+                'cogs_growth_pct' => null,
                 'gross_profit_growth_pct' => null,
+                'gross_margin_diff_pct' => null,
                 'ebitda_growth_pct' => null,
+                'ebitda_margin_diff_pct' => null,
                 'ebit_growth_pct' => null,
+                'operating_margin_diff_pct' => null,
                 'net_profit_growth_pct' => null,
+                'net_margin_diff_pct' => null,
                 'opex_growth_pct' => null,
+                'depreciation_growth_pct' => null,
+                'tax_growth_pct' => null,
                 'current_ratio_diff' => null,
                 'quick_ratio_diff' => null,
                 'debt_to_assets_diff' => null,
-                'gross_margin_diff_pct' => null,
-                'operating_margin_diff_pct' => null,
-                'ebitda_margin_diff_pct' => null,
-                'net_margin_diff_pct' => null,
+                'revenue_diff_amount' => null,
+                'cogs_diff_amount' => null,
+                'gross_profit_diff_amount' => null,
+                'opex_diff_amount' => null,
+                'ebitda_diff_amount' => null,
+                'ebit_diff_amount' => null,
+                'net_profit_diff_amount' => null,
             ];
         }
 
         return [
             'revenue_growth_pct' => $this->calculateGrowthPercentage($current->revenue(), $previous->revenue()),
+            'cogs_growth_pct' => $this->calculateGrowthPercentage($current->cogs(), $previous->cogs()),
             'gross_profit_growth_pct' => $this->calculateGrowthPercentage($current->grossProfit(), $previous->grossProfit()),
+            'gross_margin_diff_pct' => $this->calculateMarginDifference($current->grossMargin(), $previous->grossMargin()),
             'ebitda_growth_pct' => $this->calculateGrowthPercentage($current->ebitda(), $previous->ebitda()),
+            'ebitda_margin_diff_pct' => $this->calculateMarginDifference($current->ebitdaMargin(), $previous->ebitdaMargin()),
             'ebit_growth_pct' => $this->calculateGrowthPercentage($current->ebit(), $previous->ebit()),
+            'operating_margin_diff_pct' => $this->calculateMarginDifference($current->operatingMargin(), $previous->operatingMargin()),
             'net_profit_growth_pct' => $this->calculateGrowthPercentage($current->netProfit(), $previous->netProfit()),
+            'net_margin_diff_pct' => $this->calculateMarginDifference($current->netMargin(), $previous->netMargin()),
             'opex_growth_pct' => $this->calculateGrowthPercentage($current->opex(), $previous->opex()),
+            'depreciation_growth_pct' => $this->calculateGrowthPercentage($current->depreciation(), $previous->depreciation()),
+            'tax_growth_pct' => $this->calculateGrowthPercentage($current->tax(), $previous->tax()),
             'current_ratio_diff' => $this->calculateRatioDifference($current->currentRatio(), $previous->currentRatio()),
             'quick_ratio_diff' => $this->calculateRatioDifference($current->quickRatio(), $previous->quickRatio()),
             'debt_to_assets_diff' => $this->calculateRatioDifference($current->debtToAssets(), $previous->debtToAssets()),
-            'gross_margin_diff_pct' => $this->calculateMarginDifference($current->grossMargin(), $previous->grossMargin()),
-            'operating_margin_diff_pct' => $this->calculateMarginDifference($current->operatingMargin(), $previous->operatingMargin()),
-            'ebitda_margin_diff_pct' => $this->calculateMarginDifference($current->ebitdaMargin(), $previous->ebitdaMargin()),
-            'net_margin_diff_pct' => $this->calculateMarginDifference($current->netMargin(), $previous->netMargin()),
+            'revenue_diff_amount' => $this->calculateAmountDifference($current->revenue(), $previous->revenue()),
+            'cogs_diff_amount' => $this->calculateAmountDifference($current->cogs(), $previous->cogs()),
+            'gross_profit_diff_amount' => $this->calculateAmountDifference($current->grossProfit(), $previous->grossProfit()),
+            'opex_diff_amount' => $this->calculateAmountDifference($current->opex(), $previous->opex()),
+            'ebitda_diff_amount' => $this->calculateAmountDifference($current->ebitda(), $previous->ebitda()),
+            'ebit_diff_amount' => $this->calculateAmountDifference($current->ebit(), $previous->ebit()),
+            'net_profit_diff_amount' => $this->calculateAmountDifference($current->netProfit(), $previous->netProfit()),
         ];
     }
 }

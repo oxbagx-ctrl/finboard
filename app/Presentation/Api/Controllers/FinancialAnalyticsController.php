@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Presentation\Api\Controllers;
 
+use App\Contexts\Finance\Application\Queries\CalculateFinancialDynamics\CalculateFinancialDynamicsHandler;
+use App\Contexts\Finance\Application\Queries\CalculateFinancialDynamics\CalculateFinancialDynamicsQuery;
 use App\Contexts\Finance\Application\Queries\GetAvailableFiscalYears\GetAvailableFiscalYearsHandler;
 use App\Contexts\Finance\Application\Queries\GetAvailableFiscalYears\GetAvailableFiscalYearsQuery;
 use App\Contexts\Finance\Application\Queries\GetCategoryBreakdown\GetCategoryBreakdownHandler;
@@ -30,6 +32,31 @@ final class FinancialAnalyticsController
         KpiController $kpiController
     ): JsonResponse {
         return $kpiController->metrics($request);
+    }
+
+    /**
+     * Get standalone dynamic YoY and MoM financial dynamics.
+     */
+    public function dynamics(
+        FinancialAnalyticsQueryRequest $request,
+        CalculateFinancialDynamicsHandler $handler
+    ): JsonResponse {
+        $companyId = $this->resolveCompanyId($request);
+
+        $query = new CalculateFinancialDynamicsQuery(
+            companyId: $companyId,
+            startDate: $request->query('start_date'),
+            endDate: $request->query('end_date'),
+            currency: (string) $request->query('currency', 'PLN')
+        );
+
+        $result = $handler->handle($query);
+
+        return new JsonResponse([
+            'status' => 'success',
+            'company_id' => $companyId,
+            'data' => $result->toArray(),
+        ], Response::HTTP_OK);
     }
 
     /**
