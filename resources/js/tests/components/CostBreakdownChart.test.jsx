@@ -86,4 +86,68 @@ describe('CostBreakdownChart Component', () => {
         // Verify none of the items has 100%
         expect(screen.queryByText('100.0%')).not.toBeInTheDocument();
     });
+
+    it("auto-sorts categories descending by amount and renders YoY dynamics badges with polarization", () => {
+        const unsortedDataWithYoY = [
+            {
+                category_id: "cat-cloud",
+                category_name: "Oprogramowanie i chmura",
+                category_code: "CLOUD",
+                amount: 15000,
+                percentage: 15.0,
+                previous_amount: 10000,
+                amount_change: 5000,
+                yoy_growth_pct: 50.0, // Cost increased by 50% -> BAD (rose badge with reverseChange: true)
+            },
+            {
+                category_id: "cat-salaries",
+                category_name: "Wynagrodzenia i świadczenia",
+                category_code: "PAYROLL",
+                amount: 60000,
+                percentage: 60.0,
+                previous_amount: 80000,
+                amount_change: -20000,
+                yoy_growth_pct: -25.0, // Cost decreased by 25% -> GOOD (emerald badge with reverseChange: true)
+            },
+            {
+                category_id: "cat-office",
+                category_name: "Czynsz biurowy",
+                category_code: "OFFICE",
+                amount: 25000,
+                percentage: 25.0,
+                previous_amount: null,
+                amount_change: null,
+                yoy_growth_pct: null, // New category -> fallback "—"
+            },
+        ];
+
+        render(<CostBreakdownChart data={unsortedDataWithYoY} currency="PLN" reverseChange={true} />);
+
+        // The items in the legend should be sorted descending by amount: PAYROLL (60k), OFFICE (25k), CLOUD (15k)
+        const rows = screen.getAllByText(/\[(PAYROLL|OFFICE|CLOUD)\]/).map(el => el.closest("div.flex.items-center.justify-between"));
+        expect(rows).toHaveLength(3);
+        expect(rows[0]).toHaveTextContent("Wynagrodzenia i świadczenia");
+        expect(rows[1]).toHaveTextContent("Czynsz biurowy");
+        expect(rows[2]).toHaveTextContent("Oprogramowanie i chmura");
+
+        // Check YoY Dynamics badges
+        // PAYROLL decreased costs (-25.0%) -> with reverseChange: true, it should have emerald styling
+        const payrollBadge = rows[0].querySelector("[data-testid=\"percentage-badge\"]");
+        expect(payrollBadge).toBeInTheDocument();
+        expect(payrollBadge).toHaveTextContent("-25.0%");
+        expect(payrollBadge.className).toContain("text-emerald-300");
+        expect(payrollBadge).toHaveAttribute("title", expect.stringContaining("Poprzednio:"));
+
+        // OFFICE had no comparative data -> fallback "—"
+        const officeBadge = rows[1].querySelector("[data-testid=\"percentage-badge-fallback\"]");
+        expect(officeBadge).toBeInTheDocument();
+        expect(officeBadge).toHaveTextContent("—");
+
+        // CLOUD increased costs (+50.0%) -> with reverseChange: true, it should have rose styling
+        const cloudBadge = rows[2].querySelector("[data-testid=\"percentage-badge\"]");
+        expect(cloudBadge).toBeInTheDocument();
+        expect(cloudBadge).toHaveTextContent("+50.0%");
+        expect(cloudBadge.className).toContain("text-rose-300");
+        expect(cloudBadge).toHaveAttribute("title", expect.stringContaining("Poprzednio:"));
+    });
 });

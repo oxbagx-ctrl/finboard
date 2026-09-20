@@ -302,7 +302,7 @@ npm test
 - [ ] **Faza 20: Integracja UI Tabeli P&L i Wykresu Struktury Kosztów**
   - [x] Podpięcie dynamicznej dynamiki YoY per kategoria do podwierszy (children) przychodów i OPEX w `DashboardView`.
   - [x] Zapewnienie ścisłej polaryzacji `reverseChange` dla kosztów OPEX i jej brak dla przychodów.
-  - [ ] Optymalizacja wykresu `CostBreakdownChart` z auto-sortowaniem, paletą wielokategorialną i czytelną legendą.
+  - [x] Optymalizacja wykresu `CostBreakdownChart` z auto-sortowaniem, paletą wielokategorialną i czytelną legendą.
   - [ ] Testy komponentów frontendowych w `DashboardView.test.jsx` weryfikujące rozwijane wiersze P&L i odznaki YoY.
   - [ ] Testy integracyjne weryfikujące poprawną izolację kategorii w zestawieniu przychodów.
 
