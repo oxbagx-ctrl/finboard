@@ -209,4 +209,185 @@ final class BatchDeleteFinancialRecordsWorkflowTest extends TestCase
             $this->assertDatabaseHas('financial_records', ['id' => $rec->id]);
         }
     }
+
+    public function test_batch_delete_with_only_foreign_company_records_deletes_nothing_and_does_not_audit(): void
+    {
+        $foreign1 = FinancialRecord::create([
+            'id' => (string) Str::uuid(),
+            'company_id' => $this->otherCompany->id,
+            'category_id' => $this->category->id,
+            'amount' => 12000.00,
+            'currency' => 'PLN',
+            'record_date' => '2026-05-18',
+            'description' => 'Foreign Confidential A',
+            'record_type' => 'expense',
+            'source' => 'manual',
+        ]);
+
+        $foreign2 = FinancialRecord::create([
+            'id' => (string) Str::uuid(),
+            'company_id' => $this->otherCompany->id,
+            'category_id' => $this->category->id,
+            'amount' => 18000.00,
+            'currency' => 'PLN',
+            'record_date' => '2026-05-19',
+            'description' => 'Foreign Confidential B',
+            'record_type' => 'expense',
+            'source' => 'manual',
+        ]);
+
+        Sanctum::actingAs($this->tenantUser);
+
+        $response = $this->deleteJson('/api/v1/finance/records/batch', [
+            'record_ids' => [$foreign1->id, $foreign2->id],
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('status', 'deleted')
+            ->assertJsonPath('count', 0);
+
+        $this->assertEquals(0.0, (float) $response->json('total_amount'));
+
+        // Assert foreign records were not deleted
+        $this->assertDatabaseHas('financial_records', ['id' => $foreign1->id]);
+        $this->assertDatabaseHas('financial_records', ['id' => $foreign2->id]);
+
+        // Assert no audit log was created under either company
+        $tenantLogs = $this->auditLogRepository->findByCompanyId(
+            $this->tenantCompany->id,
+            action: AuditAction::RECORDS_BATCH_DELETED
+        );
+        $this->assertEmpty($tenantLogs);
+
+        $foreignLogs = $this->auditLogRepository->findByCompanyId(
+            $this->otherCompany->id,
+            action: AuditAction::RECORDS_BATCH_DELETED
+        );
+        $this->assertEmpty($foreignLogs);
+    }
+
+    public function test_batch_delete_with_non_existent_uuids_returns_zero_count(): void
+    {
+        Sanctum::actingAs($this->tenantUser);
+
+        $nonExistent1 = (string) Str::uuid();
+        $nonExistent2 = (string) Str::uuid();
+
+        $response = $this->deleteJson('/api/v1/finance/records/batch', [
+            'record_ids' => [$nonExistent1, $nonExistent2],
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('status', 'deleted')
+            ->assertJsonPath('count', 0);
+
+        $this->assertEquals(0.0, (float) $response->json('total_amount'));
+
+        // No audit logs created
+        $logs = $this->auditLogRepository->findByCompanyId(
+            $this->tenantCompany->id,
+            action: AuditAction::RECORDS_BATCH_DELETED
+        );
+        $this->assertEmpty($logs);
+    }
+
+    public function test_batch_delete_deduplicates_repeated_ids_in_payload(): void
+    {
+        $rec = FinancialRecord::create([
+            'id' => (string) Str::uuid(),
+            'company_id' => $this->tenantCompany->id,
+            'category_id' => $this->category->id,
+            'amount' => 3500.00,
+            'currency' => 'PLN',
+            'record_date' => '2026-05-20',
+            'description' => 'Duplicate ID Test Record',
+            'record_type' => 'expense',
+            'source' => 'manual',
+        ]);
+
+        Sanctum::actingAs($this->tenantUser);
+
+        // Sending same ID 3 times in payload
+        $response = $this->deleteJson('/api/v1/finance/records/batch', [
+            'record_ids' => [$rec->id, $rec->id, $rec->id],
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('status', 'deleted')
+            ->assertJsonPath('count', 1);
+
+        $this->assertEquals(3500.0, (float) $response->json('total_amount'));
+
+        $this->assertDatabaseMissing('financial_records', ['id' => $rec->id]);
+
+        $logs = $this->auditLogRepository->findByCompanyId(
+            $this->tenantCompany->id,
+            action: AuditAction::RECORDS_BATCH_DELETED
+        );
+        $this->assertNotEmpty($logs);
+        $this->assertSame(1, $logs[0]->oldValues()['count']);
+        $this->assertEquals(3500.0, (float) $logs[0]->oldValues()['total_amount']);
+    }
+
+    public function test_batch_delete_rollback_guarantees_zero_partial_deletions_when_failure_occurs(): void
+    {
+        $rec1 = FinancialRecord::create([
+            'id' => (string) Str::uuid(),
+            'company_id' => $this->tenantCompany->id,
+            'category_id' => $this->category->id,
+            'amount' => 1000.00,
+            'currency' => 'PLN',
+            'record_date' => '2026-05-21',
+            'description' => 'Batch Partial 1',
+            'record_type' => 'expense',
+            'source' => 'manual',
+        ]);
+
+        $rec2 = FinancialRecord::create([
+            'id' => (string) Str::uuid(),
+            'company_id' => $this->tenantCompany->id,
+            'category_id' => $this->category->id,
+            'amount' => 2000.00,
+            'currency' => 'PLN',
+            'record_date' => '2026-05-22',
+            'description' => 'Batch Partial 2',
+            'record_type' => 'expense',
+            'source' => 'manual',
+        ]);
+
+        $rec3 = FinancialRecord::create([
+            'id' => (string) Str::uuid(),
+            'company_id' => $this->tenantCompany->id,
+            'category_id' => $this->category->id,
+            'amount' => 3000.00,
+            'currency' => 'PLN',
+            'record_date' => '2026-05-23',
+            'description' => 'Batch Partial 3',
+            'record_type' => 'expense',
+            'source' => 'manual',
+        ]);
+
+        $mockDispatcher = $this->createMock(Dispatcher::class);
+        $mockDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->willThrowException(new \RuntimeException('Catastrophic failure after deleteManyByIds'));
+
+        $handler = new BatchDeleteFinancialRecordsHandler($this->recordRepository, $mockDispatcher);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Catastrophic failure after deleteManyByIds');
+
+        try {
+            $handler->handle(new BatchDeleteFinancialRecordsCommand(
+                companyId: $this->tenantCompany->id,
+                recordIds: [$rec1->id, $rec2->id, $rec3->id],
+                userId: (string) $this->tenantUser->id
+            ));
+        } finally {
+            // All 3 records MUST still exist in database due to atomic rollback
+            $this->assertDatabaseHas('financial_records', ['id' => $rec1->id]);
+            $this->assertDatabaseHas('financial_records', ['id' => $rec2->id]);
+            $this->assertDatabaseHas('financial_records', ['id' => $rec3->id]);
+        }
+    }
 }

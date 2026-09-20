@@ -350,7 +350,7 @@ npm test
 - [ ] **Faza 28: Zaawansowane Czyszczenie Zbiorów i Testy Regresji**
   - [x] Walidacja limitu masowego usuwania (max 500 rekordów) i obsługa skrajnych payloadów.
   - [x] Utrzymanie/reset stanu zaznaczeń przy paginacji i przełączaniu kontekstu spółki/filtrów.
-  - [ ] Testy integracyjne przypadków brzegowych (obce ID spółek, puste paczki, rollback DB).
+  - [x] Testy integracyjne przypadków brzegowych (obce ID spółek, puste paczki, rollback DB).
   - [ ] Testy E2E w `RecordsView.test.jsx` dla pełnego przepływu masowego usuwania.
   - [ ] Dokumentacja wytycznych bezpieczeństwa operacji masowych i ścieżki audytowej w changelogu.
 
