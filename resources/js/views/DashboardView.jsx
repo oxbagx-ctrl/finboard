@@ -203,7 +203,7 @@ export const DashboardView = () => {
         }));
     }, [expenseBreakdown, convertAmount]);
 
-    // Structured P&L Table Rows
+    // Standardized P&L Table Rows with institutional hierarchy (PSR / MSR)
     const pnlRows = useMemo(() => {
         const revenueChildren = revenueBreakdown.length > 0
             ? revenueBreakdown.map((rev, i) => ({
@@ -241,6 +241,7 @@ export const DashboardView = () => {
                 label: '2. Koszt Wytworzenia Sprzedanych Produktów (COGS)',
                 code: 'COGS',
                 amount: cogsVal,
+                isDeduction: true,
                 reverseChange: true,
                 change: yoyCogsGrowth,
             },
@@ -259,6 +260,7 @@ export const DashboardView = () => {
                 code: 'OPEX',
                 amount: opexVal,
                 isGroup: true,
+                isDeduction: true,
                 reverseChange: true,
                 change: yoyOpexGrowth,
                 children: expenseChildren.length > 0 ? expenseChildren : undefined,
@@ -277,6 +279,7 @@ export const DashboardView = () => {
                 label: '6. Amortyzacja Rzeczowa i Niematerialna (D&A)',
                 code: 'D&A',
                 amount: daVal,
+                isDeduction: true,
                 change: yoyDaGrowth,
                 reverseChange: true,
             },
@@ -294,6 +297,7 @@ export const DashboardView = () => {
                 label: '8. Podatek Dochodowy od Osób Prawnych (CIT)',
                 code: 'CIT',
                 amount: taxVal,
+                isDeduction: true,
                 change: yoyTaxGrowth,
                 reverseChange: true,
             },
@@ -303,8 +307,10 @@ export const DashboardView = () => {
                 code: 'EAT',
                 amount: netProfitVal,
                 isSummary: true,
+                isFinalResult: true,
                 color: 'profit',
                 change: yoyNetProfitGrowth,
+                auditStatus: 'WYNIK KOŃCOWY',
             },
         ];
     }, [

@@ -14,7 +14,7 @@ const mockTableData = [
         children: [
             {
                 id: 'rev_1',
-                label: 'Sprzedaż maszyn',
+                label: 'Sprzeda\u017c maszyn',
                 code: 'REV-01',
                 amount: 750000,
                 change: 20.0,
@@ -33,6 +33,7 @@ const mockTableData = [
         label: 'Koszt Wytworzenia (COGS)',
         code: 'COGS',
         amount: 550000,
+        isDeduction: true,
         change: null, // Missing / no comparative data
         reverseChange: true,
     },
@@ -43,6 +44,15 @@ const mockTableData = [
         amount: 450000,
         isSummary: true,
         change: -5.2,
+    },
+    {
+        id: 'net_profit',
+        label: 'Zysk Netto Okresu',
+        code: 'EAT',
+        amount: 200000,
+        isSummary: true,
+        isFinalResult: true,
+        change: 12.4,
     },
 ];
 
@@ -127,18 +137,49 @@ describe('FinancialTable Component', () => {
             />
         );
 
-        // Children are visible initially because expandedGroups.revenue is true
-        expect(screen.getByText('Sprzedaż maszyn')).toBeInTheDocument();
+        // Children are visible initially because expandedGroups is open
+        expect(screen.getByText('Sprzeda\u017c maszyn')).toBeInTheDocument();
 
         // Click to collapse
         const groupRow = screen.getByText('Przychody ze Sprzedaży').closest('tr');
         fireEvent.click(groupRow);
 
         // Children should no longer be in the document
-        expect(screen.queryByText('Sprzedaż maszyn')).not.toBeInTheDocument();
+        expect(screen.queryByText('Sprzeda\u017c maszyn')).not.toBeInTheDocument();
 
         // Click again to expand
         fireEvent.click(groupRow);
-        expect(screen.getByText('Sprzedaż maszyn')).toBeInTheDocument();
+        expect(screen.getByText('Sprzeda\u017c maszyn')).toBeInTheDocument();
+    });
+
+    it('renders category count badges for groups and deduction indicators for cost lines', () => {
+        render(
+            <FinancialTable
+                data={mockTableData}
+                currency="PLN"
+                revenueTotal={1000000}
+            />
+        );
+
+        // Group has 2 children -> renders '2 kat.'
+        expect(screen.getByText('2 kat.')).toBeInTheDocument();
+
+        // COGS is marked as deduction -> renders '(-)'
+        expect(screen.getByText('(-)')).toBeInTheDocument();
+    });
+
+    it('renders final net result row with prominent styling and WYNIK KOŃCOWY status', () => {
+        render(
+            <FinancialTable
+                data={mockTableData}
+                currency="PLN"
+                revenueTotal={1000000}
+            />
+        );
+
+        const netRow = screen.getByText('Zysk Netto Okresu').closest('tr');
+        expect(netRow).toBeInTheDocument();
+        expect(netRow).toHaveClass('border-b-4');
+        expect(screen.getByText('WYNIK KOŃCOWY')).toBeInTheDocument();
     });
 });

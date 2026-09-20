@@ -5,7 +5,8 @@ import { ChevronRight, ChevronDown } from 'lucide-react';
 
 /**
  * Bloomberg/FactSet-style high-density financial data table.
- * Supports expandable row groups, revenue share percentages, and tabular-nums alignment.
+ * Standardizes accounting hierarchy (groups, deductions, subtotals, final net bottom-line),
+ * indentation guides, expandable category breakdowns, and PSR/MSR formatting.
  */
 export const FinancialTable = ({
     title = 'Rachunek Zysków i Strat (P&L Breakdown)',
@@ -57,8 +58,10 @@ export const FinancialTable = ({
                         {data.map((row) => {
                             const isGroup = Boolean(row.isGroup);
                             const isExpanded = expandedGroups[row.id] !== false;
-                            const isSummary = Boolean(row.isSummary);
+                            const isFinalResult = Boolean(row.isFinalResult);
+                            const isSummary = Boolean(row.isSummary) || isFinalResult;
                             const isSubItem = Boolean(row.isSubItem);
+                            const isDeduction = Boolean(row.isDeduction);
 
                             // Calculate % of Revenue if total revenue is positive
                             const revShare = revenueTotal > 0 && row.amount != null && !isNaN(Number(row.amount))
@@ -69,17 +72,21 @@ export const FinancialTable = ({
                                 <React.Fragment key={row.id}>
                                     <tr
                                         className={`transition-colors duration-100 ${
-                                            isSummary
-                                                ? 'bg-zinc-850/40 font-bold border-t-2 border-b-2 border-zinc-750'
+                                            isFinalResult
+                                                ? 'bg-zinc-850/80 font-bold border-t-2 border-b-4 border-double border-zinc-600 text-zinc-100'
+                                                : isSummary
+                                                ? 'bg-zinc-850/40 font-bold border-t border-b border-zinc-750 text-zinc-100'
                                                 : isGroup
-                                                ? 'bg-zinc-950/40 font-semibold cursor-pointer hover:bg-zinc-800/40'
-                                                : 'hover:bg-zinc-850/50'
+                                                ? 'bg-zinc-950/40 font-semibold cursor-pointer hover:bg-zinc-800/40 text-zinc-200'
+                                                : 'hover:bg-zinc-850/50 text-zinc-300'
                                         }`}
                                         onClick={isGroup ? () => toggleGroup(row.id) : undefined}
                                     >
-                                        <td className={`py-2 px-4 flex items-center gap-2 ${isSubItem ? 'pl-8 text-zinc-400' : 'text-zinc-200'}`}>
+                                        <td className={`py-2 px-4 flex items-center gap-2 ${
+                                            isSubItem ? 'pl-8 text-zinc-400' : isDeduction && !isGroup ? 'pl-6 text-zinc-300' : 'text-zinc-200'
+                                        }`}>
                                             {isGroup ? (
-                                                <span className="text-zinc-500">
+                                                <span className="text-zinc-500 hover:text-zinc-300 transition-colors">
                                                     {isExpanded ? (
                                                         <ChevronDown className="w-3.5 h-3.5" />
                                                     ) : (
@@ -88,15 +95,22 @@ export const FinancialTable = ({
                                                 </span>
                                             ) : isSubItem ? (
                                                 <span className="w-1.5 h-1.5 rounded-full bg-zinc-700 mr-1 shrink-0"></span>
+                                            ) : isDeduction ? (
+                                                <span className="text-[10px] font-mono text-zinc-500 font-semibold mr-0.5">(-)</span>
                                             ) : (
                                                 <span className="w-3.5" />
                                             )}
-                                            <span className={isSummary ? 'text-zinc-100 tracking-tight' : ''}>
+                                            <span className={isFinalResult ? 'text-zinc-100 font-bold text-[13px] tracking-tight' : isSummary ? 'text-zinc-100 tracking-tight' : ''}>
                                                 {row.label}
                                             </span>
                                             {row.code && (
                                                 <span className="text-[10px] text-zinc-500 font-normal">
                                                     [{row.code}]
+                                                </span>
+                                            )}
+                                            {isGroup && row.children && row.children.length > 0 && (
+                                                <span className="ml-1 px-1.5 py-0.2 rounded text-[9px] font-mono bg-zinc-800/80 text-zinc-400 border border-zinc-700/60">
+                                                    {row.children.length} {row.children.length === 1 ? 'poz.' : 'kat.'}
                                                 </span>
                                             )}
                                         </td>
@@ -106,7 +120,7 @@ export const FinancialTable = ({
                                                 amount={row.amount}
                                                 currency={currency}
                                                 color={row.color || (isSummary ? 'auto' : 'neutral')}
-                                                size={isSummary ? 'md' : 'sm'}
+                                                size={isFinalResult ? 'md' : isSummary ? 'md' : 'sm'}
                                             />
                                         </td>
 
@@ -124,8 +138,12 @@ export const FinancialTable = ({
                                         </td>
 
                                         <td className="py-2 px-4 text-center">
-                                            <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-mono uppercase bg-zinc-950 border border-zinc-800 text-zinc-400">
-                                                {row.auditStatus || 'AUDYT: OK'}
+                                            <span className={`inline-block px-1.5 py-0.5 rounded text-[9px] font-mono uppercase border ${
+                                                isFinalResult
+                                                    ? 'bg-emerald-950/30 border-emerald-800/60 text-emerald-400 font-semibold'
+                                                    : 'bg-zinc-950 border-zinc-800 text-zinc-400'
+                                            }`}>
+                                                {row.auditStatus || (isFinalResult ? 'WYNIK KOŃCOWY' : 'AUDYT: OK')}
                                             </span>
                                         </td>
                                     </tr>
@@ -137,12 +155,12 @@ export const FinancialTable = ({
                                             : null;
 
                                         return (
-                                            <tr key={child.id} className="hover:bg-zinc-850/40 bg-zinc-950/20 text-zinc-300">
-                                                <td className="py-1.5 px-4 pl-9 flex items-center gap-1.5 text-zinc-400">
-                                                    <span className="text-zinc-600">↳</span>
-                                                    <span>{child.label}</span>
+                                            <tr key={child.id} className="hover:bg-zinc-850/40 bg-zinc-950/25 text-zinc-400 border-b border-zinc-850/60 transition-colors">
+                                                <td className="py-1.5 px-4 pl-10 flex items-center gap-2 text-zinc-400">
+                                                    <span className="text-zinc-600 font-mono select-none">↳</span>
+                                                    <span className="truncate">{child.label}</span>
                                                     {child.code && (
-                                                        <span className="text-[9px] text-zinc-600">[{child.code}]</span>
+                                                        <span className="text-[9px] text-zinc-500 font-mono">[{child.code}]</span>
                                                     )}
                                                 </td>
 
@@ -151,6 +169,7 @@ export const FinancialTable = ({
                                                         amount={child.amount}
                                                         currency={currency}
                                                         size="sm"
+                                                        color="neutral"
                                                     />
                                                 </td>
 
@@ -168,8 +187,8 @@ export const FinancialTable = ({
                                                 </td>
 
                                                 <td className="py-1.5 px-4 text-center">
-                                                    <span className="text-[9px] text-zinc-600 font-mono">
-                                                        ZWERYFIKOWANY
+                                                    <span className="inline-block px-1.5 py-0.2 rounded text-[8px] font-mono uppercase bg-zinc-950/80 border border-zinc-850 text-zinc-500">
+                                                        {child.auditStatus || 'ZWERYFIKOWANY'}
                                                     </span>
                                                 </td>
                                             </tr>
@@ -183,8 +202,8 @@ export const FinancialTable = ({
             </div>
 
             {/* Table Footer with Summary Note */}
-            <div className="px-4 py-2 bg-zinc-950 border-t border-zinc-800 flex items-center justify-between text-[10px] font-mono text-zinc-500">
-                <span>ZGODNE Z POLSKIMI STANDARDAMI RACHUNKOWOŚCI (PSR / MSR)</span>
+            <div className="px-4 py-2 bg-zinc-950 border-t border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[10px] font-mono text-zinc-500">
+                <span>STANDARD: POLSKIE STANDARDY RACHUNKOWOŚCI (PSR) / MSR 1</span>
                 <span>DOKŁADNOŚĆ: KALKULATOR DOMENOWY BCMATH (SCALE 4)</span>
             </div>
         </div>
