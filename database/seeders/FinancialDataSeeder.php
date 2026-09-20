@@ -39,7 +39,7 @@ final class FinancialDataSeeder extends Seeder
             ]);
         }
 
-        // Ensure granular OPEX categories exist
+        // Ensure granular OPEX and Revenue categories exist
         $this->seedCategories();
 
         // Clean existing records to keep seeding idempotent
@@ -53,6 +53,37 @@ final class FinancialDataSeeder extends Seeder
     private function seedCategories(): void
     {
         $categories = [
+            // Revenue categories
+            [
+                'id' => FinancialCategory::REVENUE_GENERIC,
+                'name' => 'Przychody ze sprzedaży',
+                'type' => 'revenue',
+                'code' => 'REV',
+                'description' => 'Główne przychody operacyjne ze sprzedaży towarów i usług',
+            ],
+            [
+                'id' => FinancialCategory::REVENUE_SERVICES,
+                'name' => 'Usługi programistyczne i inżynieryjne B2B',
+                'type' => 'revenue',
+                'code' => 'REV-SRV',
+                'description' => 'Przychody ze świadczenia dedykowanych usług programistycznych, wdrożeniowych i inżynieryjnych',
+            ],
+            [
+                'id' => FinancialCategory::REVENUE_SAAS,
+                'name' => 'Subskrypcje i licencje SaaS',
+                'type' => 'revenue',
+                'code' => 'REV-SAAS',
+                'description' => 'Przychody powtarzalne (ARR/MRR) z licencji oprogramowania i platform SaaS',
+            ],
+            [
+                'id' => FinancialCategory::REVENUE_CONSULTING,
+                'name' => 'Doradztwo technologiczne i audyty chmurowe',
+                'type' => 'revenue',
+                'code' => 'REV-CON',
+                'description' => 'Przychody z profesjonalnego doradztwa IT, audytów architektury i optymalizacji chmurowych',
+            ],
+
+            // OPEX granular categories
             [
                 'id' => FinancialCategory::OPEX_PAYROLL,
                 'name' => 'Wynagrodzenia i świadczenia pracownicze',
@@ -124,26 +155,34 @@ final class FinancialDataSeeder extends Seeder
                 $growthFactor = 1.0 + ($monthIndex * 0.015);
                 $seasonality = 1.0 + (sin($monthIndex * (pi() / 6)) * 0.08);
 
-                $revenue = round(520000 * $growthFactor * $seasonality, 4);
-                $cogs = round($revenue * 0.54, 4);
+                $totalRevenue = round(520000 * $growthFactor * $seasonality, 4);
+                $cogs = round($totalRevenue * 0.54, 4);
                 $opex = round(95000 * (1.0 + ($monthIndex * 0.008)), 4);
                 $depreciation = 24000.0000;
                 $financial = 8500.0000;
-                $tax = round(($revenue - $cogs - $opex - $depreciation - $financial) * 0.19, 4);
+                $tax = round(($totalRevenue - $cogs - $opex - $depreciation - $financial) * 0.19, 4);
                 if ($tax < 0) {
                     $tax = 0.0;
                 }
 
                 // Balance sheet metrics for liquidity
                 $cash = round(140000 + ($monthIndex * 3500) + (($monthIndex % 3) * 4000), 4);
-                $receivables = round($revenue * 0.42, 4);
+                $receivables = round($totalRevenue * 0.42, 4);
                 $inventory = round($cogs * 0.52, 4);
                 $currentLiab = round($cogs * 0.45 + ($opex * 0.25), 4);
                 $fixedAssets = 1250000.0000;
                 $longTermLiab = 420000.0000;
 
-                // P&L entries
-                $records[] = $this->makeRecord(self::ACME_ID, 'cat-revenue', 'revenue', (string) $revenue, $dateStr, 'Przychody ze sprzedaży produktów');
+                // Granular Revenue streams (Services 58%, SaaS 26%, Consulting 16%)
+                $revServices = round($totalRevenue * 0.58, 4);
+                $revSaas = round($totalRevenue * 0.26, 4);
+                $revConsulting = round($totalRevenue - $revServices - $revSaas, 4);
+
+                $records[] = $this->makeRecord(self::ACME_ID, FinancialCategory::REVENUE_SERVICES, 'revenue', (string) $revServices, $dateStr, 'Usługi inżynieryjne i automatyzacja linii produkcyjnych B2B');
+                $records[] = $this->makeRecord(self::ACME_ID, FinancialCategory::REVENUE_SAAS, 'revenue', (string) $revSaas, $dateStr, 'Subskrypcje oprogramowania kontroli jakości IoT');
+                $records[] = $this->makeRecord(self::ACME_ID, FinancialCategory::REVENUE_CONSULTING, 'revenue', (string) $revConsulting, $dateStr, 'Doradztwo technologiczne Industry 4.0 i audyty');
+
+                // COGS
                 $records[] = $this->makeRecord(self::ACME_ID, 'cat-cogs', 'expense', (string) $cogs, $dateStr, 'Koszt wytworzenia sprzedanych wyrobów (COGS)');
 
                 // Granular OPEX breakdown across subcategories
@@ -191,18 +230,27 @@ final class FinancialDataSeeder extends Seeder
                 $dateStr = Carbon::create($year, $month, 1)->endOfMonth()->toDateString();
                 $growth = 1.0 + ($monthIndex * 0.02);
 
-                $revenue = round(210000 * $growth, 4);
+                $totalRevenue = round(210000 * $growth, 4);
                 $cogs = round(42000 * $growth, 4);
                 $opex = round(72000 * (1.0 + ($monthIndex * 0.005)), 4);
                 $depreciation = 3500.0000;
                 $financial = 900.0000;
-                $tax = round(($revenue - $cogs - $opex - $depreciation - $financial) * 0.19, 4);
+                $tax = round(($totalRevenue - $cogs - $opex - $depreciation - $financial) * 0.19, 4);
 
                 $cash = round(320000 + ($monthIndex * 6000), 4);
-                $receivables = round($revenue * 0.35, 4);
+                $receivables = round($totalRevenue * 0.35, 4);
                 $currentLiab = round(48000 + ($monthIndex * 800), 4);
 
-                $records[] = $this->makeRecord(self::HELVEST_ID, 'cat-revenue', 'revenue', (string) $revenue, $dateStr, 'Przychody z doradztwa M&A i transakcyjnego');
+                // Granular Revenue streams (Consulting 65%, SaaS / Data Room fees 20%, Services 15%)
+                $revConsulting = round($totalRevenue * 0.65, 4);
+                $revSaas = round($totalRevenue * 0.20, 4);
+                $revServices = round($totalRevenue - $revConsulting - $revSaas, 4);
+
+                $records[] = $this->makeRecord(self::HELVEST_ID, FinancialCategory::REVENUE_CONSULTING, 'revenue', (string) $revConsulting, $dateStr, 'Doradztwo strategiczne M&A, procesy Due Diligence');
+                $records[] = $this->makeRecord(self::HELVEST_ID, FinancialCategory::REVENUE_SAAS, 'revenue', (string) $revSaas, $dateStr, 'Opłaty licencyjne za platformę Virtual Data Room');
+                $records[] = $this->makeRecord(self::HELVEST_ID, FinancialCategory::REVENUE_SERVICES, 'revenue', (string) $revServices, $dateStr, 'Usługi analityczne, wyceny komercyjne i modelowanie');
+
+                // COGS
                 $records[] = $this->makeRecord(self::HELVEST_ID, 'cat-cogs', 'expense', (string) $cogs, $dateStr, 'Wynagrodzenia zewnętrznych audytorów i rzeczoznawców');
 
                 // Granular OPEX breakdown across subcategories

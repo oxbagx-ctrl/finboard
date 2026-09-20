@@ -1,6 +1,6 @@
 kategoria,kwota,data,waluta,opis
-cat-revenue,185000.00,2026-07-02,PLN,Faktura FV/2026/07/012 - Dostawa zautomatyzowanej linii montażowej dla klienta AutoTech S.A.
-cat-revenue,92400.50,2026-07-08,PLN,Faktura FV/2026/07/045 - Kontrakt eksportowy komponentów precyzyjnych (Niemcy)
+cat-revenue-services,185000.00,2026-07-02,PLN,Faktura FV/2026/07/012 - Dostawa zautomatyzowanej linii montażowej dla klienta AutoTech S.A.
+cat-revenue-saas,92400.50,2026-07-08,PLN,Faktura FV/2026/07/045 - Kontrakt eksportowy komponentów precyzyjnych i telemetrycznych (Niemcy)
 cat-cogs,46200.00,2026-07-10,PLN,Zakup blach stalowych konstrukcyjnych i profili aluminiowych od Hutnictwo Polska
 cat-cogs,28900.00,2026-07-12,PLN,Dostawa serwonapędów i sterowników PLC Siemens do węzła automatyki
 cat-opex-payroll,64500.00,2026-07-15,PLN,Wynagrodzenia zasadnicze zespołu inżynierów i konstruktorów za czerwiec 2026
@@ -9,14 +9,14 @@ cat-opex-services,8600.00,2026-07-20,PLN,Dystrybucja i transport spedycyjny pona
 cat-opex-software,6200.00,2026-07-22,PLN,Roczne subskrypcje oprogramowania CAD/CAM SolidWorks oraz licencji ERP
 cat-depreciation,12500.00,2026-07-31,PLN,Odpis amortyzacyjny maszyn CNC i robotów spawalniczych za lipiec 2026
 cat-financial,3850.00,2026-07-31,PLN,Obsługa odsetkowa kredytu inwestycyjnego na rozbudowę parku maszynowego
-cat-revenue,215000.00,2026-08-04,PLN,Faktura FV/2026/08/005 - Realizacja II etapu modernizacji tłoczni dla Boryszew Group
-cat-revenue,64000.00,2026-08-11,PLN,Sprzedaż części zamiennych i oprzyrządowania serwisowego
+cat-revenue-services,215000.00,2026-08-04,PLN,Faktura FV/2026/08/005 - Realizacja II etapu modernizacji tłoczni dla Boryszew Group
+cat-revenue-consulting,64000.00,2026-08-11,PLN,Doradztwo inżynieryjne, audyt wydajnościowy linii i serwis technologiczny
 cat-cogs,58400.00,2026-08-14,PLN,Zamówienie odlewów żeliwnych i obróbka cieplna w kooperacji
 cat-opex-payroll,66100.00,2026-08-15,PLN,Wynagrodzenia zespołu inżynieryjnego i działu R&D za lipiec 2026
 cat-opex-office,7900.00,2026-08-20,PLN,Koszty mediów przemysłowych: energia elektryczna wysokiego napięcia (Enea)
 cat-tax,18600.00,2026-08-25,PLN,Zaliczka na podatek dochodowy od osób prawnych CIT-8 za lipiec 2026
 cat-depreciation,12500.00,2026-08-31,PLN,Odpis amortyzacyjny parku maszynowego za sierpień 2026
-cat-revenue,178000.00,2026-09-03,PLN,Faktura FV/2026/09/018 - Wdrożenie celi zrobotyzowanej dla Kirchhoff Automotive
+cat-revenue-services,178000.00,2026-09-03,PLN,Faktura FV/2026/09/018 - Wdrożenie celi zrobotyzowanej dla Kirchhoff Automotive
 cat-cogs,41200.00,2026-09-08,PLN,Komponenty pneumatyczne Festo i osprzęt elektryczny do projektu
 cat-opex-payroll,65800.00,2026-09-15,PLN,Wynagrodzenia personelu inżynieryjno-technicznego za sierpień 2026
 cat-opex-legal,9800.00,2026-09-18,PLN,Koszty audytu technicznego ISO 9001 i certyfikacji CE (TÜV SÜD)

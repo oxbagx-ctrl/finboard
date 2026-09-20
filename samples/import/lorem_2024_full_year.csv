@@ -1,7 +1,7 @@
 kategoria,kwota,data,waluta,opis
-cat-revenue,198440.00,2024-01-04,PLN,Faktura FV/2024/01/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za styczeń 2024
-cat-revenue,120756.36,2024-01-12,PLN,Faktura FV/2024/01/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
-cat-revenue,82843.64,2024-01-22,PLN,Faktura FV/2024/01/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
+cat-revenue-services,198440.00,2024-01-04,PLN,Faktura FV/2024/01/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za styczeń 2024
+cat-revenue-consulting,120756.36,2024-01-12,PLN,Faktura FV/2024/01/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
+cat-revenue-saas,82843.64,2024-01-22,PLN,Faktura FV/2024/01/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
 cat-cogs,111865.45,2024-01-08,PLN,Podwykonawstwo B2B: Zespół Senior Fullstack / Python / DevOps inżynierów kontraktowych za styczeń 2024
 cat-cogs,34025.45,2024-01-24,PLN,Dedykowane klastry Kubernetes AWS/GCP oraz licencje środowisk klienckich
 cat-opex-payroll,75872.73,2024-01-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za styczeń 2024"
@@ -15,9 +15,9 @@ cat-tax,12442.99,2024-01-31,PLN,Zaliczka na podatek dochodowy CIT-8 (z uwzględn
 cat-cash,937850.91,2024-01-31,PLN,Bilans: Stan środków pieniężnych na rachunkach bieżących PLN/EUR/USD oraz lokacie automatycznej
 cat-receivables,369876.80,2024-01-31,PLN,Bilans: Należności krótkoterminowe z tytułu zrealizowanych usług programistycznych
 cat-current-liabilities,167175.86,2024-01-31,PLN,"Bilans: Zobowiązania bieżące wobec podwykonawców B2B, podatkowe i ZUS"
-cat-revenue,205810.00,2024-02-04,PLN,Faktura FV/2024/02/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za luty 2024
-cat-revenue,119202.73,2024-02-12,PLN,Faktura FV/2024/02/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
-cat-revenue,85997.27,2024-02-22,PLN,Faktura FV/2024/02/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
+cat-revenue-services,205810.00,2024-02-04,PLN,Faktura FV/2024/02/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za luty 2024
+cat-revenue-consulting,119202.73,2024-02-12,PLN,Faktura FV/2024/02/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
+cat-revenue-saas,85997.27,2024-02-22,PLN,Faktura FV/2024/02/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
 cat-cogs,116020.91,2024-02-08,PLN,Podwykonawstwo B2B: Zespół Senior Fullstack / Python / DevOps inżynierów kontraktowych za luty 2024
 cat-cogs,32960.91,2024-02-24,PLN,Dedykowane klastry Kubernetes AWS/GCP oraz licencje środowisk klienckich
 cat-opex-payroll,78695.45,2024-02-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za luty 2024"
@@ -31,9 +31,9 @@ cat-tax,12642.16,2024-02-29,PLN,Zaliczka na podatek dochodowy CIT-8 (z uwzględn
 cat-cash,992671.82,2024-02-29,PLN,Bilans: Stan środków pieniężnych na rachunkach bieżących PLN/EUR/USD oraz lokacie automatycznej
 cat-receivables,378129.20,2024-02-29,PLN,Bilans: Należności krótkoterminowe z tytułu zrealizowanych usług programistycznych
 cat-current-liabilities,171476.36,2024-02-29,PLN,"Bilans: Zobowiązania bieżące wobec podwykonawców B2B, podatkowe i ZUS"
-cat-revenue,213180.00,2024-03-04,PLN,Faktura FV/2024/03/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za marzec 2024
-cat-revenue,123849.09,2024-03-12,PLN,Faktura FV/2024/03/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
-cat-revenue,89150.91,2024-03-22,PLN,Faktura FV/2024/03/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
+cat-revenue-services,213180.00,2024-03-04,PLN,Faktura FV/2024/03/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za marzec 2024
+cat-revenue-consulting,123849.09,2024-03-12,PLN,Faktura FV/2024/03/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
+cat-revenue-saas,89150.91,2024-03-22,PLN,Faktura FV/2024/03/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
 cat-cogs,120176.36,2024-03-08,PLN,Podwykonawstwo B2B: Zespół Senior Fullstack / Python / DevOps inżynierów kontraktowych za marzec 2024
 cat-cogs,34296.36,2024-03-24,PLN,Dedykowane klastry Kubernetes AWS/GCP oraz licencje środowisk klienckich
 cat-opex-payroll,81518.18,2024-03-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za marzec 2024"
@@ -47,9 +47,9 @@ cat-tax,13183.32,2024-03-31,PLN,Zaliczka na podatek dochodowy CIT-8 (z uwzględn
 cat-cash,1047492.73,2024-03-31,PLN,Bilans: Stan środków pieniężnych na rachunkach bieżących PLN/EUR/USD oraz lokacie automatycznej
 cat-receivables,392085.60,2024-03-31,PLN,Bilans: Należności krótkoterminowe z tytułu zrealizowanych usług programistycznych
 cat-current-liabilities,177336.83,2024-03-31,PLN,"Bilans: Zobowiązania bieżące wobec podwykonawców B2B, podatkowe i ZUS"
-cat-revenue,220550.00,2024-04-04,PLN,Faktura FV/2024/04/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za kwiecień 2024
-cat-revenue,128495.45,2024-04-12,PLN,Faktura FV/2024/04/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
-cat-revenue,88004.55,2024-04-22,PLN,Faktura FV/2024/04/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
+cat-revenue-services,220550.00,2024-04-04,PLN,Faktura FV/2024/04/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za kwiecień 2024
+cat-revenue-consulting,128495.45,2024-04-12,PLN,Faktura FV/2024/04/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
+cat-revenue-saas,88004.55,2024-04-22,PLN,Faktura FV/2024/04/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
 cat-cogs,124331.82,2024-04-08,PLN,Podwykonawstwo B2B: Zespół Senior Fullstack / Python / DevOps inżynierów kontraktowych za kwiecień 2024
 cat-cogs,35631.82,2024-04-24,PLN,Dedykowane klastry Kubernetes AWS/GCP oraz licencje środowisk klienckich
 cat-opex-payroll,84340.91,2024-04-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za kwiecień 2024"
@@ -63,9 +63,9 @@ cat-tax,13337.49,2024-04-30,PLN,Zaliczka na podatek dochodowy CIT-8 (z uwzględn
 cat-cash,1102313.64,2024-04-30,PLN,Bilans: Stan środków pieniężnych na rachunkach bieżących PLN/EUR/USD oraz lokacie automatycznej
 cat-receivables,402086.00,2024-04-30,PLN,Bilans: Należności krótkoterminowe z tytułu zrealizowanych usług programistycznych
 cat-current-liabilities,183197.33,2024-04-30,PLN,"Bilans: Zobowiązania bieżące wobec podwykonawców B2B, podatkowe i ZUS"
-cat-revenue,227920.00,2024-05-04,PLN,Faktura FV/2024/05/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za maj 2024
-cat-revenue,133141.82,2024-05-12,PLN,Faktura FV/2024/05/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
-cat-revenue,91158.18,2024-05-22,PLN,Faktura FV/2024/05/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
+cat-revenue-services,227920.00,2024-05-04,PLN,Faktura FV/2024/05/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za maj 2024
+cat-revenue-consulting,133141.82,2024-05-12,PLN,Faktura FV/2024/05/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
+cat-revenue-saas,91158.18,2024-05-22,PLN,Faktura FV/2024/05/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
 cat-cogs,128487.27,2024-05-08,PLN,Podwykonawstwo B2B: Zespół Senior Fullstack / Python / DevOps inżynierów kontraktowych za maj 2024
 cat-cogs,36967.27,2024-05-24,PLN,Dedykowane klastry Kubernetes AWS/GCP oraz licencje środowisk klienckich
 cat-opex-payroll,87163.64,2024-05-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za maj 2024"
@@ -79,9 +79,9 @@ cat-tax,13878.66,2024-05-31,PLN,Zaliczka na podatek dochodowy CIT-8 (z uwzględn
 cat-cash,1157134.55,2024-05-31,PLN,Bilans: Stan środków pieniężnych na rachunkach bieżących PLN/EUR/USD oraz lokacie automatycznej
 cat-receivables,416042.40,2024-05-31,PLN,Bilans: Należności krótkoterminowe z tytułu zrealizowanych usług programistycznych
 cat-current-liabilities,189057.81,2024-05-31,PLN,"Bilans: Zobowiązania bieżące wobec podwykonawców B2B, podatkowe i ZUS"
-cat-revenue,235290.00,2024-06-04,PLN,Faktura FV/2024/06/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za czerwiec 2024
-cat-revenue,137788.18,2024-06-12,PLN,Faktura FV/2024/06/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
-cat-revenue,94311.82,2024-06-22,PLN,Faktura FV/2024/06/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
+cat-revenue-services,235290.00,2024-06-04,PLN,Faktura FV/2024/06/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za czerwiec 2024
+cat-revenue-consulting,137788.18,2024-06-12,PLN,Faktura FV/2024/06/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
+cat-revenue-saas,94311.82,2024-06-22,PLN,Faktura FV/2024/06/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
 cat-cogs,132642.73,2024-06-08,PLN,Podwykonawstwo B2B: Zespół Senior Fullstack / Python / DevOps inżynierów kontraktowych za czerwiec 2024
 cat-cogs,38302.73,2024-06-24,PLN,Dedykowane klastry Kubernetes AWS/GCP oraz licencje środowisk klienckich
 cat-opex-payroll,89986.36,2024-06-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za czerwiec 2024"
@@ -95,9 +95,9 @@ cat-tax,14419.82,2024-06-30,PLN,Zaliczka na podatek dochodowy CIT-8 (z uwzględn
 cat-cash,1211955.45,2024-06-30,PLN,Bilans: Stan środków pieniężnych na rachunkach bieżących PLN/EUR/USD oraz lokacie automatycznej
 cat-receivables,429998.80,2024-06-30,PLN,Bilans: Należności krótkoterminowe z tytułu zrealizowanych usług programistycznych
 cat-current-liabilities,194918.31,2024-06-30,PLN,"Bilans: Zobowiązania bieżące wobec podwykonawców B2B, podatkowe i ZUS"
-cat-revenue,242660.00,2024-07-04,PLN,Faktura FV/2024/07/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za lipiec 2024
-cat-revenue,142434.55,2024-07-12,PLN,Faktura FV/2024/07/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
-cat-revenue,97465.45,2024-07-22,PLN,Faktura FV/2024/07/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
+cat-revenue-services,242660.00,2024-07-04,PLN,Faktura FV/2024/07/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za lipiec 2024
+cat-revenue-consulting,142434.55,2024-07-12,PLN,Faktura FV/2024/07/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
+cat-revenue-saas,97465.45,2024-07-22,PLN,Faktura FV/2024/07/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
 cat-cogs,136798.18,2024-07-08,PLN,Podwykonawstwo B2B: Zespół Senior Fullstack / Python / DevOps inżynierów kontraktowych za lipiec 2024
 cat-cogs,39638.18,2024-07-24,PLN,Dedykowane klastry Kubernetes AWS/GCP oraz licencje środowisk klienckich
 cat-opex-payroll,92809.09,2024-07-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za lipiec 2024"
@@ -111,9 +111,9 @@ cat-tax,14960.99,2024-07-31,PLN,Zaliczka na podatek dochodowy CIT-8 (z uwzględn
 cat-cash,1266776.36,2024-07-31,PLN,Bilans: Stan środków pieniężnych na rachunkach bieżących PLN/EUR/USD oraz lokacie automatycznej
 cat-receivables,443955.20,2024-07-31,PLN,Bilans: Należności krótkoterminowe z tytułu zrealizowanych usług programistycznych
 cat-current-liabilities,200778.80,2024-07-31,PLN,"Bilans: Zobowiązania bieżące wobec podwykonawców B2B, podatkowe i ZUS"
-cat-revenue,250030.00,2024-08-04,PLN,Faktura FV/2024/08/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za sierpień 2024
-cat-revenue,147080.91,2024-08-12,PLN,Faktura FV/2024/08/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
-cat-revenue,100619.09,2024-08-22,PLN,Faktura FV/2024/08/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
+cat-revenue-services,250030.00,2024-08-04,PLN,Faktura FV/2024/08/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za sierpień 2024
+cat-revenue-consulting,147080.91,2024-08-12,PLN,Faktura FV/2024/08/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
+cat-revenue-saas,100619.09,2024-08-22,PLN,Faktura FV/2024/08/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
 cat-cogs,140953.64,2024-08-08,PLN,Podwykonawstwo B2B: Zespół Senior Fullstack / Python / DevOps inżynierów kontraktowych za sierpień 2024
 cat-cogs,40973.64,2024-08-24,PLN,Dedykowane klastry Kubernetes AWS/GCP oraz licencje środowisk klienckich
 cat-opex-payroll,95631.82,2024-08-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za sierpień 2024"
@@ -127,9 +127,9 @@ cat-tax,15502.15,2024-08-31,PLN,Zaliczka na podatek dochodowy CIT-8 (z uwzględn
 cat-cash,1321597.27,2024-08-31,PLN,Bilans: Stan środków pieniężnych na rachunkach bieżących PLN/EUR/USD oraz lokacie automatycznej
 cat-receivables,457911.60,2024-08-31,PLN,Bilans: Należności krótkoterminowe z tytułu zrealizowanych usług programistycznych
 cat-current-liabilities,206639.30,2024-08-31,PLN,"Bilans: Zobowiązania bieżące wobec podwykonawców B2B, podatkowe i ZUS"
-cat-revenue,257400.00,2024-09-04,PLN,Faktura FV/2024/09/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za wrzesień 2024
-cat-revenue,151727.27,2024-09-12,PLN,Faktura FV/2024/09/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
-cat-revenue,103772.73,2024-09-22,PLN,Faktura FV/2024/09/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
+cat-revenue-services,257400.00,2024-09-04,PLN,Faktura FV/2024/09/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za wrzesień 2024
+cat-revenue-consulting,151727.27,2024-09-12,PLN,Faktura FV/2024/09/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
+cat-revenue-saas,103772.73,2024-09-22,PLN,Faktura FV/2024/09/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
 cat-cogs,145109.09,2024-09-08,PLN,Podwykonawstwo B2B: Zespół Senior Fullstack / Python / DevOps inżynierów kontraktowych za wrzesień 2024
 cat-cogs,42309.09,2024-09-24,PLN,Dedykowane klastry Kubernetes AWS/GCP oraz licencje środowisk klienckich
 cat-opex-payroll,98454.55,2024-09-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za wrzesień 2024"
@@ -143,9 +143,9 @@ cat-tax,16043.32,2024-09-30,PLN,Zaliczka na podatek dochodowy CIT-8 (z uwzględn
 cat-cash,1376418.18,2024-09-30,PLN,Bilans: Stan środków pieniężnych na rachunkach bieżących PLN/EUR/USD oraz lokacie automatycznej
 cat-receivables,471868.00,2024-09-30,PLN,Bilans: Należności krótkoterminowe z tytułu zrealizowanych usług programistycznych
 cat-current-liabilities,212499.77,2024-09-30,PLN,"Bilans: Zobowiązania bieżące wobec podwykonawców B2B, podatkowe i ZUS"
-cat-revenue,264770.00,2024-10-04,PLN,Faktura FV/2024/10/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za październik 2024
-cat-revenue,156373.64,2024-10-12,PLN,Faktura FV/2024/10/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
-cat-revenue,106926.36,2024-10-22,PLN,Faktura FV/2024/10/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
+cat-revenue-services,264770.00,2024-10-04,PLN,Faktura FV/2024/10/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za październik 2024
+cat-revenue-consulting,156373.64,2024-10-12,PLN,Faktura FV/2024/10/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
+cat-revenue-saas,106926.36,2024-10-22,PLN,Faktura FV/2024/10/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
 cat-cogs,149264.55,2024-10-08,PLN,Podwykonawstwo B2B: Zespół Senior Fullstack / Python / DevOps inżynierów kontraktowych za październik 2024
 cat-cogs,43644.55,2024-10-24,PLN,Dedykowane klastry Kubernetes AWS/GCP oraz licencje środowisk klienckich
 cat-opex-payroll,98177.27,2024-10-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za październik 2024"
@@ -159,9 +159,9 @@ cat-tax,16863.48,2024-10-31,PLN,Zaliczka na podatek dochodowy CIT-8 (z uwzględn
 cat-cash,1416239.09,2024-10-31,PLN,Bilans: Stan środków pieniężnych na rachunkach bieżących PLN/EUR/USD oraz lokacie automatycznej
 cat-receivables,485824.40,2024-10-31,PLN,Bilans: Należności krótkoterminowe z tytułu zrealizowanych usług programistycznych
 cat-current-liabilities,216345.27,2024-10-31,PLN,"Bilans: Zobowiązania bieżące wobec podwykonawców B2B, podatkowe i ZUS"
-cat-revenue,272140.00,2024-11-04,PLN,Faktura FV/2024/11/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za listopad 2024
-cat-revenue,161020.00,2024-11-12,PLN,Faktura FV/2024/11/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
-cat-revenue,110080.00,2024-11-22,PLN,Faktura FV/2024/11/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
+cat-revenue-services,272140.00,2024-11-04,PLN,Faktura FV/2024/11/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za listopad 2024
+cat-revenue-consulting,161020.00,2024-11-12,PLN,Faktura FV/2024/11/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
+cat-revenue-saas,110080.00,2024-11-22,PLN,Faktura FV/2024/11/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
 cat-cogs,153420.00,2024-11-08,PLN,Podwykonawstwo B2B: Zespół Senior Fullstack / Python / DevOps inżynierów kontraktowych za listopad 2024
 cat-cogs,44980.00,2024-11-24,PLN,Dedykowane klastry Kubernetes AWS/GCP oraz licencje środowisk klienckich
 cat-opex-payroll,101000.00,2024-11-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za listopad 2024"
@@ -175,9 +175,9 @@ cat-tax,17404.65,2024-11-30,PLN,Zaliczka na podatek dochodowy CIT-8 (z uwzględn
 cat-cash,1471060.00,2024-11-30,PLN,Bilans: Stan środków pieniężnych na rachunkach bieżących PLN/EUR/USD oraz lokacie automatycznej
 cat-receivables,499780.80,2024-11-30,PLN,Bilans: Należności krótkoterminowe z tytułu zrealizowanych usług programistycznych
 cat-current-liabilities,222205.75,2024-11-30,PLN,"Bilans: Zobowiązania bieżące wobec podwykonawców B2B, podatkowe i ZUS"
-cat-revenue,271010.00,2024-12-04,PLN,Faktura FV/2024/12/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za grudzień 2024
-cat-revenue,165666.36,2024-12-12,PLN,Faktura FV/2024/12/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
-cat-revenue,113233.64,2024-12-22,PLN,Faktura FV/2024/12/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
+cat-revenue-services,271010.00,2024-12-04,PLN,Faktura FV/2024/12/001 - Dedykowany zespół inżynierski dla Klienta FinTech (Core Banking SLA) za grudzień 2024
+cat-revenue-consulting,165666.36,2024-12-12,PLN,Faktura FV/2024/12/002 - Architektura chmurowa AWS & wdrożenie mikroserwisów (Projekt E-Commerce Platform)
+cat-revenue-saas,113233.64,2024-12-22,PLN,Faktura FV/2024/12/003 - Subskrypcje platformy SaaS LoremIpsumCODE & wsparcie integracji AI/ML
 cat-cogs,152775.45,2024-12-08,PLN,Podwykonawstwo B2B: Zespół Senior Fullstack / Python / DevOps inżynierów kontraktowych za grudzień 2024
 cat-cogs,46315.45,2024-12-24,PLN,Dedykowane klastry Kubernetes AWS/GCP oraz licencje środowisk klienckich
 cat-opex-payroll,103822.73,2024-12-10,PLN,"Wynagrodzenia personelu etatowego: Tech Leads, QA Automation, UI/UX & Product Delivery za grudzień 2024"
