@@ -229,4 +229,119 @@ final class FinancialRecordsApiTest extends TestCase
         $deleteResponse = $this->deleteJson('/api/v1/finance/records/' . $helvestRecord->id);
         $deleteResponse->assertStatus(403);
     }
+
+    public function test_batch_delete_financial_records_success(): void
+    {
+        Sanctum::actingAs($this->clientUser);
+
+        $category = FinancialCategory::firstOrFail();
+
+        $r1 = FinancialRecord::create([
+            'id' => (string) \Illuminate\Support\Str::uuid(),
+            'company_id' => $this->acmeCompany->id,
+            'category_id' => $category->id,
+            'amount' => 1200.50,
+            'currency' => 'PLN',
+            'record_date' => '2026-06-10',
+            'description' => 'Test Batch Delete 1',
+            'record_type' => 'revenue',
+            'source' => 'manual',
+        ]);
+
+        $r2 = FinancialRecord::create([
+            'id' => (string) \Illuminate\Support\Str::uuid(),
+            'company_id' => $this->acmeCompany->id,
+            'category_id' => $category->id,
+            'amount' => 800.50,
+            'currency' => 'PLN',
+            'record_date' => '2026-06-11',
+            'description' => 'Test Batch Delete 2',
+            'record_type' => 'revenue',
+            'source' => 'manual',
+        ]);
+
+        $response = $this->deleteJson('/api/v1/finance/records/batch', [
+            'record_ids' => [$r1->id, $r2->id],
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('status', 'deleted')
+            ->assertJsonPath('count', 2);
+
+        $this->assertEquals(2001.0, (float) $response->json('total_amount'));
+
+        $this->assertDatabaseMissing('financial_records', ['id' => $r1->id]);
+
+        $this->assertDatabaseMissing('financial_records', ['id' => $r2->id]);
+    }
+
+    public function test_batch_delete_validation_rules(): void
+    {
+        Sanctum::actingAs($this->clientUser);
+
+        // Missing record_ids
+        $this->deleteJson('/api/v1/finance/records/batch', [])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['record_ids']);
+
+        // Empty array
+        $this->deleteJson('/api/v1/finance/records/batch', ['record_ids' => []])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['record_ids']);
+
+        // Invalid uuid
+        $this->deleteJson('/api/v1/finance/records/batch', ['record_ids' => ['not-a-uuid']])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['record_ids.0']);
+    }
+
+    public function test_batch_delete_enforces_tenant_isolation(): void
+    {
+        Sanctum::actingAs($this->clientUser);
+
+        $category = FinancialCategory::firstOrFail();
+
+        $acmeRecord = FinancialRecord::create([
+            'id' => (string) \Illuminate\Support\Str::uuid(),
+            'company_id' => $this->acmeCompany->id,
+            'category_id' => $category->id,
+            'amount' => 500.00,
+            'currency' => 'PLN',
+            'record_date' => '2026-06-12',
+            'description' => 'Acme to delete',
+            'record_type' => 'expense',
+            'source' => 'manual',
+        ]);
+
+        $helvestRecord = FinancialRecord::create([
+            'id' => (string) \Illuminate\Support\Str::uuid(),
+            'company_id' => $this->helvestCompany->id,
+            'category_id' => $category->id,
+            'amount' => 9999.00,
+            'currency' => 'PLN',
+            'record_date' => '2026-06-12',
+            'description' => 'Helvest protected record',
+            'record_type' => 'expense',
+            'source' => 'manual',
+        ]);
+
+        // Acme user attempts to batch delete both their record and Helvest record
+        $response = $this->deleteJson('/api/v1/finance/records/batch', [
+            'record_ids' => [$acmeRecord->id, $helvestRecord->id],
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('status', 'deleted')
+            ->assertJsonPath('count', 1);
+
+        $this->assertEquals(500.0, (float) $response->json('total_amount'));
+
+        // Acme record deleted
+
+        $this->assertDatabaseMissing('financial_records', ['id' => $acmeRecord->id]);
+
+        // Helvest record remains strictly untouched
+        $this->assertDatabaseHas('financial_records', ['id' => $helvestRecord->id]);
+    }
 }
+

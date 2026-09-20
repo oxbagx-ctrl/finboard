@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Presentation\Api\Controllers;
 
+use App\Contexts\Finance\Application\Commands\BatchDeleteFinancialRecords\BatchDeleteFinancialRecordsCommand;
+use App\Contexts\Finance\Application\Commands\BatchDeleteFinancialRecords\BatchDeleteFinancialRecordsHandler;
 use App\Contexts\Finance\Application\Commands\CreateFinancialRecord\CreateFinancialRecordCommand;
 use App\Contexts\Finance\Application\Commands\CreateFinancialRecord\CreateFinancialRecordHandler;
 use App\Contexts\Finance\Application\Commands\DeleteFinancialRecord\DeleteFinancialRecordCommand;
@@ -12,8 +14,10 @@ use App\Contexts\Finance\Application\Commands\UpdateFinancialRecord\UpdateFinanc
 use App\Contexts\Finance\Application\Commands\UpdateFinancialRecord\UpdateFinancialRecordHandler;
 use App\Models\FinancialRecord;
 use App\Models\User;
+use App\Presentation\Api\Requests\BatchDeleteFinancialRecordsRequest;
 use App\Presentation\Api\Requests\CreateFinancialRecordRequest;
 use App\Presentation\Api\Requests\UpdateFinancialRecordRequest;
+
 use App\Presentation\Api\Resources\FinancialRecordResource;
 use App\Presentation\Api\Traits\ResolvesCompanyContext;
 use Illuminate\Http\JsonResponse;
@@ -166,6 +170,34 @@ final class FinancialRecordController
             'message' => 'Rekord finansowy został pomyślnie usunięty.',
         ], Response::HTTP_OK);
     }
+
+    /**
+     * Batch delete multiple financial records for the authorized company.
+     */
+    public function batchDestroy(
+        BatchDeleteFinancialRecordsRequest $request,
+        BatchDeleteFinancialRecordsHandler $handler
+    ): JsonResponse {
+        $companyId = $this->resolveCompanyId($request);
+        $user = $request->user();
+
+        $command = new BatchDeleteFinancialRecordsCommand(
+            companyId: $companyId,
+            recordIds: (array) $request->input('record_ids', []),
+            userId: $user ? (string) $user->id : null,
+            ipAddress: $request->ip()
+        );
+
+        $result = $handler->handle($command);
+
+        return new JsonResponse([
+            'status' => 'deleted',
+            'count' => $result->deletedCount,
+            'total_amount' => $result->totalAmount,
+            'message' => sprintf('Pomyślnie usunięto %d operacji finansowych.', $result->deletedCount),
+        ], Response::HTTP_OK);
+    }
+
 
     private function ensureCanAccessRecord(User $user, FinancialRecord $record): void
     {

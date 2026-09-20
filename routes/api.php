@@ -70,12 +70,15 @@ Route::prefix('v1')->group(function () {
                 )->name('api.finance.records.index');
             Route::post('/records', [FinancialRecordController::class, 'store']
                 )->name('api.finance.records.store');
+            Route::delete('/records/batch', [FinancialRecordController::class, 'batchDestroy']
+                )->name('api.finance.records.batch-destroy');
             Route::get('/records/{id}', [FinancialRecordController::class, 'show']
                 )->name('api.finance.records.show');
             Route::put('/records/{id}', [FinancialRecordController::class, 'update']
                 )->name('api.finance.records.update');
             Route::delete('/records/{id}', [FinancialRecordController::class, 'destroy']
                 )->name('api.finance.records.destroy');
+
 
             // Financial Benchmarks & Targets Management
             Route::prefix('benchmarks')->group(function () {
