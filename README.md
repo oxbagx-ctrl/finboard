@@ -362,7 +362,7 @@ npm test
 - [ ] **Faza 30: Integracja Tabeli Audytu Finansowego, Wyszukiwarki i Paginacji**
   - [x] Implementacja tabeli audytu finansowego wysokiej gęstości z czasem CET, profilami operatorów i badge'ami akcji.
   - [x] Połączenie tabeli audytu z wyszukiwarką tekstową (debounce) i paginacją backendową.
-  - [ ] Powiązanie przycisku inspekcji wiersza z otwarciem modalu `FinancialAuditDetailModal`.
+  - [x] Powiązanie przycisku inspekcji wiersza z otwarciem modalu `FinancialAuditDetailModal`.
   - [ ] Rygorystyczna synchronizacja kontekstu `activeCompany` oraz obsługa stanów ładowania i pustych wyników.
   - [ ] Testy komponentów w `AuditLogsView.test.jsx` dla zakładki finansowej, przełączania VDR, filtrów i modalu.
 - [ ] **Faza 31: Testy Integracyjne, Bezpieczeństwo i Dokumentacja**

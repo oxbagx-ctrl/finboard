@@ -660,7 +660,8 @@ export const AuditLogsView = () => {
                                         {financeLogs.map((log) => (
                                             <tr
                                                 key={log.id}
-                                                className="hover:bg-zinc-850/40 transition-colors"
+                                                className="hover:bg-zinc-850/60 transition-colors cursor-pointer group"
+                                                onClick={() => handleOpenDetailModal(log)}
                                                 data-testid={`finance-audit-row-${log.id}`}
                                             >
                                                 {/* Timestamp */}
@@ -725,7 +726,10 @@ export const AuditLogsView = () => {
                                                 <td className="py-2.5 px-4 text-right whitespace-nowrap">
                                                     <button
                                                         type="button"
-                                                        onClick={() => handleOpenDetailModal(log)}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleOpenDetailModal(log);
+                                                        }}
                                                         className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 text-xs font-medium transition-colors cursor-pointer"
                                                         data-testid={`audit-row-inspect-${log.id}`}
                                                         title="Podgląd szczegółów i snapshotów JSON"
