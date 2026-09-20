@@ -6,6 +6,7 @@ import { useNotification } from '../context/NotificationContext';
 import { FinancialRecordModal } from '../components/finance/FinancialRecordModal';
 import { DeleteRecordConfirmationModal } from '../components/finance/DeleteRecordConfirmationModal';
 import { BatchActionBar } from '../components/finance/BatchActionBar';
+import { BatchDeleteConfirmationModal } from '../components/finance/BatchDeleteConfirmationModal';
 import { FinancialValue } from '../components/ui/FinancialValue';
 
 import { Badge } from '../components/ui/Badge';
@@ -96,6 +97,7 @@ export const RecordsView = () => {
     }, [allSelected, currentPageIds]);
 
     const [batchDeleteModalOpen, setBatchDeleteModalOpen] = useState(false);
+    const [batchDeleting, setBatchDeleting] = useState(false);
 
     // Dynamic metrics calculation for currently selected records
     const selectedRecords = useMemo(() => {
@@ -660,6 +662,21 @@ export const RecordsView = () => {
                 onClose={() => setDeleteModalOpen(false)}
                 onSuccess={fetchRecords}
                 record={recordToDelete}
+            />
+
+            {/* Batch Delete Confirmation Modal */}
+            <BatchDeleteConfirmationModal
+                isOpen={batchDeleteModalOpen}
+                onClose={() => setBatchDeleteModalOpen(false)}
+                onConfirm={() => {
+                    setBatchDeleteModalOpen(false);
+                }}
+                selectedCount={selectedRecordIds.length}
+                totalAmount={selectedMetrics.total}
+                incomeAmount={selectedMetrics.income}
+                expenseAmount={selectedMetrics.expense}
+                currency={currency}
+                loading={batchDeleting}
             />
         </div>
     );
