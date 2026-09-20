@@ -175,6 +175,7 @@ export const AuditLogsView = () => {
     const [financeLoading, setFinanceLoading] = useState(true);
     const [financeStats, setFinanceStats] = useState(null);
     const [financeActionFilter, setFinanceActionFilter] = useState('');
+    const [financeSearchInput, setFinanceSearchInput] = useState('');
     const [financeSearchQuery, setFinanceSearchQuery] = useState('');
     const [financePagination, setFinancePagination] = useState({
         currentPage: 1,
@@ -317,6 +318,19 @@ export const AuditLogsView = () => {
             window.removeEventListener('finboard:company-changed', handleCompanyChanged);
         };
     }, [activeTab, fetchFinanceLogs, fetchFinanceStats, fetchVdrLogs]);
+
+    // Debounce search query input (300ms)
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setFinanceSearchQuery(financeSearchInput);
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [financeSearchInput]);
+
+    const handleClearFinanceSearch = () => {
+        setFinanceSearchInput('');
+        setFinanceSearchQuery('');
+    };
 
     const handleOpenDetailModal = (log) => {
         setSelectedDetailLog(log);
@@ -555,9 +569,12 @@ export const AuditLogsView = () => {
                         </div>
                     </div>
 
-                    {/* Financial Action Filter Pills Bar */}
-                    <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3" data-testid="finance-filters-bar">
-                        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
+                    {/* Financial Action Filter Pills & Search Bar */}
+                    <div
+                        className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 bg-zinc-900 border border-zinc-800 rounded-lg p-3"
+                        data-testid="finance-filters-bar"
+                    >
+                        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 text-xs shrink-0">
                             {FINANCE_ACTION_PILLS.map((pill) => {
                                 const isActive = financeActionFilter === pill.id;
                                 const count = pill.getCount(financeStats);
@@ -584,6 +601,30 @@ export const AuditLogsView = () => {
                                     </button>
                                 );
                             })}
+                        </div>
+
+                        {/* Search Query Input with Debounce */}
+                        <div className="relative flex-1 max-w-md">
+                            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
+                            <input
+                                type="text"
+                                data-testid="finance-search-input"
+                                value={financeSearchInput}
+                                onChange={(e) => setFinanceSearchInput(e.target.value)}
+                                placeholder="Szukaj w opisie, encji, IP, użytkowniku..."
+                                className="w-full bg-zinc-950 border border-zinc-800 rounded pl-8 pr-8 py-1.5 text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 font-mono"
+                            />
+                            {financeSearchInput && (
+                                <button
+                                    type="button"
+                                    data-testid="finance-search-clear"
+                                    onClick={handleClearFinanceSearch}
+                                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 cursor-pointer"
+                                    title="Wyczyść wyszukiwanie"
+                                >
+                                    <X className="w-3.5 h-3.5" />
+                                </button>
+                            )}
                         </div>
                     </div>
 
@@ -700,6 +741,43 @@ export const AuditLogsView = () => {
                             </div>
                         )}
                     </div>
+
+                    {/* Financial Pagination Controls */}
+                    {financePagination.total > 0 && (
+                        <div
+                            className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-2.5 text-xs text-zinc-400"
+                            data-testid="finance-pagination"
+                        >
+                            <div>
+                                Wpisy audytowe: <strong className="text-zinc-200 tabular-nums">{financeLogs.length}</strong> z <strong className="text-zinc-200 tabular-nums">{financePagination.total}</strong>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    variant="secondary"
+                                    size="sm"
+                                    icon={ChevronLeft}
+                                    disabled={financePagination.currentPage <= 1 || financeLoading}
+                                    onClick={() => fetchFinanceLogs(financePagination.currentPage - 1)}
+                                    data-testid="finance-prev-page"
+                                >
+                                    Poprzednia
+                                </Button>
+                                <span className="px-2 text-zinc-300 tabular-nums" data-testid="finance-page-info">
+                                    Strona {financePagination.currentPage} z {financePagination.lastPage}
+                                </span>
+                                <Button
+                                    variant="secondary"
+                                    size="sm"
+                                    icon={ChevronRight}
+                                    disabled={financePagination.currentPage >= financePagination.lastPage || financeLoading}
+                                    onClick={() => fetchFinanceLogs(financePagination.currentPage + 1)}
+                                    data-testid="finance-next-page"
+                                >
+                                    Następna
+                                </Button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             )}
 
