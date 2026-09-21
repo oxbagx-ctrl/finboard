@@ -379,12 +379,12 @@ npm test
   - Testy integracyjne w `FinancialRecordsApiTest` dla zapytań case-insensitive i aliasu `income`.
   - Walidacja i egzekwowanie kanonicznych wartości `RecordType` w command handlerach.
   - Testy jednostkowe walidacji enumu `RecordType` i lokalizacji etykiet.
-- [ ] **Faza 33: Naprawa Obliczeń Metryk i Filtrów w Księdze Transakcji**
+- [x] **Faza 33: Naprawa Obliczeń Metryk i Filtrów w Księdze Transakcji**
   - [x] Aktualizacja opcji filtra typu w `RecordsView` do wartości kanonicznych.
   - [x] Poprawa logiki sumowania kafelków metryk strony (przychody, koszty, saldo).
   - [x] Poprawa agregacji `selectedMetrics` w pływającym pasku akcji masowych.
   - [x] Zapewnienie poprawnego formatowania badge'y typów i kolorów kwot.
-  - [ ] Zastąpienie legacy `'INCOME'` wartościami kanonicznymi w mockach testowych.
+  - [x] Zastąpienie legacy `'INCOME'` wartościami kanonicznymi w mockach testowych.
 - [ ] **Faza 34: Testy Regresyjne, Walidacja E2E i Dokumentacja**
   - [ ] Testy komponentowe wyświetlania niezerowych wartości w kafelkach podsumowań.
   - [ ] Testy reaktywnego filtrowania po typie operacji w tabeli księgowej.
