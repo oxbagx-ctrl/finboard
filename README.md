@@ -5,7 +5,7 @@
 [![PostgreSQL](https://img.shields.io/badge/postgresql-16-blue.svg)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/redis-alpine-red.svg)](https://redis.io/)
 [![Architecture](https://img.shields.io/badge/architecture-DDD%20%2F%20CQRS-brightgreen.svg)]()
-[![Tests](https://img.shields.io/badge/tests-389%20backend%20%7C%20147%20frontend%20passed-success.svg)]()
+[![Tests](https://img.shields.io/badge/tests-426%20backend%20%7C%20224%20frontend%20passed-success.svg)]()
 
 FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakcyjnego (M&A, Due Diligence, Corporate Finance) oraz ich klientom (CFO, Zarządy). Aplikacja łączy w sobie zaawansowaną analitykę finansową w ujęciu wielo-najemcowym (Multi-Tenant) z bezpiecznym repozytorium dokumentów Virtual Data Room (VDR).
 
@@ -62,6 +62,12 @@ FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakc
     - Zastąpienie statycznych wartości na Pulpicie Zarządczym (`DashboardView`) i w Analityce (`AnalyticsView`) dynamicznymi danymi z API w czasie rzeczywistym z kalkulacją dynamiki okresowej (YoY/MoM), ewaluacją benchmarków doradcy i semaforami statusu (`OPT`, `WARN`, `CRIT`).
     - Interfejs edycji celów finansowych i benchmarków M&A dla Doradców z reaktywną ewaluacją statusów w czasie rzeczywistym (`BenchmarkConfigModal` oraz dedykowana matryca w `AnalyticsView`).
     - Standaryzowane tabele Rachunku Zysków i Strat (`FinancialTable`) zgodne ze standardami sprawozdawczości finansowej (PSR / MSR), ze ścisłą hierarchią pozycji, wcięciami, wskaźnikami dedukcji kosztów `(-)` oraz podwójną linią bilansową dla ostatecznego wyniku netto.
+- **Księga Operacji Finansowych (General Ledger) i Kontrakt Danych `RecordType`**:
+    - Ścisłe typowanie transakcji w oparciu o domenowy enum `RecordType` (`revenue`, `expense`, `asset`, `liability`) ze wsparciem dla wstecznej kompatybilności i aliasu `income`.
+    - Normalizacja zapytań `record_type` w backendzie (`FinancialRecordController`) w trybie case-insensitive z eliminacją niepoprawnych wartości.
+    - Szybkie kafelki analityczne widoku ("Przychody (Strona)", "Koszty OPEX (Strona)", "Saldo Operacji (Netto)") z separacją pozycji bilansowych od operacyjnych.
+    - Pływający pasek akcji masowych `BatchActionBar` z selekcją wielostronicową, agregacją kwot i bezpiecznym resetem stanu przy zmianie filtrów.
+    - Eksport zestawienia do formatu CSV z zachowaniem kanonicznych nagłówków (`ID,Data,Kategoria,Typ,Kwota,Waluta,Opis,Zrodlo`) i znormalizowanych kodów typów operacji.
 
 ---
 
@@ -120,13 +126,13 @@ Pulpit Mailpit (podgląd e-maili deweloperskich): `http://localhost:8025`.
 ## 🧪 Uruchamianie Testów
 
 ### Testy Backendowe (PHPUnit)
-Pakiet 389 testów jednostkowych i integracyjnych pokrywających warstwę domenową (DDD), zapytania CQRS, repozytoria, kalkulacje matematyczne `Money`, importy CSV, autoryzację wielonajemcową, system zaproszeń, logi audytowe oraz API benchmarków i analityki:
+Pakiet 426 testów jednostkowych i integracyjnych pokrywających warstwę domenową (DDD), zapytania CQRS, repozytoria, kalkulacje matematyczne `Money`, importy CSV, autoryzację wielonajemcową, system zaproszeń, logi audytowe oraz API benchmarków i analityki:
 ```bash
 docker compose exec app ./vendor/bin/phpunit
 ```
 
 ### Testy Frontendowe (Vitest)
-Pakiet 147 testów jednostkowych i integracyjnych dla komponentów React, kontekstu transakcyjnego, walidacji danych, kalkulatorów walutowych, konfiguratora celów benchmarkowych oraz przepływów integracyjnych E2E:
+Pakiet 224 testów jednostkowych i integracyjnych dla komponentów React, kontekstu transakcyjnego, walidacji danych, kalkulatorów walutowych, konfiguratora celów benchmarkowych, księgi operacji oraz przepływów integracyjnych E2E:
 ```bash
 npm test
 ```
@@ -150,11 +156,12 @@ npm test
 - `POST /api/v1/companies` – Utworzenie nowej spółki portfelowej i powiązanie z doradcą
 
 ### Transakcje Finansowe & Import (Finance Context)
-- `GET /api/v1/finance/records` – Lista rekordów finansowych z filtrami daty i typu
-- `POST /api/v1/finance/records` – Rejestracja nowego rekordu (Przychód, Koszt, Aktywa, Pasywa)
-- `PUT /api/v1/finance/records/{id}` – Aktualizacja istniejącego wpisu finansowego
-- `DELETE /api/v1/finance/records/{id}` – Usunięcie rekordu finansowego
-- `POST /api/v1/finance/import/csv` – Asynchroniczny upload pliku CSV z transakcjami
+- `GET /api/v1/finance/records` – Paginowana lista transakcji z filtrami (`search`, `category_id`, `start_date`, `end_date`, `record_type` z obsługą kanonicznych kodów `revenue`, `expense`, `asset`, `liability`, case-insensitivity oraz aliasu `income`)
+- `POST /api/v1/finance/records` – Rejestracja nowego rekordu (Przychód, Koszt, Aktywa, Pasywa) z walidacją enumu `RecordType`
+- `PUT /api/v1/finance/records/{id}` – Aktualizacja istniejącego wpisu finansowego z walidacją `RecordType`
+- `DELETE /api/v1/finance/records/{id}` – Usunięcie pojedynczego rekordu finansowego z wpisem audytowym
+- `DELETE /api/v1/finance/records/batch` – Bezpieczne masowe usunięcie paczki rekordów (do 500 wpisów) z atomowością transakcyjną, audytem i zdarzeniem `FinancialRecordsBatchDeleted`
+- `POST /api/v1/finance/import/csv` – Asynchroniczny upload pliku CSV z transakcjami (kolejkowany w Redis)
 - `POST /api/v1/finance/import/preview` – Walidacja pliku i podgląd dry-run pierwszych wierszy
 
 ### Cele Finansowe & Benchmarki Branżowe (Finance Context)
@@ -385,12 +392,12 @@ npm test
   - Poprawa agregacji `selectedMetrics` w pływającym pasku akcji masowych.
   - Zapewnienie poprawnego formatowania badge'y typów i kolorów kwot.
   - Zastąpienie legacy `'INCOME'` wartościami kanonicznymi w mockach testowych.
-- [ ] **Faza 34: Testy Regresyjne, Walidacja E2E i Dokumentacja**
+- [x] **Faza 34: Testy Regresyjne, Walidacja E2E i Dokumentacja**
   - [x] Testy komponentowe wyświetlania niezerowych wartości w kafelkach podsumowań.
   - [x] Testy reaktywnego filtrowania po typie operacji w tabeli księgowej.
   - [x] Testy eksportu CSV z zachowaniem kanonicznych nagłówków i wartości typów.
   - [x] Aktualizacja dokumentacji changelogu i reguł filtrowania kontraktu danych.
-  - [ ] Aktualizacja dokumentacji `README.md` w zakresie księgi transakcji i kryteriów filtrowania.
+  - [x] Aktualizacja dokumentacji `README.md` w zakresie księgi transakcji i kryteriów filtrowania.
 
 ---
 
