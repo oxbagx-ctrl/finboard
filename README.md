@@ -383,7 +383,7 @@ npm test
   - [x] Aktualizacja opcji filtra typu w `RecordsView` do wartości kanonicznych.
   - [x] Poprawa logiki sumowania kafelków metryk strony (przychody, koszty, saldo).
   - [x] Poprawa agregacji `selectedMetrics` w pływającym pasku akcji masowych.
-  - [ ] Zapewnienie poprawnego formatowania badge'y typów i kolorów kwot.
+  - [x] Zapewnienie poprawnego formatowania badge'y typów i kolorów kwot.
   - [ ] Zastąpienie legacy `'INCOME'` wartościami kanonicznymi w mockach testowych.
 - [ ] **Faza 34: Testy Regresyjne, Walidacja E2E i Dokumentacja**
   - [ ] Testy komponentowe wyświetlania niezerowych wartości w kafelkach podsumowań.

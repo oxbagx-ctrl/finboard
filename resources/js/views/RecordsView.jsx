@@ -339,14 +339,16 @@ export const RecordsView = () => {
     };
 
     const getTypeBadge = (type) => {
-        switch (type) {
-            case 'INCOME':
+        const normalized = (type || '').toLowerCase();
+        switch (normalized) {
+            case 'revenue':
+            case 'income':
                 return <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-950 border border-emerald-800 text-emerald-400">PRZYCHÓD</span>;
-            case 'EXPENSE':
+            case 'expense':
                 return <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-rose-950 border border-rose-800 text-rose-400">KOSZT OPEX</span>;
-            case 'ASSET':
+            case 'asset':
                 return <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-sky-950 border border-sky-800 text-sky-400">AKTYWA</span>;
-            case 'LIABILITY':
+            case 'liability':
                 return <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-950 border border-amber-800 text-amber-400">PASYWA</span>;
             default:
                 return <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-zinc-800 text-zinc-300">{type}</span>;
@@ -573,7 +575,7 @@ export const RecordsView = () => {
                             ) : (
                                 records.map((record) => {
                                     const convertedAmt = convertAmount(Number(record.amount));
-                                    const isIncome = record.record_type === 'INCOME';
+                                    const isIncome = record.record_type?.toLowerCase() === 'revenue' || record.record_type?.toLowerCase() === 'income';
                                     const isSelected = selectedSet.has(record.id);
 
                                     return (
