@@ -404,12 +404,12 @@ npm test
   - Szablon mailable `TestDiagnosticMail` z czasem systemowym, latencją i ciemnym motywem FinBoard.
   - Testy jednostkowe i integracyjne dla komendy `mail:test` i endpointów diagnostycznych.
   - Aktualizacja dokumentacji `ORACLE_CLOUD_SETUP.md` oraz `.env.example` o bezpieczne porty SMTP (587/465).
-- [ ] **Faza 36: Obsługa Błędów Wysyłki, Rejestr Audytowy i Link Aktywacyjny w UI**
+- [x] **Faza 36: Obsługa Błędów Wysyłki, Rejestr Audytowy i Link Aktywacyjny w UI**
   - [x] Ekspozycja bezpiecznego `activation_url` w `InvitationResource` dla oczekujących zaproszeń.
   - [x] Obsługa błędów wysyłki w `SendInvitationEmailListener` z logowaniem i rejestracją w ścieżce audytowej.
   - [x] Przycisk "Kopiuj link aktywacyjny" z powiadomieniem w tabeli zaproszeń.
   - [x] Widżet weryfikacji poczty SMTP i modal testowy w widoku ustawień administracyjnych.
-  - [ ] Testy komponentów dla kopiowania linku aktywacyjnego i akcji zaproszeń.
+  - [x] Testy komponentów dla kopiowania linku aktywacyjnego i akcji zaproszeń.
 - [ ] **Faza 37: Odporność Kolejek, Testy Integracyjne i Dokumentacja**
   - [ ] Konfiguracja polityki ponowień (retry/backoff) dla maili zaproszeń w `SendInvitationEmailListener`.
   - [ ] Testy integracyjne symulujące timeouty połączeń SMTP i odporność kolejki zadań.

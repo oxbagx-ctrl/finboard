@@ -224,6 +224,30 @@ describe('AdvisorsManagementView (SuperAdmin Dashboard)', () => {
             if (url === '/invitations') {
                 return Promise.resolve({ data: { data: mockInvitations } });
             }
+            if (url === '/admin/mail/status') {
+                return Promise.resolve({
+                    data: {
+                        data: {
+                            mailer: 'smtp',
+                            host: 'mail.helvest.pl',
+                            port: 587,
+                            encryption: 'tls',
+                            username: 'invitations@helvest.pl',
+                            has_password: true,
+                            from_address: 'deal-advisory@helvest.pl',
+                            from_name: 'FinBoard Deal Advisory',
+                            timeout: 15,
+                            is_port_25_warning: false,
+                            is_secure_port: true,
+                            socket: {
+                                connected: true,
+                                latency_ms: 38,
+                                banner: '220 mail.helvest.pl ESMTP Postfix',
+                            },
+                        },
+                    },
+                });
+            }
             return Promise.resolve({ data: { data: [] } });
         });
     });
@@ -507,6 +531,36 @@ describe('AdvisorsManagementView (SuperAdmin Dashboard)', () => {
         // Verify the newly created company is present in the select options!
         await waitFor(() => {
             expect(screen.getByRole("option", { name: /\[OMEGA\] Omega Holdings S.A./i })).toBeInTheDocument();
+        });
+    });
+
+    it('switches to Diagnostyka SMTP tab and renders SmtpStatusWidget', async () => {
+        renderWithContext(<AdvisorsManagementView />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Diagnostyka SMTP')).toBeInTheDocument();
+        });
+
+        fireEvent.click(screen.getByText('Diagnostyka SMTP'));
+
+        await waitFor(() => {
+            expect(screen.getByText('Węzeł Poczty Transakcyjnej (SMTP)')).toBeInTheDocument();
+            expect(screen.getByText('mail.helvest.pl:587')).toBeInTheDocument();
+        });
+    });
+
+    it('opens TestMailModal when clicking Testuj SMTP button from top bar', async () => {
+        renderWithContext(<AdvisorsManagementView />);
+
+        await waitFor(() => {
+            expect(screen.getByRole('button', { name: /Testuj SMTP/i })).toBeInTheDocument();
+        });
+
+        fireEvent.click(screen.getByRole('button', { name: /Testuj SMTP/i }));
+
+        await waitFor(() => {
+            expect(screen.getByText('Diagnostyka Połączenia SMTP')).toBeInTheDocument();
+            expect(screen.getByText('TEST TRANSPORTU POCZTY & HANDSHAKE TLS/SSL')).toBeInTheDocument();
         });
     });
 });
