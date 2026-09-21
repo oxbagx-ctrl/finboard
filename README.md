@@ -373,6 +373,24 @@ npm test
   - [x] Weryfikacja izolacji najemcy (tenant isolation) przy przełączaniu spółek przez DealContext.
   - [x] Testy regresji weryfikujące paginację i filtrowanie audytu dokumentów VDR.
   - [x] Aktualizacja dokumentacji systemu audytu i przewodnika po zrzutach JSON w changelogu.
+- [ ] **Faza 32: Normalizacja Kontraktu RecordType w Backendzie i Obsługa Aliasów**
+  - [x] Normalizacja parametru `record_type` w kontrolerze (wielkość liter, walidacja enumu, alias `income` -> `revenue`).
+  - [ ] Wzbogacenie zasobu `FinancialRecordResource` o etykietę `record_type_label` i kod kanoniczny.
+  - [ ] Testy integracyjne w `FinancialRecordsApiTest` dla zapytań case-insensitive i aliasu `income`.
+  - [ ] Walidacja i egzekwowanie kanonicznych wartości `RecordType` w command handlerach.
+  - [ ] Testy jednostkowe walidacji enumu `RecordType` i lokalizacji etykiet.
+- [ ] **Faza 33: Naprawa Obliczeń Metryk i Filtrów w Księdze Transakcji**
+  - [ ] Aktualizacja opcji filtra typu w `RecordsView` do wartości kanonicznych.
+  - [ ] Poprawa logiki sumowania kafelków metryk strony (przychody, koszty, saldo).
+  - [ ] Poprawa agregacji `selectedMetrics` w pływającym pasku akcji masowych.
+  - [ ] Zapewnienie poprawnego formatowania badge'y typów i kolorów kwot.
+  - [ ] Zastąpienie legacy `'INCOME'` wartościami kanonicznymi w mockach testowych.
+- [ ] **Faza 34: Testy Regresyjne, Walidacja E2E i Dokumentacja**
+  - [ ] Testy komponentowe wyświetlania niezerowych wartości w kafelkach podsumowań.
+  - [ ] Testy reaktywnego filtrowania po typie operacji w tabeli księgowej.
+  - [ ] Testy eksportu CSV z zachowaniem kanonicznych nagłówków i wartości typów.
+  - [ ] Aktualizacja dokumentacji changelogu i reguł filtrowania kontraktu danych.
+  - [ ] Aktualizacja dokumentacji `README.md` w zakresie księgi transakcji i kryteriów filtrowania.
 
 ---
 

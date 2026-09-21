@@ -12,6 +12,7 @@ use App\Contexts\Finance\Application\Commands\DeleteFinancialRecord\DeleteFinanc
 use App\Contexts\Finance\Application\Commands\DeleteFinancialRecord\DeleteFinancialRecordHandler;
 use App\Contexts\Finance\Application\Commands\UpdateFinancialRecord\UpdateFinancialRecordCommand;
 use App\Contexts\Finance\Application\Commands\UpdateFinancialRecord\UpdateFinancialRecordHandler;
+use App\Contexts\Finance\Domain\ValueObjects\RecordType;
 use App\Models\FinancialRecord;
 use App\Models\User;
 use App\Presentation\Api\Requests\BatchDeleteFinancialRecordsRequest;
@@ -55,7 +56,21 @@ final class FinancialRecordController
         }
 
         if ($request->filled('record_type')) {
-            $query->where('record_type', $request->query('record_type'));
+            $rawType = strtolower(trim((string) $request->query('record_type')));
+            if ($rawType === 'income') {
+                $rawType = RecordType::REVENUE->value;
+            }
+
+            $validType = RecordType::tryFrom($rawType);
+            if ($validType !== null) {
+                $query->where(function ($q) use ($validType) {
+                    $q->where('record_type', $validType->value)
+                        ->orWhere('record_type', strtoupper($validType->value));
+                    if ($validType === RecordType::REVENUE) {
+                        $q->orWhere('record_type', 'INCOME');
+                    }
+                });
+            }
         }
 
         if ($request->filled('search')) {
