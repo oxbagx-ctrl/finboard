@@ -382,7 +382,7 @@ npm test
 - [ ] **Faza 33: Naprawa Obliczeń Metryk i Filtrów w Księdze Transakcji**
   - [x] Aktualizacja opcji filtra typu w `RecordsView` do wartości kanonicznych.
   - [x] Poprawa logiki sumowania kafelków metryk strony (przychody, koszty, saldo).
-  - [ ] Poprawa agregacji `selectedMetrics` w pływającym pasku akcji masowych.
+  - [x] Poprawa agregacji `selectedMetrics` w pływającym pasku akcji masowych.
   - [ ] Zapewnienie poprawnego formatowania badge'y typów i kolorów kwot.
   - [ ] Zastąpienie legacy `'INCOME'` wartościami kanonicznymi w mockach testowych.
 - [ ] **Faza 34: Testy Regresyjne, Walidacja E2E i Dokumentacja**

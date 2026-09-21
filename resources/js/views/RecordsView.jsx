@@ -129,8 +129,11 @@ export const RecordsView = () => {
         Object.values(selectedMap).forEach((r) => {
             const amt = Number(r.amount || 0);
             total += amt;
-            if (r.record_type === 'INCOME') income += amt;
-            if (r.record_type === 'EXPENSE') expense += amt;
+            const type = (r.record_type || '').toLowerCase();
+            const isRev = type === 'revenue' || type === 'income';
+            const isExp = type === 'expense';
+            if (isRev) income += amt;
+            if (isExp) expense += amt;
         });
 
         return {
