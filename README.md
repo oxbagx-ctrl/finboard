@@ -126,13 +126,13 @@ Pulpit Mailpit (podgląd e-maili deweloperskich): `http://localhost:8025`.
 ## 🧪 Uruchamianie Testów
 
 ### Testy Backendowe (PHPUnit)
-Pakiet 426 testów jednostkowych i integracyjnych pokrywających warstwę domenową (DDD), zapytania CQRS, repozytoria, kalkulacje matematyczne `Money`, importy CSV, autoryzację wielonajemcową, system zaproszeń, logi audytowe oraz API benchmarków i analityki:
+Pakiet ponad 460 testów jednostkowych i integracyjnych pokrywających warstwę domenową (DDD), zapytania CQRS, repozytoria, kalkulacje matematyczne `Money`, importy CSV, autoryzację wielonajemcową, system zaproszeń, odporność kolejek pocztowych, logi audytowe oraz API benchmarków i analityki:
 ```bash
 docker compose exec app ./vendor/bin/phpunit
 ```
 
 ### Testy Frontendowe (Vitest)
-Pakiet 224 testów jednostkowych i integracyjnych dla komponentów React, kontekstu transakcyjnego, walidacji danych, kalkulatorów walutowych, konfiguratora celów benchmarkowych, księgi operacji oraz przepływów integracyjnych E2E:
+Pakiet 239 testów jednostkowych i integracyjnych dla komponentów React, kontekstu transakcyjnego, walidacji danych, kalkulatorów walutowych, konfiguratora celów benchmarkowych, księgi operacji, diagnostyki poczty oraz przepływów integracyjnych E2E:
 ```bash
 npm test
 ```
@@ -152,8 +152,14 @@ npm test
 - `DELETE /api/v1/admin/advisors/{id}/companies/{companyId}` – Odebranie doradcy dostępu do spółki
 - `POST /api/v1/invitations` – Wysłanie zaproszenia dla nowego użytkownika (Doradca/Klient)
 - `GET /api/v1/invitations/pending` – Lista oczekujących zaproszeń dla firmy
+- `GET /api/v1/invitations/tokens/{token}` / `GET /api/v1/invitations/verify` – Publiczna weryfikacja ważności tokenu zaproszenia
+- `POST /api/v1/invitations/{id}/resend` – Regeneracja tokenu zaproszenia z nowym 48-godzinnym okresem ważności
 - `POST /api/v1/invitations/accept` – Aktywacja konta i nadanie hasła z tokena zaproszenia
 - `POST /api/v1/companies` – Utworzenie nowej spółki portfelowej i powiązanie z doradcą
+
+### Diagnostyka Poczty & SMTP (SuperAdmin & Admin)
+- `GET /api/v1/admin/mail/status` – Stan konfiguracji serwera pocztowego, szyfrowania i weryfikacja gniazda TCP
+- `POST /api/v1/admin/mail/test` – Wysłanie diagnostycznej wiadomości e-mail w ciemnym motywie FinBoard z kalkulacją latencji
 
 ### Transakcje Finansowe & Import (Finance Context)
 - `GET /api/v1/finance/records` – Paginowana lista transakcji z filtrami (`search`, `category_id`, `start_date`, `end_date`, `record_type` z obsługą kanonicznych kodów `revenue`, `expense`, `asset`, `liability`, case-insensitivity oraz aliasu `income`)
@@ -193,6 +199,69 @@ npm test
 - `DELETE /api/v1/documents/{id}` – Usunięcie pliku z magazynu i bazy danych
 - `GET /api/v1/documents/{id}/audit-logs` – Rejestr zdarzeń i pobrań dla wskazanego dokumentu
 - `GET /api/v1/documents/audit-logs` – Zbiorczy dziennik audytowy operacji na dokumentach firmy
+
+---
+
+## ✉️ Konfiguracja Poczty i Diagnostyka SMTP w Środowisku Produkcyjnym
+
+Platforma FinBoard posiada zintegrowany, wysoce odporny podsystem pocztowy dedykowany dla powiadomień transakcyjnych oraz dystrybucji zaproszeń użytkowników do portfela Deal Advisory.
+
+### 🛡️ Restrykcje Portu 25 w Chmurze (OCI / AWS / GCP / Azure)
+> [!WARNING]
+> Dostawcy chmury publicznej (w szczególności **Oracle Cloud Infrastructure - OCI**, **AWS**, **GCP**) bezwzględnie blokują wychodzący ruch TCP na porcie 25 w celu przeciwdziałania rozsyłaniu spamu.
+> Użycie portu 25 w środowisku chmurowym skutkuje błędem `Connection timed out (errno 110)` lub `Unable to connect to tcp://...:25`.
+
+**Wymagane porty i protokoły szyfrowania (MSA - Mail Submission Agent):**
+- **Port 587 (STARTTLS / TLS) – Rekomendowany**: Standard RFC 6409. Sesja rozpoczyna się w trybie jawnym, po czym następuje podniesienie do szyfrowanego TLS.
+- **Port 465 (SMTPS / SSL) – Alternatywny**: Standard RFC 8314. Sesja TLS/SSL jest negocjowana natychmiast po zestawieniu gniazda TCP.
+
+### ⚙️ Wzorcowa Konfiguracja Środowiska Produkcyjnego (`.env`)
+```dotenv
+MAIL_MAILER=smtp
+MAIL_HOST=mail.helvest.pl
+MAIL_PORT=587
+MAIL_USERNAME=powiadomienia@helvest.pl
+MAIL_PASSWORD=Silne_Haslo_SMTP_Deal_Advisory_2026!
+MAIL_ENCRYPTION=tls
+MAIL_TIMEOUT=15
+MAIL_FROM_ADDRESS="powiadomienia@helvest.pl"
+MAIL_FROM_NAME="FinBoard Deal Advisory"
+```
+
+### ⚡ Odporność Kolejki Zadań (Queue Worker & Retry Policy)
+Wysyłka wiadomości e-mail jest w pełni asynchroniczna (`ShouldQueue` w `SendInvitationEmailListener`). W przypadku chwilowych zakłóceń sieciowych lub obciążenia serwera SMTP system stosuje politykę wykładniczego wycofywania (Exponential Backoff):
+- **Limit prób:** 3 próby dostarczenia (`$tries = 3`, `$maxExceptions = 3`).
+- **Timeout wykonania:** 30 sekund na próbę (`$timeout = 30`).
+- **Harmonogram opóźnień:** Próba 1 -> 10s opóźnienia (`release(10)`), Próba 2 -> 60s opóźnienia (`release(60)`), Próba 3 -> trwałe niepowodzenie.
+- **Dziennik audytowy i logi:** W przypadku ostatecznego niepowodzenia generowane jest zdarzenie audytowe `user_invitation_mail_failed` z pełnym kontekstem technicznym (ID zaproszenia, odbiorca, host, port, treść błędu).
+- **Polecenie uruchomienia workera produkcyjnego:**
+  ```bash
+  php artisan queue:work --queue=default --tries=3 --timeout=35 --sleep=3 --backoff=10,60,180
+  ```
+
+### 🔗 Awaryjna Ścieżka Aktywacji (Fallback Activation Flow)
+W sytuacji niedostępności skrzynki pocztowej odbiorcy lub awarii serwera SMTP, administratorzy i doradcy FinBoard mogą przekazać unikalny link aktywacyjny bezpośrednio:
+1. **Modal po utworzeniu zaproszenia:** Natychmiast po wysłaniu formularza w `InviteUserModal` pojawia się okno z bezpośrednim linkiem (`activation_url`) i przyciskiem kopiowania.
+2. **Kopiowanie z tabeli zaproszeń:** W widoku `AdvisorsManagementView` każdy wiersz oczekującego zaproszenia posiada przycisk *Kopiuj link aktywacyjny*.
+3. **Regeneracja tokenu:** Przycisk *Wyślij ponownie* generuje świeży kryptograficzny token ważny przez kolejne 48 godzin.
+4. **Bezpośrednia aktywacja:** Odbiorca otwiera link w przeglądarce, przechodząc do dedykowanego widoku `AcceptInvitationView` w modelu Zero-Trust (weryfikacja tokenu, nadanie hasła, automatyczne logowanie).
+
+### 🩺 Narzędzia Diagnostyczne i Rozwiązywanie Problemów (Troubleshooting)
+1. **Weryfikacja CLI (z poziomu kontenera produkcyjnego):**
+   ```bash
+   # Pełny test handshake'u i wysyłka diagnostycznego maila
+   php artisan mail:test admin@helvest.pl
+
+   # Szybka weryfikacja otwarcia gniazda TCP (bez wysyłki)
+   php artisan mail:test admin@helvest.pl --check-socket --skip-send
+
+   # Diagnostyka z niestandardowym limitem czasu
+   php artisan mail:test admin@helvest.pl --timeout=10
+   ```
+2. **Diagnostyka w Panelu FinBoard (UI):**
+   - Dostępna w widoku `Zarządzanie Doradcami & Uprawnieniami Portfela` w zakładce **Diagnostyka SMTP**.
+   - Widżet `SmtpStatusWidget` w czasie rzeczywistym prezentuje status gniazda, host, port, szyfrowanie oraz latencję handshake'u w milisekundach.
+   - Przycisk **Testuj SMTP** otwiera modal umożliwiający natychmiastową wysyłkę testowego e-maila w motywie Deal Advisory.
 
 ---
 
@@ -410,12 +479,12 @@ npm test
   - Przycisk "Kopiuj link aktywacyjny" z powiadomieniem w tabeli zaproszeń.
   - Widżet weryfikacji poczty SMTP i modal testowy w widoku ustawień administracyjnych.
   - Testy komponentów dla kopiowania linku aktywacyjnego i akcji zaproszeń.
-- [ ] **Faza 37: Odporność Kolejek, Testy Integracyjne i Dokumentacja**
+- [x] **Faza 37: Odporność Kolejek, Testy Integracyjne i Dokumentacja**
   - [x] Konfiguracja polityki ponowień (retry/backoff) dla maili zaproszeń w `SendInvitationEmailListener`.
   - [x] Testy integracyjne symulujące timeouty połączeń SMTP i odporność kolejki zadań.
   - [x] Testy E2E dla tworzenia zaproszeń, regeneracji tokenów i awaryjnego przepływu aktywacji.
   - [x] Aktualizacja changelogu z architekturą doręczania poczty, restrykcjami portu 25 i wytycznymi SMTP.
-  - [ ] Aktualizacja dokumentacji `README.md` opisującej produkcyjną konfigurację i diagnostykę poczty.
+  - [x] Aktualizacja dokumentacji `README.md` opisującej produkcyjną konfigurację i diagnostykę poczty.
 
 ---
 
