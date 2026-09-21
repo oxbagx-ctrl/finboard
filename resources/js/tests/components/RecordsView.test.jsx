@@ -725,3 +725,197 @@ describe('RecordsView - Complete Batch Delete End-to-End Workflow', () => {
         expect(apiClient.delete).not.toHaveBeenCalled();
     });
 });
+
+describe('RecordsView - Non-Zero Summary Cards Calculations and Domain Contract Compliance', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
+    it('displays accurately calculated non-zero summary cards for canonical revenue and expense records', async () => {
+        apiClient.get.mockImplementation((url) => {
+            if (url === '/finance/categories') {
+                return Promise.resolve({ data: { data: mockCategories } });
+            }
+            if (url.startsWith('/finance/records')) {
+                return Promise.resolve({
+                    data: {
+                        data: mockRecords,
+                        meta: {
+                            current_page: 1,
+                            last_page: 1,
+                            per_page: 25,
+                            total: 2,
+                            from: 1,
+                            to: 2,
+                        },
+                    },
+                });
+            }
+            return Promise.resolve({ data: {} });
+        });
+
+        renderWithProviders(<RecordsView />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Płatność za maszyny produkcyjne')).toBeInTheDocument();
+        });
+
+        // Verify summary cards contain non-zero formatted values
+        const incomeValue = screen.getByTestId('summary-income-value');
+        const expenseValue = screen.getByTestId('summary-expense-value');
+        const balanceValue = screen.getByTestId('summary-balance-value');
+        const totalValue = screen.getByTestId('summary-total-value');
+
+        // Revenue: 25 000,00 zł
+        expect(incomeValue.textContent.replace(/\u00a0/g, ' ')).toMatch(/25\s?000,00\s?zł/);
+        // Expense: 8 000,00 zł
+        expect(expenseValue.textContent.replace(/\u00a0/g, ' ')).toMatch(/8\s?000,00\s?zł/);
+        // Balance: 17 000,00 zł (positive balance style)
+        expect(balanceValue.textContent.replace(/\u00a0/g, ' ')).toMatch(/17\s?000,00\s?zł/);
+        expect(balanceValue).toHaveClass('text-zinc-100');
+        expect(totalValue).toHaveTextContent('2 wpisów');
+    });
+
+    it('correctly aggregates records using legacy income alias and renders positive balance', async () => {
+        const recordsWithIncomeAlias = [
+            {
+                id: 'rec-inc-1',
+                company_id: 'comp-acme-1',
+                record_date: '2026-03-02',
+                category_id: 'cat-rev-1',
+                category: mockCategories[0],
+                record_type: 'INCOME', // legacy uppercase alias
+                amount: 15000,
+                currency: 'PLN',
+                description: 'Przychody konsultingowe',
+                source: 'manual',
+            },
+            {
+                id: 'rec-exp-1',
+                company_id: 'comp-acme-1',
+                record_date: '2026-03-03',
+                category_id: 'cat-opex-1',
+                category: mockCategories[1],
+                record_type: 'expense',
+                amount: 5000,
+                currency: 'PLN',
+                description: 'Koszty serwerów',
+                source: 'manual',
+            },
+        ];
+
+        apiClient.get.mockImplementation((url) => {
+            if (url === '/finance/categories') return Promise.resolve({ data: { data: mockCategories } });
+            if (url.startsWith('/finance/records')) {
+                return Promise.resolve({
+                    data: {
+                        data: recordsWithIncomeAlias,
+                        meta: { current_page: 1, last_page: 1, per_page: 25, total: 2, from: 1, to: 2 },
+                    },
+                });
+            }
+            return Promise.resolve({ data: {} });
+        });
+
+        renderWithProviders(<RecordsView />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Przychody konsultingowe')).toBeInTheDocument();
+        });
+
+        const incomeValue = screen.getByTestId('summary-income-value');
+        const expenseValue = screen.getByTestId('summary-expense-value');
+        const balanceValue = screen.getByTestId('summary-balance-value');
+
+        expect(incomeValue.textContent.replace(/\u00a0/g, ' ')).toMatch(/15\s?000,00\s?zł/);
+        expect(expenseValue.textContent.replace(/\u00a0/g, ' ')).toMatch(/5\s?000,00\s?zł/);
+        expect(balanceValue.textContent.replace(/\u00a0/g, ' ')).toMatch(/10\s?000,00\s?zł/);
+    });
+
+    it('isolates asset and liability records from operational income/expense and computes negative balance when expense exceeds revenue', async () => {
+        const mixedRecords = [
+            {
+                id: 'rec-rev-1',
+                company_id: 'comp-acme-1',
+                record_date: '2026-03-01',
+                category_id: 'cat-rev-1',
+                category: mockCategories[0],
+                record_type: 'revenue',
+                amount: 10000,
+                currency: 'PLN',
+                description: 'Przychód z prowizji',
+                source: 'manual',
+            },
+            {
+                id: 'rec-exp-2',
+                company_id: 'comp-acme-1',
+                record_date: '2026-03-02',
+                category_id: 'cat-opex-1',
+                category: mockCategories[1],
+                record_type: 'expense',
+                amount: 25000,
+                currency: 'PLN',
+                description: 'Duży koszt operacyjny',
+                source: 'manual',
+            },
+            {
+                id: 'rec-ast-1',
+                company_id: 'comp-acme-1',
+                record_date: '2026-03-03',
+                category_id: null,
+                category: null,
+                record_type: 'asset',
+                amount: 50000,
+                currency: 'PLN',
+                description: 'Zakup środka trwałego',
+                source: 'manual',
+            },
+            {
+                id: 'rec-lia-1',
+                company_id: 'comp-acme-1',
+                record_date: '2026-03-04',
+                category_id: null,
+                category: null,
+                record_type: 'liability',
+                amount: 40000,
+                currency: 'PLN',
+                description: 'Zaciągnięty kredyt bankowy',
+                source: 'manual',
+            },
+        ];
+
+        apiClient.get.mockImplementation((url) => {
+            if (url === '/finance/categories') return Promise.resolve({ data: { data: mockCategories } });
+            if (url.startsWith('/finance/records')) {
+                return Promise.resolve({
+                    data: {
+                        data: mixedRecords,
+                        meta: { current_page: 1, last_page: 1, per_page: 25, total: 4, from: 1, to: 4 },
+                    },
+                });
+            }
+            return Promise.resolve({ data: {} });
+        });
+
+        renderWithProviders(<RecordsView />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Zakup środka trwałego')).toBeInTheDocument();
+        });
+
+        const incomeValue = screen.getByTestId('summary-income-value');
+        const expenseValue = screen.getByTestId('summary-expense-value');
+        const balanceValue = screen.getByTestId('summary-balance-value');
+        const totalValue = screen.getByTestId('summary-total-value');
+
+        // Revenue: exactly 10 000 (asset/liability ignored)
+        expect(incomeValue.textContent.replace(/\u00a0/g, ' ')).toMatch(/10\s?000,00\s?zł/);
+        // Expense: exactly 25 000
+        expect(expenseValue.textContent.replace(/\u00a0/g, ' ')).toMatch(/25\s?000,00\s?zł/);
+        // Balance: 10 000 - 25 000 = -15 000 (negative balance style)
+        expect(balanceValue.textContent.replace(/\u00a0/g, ' ')).toMatch(/-15\s?000,00\s?zł/);
+        expect(balanceValue).toHaveClass('text-rose-400');
+        expect(totalValue).toHaveTextContent('4 wpisów');
+    });
+});
+

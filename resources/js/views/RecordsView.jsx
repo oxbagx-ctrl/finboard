@@ -397,39 +397,39 @@ export const RecordsView = () => {
 
             {/* Quick Metrics Bar for View */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-                <div className="p-2.5 rounded-lg bg-zinc-900 border border-zinc-800">
+                <div className="p-2.5 rounded-lg bg-zinc-900 border border-zinc-800" data-testid="summary-card-total">
                     <div className="text-[10px] text-zinc-500 uppercase">Łącznie Pozycji</div>
-                    <div className="text-sm font-bold text-zinc-100 tabular-nums mt-0.5">
+                    <div className="text-sm font-bold text-zinc-100 tabular-nums mt-0.5" data-testid="summary-total-value">
                         {meta.total} <span className="text-[10px] text-zinc-500 font-normal">wpisów</span>
                     </div>
                 </div>
 
-                <div className="p-2.5 rounded-lg bg-zinc-900 border border-zinc-800">
+                <div className="p-2.5 rounded-lg bg-zinc-900 border border-zinc-800" data-testid="summary-card-income">
                     <div className="text-[10px] text-zinc-500 uppercase flex items-center gap-1">
                         <ArrowUpRight className="w-3 h-3 text-emerald-400" />
                         Przychody (Strona)
                     </div>
-                    <div className="text-sm font-bold text-emerald-400 tabular-nums mt-0.5">
+                    <div className="text-sm font-bold text-emerald-400 tabular-nums mt-0.5" data-testid="summary-income-value">
                         {formatCurrency(summary.income, currency)}
                     </div>
                 </div>
 
-                <div className="p-2.5 rounded-lg bg-zinc-900 border border-zinc-800">
+                <div className="p-2.5 rounded-lg bg-zinc-900 border border-zinc-800" data-testid="summary-card-expense">
                     <div className="text-[10px] text-zinc-500 uppercase flex items-center gap-1">
                         <ArrowDownRight className="w-3 h-3 text-rose-400" />
                         Koszty OPEX (Strona)
                     </div>
-                    <div className="text-sm font-bold text-rose-400 tabular-nums mt-0.5">
+                    <div className="text-sm font-bold text-rose-400 tabular-nums mt-0.5" data-testid="summary-expense-value">
                         {formatCurrency(summary.expense, currency)}
                     </div>
                 </div>
 
-                <div className="p-2.5 rounded-lg bg-zinc-900 border border-zinc-800">
+                <div className="p-2.5 rounded-lg bg-zinc-900 border border-zinc-800" data-testid="summary-card-balance">
                     <div className="text-[10px] text-zinc-500 uppercase flex items-center gap-1">
                         <DollarSign className="w-3 h-3 text-zinc-400" />
                         Saldo Operacji (Netto)
                     </div>
-                    <div className={`text-sm font-bold tabular-nums mt-0.5 ${summary.balance >= 0 ? 'text-zinc-100' : 'text-rose-400'}`}>
+                    <div className={`text-sm font-bold tabular-nums mt-0.5 ${summary.balance >= 0 ? 'text-zinc-100' : 'text-rose-400'}`} data-testid="summary-balance-value">
                         {formatCurrency(summary.balance, currency)}
                     </div>
                 </div>
