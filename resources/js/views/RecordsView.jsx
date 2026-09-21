@@ -456,6 +456,7 @@ export const RecordsView = () => {
                     {/* Record type filter */}
                     <div>
                         <select
+                            data-testid="filter-record-type"
                             value={selectedType}
                             onChange={(e) => {
                                 setSelectedType(e.target.value);

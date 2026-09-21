@@ -919,3 +919,130 @@ describe('RecordsView - Non-Zero Summary Cards Calculations and Domain Contract 
     });
 });
 
+describe('RecordsView - Reactive Transaction Type Filtering with Canonical Domain Values', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+        apiClient.get.mockImplementation((url) => {
+            if (url === '/finance/categories') {
+                return Promise.resolve({ data: { data: mockCategories } });
+            }
+            if (url.startsWith('/finance/records')) {
+                return Promise.resolve({
+                    data: {
+                        data: mockRecords,
+                        meta: {
+                            current_page: 1,
+                            last_page: 1,
+                            per_page: 25,
+                            total: 2,
+                            from: 1,
+                            to: 2,
+                        },
+                    },
+                });
+            }
+            return Promise.resolve({ data: {} });
+        });
+    });
+
+    it('emits canonical record_type=revenue query parameter when filtering by revenue', async () => {
+        renderWithProviders(<RecordsView />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Płatność za maszyny produkcyjne')).toBeInTheDocument();
+        });
+
+        const typeFilter = screen.getByTestId('filter-record-type');
+        expect(typeFilter.value).toBe('');
+
+        fireEvent.change(typeFilter, { target: { value: 'revenue' } });
+
+        await waitFor(() => {
+            expect(apiClient.get).toHaveBeenCalledWith(
+                '/finance/records',
+                expect.objectContaining({
+                    params: expect.objectContaining({
+                        record_type: 'revenue',
+                        page: 1,
+                    }),
+                })
+            );
+        });
+    });
+
+    it('emits canonical record_type query parameter across all domain values: expense, asset, liability', async () => {
+        renderWithProviders(<RecordsView />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Płatność za maszyny produkcyjne')).toBeInTheDocument();
+        });
+
+        const typeFilter = screen.getByTestId('filter-record-type');
+
+        // Test expense
+        fireEvent.change(typeFilter, { target: { value: 'expense' } });
+        await waitFor(() => {
+            expect(apiClient.get).toHaveBeenCalledWith(
+                '/finance/records',
+                expect.objectContaining({
+                    params: expect.objectContaining({ record_type: 'expense' }),
+                })
+            );
+        });
+
+        // Test asset
+        fireEvent.change(typeFilter, { target: { value: 'asset' } });
+        await waitFor(() => {
+            expect(apiClient.get).toHaveBeenCalledWith(
+                '/finance/records',
+                expect.objectContaining({
+                    params: expect.objectContaining({ record_type: 'asset' }),
+                })
+            );
+        });
+
+        // Test liability
+        fireEvent.change(typeFilter, { target: { value: 'liability' } });
+        await waitFor(() => {
+            expect(apiClient.get).toHaveBeenCalledWith(
+                '/finance/records',
+                expect.objectContaining({
+                    params: expect.objectContaining({ record_type: 'liability' }),
+                })
+            );
+        });
+
+        // Reset to all types ("")
+        fireEvent.change(typeFilter, { target: { value: '' } });
+        await waitFor(() => {
+            const lastCallArgs = apiClient.get.mock.calls[apiClient.get.mock.calls.length - 1];
+            expect(lastCallArgs[0]).toBe('/finance/records');
+            expect(lastCallArgs[1].params.record_type).toBeUndefined();
+        });
+    });
+
+    it('resets selection state and floating action bar when switching transaction type filter', async () => {
+        renderWithProviders(<RecordsView />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Płatność za maszyny produkcyjne')).toBeInTheDocument();
+        });
+
+        // Select a record
+        const check1 = screen.getByTestId('record-checkbox-rec-001');
+        fireEvent.click(check1);
+        expect(screen.getByTestId('batch-action-bar')).toBeInTheDocument();
+        expect(screen.getByTestId('batch-selected-count')).toHaveTextContent('1');
+
+        // Change type filter
+        const typeFilter = screen.getByTestId('filter-record-type');
+        fireEvent.change(typeFilter, { target: { value: 'revenue' } });
+
+        // Floating action bar should unmount as selections are cleared
+        await waitFor(() => {
+            expect(screen.queryByTestId('batch-action-bar')).toBeNull();
+        });
+    });
+});
+
+
