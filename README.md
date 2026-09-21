@@ -408,7 +408,7 @@ npm test
   - [x] Ekspozycja bezpiecznego `activation_url` w `InvitationResource` dla oczekujących zaproszeń.
   - [x] Obsługa błędów wysyłki w `SendInvitationEmailListener` z logowaniem i rejestracją w ścieżce audytowej.
   - [x] Przycisk "Kopiuj link aktywacyjny" z powiadomieniem w tabeli zaproszeń.
-  - [ ] Widżet weryfikacji poczty SMTP i modal testowy w widoku ustawień administracyjnych.
+  - [x] Widżet weryfikacji poczty SMTP i modal testowy w widoku ustawień administracyjnych.
   - [ ] Testy komponentów dla kopiowania linku aktywacyjnego i akcji zaproszeń.
 - [ ] **Faza 37: Odporność Kolejek, Testy Integracyjne i Dokumentacja**
   - [ ] Konfiguracja polityki ponowień (retry/backoff) dla maili zaproszeń w `SendInvitationEmailListener`.

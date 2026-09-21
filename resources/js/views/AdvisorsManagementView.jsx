@@ -8,6 +8,8 @@ import { MetricCard } from '../components/ui/Card';
 import { AdvisorAssignmentModal } from '../components/advisors/AdvisorAssignmentModal';
 import { InviteUserModal } from '../components/advisors/InviteUserModal';
 import { CreateCompanyModal } from '../components/advisors/CreateCompanyModal';
+import { SmtpStatusWidget } from '../components/advisors/SmtpStatusWidget';
+import { TestMailModal } from '../components/advisors/TestMailModal';
 import {
     Users,
     Building2,
@@ -29,7 +31,8 @@ import {
     Copy,
     Check,
     CheckCircle2,
-    X
+    X,
+    Server
 } from 'lucide-react';
 
 export const AdvisorsManagementView = () => {
@@ -64,6 +67,7 @@ export const AdvisorsManagementView = () => {
     const [copiedId, setCopiedId] = useState(null);
     const [activationModalInvitation, setActivationModalInvitation] = useState(null);
     const [modalCopied, setModalCopied] = useState(false);
+    const [testMailModalOpen, setTestMailModalOpen] = useState(false);
 
     const fetchAdvisors = useCallback(async () => {
         if (isAdvisor) return; // Advisors do not list other advisors
@@ -300,14 +304,25 @@ export const AdvisorsManagementView = () => {
 
                 <div className="flex items-center gap-2">
                     {!isAdvisor && (
-                        <Button
-                            variant="secondary"
-                            size="sm"
-                            icon={Building2}
-                            onClick={() => setCreateCompanyModalOpen(true)}
-                        >
-                            Dodaj Spółkę
-                        </Button>
+                        <>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                icon={Send}
+                                onClick={() => setTestMailModalOpen(true)}
+                                title="Diagnostyka połączenia i testowy email SMTP"
+                            >
+                                Testuj SMTP
+                            </Button>
+                            <Button
+                                variant="secondary"
+                                size="sm"
+                                icon={Building2}
+                                onClick={() => setCreateCompanyModalOpen(true)}
+                            >
+                                Dodaj Spółkę
+                            </Button>
+                        </>
                     )}
                     <Button
                         variant="primary"
@@ -430,6 +445,20 @@ export const AdvisorsManagementView = () => {
                     <Mail className="w-3.5 h-3.5" />
                     <span>Wysłane Zaproszenia ({invitations.length})</span>
                 </button>
+                {!isAdvisor && (
+                    <button
+                        type="button"
+                        onClick={() => setActiveTab('mail')}
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded text-xs font-bold transition-colors cursor-pointer ${
+                            activeTab === 'mail'
+                                ? 'bg-zinc-100 text-zinc-950 shadow-xs'
+                                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
+                        }`}
+                    >
+                        <Server className="w-3.5 h-3.5" />
+                        <span>Diagnostyka SMTP</span>
+                    </button>
+                )}
             </div>
 
             {/* Tab 1: Advisors List */}
@@ -742,6 +771,13 @@ export const AdvisorsManagementView = () => {
             {/* Tab 3: Invitations Register */}
             {activeTab === 'invitations' && (
                 <div className="space-y-3">
+                    {!isAdvisor && (
+                        <SmtpStatusWidget
+                            compact={true}
+                            onOpenTestModal={() => setTestMailModalOpen(true)}
+                        />
+                    )}
+
                     {/* Filters Bar */}
                     <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3 flex flex-col md:flex-row md:items-center justify-between gap-3">
                         <div className="relative flex-1 max-w-md">
@@ -918,6 +954,15 @@ export const AdvisorsManagementView = () => {
                 </div>
             )}
 
+            {/* Tab 4: SMTP Mail Diagnostics */}
+            {activeTab === 'mail' && !isAdvisor && (
+                <div className="space-y-4">
+                    <SmtpStatusWidget
+                        onOpenTestModal={() => setTestMailModalOpen(true)}
+                    />
+                </div>
+            )}
+
             {/* Modal: Advisor Company Assignments */}
             <AdvisorAssignmentModal
                 isOpen={assignmentModalOpen}
@@ -1034,6 +1079,12 @@ export const AdvisorsManagementView = () => {
                         refreshUser();
                     }
                 }}
+            />
+
+            {/* Modal: Test Mail SMTP */}
+            <TestMailModal
+                isOpen={testMailModalOpen}
+                onClose={() => setTestMailModalOpen(false)}
             />
         </div>
     );
