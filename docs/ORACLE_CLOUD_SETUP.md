@@ -455,3 +455,70 @@ git push origin master
 2. ⚠️ **Koniecznie zaznacz pole:** `Permanently delete the attached boot volume`.
    * Bez zaznaczenia tego pola sam serwer zostanie usunięty, ale dysk pozostanie w chmurze i będzie niepotrzebnie blokował Twoją pulę darmowych 200 GB.
 3. Kliknij **Terminate instance**.
+
+---
+
+## 12. Konfiguracja Poczty Elektronicznej (SMTP) i Blokada Portu 25 w Oracle Cloud
+
+W środowisku produkcyjnym **Oracle Cloud Infrastructure (OCI)** skuteczne doręczanie wiadomości e-mail (np. zaproszeń użytkowników, powiadomień transakcyjnych, linków aktywacyjnych) wymaga uwzględnienia restrykcji sieciowych dostawcy chmury.
+
+### Krytyczna uwaga: Domyślna blokada portu 25 (Standard SMTP)
+* **Polityka OCI:** Oracle Cloud Infrastructure domyślnie **całkowicie blokuje wychodzący ruch (Outbound / Egress) na porcie 25** dla wszystkich maszyn wirtualnych (zwłaszcza w ramach Always Free i standardowych subskrypcji), aby zapobiec rozsyłaniu spamu i degradacji reputacji adresów IP.
+* **Objawy próby użycia portu 25:** Próby nawiązania połączenia na porcie 25 kończą się błędem `Connection Timed Out` (kod błędu 110) po upływie zdefiniowanego timeoutu.
+* **Odblokowanie:** Zezwolenie na ruch na porcie 25 wymaga złożenia oficjalnego wniosku serwisowego (*Service Request - SR*) z uzasadnieniem biznesowym (często odrzucane dla kont darmowych).
+
+### Rekomendowane Bezpieczne Porty Poczty (Egress):
+Zamiast niebezpiecznego portu 25, FinBoard obsługuje standardowe porty szyfrowane, które są domyślnie dozwolone w regułach wychodzących (*Egress Rules*) w OCI:
+1. **Port 587 (STARTTLS / TLS) – Rekomendowany:**
+   - Standard nowoczesnej poczty wychodzącej (MSA - Mail Submission Agent).
+   - Wykorzystywany przez serwery pocztowe (np. `mail.helvest.pl`) oraz komercyjne usługi transakcyjne (SendGrid, Mailgun, AWS SES, Postmark).
+2. **Port 465 (SSL / SMTPS) – Alternatywny:**
+   - Bezpośrednio szyfrowany kanał SSL od momentu nawiązania gniazda.
+
+### Krok 1: Weryfikacja reguł sieciowych OCI (Security List)
+W Oracle Cloud reguły wychodzące (*Egress Rules*) w *Default Security List for vcn-...* domyślnie zezwalają na cały ruch wychodzący (`All Protocols / 0.0.0.0/0`).  
+Dla pewności upewnij się, że w sekcji:  
+**Networking** → **Virtual Cloud Networks** → Twoja sieć VCN → **Security Lists** → **Default Security List** → zakładka **Egress Rules** znajduje się wpis zezwalający na ruch wychodzący:
+* **Destination CIDR:** `0.0.0.0/0`
+* **IP Protocol:** `All Protocols` (lub `TCP` z portami docelowymi `587, 465`)
+
+### Krok 2: Konfiguracja pliku `.env` na serwerze produkcyjnym
+Edytuj plik `.env` w katalogu aplikacji na serwerze (`~/finboard/.env`):
+```ini
+# Konfiguracja SMTP z uwzględnieniem portu 587 (STARTTLS)
+MAIL_MAILER=smtp
+MAIL_HOST=mail.helvest.pl
+MAIL_PORT=587
+MAIL_ENCRYPTION=tls
+MAIL_USERNAME=advisory@helvest.pl
+MAIL_PASSWORD="twoje_haslo_smtp"
+MAIL_TIMEOUT=15
+MAIL_FROM_ADDRESS="advisory@helvest.pl"
+MAIL_FROM_NAME="FinBoard Advisory"
+```
+
+*W przypadku portu 465 (SSL):*
+```ini
+MAIL_PORT=465
+MAIL_ENCRYPTION=ssl
+```
+
+### Krok 3: Narzędzia diagnostyczne FinBoard (Weryfikacja z konsoli serwera)
+FinBoard posiada wbudowaną komendę diagnostyczną weryfikującą konfigurację środowiska, socket TCP, baner SMTP oraz nadanie wiadomości testowej:
+
+1. **Szybki test gniazda i konfiguracji (bez wysyłki maila):**
+   ```bash
+   docker compose -f docker-compose.prod.yml exec app php artisan mail:test --skip-send
+   ```
+
+2. **Pełny test połączenia i wysyłki do wskazanego odbiorcy:**
+   ```bash
+   docker compose -f docker-compose.prod.yml exec app php artisan mail:test twoj-email@domena.pl --timeout=10
+   ```
+
+3. **Weryfikacja stanu przez endpoint API (dla administratorów):**
+   - Administratorzy mogą sprawdzić stan transportu i połączenia poprzez:
+     `GET /api/v1/admin/mail/status?check_socket=1`
+   - Oraz wykonać test wysyłki bezpośrednio z interfejsu lub narzędzia cURL:
+     `POST /api/v1/admin/mail/test` z payloadem `{"recipient": "twoj-email@domena.pl"}`.
+

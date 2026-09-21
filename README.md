@@ -398,12 +398,12 @@ npm test
   - Testy eksportu CSV z zachowaniem kanonicznych nagłówków i wartości typów.
   - Aktualizacja dokumentacji changelogu i reguł filtrowania kontraktu danych.
   - Aktualizacja dokumentacji `README.md` w zakresie księgi transakcji i kryteriów filtrowania.
-- [ ] **Faza 35: Narzędzia Diagnostyczne SMTP i Weryfikacja Połączenia Pocztowego (Commity 172–176)**
+- [x] **Faza 35: Narzędzia Diagnostyczne SMTP i Weryfikacja Połączenia Pocztowego (Commity 172–176)**
   - [x] Implementacja narzędzia CLI `TestMailConnectionCommand` (`mail:test`) do weryfikacji handshake SMTP, poświadczeń i transportu.
   - [x] Wystawienie endpointów `POST /api/v1/admin/mail/test` i `GET /api/v1/admin/mail/status` dla administratorów.
   - [x] Szablon mailable `TestDiagnosticMail` z czasem systemowym, latencją i ciemnym motywem FinBoard.
   - [x] Testy jednostkowe i integracyjne dla komendy `mail:test` i endpointów diagnostycznych.
-  - [ ] Aktualizacja dokumentacji `ORACLE_CLOUD_SETUP.md` oraz `.env.example` o bezpieczne porty SMTP (587/465).
+  - [x] Aktualizacja dokumentacji `ORACLE_CLOUD_SETUP.md` oraz `.env.example` o bezpieczne porty SMTP (587/465).
 - [ ] **Faza 36: Obsługa Błędów Wysyłki, Rejestr Audytowy i Link Aktywacyjny w UI (Commity 177–181)**
   - [ ] Ekspozycja bezpiecznego `activation_url` w `InvitationResource` dla oczekujących zaproszeń.
   - [ ] Obsługa błędów wysyłki w `SendInvitationEmailListener` z logowaniem i rejestracją w ścieżce audytowej.
