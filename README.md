@@ -373,12 +373,12 @@ npm test
   - Weryfikacja izolacji najemcy (tenant isolation) przy przełączaniu spółek przez DealContext.
   - Testy regresji weryfikujące paginację i filtrowanie audytu dokumentów VDR.
   - Aktualizacja dokumentacji systemu audytu i przewodnika po zrzutach JSON w changelogu.
-- [ ] **Faza 32: Normalizacja Kontraktu RecordType w Backendzie i Obsługa Aliasów**
+- [x] **Faza 32: Normalizacja Kontraktu RecordType w Backendzie i Obsługa Aliasów**
   - [x] Normalizacja parametru `record_type` w kontrolerze (wielkość liter, walidacja enumu, alias `income` -> `revenue`).
   - [x] Wzbogacenie zasobu `FinancialRecordResource` o etykietę `record_type_label` i kod kanoniczny.
   - [x] Testy integracyjne w `FinancialRecordsApiTest` dla zapytań case-insensitive i aliasu `income`.
   - [x] Walidacja i egzekwowanie kanonicznych wartości `RecordType` w command handlerach.
-  - [ ] Testy jednostkowe walidacji enumu `RecordType` i lokalizacji etykiet.
+  - [x] Testy jednostkowe walidacji enumu `RecordType` i lokalizacji etykiet.
 - [ ] **Faza 33: Naprawa Obliczeń Metryk i Filtrów w Księdze Transakcji**
   - [ ] Aktualizacja opcji filtra typu w `RecordsView` do wartości kanonicznych.
   - [ ] Poprawa logiki sumowania kafelków metryk strony (przychody, koszty, saldo).
