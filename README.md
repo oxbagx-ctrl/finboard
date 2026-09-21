@@ -400,7 +400,7 @@ npm test
   - [x] Aktualizacja dokumentacji `README.md` w zakresie księgi transakcji i kryteriów filtrowania.
 - [ ] **Faza 35: Narzędzia Diagnostyczne SMTP i Weryfikacja Połączenia Pocztowego (Commity 172–176)**
   - [x] Implementacja narzędzia CLI `TestMailConnectionCommand` (`mail:test`) do weryfikacji handshake SMTP, poświadczeń i transportu.
-  - [ ] Wystawienie endpointów `POST /api/v1/admin/mail/test` i `GET /api/v1/admin/mail/status` dla administratorów.
+  - [x] Wystawienie endpointów `POST /api/v1/admin/mail/test` i `GET /api/v1/admin/mail/status` dla administratorów.
   - [ ] Szablon mailable `TestDiagnosticMail` z czasem systemowym, latencją i ciemnym motywem FinBoard.
   - [ ] Testy jednostkowe i integracyjne dla komendy `mail:test` i endpointów diagnostycznych.
   - [ ] Aktualizacja dokumentacji `ORACLE_CLOUD_SETUP.md` oraz `.env.example` o bezpieczne porty SMTP (587/465).

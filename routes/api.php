@@ -1,5 +1,6 @@
 <?php
 
+use App\Presentation\Api\Controllers\AdminMailController;
 use App\Presentation\Api\Controllers\AdvisorManagementController;
 use App\Presentation\Api\Controllers\AuditLogController;
 use App\Presentation\Api\Controllers\AuthController;
@@ -49,6 +50,11 @@ Route::prefix('v1')->group(function () {
             Route::patch('/advisors/{id}/toggle-status', [AdvisorManagementController::class, 'toggleStatus'])->name('api.admin.advisors.toggle-status');
             Route::get('/companies', [AdvisorManagementController::class, 'companies'])->name('api.admin.companies.index');
             Route::post('/companies', [AdvisorManagementController::class, 'storeCompany'])->name('api.admin.companies.store');
+
+            // Mail Diagnostics & Testing Endpoints
+            Route::get('/mail/status', [AdminMailController::class, 'status'])->name('api.admin.mail.status');
+            Route::post('/mail/test', [AdminMailController::class, 'test'])->name('api.admin.mail.test');
+            Route::post('/mail/test-connection', [AdminMailController::class, 'test'])->name('api.admin.mail.test-connection');
         });
 
         // Invitation Management Endpoints
