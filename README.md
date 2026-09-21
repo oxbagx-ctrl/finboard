@@ -388,7 +388,7 @@ npm test
 - [ ] **Faza 34: Testy Regresyjne, Walidacja E2E i Dokumentacja**
   - [x] Testy komponentowe wyświetlania niezerowych wartości w kafelkach podsumowań.
   - [x] Testy reaktywnego filtrowania po typie operacji w tabeli księgowej.
-  - [ ] Testy eksportu CSV z zachowaniem kanonicznych nagłówków i wartości typów.
+  - [x] Testy eksportu CSV z zachowaniem kanonicznych nagłówków i wartości typów.
   - [ ] Aktualizacja dokumentacji changelogu i reguł filtrowania kontraktu danych.
   - [ ] Aktualizacja dokumentacji `README.md` w zakresie księgi transakcji i kryteriów filtrowania.
 

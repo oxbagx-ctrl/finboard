@@ -1,5 +1,5 @@
 import React from 'react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { RecordsView } from '../../views/RecordsView';
 import { NotificationProvider } from '../../context/NotificationContext';
@@ -1044,5 +1044,170 @@ describe('RecordsView - Reactive Transaction Type Filtering with Canonical Domai
         });
     });
 });
+
+describe('RecordsView - CSV Export Payload and Canonical Domain Types', () => {
+    let originalCreateObjectURL;
+    let createObjectURLMock;
+
+    beforeEach(() => {
+        vi.clearAllMocks();
+        originalCreateObjectURL = window.URL.createObjectURL;
+        createObjectURLMock = vi.fn().mockReturnValue('blob:http://localhost/csv-download');
+        window.URL.createObjectURL = createObjectURLMock;
+        window.URL.revokeObjectURL = vi.fn();
+    });
+
+    afterEach(() => {
+        window.URL.createObjectURL = originalCreateObjectURL;
+    });
+
+    it('exports CSV payload with canonical headers and canonical record_type values', async () => {
+        const fullRecords = [
+            {
+                id: 'rec-rev-101',
+                company_id: 'comp-acme-1',
+                record_date: '2026-03-01',
+                category_id: 'cat-rev-1',
+                category: mockCategories[0],
+                record_type: 'revenue',
+                amount: 15000,
+                currency: 'PLN',
+                description: 'Przychód z usług',
+                source: 'manual',
+            },
+            {
+                id: 'rec-exp-102',
+                company_id: 'comp-acme-1',
+                record_date: '2026-03-02',
+                category_id: 'cat-opex-1',
+                category: mockCategories[1],
+                record_type: 'expense',
+                amount: 4500,
+                currency: 'PLN',
+                description: 'Koszt serwerów',
+                source: 'manual',
+            },
+            {
+                id: 'rec-ast-103',
+                company_id: 'comp-acme-1',
+                record_date: '2026-03-03',
+                category_id: null,
+                category: null,
+                record_type: 'asset',
+                amount: 80000,
+                currency: 'PLN',
+                description: 'Zakup sprzętu',
+                source: 'manual',
+            },
+            {
+                id: 'rec-lia-104',
+                company_id: 'comp-acme-1',
+                record_date: '2026-03-04',
+                category_id: null,
+                category: null,
+                record_type: 'liability',
+                amount: 20000,
+                currency: 'PLN',
+                description: 'Pożyczka wspólnika',
+                source: 'manual',
+            },
+            {
+                id: 'rec-leg-105',
+                company_id: 'comp-acme-1',
+                record_date: '2026-03-05',
+                category_id: 'cat-rev-1',
+                category: mockCategories[0],
+                record_type: 'INCOME', // legacy uppercase alias
+                amount: 12000,
+                currency: 'PLN',
+                description: 'Stary format przychodu',
+                source: 'manual',
+            },
+        ];
+
+        apiClient.get.mockImplementation((url) => {
+            if (url === '/finance/categories') return Promise.resolve({ data: { data: mockCategories } });
+            if (url.startsWith('/finance/records')) {
+                return Promise.resolve({
+                    data: {
+                        data: fullRecords,
+                        meta: { current_page: 1, last_page: 1, per_page: 25, total: 5, from: 1, to: 5 },
+                    },
+                });
+            }
+            return Promise.resolve({ data: {} });
+        });
+
+        renderWithProviders(<RecordsView />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Przychód z usług')).toBeInTheDocument();
+        });
+
+        // Click Export CSV button
+        const exportBtn = screen.getByRole('button', { name: /Eksportuj CSV/i });
+        fireEvent.click(exportBtn);
+
+        expect(createObjectURLMock).toHaveBeenCalledTimes(1);
+        const blob = createObjectURLMock.mock.calls[0][0];
+        expect(blob).toBeInstanceOf(Blob);
+
+        const csvContent = await blob.text();
+        const lines = csvContent.trim().split('\n');
+
+        // Check header row
+        expect(lines[0]).toBe('ID,Data,Kategoria,Typ,Kwota,Waluta,Opis,Zrodlo');
+
+        // Check row 1: revenue
+        expect(lines[1]).toContain('"rec-rev-101"');
+        expect(lines[1]).toContain('"revenue"');
+        expect(lines[1]).not.toContain('"INCOME"');
+
+        // Check row 2: expense
+        expect(lines[2]).toContain('"rec-exp-102"');
+        expect(lines[2]).toContain('"expense"');
+
+        // Check row 3: asset
+        expect(lines[3]).toContain('"rec-ast-103"');
+        expect(lines[3]).toContain('"asset"');
+
+        // Check row 4: liability
+        expect(lines[4]).toContain('"rec-lia-104"');
+        expect(lines[4]).toContain('"liability"');
+
+        // Check row 5: legacy INCOME converted to canonical revenue
+        expect(lines[5]).toContain('"rec-leg-105"');
+        expect(lines[5]).toContain('"revenue"');
+        expect(lines[5]).not.toContain('"INCOME"');
+    });
+
+    it('shows notification and aborts download when trying to export empty dataset', async () => {
+        apiClient.get.mockImplementation((url) => {
+            if (url === '/finance/categories') return Promise.resolve({ data: { data: mockCategories } });
+            if (url.startsWith('/finance/records')) {
+                return Promise.resolve({
+                    data: {
+                        data: [],
+                        meta: { current_page: 1, last_page: 1, per_page: 25, total: 0, from: 0, to: 0 },
+                    },
+                });
+            }
+            return Promise.resolve({ data: {} });
+        });
+
+        renderWithProviders(<RecordsView />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Brak transakcji spełniających wybrane kryteria filtrów.')).toBeInTheDocument();
+        });
+
+        const exportBtn = screen.getByRole('button', { name: /Eksportuj CSV/i });
+        fireEvent.click(exportBtn);
+
+        expect(createObjectURLMock).not.toHaveBeenCalled();
+        expect(screen.getByText('Brak danych do eksportu.')).toBeInTheDocument();
+    });
+});
+
 
 

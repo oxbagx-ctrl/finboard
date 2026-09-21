@@ -314,11 +314,13 @@ export const RecordsView = () => {
         const csvRows = [headers.join(',')];
 
         records.forEach((r) => {
+            const rawType = (r.record_type || '').toLowerCase();
+            const canonicalType = rawType === 'income' ? 'revenue' : rawType;
             const row = [
                 `"${r.id}"`,
                 `"${r.record_date}"`,
                 `"${r.category?.name || r.category_id}"`,
-                `"${r.record_type}"`,
+                `"${canonicalType}"`,
                 r.amount,
                 `"${r.currency}"`,
                 `"${(r.description || '').replace(/"/g, '""')}"`,
