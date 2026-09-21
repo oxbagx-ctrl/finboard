@@ -96,4 +96,60 @@ final class MailDiagnosticServiceTest extends TestCase
         $this->assertNull($result['error_message']);
         $this->assertGreaterThanOrEqual(0, $result['latency_ms']);
     }
+
+    public function test_get_status_recognizes_port_465_as_secure(): void
+    {
+        Config::set('mail.default', 'smtp');
+        Config::set('mail.mailers.smtp', [
+            'transport' => 'smtp',
+            'host' => 'smtp.ssl-provider.net',
+            'port' => 465,
+            'encryption' => 'ssl',
+            'username' => 'ssl_user',
+            'password' => 'secret',
+            'timeout' => 30,
+        ]);
+
+        $status = $this->service->getStatus();
+
+        $this->assertSame(465, $status['port']);
+        $this->assertSame('ssl', $status['encryption']);
+        $this->assertSame(30, $status['timeout']);
+        $this->assertTrue($status['is_secure_port']);
+        $this->assertFalse($status['is_port_25_warning']);
+    }
+
+    public function test_get_status_handles_missing_password_and_unsecured_port(): void
+    {
+        Config::set('mail.default', 'smtp');
+        Config::set('mail.mailers.smtp', [
+            'transport' => 'smtp',
+            'host' => 'smtp.internal.local',
+            'port' => 2525,
+            'username' => null,
+            'password' => null,
+        ]);
+
+        $status = $this->service->getStatus();
+
+        $this->assertSame(2525, $status['port']);
+        $this->assertFalse($status['has_password']);
+        $this->assertNull($status['username']);
+        $this->assertFalse($status['is_secure_port']);
+        $this->assertFalse($status['is_port_25_warning']);
+    }
+
+    public function test_send_test_email_handles_exception_and_returns_error_result(): void
+    {
+        Config::set('mail.mailers.faulty_mailer', [
+            'transport' => 'unknown_transport_driver',
+        ]);
+
+        $result = $this->service->sendTestEmail('error@finboard.local', 'faulty_mailer');
+
+        $this->assertFalse($result['success']);
+        $this->assertSame('error@finboard.local', $result['recipient']);
+        $this->assertNotNull($result['error_message']);
+        $this->assertGreaterThanOrEqual(0, $result['latency_ms']);
+    }
 }

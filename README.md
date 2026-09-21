@@ -402,7 +402,7 @@ npm test
   - [x] Implementacja narzędzia CLI `TestMailConnectionCommand` (`mail:test`) do weryfikacji handshake SMTP, poświadczeń i transportu.
   - [x] Wystawienie endpointów `POST /api/v1/admin/mail/test` i `GET /api/v1/admin/mail/status` dla administratorów.
   - [x] Szablon mailable `TestDiagnosticMail` z czasem systemowym, latencją i ciemnym motywem FinBoard.
-  - [ ] Testy jednostkowe i integracyjne dla komendy `mail:test` i endpointów diagnostycznych.
+  - [x] Testy jednostkowe i integracyjne dla komendy `mail:test` i endpointów diagnostycznych.
   - [ ] Aktualizacja dokumentacji `ORACLE_CLOUD_SETUP.md` oraz `.env.example` o bezpieczne porty SMTP (587/465).
 - [ ] **Faza 36: Obsługa Błędów Wysyłki, Rejestr Audytowy i Link Aktywacyjny w UI (Commity 177–181)**
   - [ ] Ekspozycja bezpiecznego `activation_url` w `InvitationResource` dla oczekujących zaproszeń.

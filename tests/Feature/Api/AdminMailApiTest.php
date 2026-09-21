@@ -170,6 +170,54 @@ final class AdminMailApiTest extends TestCase
             ->assertJsonPath('recipient', 'superadmin@helvest.pl');
     }
 
+    public function test_super_admin_can_retrieve_mail_status(): void
+    {
+        Sanctum::actingAs($this->superAdminUser);
+
+        $response = $this->getJson('/api/v1/admin/mail/status?check_socket=0');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('status', 'success');
+    }
+
+    public function test_status_endpoint_supports_custom_transport_query_param(): void
+    {
+        Sanctum::actingAs($this->adminUser);
+
+        $response = $this->getJson('/api/v1/admin/mail/status?transport=log&check_socket=0');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('status', 'success')
+            ->assertJsonPath('data.mailer', 'log');
+    }
+
+    public function test_status_endpoint_returns_socket_health_when_check_socket_is_enabled(): void
+    {
+        Sanctum::actingAs($this->adminUser);
+
+        Config::set('mail.default', 'smtp');
+        Config::set('mail.mailers.smtp.host', '127.0.0.1');
+        Config::set('mail.mailers.smtp.port', 59998);
+        Config::set('mail.mailers.smtp.timeout', 1);
+
+        $response = $this->getJson('/api/v1/admin/mail/status?check_socket=1');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('status', 'success')
+            ->assertJsonStructure([
+                'status',
+                'data' => [
+                    'socket' => [
+                        'connected',
+                        'latency_ms',
+                        'error_code',
+                        'error_message',
+                    ],
+                ],
+            ])
+            ->assertJsonPath('data.socket.connected', false);
+    }
+
     public function test_admin_receives_error_response_when_smtp_fails(): void
     {
         Sanctum::actingAs($this->adminUser);

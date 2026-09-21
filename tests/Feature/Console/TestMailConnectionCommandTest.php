@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Console;
 
+use App\Contexts\Identity\Infrastructure\Mail\TestDiagnosticMail;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
@@ -47,6 +48,11 @@ final class TestMailConnectionCommandTest extends TestCase
             ->expectsOutputToContain('Wysyłanie wiadomości testowej do: cfo@helvest.pl')
             ->expectsOutputToContain('[OK] Wiadomość testowa została pomyślnie wysłana!')
             ->assertSuccessful();
+
+        Mail::assertSent(TestDiagnosticMail::class, function (TestDiagnosticMail $mail) {
+            return $mail->recipientEmail === 'cfo@helvest.pl'
+                && $mail->mailerName === 'array';
+        });
     }
 
     public function test_command_fails_gracefully_when_smtp_socket_unreachable(): void
@@ -60,6 +66,52 @@ final class TestMailConnectionCommandTest extends TestCase
             '--timeout' => 1,
         ])
             ->expectsOutputToContain('[BŁĄD POŁĄCZENIA]')
+            ->assertFailed();
+    }
+
+    public function test_command_prompts_for_valid_email_when_missing_and_handles_invalid_input(): void
+    {
+        Config::set('mail.from.address', '');
+
+        $this->artisan('mail:test', [
+            '--transport' => 'array',
+        ])
+            ->expectsQuestion('Podaj adres email do wysyłki testowej', 'not-a-valid-email')
+            ->expectsOutputToContain('[BŁĄD] Podano nieprawidłowy adres email odbiorcy.')
+            ->assertFailed();
+    }
+
+    public function test_command_prompts_and_succeeds_when_valid_email_is_entered_interactively(): void
+    {
+        Mail::fake();
+        Config::set('mail.from.address', '');
+
+        $this->artisan('mail:test', [
+            '--transport' => 'array',
+        ])
+            ->expectsQuestion('Podaj adres email do wysyłki testowej', 'interactive@helvest.pl')
+            ->expectsOutputToContain('Wysyłanie wiadomości testowej do: interactive@helvest.pl')
+            ->expectsOutputToContain('[OK] Wiadomość testowa została pomyślnie wysłana!')
+            ->assertSuccessful();
+
+        Mail::assertSent(TestDiagnosticMail::class, function (TestDiagnosticMail $mail) {
+            return $mail->recipientEmail === 'interactive@helvest.pl';
+        });
+    }
+
+    public function test_command_handles_mail_send_failure_gracefully(): void
+    {
+        // Using non-existent transport driver to trigger send exception
+        Config::set('mail.mailers.invalid_mailer', [
+            'transport' => 'non_existent_driver',
+        ]);
+
+        $this->artisan('mail:test', [
+            'recipient' => 'test@finboard.local',
+            '--transport' => 'invalid_mailer',
+        ])
+            ->expectsOutputToContain('[BŁĄD WYSYŁKI]')
+            ->expectsOutputToContain('Wysyłka wiadomości testowej zakończona niepowodzeniem.')
             ->assertFailed();
     }
 }
