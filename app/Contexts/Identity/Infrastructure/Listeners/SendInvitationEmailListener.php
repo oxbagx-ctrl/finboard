@@ -21,7 +21,39 @@ final class SendInvitationEmailListener implements ShouldQueue
 {
     use InteractsWithQueue;
 
+    /**
+     * Target queue name for invitation emails.
+     */
     public string $queue = 'default';
+
+    /**
+     * The number of times the queued listener may be attempted.
+     */
+    public int $tries = 3;
+
+    /**
+     * The maximum number of unhandled exceptions to allow before failing.
+     */
+    public int $maxExceptions = 3;
+
+    /**
+     * The number of seconds the job can run before timing out.
+     */
+    public int $timeout = 30;
+
+    /**
+     * Calculate the number of seconds to wait before retrying the job.
+     * Exponential backoff policy:
+     * Attempt 1 -> 10s delay
+     * Attempt 2 -> 60s delay
+     * Attempt 3 -> 180s delay
+     *
+     * @return array<int, int>
+     */
+    public function backoff(): array
+    {
+        return [10, 60, 180];
+    }
 
     public function handle(UserInvited $event): void
     {
@@ -77,8 +109,34 @@ final class SendInvitationEmailListener implements ShouldQueue
         try {
             Mail::to($event->email())->send($mailable);
         } catch (Throwable $e) {
+            if ($this->job !== null && $this->attempts() < $this->tries) {
+                $backoffSchedule = $this->backoff();
+                $attemptIndex = max(0, $this->attempts() - 1);
+                $delay = $backoffSchedule[$attemptIndex] ?? end($backoffSchedule);
+
+                Log::warning(sprintf(
+                    'Tymczasowy błąd wysyłki emaila do %s (próba %d/%d). Ponawianie za %ds... Błąd: %s',
+                    $event->email(),
+                    $this->attempts(),
+                    $this->tries,
+                    $delay,
+                    $e->getMessage()
+                ));
+
+                $this->release($delay);
+                return;
+            }
+
             $this->handleMailFailure($event, $e);
         }
+    }
+
+    /**
+     * Handle a job failure after all retry attempts are exhausted.
+     */
+    public function failed(UserInvited $event, Throwable $exception): void
+    {
+        $this->handleMailFailure($event, $exception);
     }
 
     /**
@@ -92,6 +150,8 @@ final class SendInvitationEmailListener implements ShouldQueue
             'role' => $event->role(),
             'company_id' => $event->companyId(),
             'invited_by' => $event->invitedBy(),
+            'attempts' => $this->attempts(),
+            'max_tries' => $this->tries,
             'transport' => config('mail.default'),
             'host' => config('mail.mailers.smtp.host'),
             'port' => config('mail.mailers.smtp.port'),

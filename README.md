@@ -405,13 +405,13 @@ npm test
   - Testy jednostkowe i integracyjne dla komendy `mail:test` i endpointów diagnostycznych.
   - Aktualizacja dokumentacji `ORACLE_CLOUD_SETUP.md` oraz `.env.example` o bezpieczne porty SMTP (587/465).
 - [x] **Faza 36: Obsługa Błędów Wysyłki, Rejestr Audytowy i Link Aktywacyjny w UI**
-  - [x] Ekspozycja bezpiecznego `activation_url` w `InvitationResource` dla oczekujących zaproszeń.
-  - [x] Obsługa błędów wysyłki w `SendInvitationEmailListener` z logowaniem i rejestracją w ścieżce audytowej.
-  - [x] Przycisk "Kopiuj link aktywacyjny" z powiadomieniem w tabeli zaproszeń.
-  - [x] Widżet weryfikacji poczty SMTP i modal testowy w widoku ustawień administracyjnych.
-  - [x] Testy komponentów dla kopiowania linku aktywacyjnego i akcji zaproszeń.
+  - Ekspozycja bezpiecznego `activation_url` w `InvitationResource` dla oczekujących zaproszeń.
+  - Obsługa błędów wysyłki w `SendInvitationEmailListener` z logowaniem i rejestracją w ścieżce audytowej.
+  - Przycisk "Kopiuj link aktywacyjny" z powiadomieniem w tabeli zaproszeń.
+  - Widżet weryfikacji poczty SMTP i modal testowy w widoku ustawień administracyjnych.
+  - Testy komponentów dla kopiowania linku aktywacyjnego i akcji zaproszeń.
 - [ ] **Faza 37: Odporność Kolejek, Testy Integracyjne i Dokumentacja**
-  - [ ] Konfiguracja polityki ponowień (retry/backoff) dla maili zaproszeń w `SendInvitationEmailListener`.
+  - [x] Konfiguracja polityki ponowień (retry/backoff) dla maili zaproszeń w `SendInvitationEmailListener`.
   - [ ] Testy integracyjne symulujące timeouty połączeń SMTP i odporność kolejki zadań.
   - [ ] Testy E2E dla tworzenia zaproszeń, regeneracji tokenów i awaryjnego przepływu aktywacji.
   - [ ] Aktualizacja changelogu z architekturą doręczania poczty, restrykcjami portu 25 i wytycznymi SMTP.
