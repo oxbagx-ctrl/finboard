@@ -15,6 +15,7 @@ enum AuditAction: string
     case CSV_IMPORT_PROCESSED = 'CSV_IMPORT_PROCESSED';
     case CSV_IMPORT_FAILED = 'CSV_IMPORT_FAILED';
     case METRICS_EVALUATED = 'METRICS_EVALUATED';
+    case INVITATION_MAIL_FAILED = 'INVITATION_MAIL_FAILED';
 
     public function label(): string
     {
@@ -28,6 +29,7 @@ enum AuditAction: string
             self::CSV_IMPORT_PROCESSED => 'Asynchroniczny import danych CSV',
             self::CSV_IMPORT_FAILED => 'Niepowodzenie importu CSV',
             self::METRICS_EVALUATED => 'Ewaluacja wskaźników KPI',
+            self::INVITATION_MAIL_FAILED => 'Błąd wysyłki emaila zaproszenia',
         };
     }
 
@@ -41,7 +43,8 @@ enum AuditAction: string
             self::BENCHMARK_CONFIGURED => 'indigo',
             self::BENCHMARK_RESET => 'amber',
             self::CSV_IMPORT_PROCESSED => 'cyan',
-            self::CSV_IMPORT_FAILED => 'red',
+            self::CSV_IMPORT_FAILED,
+            self::INVITATION_MAIL_FAILED => 'red',
             self::METRICS_EVALUATED => 'violet',
         };
     }
@@ -58,6 +61,7 @@ enum AuditAction: string
             self::CSV_IMPORT_PROCESSED,
             self::CSV_IMPORT_FAILED => 'import',
             self::METRICS_EVALUATED => 'analytics',
+            self::INVITATION_MAIL_FAILED => 'invitation',
         };
     }
 

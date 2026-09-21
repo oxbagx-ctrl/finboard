@@ -406,7 +406,7 @@ npm test
   - Aktualizacja dokumentacji `ORACLE_CLOUD_SETUP.md` oraz `.env.example` o bezpieczne porty SMTP (587/465).
 - [ ] **Faza 36: Obsługa Błędów Wysyłki, Rejestr Audytowy i Link Aktywacyjny w UI**
   - [x] Ekspozycja bezpiecznego `activation_url` w `InvitationResource` dla oczekujących zaproszeń.
-  - [ ] Obsługa błędów wysyłki w `SendInvitationEmailListener` z logowaniem i rejestracją w ścieżce audytowej.
+  - [x] Obsługa błędów wysyłki w `SendInvitationEmailListener` z logowaniem i rejestracją w ścieżce audytowej.
   - [ ] Przycisk "Kopiuj link aktywacyjny" z powiadomieniem w tabeli zaproszeń.
   - [ ] Widżet weryfikacji poczty SMTP i modal testowy w widoku ustawień administracyjnych.
   - [ ] Testy komponentów dla kopiowania linku aktywacyjnego i akcji zaproszeń.
