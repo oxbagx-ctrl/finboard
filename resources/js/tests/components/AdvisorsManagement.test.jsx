@@ -89,6 +89,8 @@ const mockInvitations = [
         email: 'cfo@acme.com',
         role: 'client',
         status: 'pending',
+        token: 'sample-token-abc',
+        activation_url: 'https://finboard.test/register?invitation_token=sample-token-abc',
         expires_at: '2026-09-22T10:00:00Z',
         created_at: '2026-09-20T10:00:00Z',
         company: { id: 'comp-acme-1', name: 'Acme Manufacturing S.A.', code: 'ACME' },
@@ -364,6 +366,40 @@ describe('AdvisorsManagementView (SuperAdmin Dashboard)', () => {
             expect(apiClient.post).toHaveBeenCalledWith('/invitations/inv-test-1/resend');
         });
     });
+
+    it('renders copy activation link button for pending invitations and copies link to clipboard', async () => {
+        const writeTextMock = vi.fn().mockResolvedValue(undefined);
+        Object.defineProperty(navigator, 'clipboard', {
+            value: {
+                writeText: writeTextMock,
+            },
+            writable: true,
+            configurable: true,
+        });
+
+        renderWithContext(<AdvisorsManagementView />);
+
+        await waitFor(() => {
+            expect(screen.getByText(/Wysłane Zaproszenia/i)).toBeInTheDocument();
+        });
+
+        fireEvent.click(screen.getByText(/Wysłane Zaproszenia/i));
+
+        await waitFor(() => {
+            expect(screen.getByText('cfo@acme.com')).toBeInTheDocument();
+        });
+
+        const copyBtn = screen.getByRole('button', { name: /Kopiuj link/i });
+        expect(copyBtn).toBeInTheDocument();
+
+        fireEvent.click(copyBtn);
+
+        await waitFor(() => {
+            expect(writeTextMock).toHaveBeenCalledWith('https://finboard.test/register?invitation_token=sample-token-abc');
+            expect(screen.getByText('Skopiowano')).toBeInTheDocument();
+        });
+    });
+
     it('opens create company modal from top bar and companies tab', async () => {
         renderWithContext(<AdvisorsManagementView />);
 

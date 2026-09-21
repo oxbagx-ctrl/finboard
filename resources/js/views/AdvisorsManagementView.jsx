@@ -25,7 +25,11 @@ import {
     XCircle,
     Mail,
     Lock,
-    Send
+    Send,
+    Copy,
+    Check,
+    CheckCircle2,
+    X
 } from 'lucide-react';
 
 export const AdvisorsManagementView = () => {
@@ -57,6 +61,9 @@ export const AdvisorsManagementView = () => {
     const [inviteModalOpen, setInviteModalOpen] = useState(false);
     const [createCompanyModalOpen, setCreateCompanyModalOpen] = useState(false);
     const [actionInProgressId, setActionInProgressId] = useState(null);
+    const [copiedId, setCopiedId] = useState(null);
+    const [activationModalInvitation, setActivationModalInvitation] = useState(null);
+    const [modalCopied, setModalCopied] = useState(false);
 
     const fetchAdvisors = useCallback(async () => {
         if (isAdvisor) return; // Advisors do not list other advisors
@@ -174,6 +181,61 @@ export const AdvisorsManagementView = () => {
             error(msg);
         } finally {
             setActionInProgressId(null);
+        }
+    };
+
+    const copyTextToClipboard = async (text) => {
+        if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+            return true;
+        }
+        try {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            textArea.style.top = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            const successful = document.execCommand('copy');
+            textArea.remove();
+            return successful;
+        } catch (e) {
+            return false;
+        }
+    };
+
+    const handleCopyActivationUrl = async (inv) => {
+        const url = inv.activation_url || `${window.location.origin}/register?invitation_token=${inv.token}`;
+        try {
+            const ok = await copyTextToClipboard(url);
+            if (ok) {
+                setCopiedId(inv.id);
+                success(`Link aktywacyjny dla ${inv.email} został skopiowany do schowka.`);
+                setTimeout(() => {
+                    setCopiedId(prev => (prev === inv.id ? null : prev));
+                }, 3000);
+            } else {
+                error('Nie udało się skopiować linku do schowka.');
+            }
+        } catch (err) {
+            error('Błąd podczas kopiowania linku aktywacyjnego.');
+        }
+    };
+
+    const handleCopyModalUrl = async (url) => {
+        try {
+            const ok = await copyTextToClipboard(url);
+            if (ok) {
+                setModalCopied(true);
+                success('Link aktywacyjny został pomyślnie skopiowany do schowka.');
+                setTimeout(() => setModalCopied(false), 3000);
+            } else {
+                error('Nie udało się skopiować linku do schowka.');
+            }
+        } catch (err) {
+            error('Błąd podczas kopiowania linku aktywacyjnego.');
         }
     };
 
@@ -806,6 +868,18 @@ export const AdvisorsManagementView = () => {
 
                                                     <td className="py-3 px-4 text-right">
                                                         <div className="flex items-center justify-end gap-1.5">
+                                                            {isPending && (
+                                                                <Button
+                                                                    variant="outline"
+                                                                    size="sm"
+                                                                    icon={copiedId === inv.id ? Check : Copy}
+                                                                    onClick={() => handleCopyActivationUrl(inv)}
+                                                                    className={copiedId === inv.id ? 'text-emerald-400 border-emerald-500/50 bg-emerald-950/20' : ''}
+                                                                    title="Kopiuj bezpieczny link aktywacyjny do schowka"
+                                                                >
+                                                                    {copiedId === inv.id ? 'Skopiowano' : 'Kopiuj link'}
+                                                                </Button>
+                                                            )}
                                                             {(isPending || isExpired) && (
                                                                 <Button
                                                                     variant="outline"
@@ -858,13 +932,88 @@ export const AdvisorsManagementView = () => {
                 isOpen={inviteModalOpen}
                 onClose={() => setInviteModalOpen(false)}
                 companies={companies}
-                onSuccess={() => {
+                onSuccess={(newInv) => {
                     fetchInvitations();
                     if (!isAdvisor) {
                         fetchAdvisors();
                     }
+                    if (newInv?.activation_url) {
+                        setActivationModalInvitation(newInv);
+                        setModalCopied(false);
+                    }
                 }}
             />
+
+            {/* Modal: Activation Link Confirmation */}
+            {activationModalInvitation && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-xs font-mono">
+                    <div className="bg-zinc-900 border border-zinc-750 rounded-lg shadow-2xl max-w-lg w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150 flex flex-col">
+                        <div className="px-5 py-3.5 bg-zinc-950 border-b border-zinc-800 flex items-center justify-between shrink-0">
+                            <div className="flex items-center gap-2.5">
+                                <div className="w-7 h-7 rounded bg-emerald-950/60 border border-emerald-700/60 flex items-center justify-center text-emerald-400">
+                                    <CheckCircle2 className="w-4 h-4" />
+                                </div>
+                                <div>
+                                    <h2 className="text-xs font-bold uppercase tracking-wider text-zinc-100">
+                                        Zaproszenie Utworzone
+                                    </h2>
+                                    <p className="text-[10px] text-zinc-500 mt-0.5">
+                                        BEZPOŚREDNI LINK AKTYWACYJNY DLA UŻYTKOWNIKA
+                                    </p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => setActivationModalInvitation(null)}
+                                className="p-1 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors"
+                            >
+                                <X className="w-4 h-4" />
+                            </button>
+                        </div>
+
+                        <div className="p-5 space-y-4">
+                            <div className="p-3 rounded bg-emerald-950/30 border border-emerald-800/60 flex items-start gap-2.5">
+                                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                                <div className="text-[11px] text-zinc-300 leading-relaxed">
+                                    Zaproszenie dla <span className="font-semibold text-emerald-300">{activationModalInvitation.email}</span> zostało wygenerowane. Jeśli serwer pocztowy napotka problem z dostarczeniem, możesz ręcznie przekazać poniższy unikalny link (ważny 48h).
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mb-1.5">
+                                    Link Rejestracyjny i Aktywacyjny
+                                </label>
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        type="text"
+                                        readOnly
+                                        value={activationModalInvitation.activation_url}
+                                        className="w-full px-3 py-2 text-xs bg-zinc-950 border border-zinc-750 rounded text-zinc-200 font-mono select-all focus:outline-none focus:border-brand"
+                                    />
+                                    <Button
+                                        variant={modalCopied ? 'outline' : 'primary'}
+                                        size="sm"
+                                        icon={modalCopied ? Check : Copy}
+                                        onClick={() => handleCopyModalUrl(activationModalInvitation.activation_url)}
+                                        className={modalCopied ? 'text-emerald-400 border-emerald-500/50 bg-emerald-950/20' : ''}
+                                    >
+                                        {modalCopied ? 'Skopiowano' : 'Kopiuj'}
+                                    </Button>
+                                </div>
+                            </div>
+
+                            <div className="flex justify-end pt-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setActivationModalInvitation(null)}
+                                >
+                                    Zamknij
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Modal: Create Company */}
             <CreateCompanyModal
