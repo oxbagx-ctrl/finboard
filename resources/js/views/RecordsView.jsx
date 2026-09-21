@@ -456,10 +456,10 @@ export const RecordsView = () => {
                             className="w-full bg-zinc-950 border border-zinc-750 rounded px-2.5 py-1.5 text-xs text-zinc-200 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
                         >
                             <option value="">Wszystkie typy</option>
-                            <option value="INCOME">Przychody (INCOME)</option>
-                            <option value="EXPENSE">Koszty (EXPENSE)</option>
-                            <option value="ASSET">Aktywa (ASSET)</option>
-                            <option value="LIABILITY">Pasywa (LIABILITY)</option>
+                            <option value="revenue">Przychody (REVENUE)</option>
+                            <option value="expense">Koszty (EXPENSE)</option>
+                            <option value="asset">Aktywa (ASSET)</option>
+                            <option value="liability">Pasywa (LIABILITY)</option>
                         </select>
                     </div>
 
