@@ -51,6 +51,7 @@ final class InvitationResource extends JsonResource
             'is_accepted' => $this->isAccepted(),
             'is_revoked' => $this->isRevoked(),
             'is_expired' => $this->isExpired(),
+            'activation_url' => $this->activation_url,
             'expires_at' => $this->expires_at?->toIso8601String(),
             'created_at' => $this->created_at?->toIso8601String(),
             'accepted_at' => $this->accepted_at?->toIso8601String(),

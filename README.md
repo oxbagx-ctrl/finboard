@@ -398,19 +398,19 @@ npm test
   - Testy eksportu CSV z zachowaniem kanonicznych nagłówków i wartości typów.
   - Aktualizacja dokumentacji changelogu i reguł filtrowania kontraktu danych.
   - Aktualizacja dokumentacji `README.md` w zakresie księgi transakcji i kryteriów filtrowania.
-- [x] **Faza 35: Narzędzia Diagnostyczne SMTP i Weryfikacja Połączenia Pocztowego (Commity 172–176)**
-  - [x] Implementacja narzędzia CLI `TestMailConnectionCommand` (`mail:test`) do weryfikacji handshake SMTP, poświadczeń i transportu.
-  - [x] Wystawienie endpointów `POST /api/v1/admin/mail/test` i `GET /api/v1/admin/mail/status` dla administratorów.
-  - [x] Szablon mailable `TestDiagnosticMail` z czasem systemowym, latencją i ciemnym motywem FinBoard.
-  - [x] Testy jednostkowe i integracyjne dla komendy `mail:test` i endpointów diagnostycznych.
-  - [x] Aktualizacja dokumentacji `ORACLE_CLOUD_SETUP.md` oraz `.env.example` o bezpieczne porty SMTP (587/465).
-- [ ] **Faza 36: Obsługa Błędów Wysyłki, Rejestr Audytowy i Link Aktywacyjny w UI (Commity 177–181)**
-  - [ ] Ekspozycja bezpiecznego `activation_url` w `InvitationResource` dla oczekujących zaproszeń.
+- [x] **Faza 35: Narzędzia Diagnostyczne SMTP i Weryfikacja Połączenia Pocztowego**
+  - Implementacja narzędzia CLI `TestMailConnectionCommand` (`mail:test`) do weryfikacji handshake SMTP, poświadczeń i transportu.
+  - Wystawienie endpointów `POST /api/v1/admin/mail/test` i `GET /api/v1/admin/mail/status` dla administratorów.
+  - Szablon mailable `TestDiagnosticMail` z czasem systemowym, latencją i ciemnym motywem FinBoard.
+  - Testy jednostkowe i integracyjne dla komendy `mail:test` i endpointów diagnostycznych.
+  - Aktualizacja dokumentacji `ORACLE_CLOUD_SETUP.md` oraz `.env.example` o bezpieczne porty SMTP (587/465).
+- [ ] **Faza 36: Obsługa Błędów Wysyłki, Rejestr Audytowy i Link Aktywacyjny w UI**
+  - [x] Ekspozycja bezpiecznego `activation_url` w `InvitationResource` dla oczekujących zaproszeń.
   - [ ] Obsługa błędów wysyłki w `SendInvitationEmailListener` z logowaniem i rejestracją w ścieżce audytowej.
   - [ ] Przycisk "Kopiuj link aktywacyjny" z powiadomieniem w tabeli zaproszeń.
   - [ ] Widżet weryfikacji poczty SMTP i modal testowy w widoku ustawień administracyjnych.
   - [ ] Testy komponentów dla kopiowania linku aktywacyjnego i akcji zaproszeń.
-- [ ] **Faza 37: Odporność Kolejek, Testy Integracyjne i Dokumentacja (Commity 182–186)**
+- [ ] **Faza 37: Odporność Kolejek, Testy Integracyjne i Dokumentacja**
   - [ ] Konfiguracja polityki ponowień (retry/backoff) dla maili zaproszeń w `SendInvitationEmailListener`.
   - [ ] Testy integracyjne symulujące timeouty połączeń SMTP i odporność kolejki zadań.
   - [ ] Testy E2E dla tworzenia zaproszeń, regeneracji tokenów i awaryjnego przepływu aktywacji.

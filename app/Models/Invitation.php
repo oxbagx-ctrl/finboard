@@ -107,4 +107,15 @@ class Invitation extends Model
 
         return $this->status === 'pending' && $this->expires_at !== null && $this->expires_at->isPast();
     }
+
+    public function getActivationUrlAttribute(): ?string
+    {
+        if (!$this->isPending() || empty($this->token)) {
+            return null;
+        }
+
+        $baseUrl = rtrim((string) config('app.url', 'http://localhost:8080'), '/');
+
+        return "{$baseUrl}/invitation/accept?token=" . urlencode((string) $this->token);
+    }
 }
