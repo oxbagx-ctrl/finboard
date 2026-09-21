@@ -349,5 +349,88 @@ final class FinancialRecordsApiTest extends TestCase
         // Helvest record remains strictly untouched
         $this->assertDatabaseHas('financial_records', ['id' => $helvestRecord->id]);
     }
+
+    public function test_filter_records_by_case_insensitive_record_type_and_income_alias(): void
+    {
+        Sanctum::actingAs($this->clientUser);
+
+        $revRecord = FinancialRecord::create([
+            'id' => (string) \Illuminate\Support\Str::uuid(),
+            'company_id' => $this->acmeCompany->id,
+            'category_id' => 'cat-revenue',
+            'record_type' => 'revenue',
+            'amount' => 5000.00,
+            'currency' => 'PLN',
+            'record_date' => '2026-08-01',
+            'description' => 'Test_Case_Insensitive_Revenue_Record',
+            'source' => 'manual',
+        ]);
+
+        $expRecord = FinancialRecord::create([
+            'id' => (string) \Illuminate\Support\Str::uuid(),
+            'company_id' => $this->acmeCompany->id,
+            'category_id' => 'cat-cogs',
+            'record_type' => 'expense',
+            'amount' => 2000.00,
+            'currency' => 'PLN',
+            'record_date' => '2026-08-02',
+            'description' => 'Test_Case_Insensitive_Expense_Record',
+            'source' => 'manual',
+        ]);
+
+        // 1. Lowercase 'revenue'
+        $resp1 = $this->getJson('/api/v1/finance/records?search=Test_Case_Insensitive&record_type=revenue');
+        $resp1->assertStatus(200);
+        $descriptions1 = collect($resp1->json('data'))->pluck('description')->all();
+        $this->assertContains('Test_Case_Insensitive_Revenue_Record', $descriptions1);
+        $this->assertNotContains('Test_Case_Insensitive_Expense_Record', $descriptions1);
+
+        // 2. Uppercase 'REVENUE'
+        $resp2 = $this->getJson('/api/v1/finance/records?search=Test_Case_Insensitive&record_type=REVENUE');
+        $resp2->assertStatus(200);
+        $descriptions2 = collect($resp2->json('data'))->pluck('description')->all();
+        $this->assertContains('Test_Case_Insensitive_Revenue_Record', $descriptions2);
+        $this->assertNotContains('Test_Case_Insensitive_Expense_Record', $descriptions2);
+
+        // 3. Lowercase 'income' alias
+        $resp3 = $this->getJson('/api/v1/finance/records?search=Test_Case_Insensitive&record_type=income');
+        $resp3->assertStatus(200);
+        $descriptions3 = collect($resp3->json('data'))->pluck('description')->all();
+        $this->assertContains('Test_Case_Insensitive_Revenue_Record', $descriptions3);
+        $this->assertNotContains('Test_Case_Insensitive_Expense_Record', $descriptions3);
+
+        // 4. Uppercase 'INCOME' alias
+        $resp4 = $this->getJson('/api/v1/finance/records?search=Test_Case_Insensitive&record_type=INCOME');
+        $resp4->assertStatus(200);
+        $descriptions4 = collect($resp4->json('data'))->pluck('description')->all();
+        $this->assertContains('Test_Case_Insensitive_Revenue_Record', $descriptions4);
+        $this->assertNotContains('Test_Case_Insensitive_Expense_Record', $descriptions4);
+
+        // 5. Uppercase 'EXPENSE'
+        $resp5 = $this->getJson('/api/v1/finance/records?search=Test_Case_Insensitive&record_type=EXPENSE');
+        $resp5->assertStatus(200);
+        $descriptions5 = collect($resp5->json('data'))->pluck('description')->all();
+        $this->assertContains('Test_Case_Insensitive_Expense_Record', $descriptions5);
+        $this->assertNotContains('Test_Case_Insensitive_Revenue_Record', $descriptions5);
+
+        // 6. Verify canonical response fields (record_type and record_type_label)
+        $firstItem = collect($resp1->json('data'))->firstWhere('id', $revRecord->id);
+        $this->assertNotNull($firstItem);
+        $this->assertSame('revenue', $firstItem['record_type']);
+        $this->assertSame('Przychód', $firstItem['record_type_label']);
+
+        $expItem = collect($resp5->json('data'))->firstWhere('id', $expRecord->id);
+        $this->assertNotNull($expItem);
+        $this->assertSame('expense', $expItem['record_type']);
+        $this->assertSame('Koszt', $expItem['record_type_label']);
+    }
+
+    public function test_filter_records_with_invalid_record_type_does_not_break(): void
+    {
+        Sanctum::actingAs($this->clientUser);
+
+        $response = $this->getJson('/api/v1/finance/records?record_type=unknown_invalid_type');
+        $response->assertStatus(200);
+    }
 }
 
