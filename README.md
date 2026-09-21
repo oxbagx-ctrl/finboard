@@ -368,14 +368,14 @@ npm test
   - Rygorystyczna synchronizacja kontekstu `activeCompany` oraz obsługa stanów ładowania i pustych wyników.
   - Testy komponentów w `AuditLogsView.test.jsx` dla zakładki finansowej, przełączania VDR, filtrów i modalu.
 - [x] **Faza 31: Testy Integracyjne, Bezpieczeństwo i Dokumentacja**
-  - [x] Testy integracyjne E2E dla filtrowania zdarzeń audytowych według akcji usunięcia, modyfikacji i importu CSV.
-  - [x] Harmonizacja palety kolorów badge'y i mapowania ikon w kategoriach audytowych.
-  - [x] Weryfikacja izolacji najemcy (tenant isolation) przy przełączaniu spółek przez DealContext.
-  - [x] Testy regresji weryfikujące paginację i filtrowanie audytu dokumentów VDR.
-  - [x] Aktualizacja dokumentacji systemu audytu i przewodnika po zrzutach JSON w changelogu.
+  - Testy integracyjne E2E dla filtrowania zdarzeń audytowych według akcji usunięcia, modyfikacji i importu CSV.
+  - Harmonizacja palety kolorów badge'y i mapowania ikon w kategoriach audytowych.
+  - Weryfikacja izolacji najemcy (tenant isolation) przy przełączaniu spółek przez DealContext.
+  - Testy regresji weryfikujące paginację i filtrowanie audytu dokumentów VDR.
+  - Aktualizacja dokumentacji systemu audytu i przewodnika po zrzutach JSON w changelogu.
 - [ ] **Faza 32: Normalizacja Kontraktu RecordType w Backendzie i Obsługa Aliasów**
   - [x] Normalizacja parametru `record_type` w kontrolerze (wielkość liter, walidacja enumu, alias `income` -> `revenue`).
-  - [ ] Wzbogacenie zasobu `FinancialRecordResource` o etykietę `record_type_label` i kod kanoniczny.
+  - [x] Wzbogacenie zasobu `FinancialRecordResource` o etykietę `record_type_label` i kod kanoniczny.
   - [ ] Testy integracyjne w `FinancialRecordsApiTest` dla zapytań case-insensitive i aliasu `income`.
   - [ ] Walidacja i egzekwowanie kanonicznych wartości `RecordType` w command handlerach.
   - [ ] Testy jednostkowe walidacji enumu `RecordType` i lokalizacji etykiet.
