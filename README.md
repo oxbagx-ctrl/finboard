@@ -412,7 +412,7 @@ npm test
   - Testy komponentów dla kopiowania linku aktywacyjnego i akcji zaproszeń.
 - [ ] **Faza 37: Odporność Kolejek, Testy Integracyjne i Dokumentacja**
   - [x] Konfiguracja polityki ponowień (retry/backoff) dla maili zaproszeń w `SendInvitationEmailListener`.
-  - [ ] Testy integracyjne symulujące timeouty połączeń SMTP i odporność kolejki zadań.
+  - [x] Testy integracyjne symulujące timeouty połączeń SMTP i odporność kolejki zadań.
   - [ ] Testy E2E dla tworzenia zaproszeń, regeneracji tokenów i awaryjnego przepływu aktywacji.
   - [ ] Aktualizacja changelogu z architekturą doręczania poczty, restrykcjami portu 25 i wytycznymi SMTP.
   - [ ] Aktualizacja dokumentacji `README.md` opisującej produkcyjną konfigurację i diagnostykę poczty.
