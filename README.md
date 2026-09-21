@@ -389,7 +389,7 @@ npm test
   - [x] Testy komponentowe wyświetlania niezerowych wartości w kafelkach podsumowań.
   - [x] Testy reaktywnego filtrowania po typie operacji w tabeli księgowej.
   - [x] Testy eksportu CSV z zachowaniem kanonicznych nagłówków i wartości typów.
-  - [ ] Aktualizacja dokumentacji changelogu i reguł filtrowania kontraktu danych.
+  - [x] Aktualizacja dokumentacji changelogu i reguł filtrowania kontraktu danych.
   - [ ] Aktualizacja dokumentacji `README.md` w zakresie księgi transakcji i kryteriów filtrowania.
 
 ---
