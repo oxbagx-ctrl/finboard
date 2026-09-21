@@ -11,7 +11,9 @@ use App\Contexts\Finance\Domain\Repositories\FinancialRecordRepositoryInterface;
 use App\Contexts\Finance\Domain\ValueObjects\Currency;
 use App\Contexts\Finance\Domain\ValueObjects\FinancialRecordId;
 use App\Contexts\Finance\Domain\ValueObjects\Money;
+use App\Contexts\Finance\Domain\ValueObjects\RecordType;
 use DateTimeImmutable;
+use DomainException;
 
 final class CreateFinancialRecordHandler
 {
@@ -26,6 +28,11 @@ final class CreateFinancialRecordHandler
         $category = $this->categoryRepository->findById($command->categoryId);
         if ($category === null) {
             throw CategoryNotFoundException::withId($command->categoryId);
+        }
+
+        $recordType = $category->recordType();
+        if (RecordType::tryFrom($recordType->value) === null) {
+            throw new DomainException("Category [{$command->categoryId}] does not resolve to a canonical RecordType.");
         }
 
         $recordId = FinancialRecordId::generate();
