@@ -133,7 +133,8 @@ final class TestMailConnectionCommand extends Command
         $this->info("3. Wysyłka Diagnostycznej Wiadomości Email:");
         $this->line(" Wysyłanie wiadomości testowej do: <fg=cyan>{$recipient}</> przy użyciu mailera: <fg=cyan>{$transport}</>...");
 
-        $sendResult = $diagnosticService->sendTestEmail($recipient, $transport);
+        $socketLatency = (isset($socketResult) && is_array($socketResult) && ($socketResult['connected'] ?? false)) ? $socketResult['latency_ms'] : null;
+        $sendResult = $diagnosticService->sendTestEmail($recipient, $transport, $socketLatency);
 
         if (!$sendResult['success']) {
             $this->error(' [BŁĄD WYSYŁKI]');

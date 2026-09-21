@@ -393,15 +393,15 @@ npm test
   - Zapewnienie poprawnego formatowania badge'y typów i kolorów kwot.
   - Zastąpienie legacy `'INCOME'` wartościami kanonicznymi w mockach testowych.
 - [x] **Faza 34: Testy Regresyjne, Walidacja E2E i Dokumentacja**
-  - [x] Testy komponentowe wyświetlania niezerowych wartości w kafelkach podsumowań.
-  - [x] Testy reaktywnego filtrowania po typie operacji w tabeli księgowej.
-  - [x] Testy eksportu CSV z zachowaniem kanonicznych nagłówków i wartości typów.
-  - [x] Aktualizacja dokumentacji changelogu i reguł filtrowania kontraktu danych.
-  - [x] Aktualizacja dokumentacji `README.md` w zakresie księgi transakcji i kryteriów filtrowania.
+  - Testy komponentowe wyświetlania niezerowych wartości w kafelkach podsumowań.
+  - Testy reaktywnego filtrowania po typie operacji w tabeli księgowej.
+  - Testy eksportu CSV z zachowaniem kanonicznych nagłówków i wartości typów.
+  - Aktualizacja dokumentacji changelogu i reguł filtrowania kontraktu danych.
+  - Aktualizacja dokumentacji `README.md` w zakresie księgi transakcji i kryteriów filtrowania.
 - [ ] **Faza 35: Narzędzia Diagnostyczne SMTP i Weryfikacja Połączenia Pocztowego (Commity 172–176)**
   - [x] Implementacja narzędzia CLI `TestMailConnectionCommand` (`mail:test`) do weryfikacji handshake SMTP, poświadczeń i transportu.
   - [x] Wystawienie endpointów `POST /api/v1/admin/mail/test` i `GET /api/v1/admin/mail/status` dla administratorów.
-  - [ ] Szablon mailable `TestDiagnosticMail` z czasem systemowym, latencją i ciemnym motywem FinBoard.
+  - [x] Szablon mailable `TestDiagnosticMail` z czasem systemowym, latencją i ciemnym motywem FinBoard.
   - [ ] Testy jednostkowe i integracyjne dla komendy `mail:test` i endpointów diagnostycznych.
   - [ ] Aktualizacja dokumentacji `ORACLE_CLOUD_SETUP.md` oraz `.env.example` o bezpieczne porty SMTP (587/465).
 - [ ] **Faza 36: Obsługa Błędów Wysyłki, Rejestr Audytowy i Link Aktywacyjny w UI (Commity 177–181)**

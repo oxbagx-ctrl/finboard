@@ -124,31 +124,34 @@ final class MailDiagnosticService
      *
      * @return array{success: bool, recipient: string, latency_ms: int, error_message: ?string}
      */
-    public function sendTestEmail(string $recipient, ?string $mailer = null): array
+    public function sendTestEmail(string $recipient, ?string $mailer = null, ?int $socketLatencyMs = null): array
     {
         $activeMailer = $mailer ?? (string) config('mail.default', 'smtp');
-        $status = $this->getStatus();
+        $status = $this->getStatus($activeMailer);
+
+        $sentAt = now()->format('Y-m-d H:i:s T');
+
+        $mailable = new TestDiagnosticMail(
+            recipientEmail: $recipient,
+            mailerName: $activeMailer,
+            host: $status['host'] ?? null,
+            port: $status['port'] ?? null,
+            encryption: $status['encryption'] ?? null,
+            fromAddress: $status['from_address'] ?? null,
+            environment: (string) config('app.env', 'production'),
+            sentAtFormatted: $sentAt,
+            socketLatencyMs: $socketLatencyMs,
+            diagnosticMetadata: [
+                'php_version' => PHP_VERSION,
+                'laravel_version' => app()->version(),
+                'server_hostname' => gethostname() ?: 'finboard-app',
+            ]
+        );
 
         $startTime = microtime(true);
 
         try {
-            Mail::mailer($activeMailer)->raw(
-                "FinBoard SMTP Mail Transport Diagnostic Ping\n" .
-                "===============================================\n\n" .
-                "Środowisko: " . config('app.env') . "\n" .
-                "Data i czas wysyłki (UTC): " . now()->toIso8601String() . "\n" .
-                "Mailer: {$activeMailer}\n" .
-                "Host SMTP: " . ($status['host'] ?? 'N/A') . ":" . ($status['port'] ?? 'N/A') . "\n" .
-                "Szyfrowanie: " . ($status['encryption'] ?: 'brak') . "\n" .
-                "Adres nadawcy: " . ($status['from_address'] ?: 'N/A') . "\n" .
-                "Adres odbiorcy: {$recipient}\n\n" .
-                "Wiadomość została wygenerowana automatycznie przez narzędzie diagnostyczne FinBoard.\n" .
-                "Jeśli otrzymałeś tę wiadomość, oznacza to, że konfiguracja SMTP działa w 100% poprawnie.",
-                function ($message) use ($recipient) {
-                    $message->to($recipient)
-                        ->subject('[FinBoard] Test Połączenia Poczty SMTP (Diagnostic Ping)');
-                }
-            );
+            Mail::mailer($activeMailer)->to($recipient)->send($mailable);
 
             $latencyMs = (int) round((microtime(true) - $startTime) * 1000);
 
