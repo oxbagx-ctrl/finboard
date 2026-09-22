@@ -9,6 +9,7 @@ use App\Contexts\InvestmentProject\Domain\Services\BalanceSheetService;
 use App\Contexts\InvestmentProject\Domain\Services\CashFlowService;
 use App\Contexts\InvestmentProject\Domain\Services\DebtAmortizationService;
 use App\Contexts\InvestmentProject\Domain\Services\DepreciationScheduleService;
+use App\Contexts\InvestmentProject\Domain\Services\EquityWaterfallSolverService;
 use App\Contexts\InvestmentProject\Domain\Services\GrantAllocationService;
 use App\Contexts\InvestmentProject\Domain\Services\IncomeStatementService;
 use App\Contexts\InvestmentProject\Domain\Services\InvestmentAppraisalService;
@@ -50,9 +51,12 @@ final class InvestmentProjectServiceProvider extends ServiceProvider
         ));
         $this->app->singleton(LiquidityBalancingService::class, fn () => new LiquidityBalancingService());
         $this->app->singleton(WaccCalculatorService::class, fn () => new WaccCalculatorService());
-        $this->app->singleton(InvestmentAppraisalService::class, fn ($app) => new InvestmentAppraisalService(
-            $app->make(WaccCalculatorService::class)
-        ));
+        $this->app->singleton(InvestmentAppraisalService::class, function ($app) {
+            return new InvestmentAppraisalService($app->make(WaccCalculatorService::class));
+        });
+        $this->app->singleton(EquityWaterfallSolverService::class, function ($app) {
+            return new EquityWaterfallSolverService($app->make(InvestmentAppraisalService::class));
+        });
     }
 
     /**

@@ -506,7 +506,7 @@ W sytuacji niedostępności skrzynki pocztowej odbiorcy lub awarii serwera SMTP,
 - [ ] **Faza 41: Dynamiczny WACC, Wycena Efektywności (NPV, IRR) i Equity Waterfall**
   - [x] Serwis WaccCalculatorService wyliczający średni ważony koszt kapitału z tarczą podatkową i inflacją.
   - [x] Serwis InvestmentAppraisalService obliczający zdyskontowane FCFF/FCFE, NPV, Project IRR, RV i okres zwrotu.
-  - [ ] Numeryczny solver EquityWaterfallSolverService wyznaczający udziały inwestorów i docelowe stopy IRR.
+  - [x] Numeryczny solver EquityWaterfallSolverService wyznaczający udziały inwestorów i docelowe stopy IRR.
   - [ ] Kontrolery REST API dla zarządzania projektami, pobierania sprawozdań i wskaźników wyceny.
   - [ ] Testy API weryfikujące endpointy wyceny inwestycji, wielonajemcowość i kalkulacje waterfall.
 - [ ] **Faza 42: Frontend: Kreator Założeń Inwestycyjnych i Harmonogramu CAPEX**
