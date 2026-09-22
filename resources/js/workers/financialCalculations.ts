@@ -9,6 +9,7 @@ import {
     WhatIfOverrides,
     CapexStageInput,
     DebtFacilityInput,
+    ReinvestmentProgramInput,
     MonthlyStatementPeriod,
     AnnualStatementPeriod,
     AppraisalMetrics,
@@ -36,30 +37,39 @@ export function calculateDepreciationSchedule(
     stages: CapexStageInput[] = [],
     projectStartDateStr: string = '2026-01-01',
     horizonYears: number = 15,
-    capexMultiplier: number = 1.0
+    capexMultiplier: number = 1.0,
+    reinvestments: ReinvestmentProgramInput[] = [],
+    reinvestmentMultiplier: number = 1.0,
+    reinvestmentsEnabled: boolean = true
 ): {
     monthlyDepreciation: number[];
     monthlyCapex: number[];
+    monthlyReinvestmentCapex: number[];
     annualDepreciation: number[];
     annualCapex: number[];
+    annualReinvestmentCapex: number[];
     totalCapex: number;
+    initialCapex: number;
+    totalReinvestmentCapex: number;
 } {
     const totalMonths = horizonYears * 12;
     const monthlyDepreciation = new Array(totalMonths + 1).fill(0);
     const monthlyCapex = new Array(totalMonths + 1).fill(0);
+    const monthlyReinvestmentCapex = new Array(totalMonths + 1).fill(0);
 
     const projectStart = new Date(projectStartDateStr);
     const startYear = projectStart.getFullYear() || 2026;
     const startMonth = projectStart.getMonth() || 0; // 0-based
 
-    let totalCapex = 0;
+    let initialCapex = 0;
 
+    // 1. Initial Construction CAPEX Stages
     for (const stage of stages) {
         const baseAmount = typeof stage.net_amount === 'string'
             ? parseFloat(stage.net_amount) || 0
             : Number(stage.net_amount) || 0;
         const netAmount = baseAmount * (capexMultiplier > 0 ? capexMultiplier : 1.0);
-        totalCapex += netAmount;
+        initialCapex += netAmount;
 
         const duration = Math.max(1, Math.min(120, parseInt(String(stage.duration_months || 6), 10)));
         const stageStart = stage.start_date ? new Date(stage.start_date) : projectStart;
@@ -104,22 +114,85 @@ export function calculateDepreciationSchedule(
         }
     }
 
+    let totalCapex = initialCapex;
+    let totalReinvestmentCapex = 0;
+
+    // 2. Cyclical Reinvestment Programs (Replacement CAPEX: Nakłady A, B, C)
+    if (reinvestmentsEnabled && reinvestments && reinvestments.length > 0) {
+        for (const prog of reinvestments) {
+            if (prog.enabled === false) continue;
+
+            const baseReinvestAmount = typeof prog.net_amount === 'string'
+                ? parseFloat(prog.net_amount) || 0
+                : Number(prog.net_amount) || 0;
+            const netReinvestAmount = baseReinvestAmount * (reinvestmentMultiplier > 0 ? reinvestmentMultiplier : 1.0);
+            if (netReinvestAmount <= 0) continue;
+
+            // Determine occurrence years
+            let occurrenceYears: number[] = [];
+            if (prog.specific_years && Array.isArray(prog.specific_years) && prog.specific_years.length > 0) {
+                occurrenceYears = prog.specific_years.filter(y => y >= 1 && y <= horizonYears);
+            } else {
+                const firstYr = Math.max(1, Math.min(horizonYears, Number(prog.first_occurrence_year || 5)));
+                const freq = Math.max(1, Math.min(horizonYears, Number(prog.frequency_years || 5)));
+                for (let yr = firstYr; yr <= horizonYears; yr += freq) {
+                    occurrenceYears.push(yr);
+                }
+            }
+
+            const kstCode = prog.kst_code || 'KST_4';
+            const ratePercent = prog.kst_annual_rate !== undefined
+                ? Number(prog.kst_annual_rate)
+                : (KST_RATES[kstCode] !== undefined ? KST_RATES[kstCode] : 10.0);
+            const monthlyRate = (ratePercent / 100.0) / 12.0;
+            const standardMonthlyCharge = netReinvestAmount * monthlyRate;
+
+            for (const yr of occurrenceYears) {
+                // Occurs in month 1 of operating year
+                const m = (yr - 1) * 12 + 1;
+                if (m <= totalMonths) {
+                    monthlyCapex[m] += netReinvestAmount;
+                    monthlyReinvestmentCapex[m] += netReinvestAmount;
+                    totalCapex += netReinvestAmount;
+                    totalReinvestmentCapex += netReinvestAmount;
+
+                    // Asset enters service in month m, depreciation starts month m + 1
+                    if (ratePercent > 0 && m + 1 <= totalMonths) {
+                        let remainingBookValue = netReinvestAmount;
+                        for (let dm = m + 1; dm <= totalMonths; dm++) {
+                            if (remainingBookValue <= 0.0001) break;
+                            const charge = Math.min(standardMonthlyCharge, remainingBookValue);
+                            monthlyDepreciation[dm] += charge;
+                            remainingBookValue -= charge;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     // Aggregate to annual figures (1..horizonYears)
     const annualDepreciation = new Array(horizonYears + 1).fill(0);
     const annualCapex = new Array(horizonYears + 1).fill(0);
+    const annualReinvestmentCapex = new Array(horizonYears + 1).fill(0);
 
     for (let m = 1; m <= totalMonths; m++) {
         const y = Math.ceil(m / 12);
         annualDepreciation[y] += monthlyDepreciation[m];
         annualCapex[y] += monthlyCapex[m];
+        annualReinvestmentCapex[y] += monthlyReinvestmentCapex[m];
     }
 
     return {
         monthlyDepreciation,
         monthlyCapex,
+        monthlyReinvestmentCapex,
         annualDepreciation,
         annualCapex,
-        totalCapex
+        annualReinvestmentCapex,
+        totalCapex,
+        initialCapex,
+        totalReinvestmentCapex
     };
 }
 
@@ -258,6 +331,8 @@ export function calculate15YearStatements(
     monthlyPeriods: MonthlyStatementPeriod[];
     annualPeriods: AnnualStatementPeriod[];
     totalCapex: number;
+    initialCapex: number;
+    totalReinvestmentCapex: number;
     initialDebt: number;
     initialEquity: number;
     depreciationSchedule: ReturnType<typeof calculateDepreciationSchedule>;
@@ -271,19 +346,24 @@ export function calculate15YearStatements(
     const varCostMult = overrides?.variableCostMultiplier ?? 1.0;
     const fixedCostMult = overrides?.fixedCostMultiplier ?? 1.0;
     const payrollMult = overrides?.payrollMultiplier ?? 1.0;
+    const reinvestmentMult = overrides?.reinvestmentMultiplier ?? 1.0;
+    const reinvestmentsEnabled = overrides?.reinvestmentsEnabled ?? true;
 
     // 1. Depreciation schedule
     const depSchedule = calculateDepreciationSchedule(
         project.capex_stages || [],
         project.start_date || '2026-01-01',
         horizonYears,
-        capexMult
+        capexMult,
+        assumptions.reinvestment_programs || [],
+        reinvestmentMult,
+        reinvestmentsEnabled
     );
 
     // 2. Debt schedule
     const debtSchedule = calculateDebtSchedule(
         project.debt_facility,
-        depSchedule.totalCapex,
+        depSchedule.initialCapex,
         horizonYears,
         overrides?.repaymentTypeOverride
     );
@@ -293,7 +373,7 @@ export function calculate15YearStatements(
     const initialEquity2 = Number(project.financing_structure?.investor2_equity || 0);
     const initialEquity = initialEquity1 + initialEquity2 > 0
         ? initialEquity1 + initialEquity2
-        : Math.max(0, depSchedule.totalCapex - debtSchedule.initialPrincipal);
+        : Math.max(0, depSchedule.initialCapex - debtSchedule.initialPrincipal);
 
     // 4. Commercial operation offset
     const projectStartDate = new Date(project.start_date || '2026-01-01');
@@ -570,6 +650,8 @@ export function calculate15YearStatements(
         monthlyPeriods,
         annualPeriods,
         totalCapex: depSchedule.totalCapex,
+        initialCapex: depSchedule.initialCapex,
+        totalReinvestmentCapex: depSchedule.totalReinvestmentCapex,
         initialDebt: debtSchedule.initialPrincipal,
         initialEquity,
         depreciationSchedule: depSchedule,
@@ -860,7 +942,7 @@ export function runSimulation(
     const appraisal = calculateAppraisalMetrics(
         project,
         statements.annualPeriods,
-        statements.totalCapex,
+        statements.initialCapex,
         statements.initialEquity,
         overrides
     );
@@ -875,6 +957,8 @@ export function runSimulation(
     return {
         summary: {
             totalCapex: Math.round(statements.totalCapex),
+            initialCapex: Math.round(statements.initialCapex),
+            totalReinvestmentCapex: Math.round(statements.totalReinvestmentCapex),
             initialDebt: Math.round(statements.initialDebt),
             initialEquity: Math.round(statements.initialEquity),
             totalRevenue15Y: Math.round(totalRevenue15Y),

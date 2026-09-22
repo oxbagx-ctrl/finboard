@@ -160,7 +160,7 @@ describe('InvestmentPlanningView Component', () => {
             expect(screen.getByText('Budowa Centrum Dystrybucyjnego Logistics Hub')).toBeInTheDocument();
         });
 
-        const select = screen.getByRole('combobox');
+        const select = screen.getByTestId('project-selector');
         fireEvent.change(select, { target: { value: 'proj-solar-2' } });
 
         await waitFor(() => {

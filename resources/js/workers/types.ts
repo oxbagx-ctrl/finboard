@@ -58,6 +58,19 @@ export interface HeadcountRoleInput {
     employer_cost_multiplier?: number;
 }
 
+export interface ReinvestmentProgramInput {
+    id?: string;
+    code: 'A' | 'B' | 'C' | string;
+    name: string;
+    net_amount: number | string;
+    frequency_years: number;
+    first_occurrence_year: number;
+    specific_years?: number[];
+    kst_code?: string;
+    kst_annual_rate?: number;
+    enabled: boolean;
+}
+
 export interface OperatingAssumptionsInput {
     annual_revenue_base?: number | string;
     revenue_growth_rate_percent?: number | string;
@@ -68,6 +81,7 @@ export interface OperatingAssumptionsInput {
     payroll_growth_rate_percent?: number | string;
     revenue_lines?: RevenueLineInput[];
     headcount_matrix?: HeadcountRoleInput[];
+    reinvestment_programs?: ReinvestmentProgramInput[];
     capacity_ramp_up?: {
         year1_percent?: number | string;
         year2_percent?: number | string;
@@ -112,6 +126,8 @@ export interface WhatIfOverrides {
     variableCostMultiplier?: number;    // e.g. 1.10 = +10% Variable Costs
     fixedCostMultiplier?: number;       // e.g. 1.05 = +5% Fixed OPEX
     payrollMultiplier?: number;         // e.g. 1.08 = +8% Payroll
+    reinvestmentMultiplier?: number;    // e.g. 1.00 = 100% reinvestment CAPEX
+    reinvestmentsEnabled?: boolean;     // Toggle cyclical reinvestment on/off
     waccOverridePercent?: number | null;// Override WACC rate in %
     exitMultipleOverride?: number | null;// Override EV/EBITDA multiple
     repaymentTypeOverride?: 'annuity' | 'linear' | 'bullet' | null;
@@ -207,6 +223,8 @@ export interface AppraisalMetrics {
 export interface SimulationResult {
     summary: {
         totalCapex: number;
+        initialCapex?: number;
+        totalReinvestmentCapex?: number;
         initialDebt: number;
         initialEquity: number;
         totalRevenue15Y: number;

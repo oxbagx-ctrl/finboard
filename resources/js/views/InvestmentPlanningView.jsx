@@ -23,6 +23,7 @@ import { Badge } from '../components/ui/Badge';
 import { Card, MetricCard } from '../components/ui/Card';
 import { CreateProjectModal } from '../components/investments/CreateProjectModal';
 import { CapexScheduleManager } from '../components/investments/CapexScheduleManager';
+import { ReinvestmentManager } from '../components/investments/ReinvestmentManager';
 import { FinancingStructureConfigurator } from '../components/investments/FinancingStructureConfigurator';
 import { OperatingAssumptionsForm } from '../components/investments/OperatingAssumptionsForm';
 import { SensitivityCockpitView } from '../components/investments/SensitivityCockpitView';
@@ -148,6 +149,8 @@ export const InvestmentPlanningView = () => {
                             <select
                                 value={selectedProjectId || ''}
                                 onChange={(e) => selectProject(e.target.value)}
+                                aria-label="Wybierz projekt"
+                                data-testid="project-selector"
                                 className="bg-transparent text-xs text-zinc-100 font-semibold focus:outline-none cursor-pointer max-w-[200px] truncate"
                             >
                                 {projects.map((p) => (
@@ -285,6 +288,9 @@ export const InvestmentPlanningView = () => {
 
                                 {/* Live CapexScheduleManager Component (Commit 208) */}
                                 <CapexScheduleManager />
+
+                                {/* Live ReinvestmentManager Component (Commit 214) */}
+                                <ReinvestmentManager />
 
                                 {/* Live FinancingStructureConfigurator Component (Commit 209) */}
                                 <FinancingStructureConfigurator />

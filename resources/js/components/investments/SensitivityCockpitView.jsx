@@ -16,7 +16,8 @@ import {
     DollarSign,
     Coins,
     Building2,
-    Clock
+    Clock,
+    RefreshCw
 } from 'lucide-react';
 import {
     ResponsiveContainer,
@@ -35,6 +36,7 @@ import { Badge } from '../ui/Badge';
 import { Card, MetricCard } from '../ui/Card';
 import { CustomChartTooltip } from '../charts/CustomChartTooltip';
 import { getInvestmentWorkerClient } from '../../workers/InvestmentWorkerClient';
+import { ReinvestmentManager } from './ReinvestmentManager';
 
 export const SensitivityCockpitView = () => {
     const { selectedProject } = useInvestmentProject();
@@ -45,6 +47,9 @@ export const SensitivityCockpitView = () => {
     const [varCostDelta, setVarCostDelta] = useState(0);   // -20% .. +30%
     const [fixedCostDelta, setFixedCostDelta] = useState(0); // -20% .. +30%
     const [payrollDelta, setPayrollDelta] = useState(0);   // -15% .. +30%
+    const [reinvestmentDelta, setReinvestmentDelta] = useState(0); // -50% .. +50%
+    const [reinvestmentsEnabled, setReinvestmentsEnabled] = useState(true);
+    const [showReinvestmentDetails, setShowReinvestmentDetails] = useState(false);
     const [waccOverride, setWaccOverride] = useState(null); // null or number (4.0 .. 18.0)
     const [activeScenario, setActiveScenario] = useState('base');
 
@@ -113,6 +118,8 @@ export const SensitivityCockpitView = () => {
             variableCostMultiplier: 1.0 + varCostDelta / 100.0,
             fixedCostMultiplier: 1.0 + fixedCostDelta / 100.0,
             payrollMultiplier: 1.0 + payrollDelta / 100.0,
+            reinvestmentMultiplier: 1.0 + reinvestmentDelta / 100.0,
+            reinvestmentsEnabled: reinvestmentsEnabled,
             waccOverridePercent: waccOverride,
         };
 
@@ -142,6 +149,8 @@ export const SensitivityCockpitView = () => {
         varCostDelta,
         fixedCostDelta,
         payrollDelta,
+        reinvestmentDelta,
+        reinvestmentsEnabled,
         waccOverride,
         workerClient
     ]);
@@ -153,6 +162,8 @@ export const SensitivityCockpitView = () => {
         setVarCostDelta(0);
         setFixedCostDelta(0);
         setPayrollDelta(0);
+        setReinvestmentDelta(0);
+        setReinvestmentsEnabled(true);
         setWaccOverride(null);
         setActiveScenario('base');
     };
@@ -163,6 +174,8 @@ export const SensitivityCockpitView = () => {
         setVarCostDelta(-5);
         setFixedCostDelta(0);
         setPayrollDelta(2);
+        setReinvestmentDelta(-10);
+        setReinvestmentsEnabled(true);
         setWaccOverride(null);
         setActiveScenario('optimistic');
     };
@@ -173,6 +186,8 @@ export const SensitivityCockpitView = () => {
         setVarCostDelta(10);
         setFixedCostDelta(10);
         setPayrollDelta(8);
+        setReinvestmentDelta(25);
+        setReinvestmentsEnabled(true);
         setWaccOverride(null);
         setActiveScenario('pessimistic');
     };
@@ -183,6 +198,8 @@ export const SensitivityCockpitView = () => {
         setVarCostDelta(5);
         setFixedCostDelta(5);
         setPayrollDelta(15);
+        setReinvestmentDelta(5);
+        setReinvestmentsEnabled(true);
         setWaccOverride(null);
         setActiveScenario('wage_shock');
     };
@@ -645,8 +662,66 @@ export const SensitivityCockpitView = () => {
                             <span>16.0%</span>
                         </div>
                     </div>
+
+                    {/* 7. Reinvestment CAPEX (A, B, C) Modifier */}
+                    <div className="space-y-2 p-3 bg-zinc-950 border border-zinc-850 rounded">
+                        <div className="flex items-center justify-between text-xs">
+                            <span className="font-semibold text-zinc-300 uppercase">Reinvestment A, B, C</span>
+                            <span className={`font-mono font-bold ${reinvestmentDelta > 0 ? 'text-rose-400' : reinvestmentDelta < 0 ? 'text-emerald-400' : 'text-zinc-300'}`}>
+                                {reinvestmentsEnabled ? (reinvestmentDelta > 0 ? `+${reinvestmentDelta}%` : `${reinvestmentDelta}%`) : 'WYŁĄCZONY'}
+                            </span>
+                        </div>
+                        <input
+                            type="range"
+                            min="-50"
+                            max="50"
+                            step="5"
+                            value={reinvestmentDelta}
+                            disabled={!reinvestmentsEnabled}
+                            onChange={(e) => {
+                                setReinvestmentDelta(parseInt(e.target.value, 10));
+                                setActiveScenario('custom');
+                            }}
+                            className="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-emerald-500 disabled:opacity-40"
+                        />
+                        <div className="flex items-center justify-between text-[10px] text-zinc-500 font-mono">
+                            <span>-50%</span>
+                            <div className="flex items-center gap-2">
+                                <label className="flex items-center gap-1 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={reinvestmentsEnabled}
+                                        onChange={(e) => {
+                                            setReinvestmentsEnabled(e.target.checked);
+                                            setActiveScenario('custom');
+                                        }}
+                                        className="w-3 h-3 rounded bg-zinc-900 border-zinc-700 text-emerald-500 focus:ring-0"
+                                    />
+                                    <span className="text-[10px] text-zinc-400">Aktywny</span>
+                                </label>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowReinvestmentDetails(prev => !prev)}
+                                    className="text-[10px] text-cyan-400 hover:text-cyan-300 underline font-bold"
+                                >
+                                    {showReinvestmentDetails ? 'Ukryj A, B, C' : 'Konfiguruj A, B, C'}
+                                </button>
+                            </div>
+                            <span>+50%</span>
+                        </div>
+                    </div>
                 </div>
             </div>
+
+            {/* Collapsible Reinvestment Manager */}
+            {showReinvestmentDetails && (
+                <div className="animate-in fade-in duration-200">
+                    <ReinvestmentManager
+                        initialMultiplier={1.0 + reinvestmentDelta / 100.0}
+                        initialEnabled={reinvestmentsEnabled}
+                    />
+                </div>
+            )}
 
             {/* 15-Year Financial Evolution Chart */}
             <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-5">
@@ -768,6 +843,32 @@ export const SensitivityCockpitView = () => {
                                 <td className="py-3 px-4 text-center">
                                     <Badge variant={capexDelta <= 0 ? 'success' : 'danger'}>
                                         {capexDelta <= 0 ? 'W NORMIE' : 'PRZEKROCZENIE'}
+                                    </Badge>
+                                </td>
+                            </tr>
+
+                            {/* 1b. Cyclical Reinvestment CAPEX */}
+                            <tr className="hover:bg-zinc-850/40 transition-colors">
+                                <td className="py-3 px-4 font-semibold text-zinc-300 pl-6 flex items-center gap-1.5">
+                                    <span className="text-zinc-600">↳</span>
+                                    <span>Reinvestment CAPEX (A, B, C)</span>
+                                </td>
+                                <td className="py-3 px-4 text-right text-zinc-400">
+                                    {formatMoney(baseResult?.summary?.totalReinvestmentCapex ?? 0)}
+                                </td>
+                                <td className="py-3 px-4 text-right font-mono font-bold text-zinc-200">
+                                    {formatMoney(whatIfResult?.summary?.totalReinvestmentCapex ?? 0)}
+                                </td>
+                                <td className="py-3 px-4 text-right">
+                                    {baseResult && whatIfResult && (
+                                        <span className={(whatIfResult.summary?.totalReinvestmentCapex ?? 0) <= (baseResult.summary?.totalReinvestmentCapex ?? 0) ? 'text-emerald-400' : 'text-rose-400'}>
+                                            {formatMoney((whatIfResult.summary?.totalReinvestmentCapex ?? 0) - (baseResult.summary?.totalReinvestmentCapex ?? 0))}
+                                        </span>
+                                    )}
+                                </td>
+                                <td className="py-3 px-4 text-center">
+                                    <Badge variant={reinvestmentsEnabled ? 'brand' : 'warning'}>
+                                        {reinvestmentsEnabled ? 'AKTYWNY' : 'WYŁĄCZONY'}
                                     </Badge>
                                 </td>
                             </tr>

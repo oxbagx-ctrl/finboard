@@ -314,4 +314,106 @@ describe('Financial Calculations Engine & Web Worker (Phase 43 Commit 212)', () 
             expect(client1).toBe(client2);
         });
     });
+
+    describe('7. Cyclical Reinvestment CAPEX (Nakłady A, B, C) & KŚT Schedule (Phase 43 Commit 214)', () => {
+        const mockReinvestments = [
+            {
+                id: 'prog-a',
+                program_type: 'program_a',
+                name: 'Nakład A (IT / SCADA)',
+                enabled: true,
+                net_amount: 1500000,
+                frequency_years: 5,
+                first_occurrence_year: 5,
+                kst_code: 'KST_IT',
+                kst_annual_rate: 30.0,
+            },
+            {
+                id: 'prog-b',
+                program_type: 'program_b',
+                name: 'Nakład B (Maszyny)',
+                enabled: true,
+                net_amount: 4000000,
+                frequency_years: 7,
+                first_occurrence_year: 7,
+                kst_code: 'KST_4',
+                kst_annual_rate: 10.0,
+            },
+            {
+                id: 'prog-c',
+                program_type: 'program_c',
+                name: 'Nakład C (Tabor)',
+                enabled: true,
+                net_amount: 2000000,
+                frequency_years: 5,
+                first_occurrence_year: 5,
+                kst_code: 'KST_7',
+                kst_annual_rate: 20.0,
+            }
+        ];
+
+        it('schedules reinvestment capex in specific years and calculates initial vs reinvestment capex', () => {
+            const assumptionsWithReinvest = {
+                ...mockProject.operating_assumptions,
+                reinvestment_programs: mockReinvestments
+            };
+
+            const statements = calculate15YearStatements(mockProject, assumptionsWithReinvest);
+
+            // Initial Capex is 45,000,000 PLN
+            expect(statements.initialCapex).toBe(45000000);
+
+            // In 15 years:
+            // Prog A: Y5, Y10, Y15 = 3 * 1.5M = 4.5M
+            // Prog B: Y7, Y14 = 2 * 4.0M = 8.0M
+            // Prog C: Y5, Y10, Y15 = 3 * 2.0M = 6.0M
+            // Total Reinvestment Capex = 18.5M
+            expect(statements.totalReinvestmentCapex).toBe(18500000);
+            expect(statements.totalCapex).toBe(45000000 + 18500000);
+
+            // Year 5 has Prog A (1.5M) + Prog C (2.0M) = 3.5M
+            expect(statements.annualPeriods[4].capex).toBe(3500000);
+
+            // Year 7 has Prog B (4.0M)
+            expect(statements.annualPeriods[6].capex).toBe(4000000);
+
+            // Year 10 has Prog A (1.5M) + Prog C (2.0M) = 3.5M
+            expect(statements.annualPeriods[9].capex).toBe(3500000);
+        });
+
+        it('capitalizes reinvested assets and increases depreciation in following periods according to KŚT rate', () => {
+            const assumptionsWithout = {
+                ...mockProject.operating_assumptions,
+                reinvestment_programs: []
+            };
+            const assumptionsWith = {
+                ...mockProject.operating_assumptions,
+                reinvestment_programs: mockReinvestments
+            };
+
+            const resWithout = runSimulation(mockProject, assumptionsWithout);
+            const resWith = runSimulation(mockProject, assumptionsWith);
+
+            // In Year 6 (following Year 5 reinvestment of 3.5M PLN), depreciation should be higher
+            const depYear6Without = resWithout.annualPeriods[5].depreciation;
+            const depYear6With = resWith.annualPeriods[5].depreciation;
+
+            expect(depYear6With).toBeGreaterThan(depYear6Without);
+        });
+
+        it('scales reinvestment capex proportionately when reinvestmentMultiplier is applied or disabled', () => {
+            const assumptionsWith = {
+                ...mockProject.operating_assumptions,
+                reinvestment_programs: mockReinvestments
+            };
+
+            const resNormal = runSimulation(mockProject, assumptionsWith);
+            const resScaled = runSimulation(mockProject, assumptionsWith, { reinvestmentMultiplier: 1.20 }); // +20%
+            const resDisabled = runSimulation(mockProject, assumptionsWith, { reinvestmentsEnabled: false });
+
+            expect(resScaled.summary.totalReinvestmentCapex).toBe(Math.round(18500000 * 1.20));
+            expect(resDisabled.summary.totalReinvestmentCapex).toBe(0);
+            expect(resDisabled.summary.totalCapex).toBe(45000000);
+        });
+    });
 });
