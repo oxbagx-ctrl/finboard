@@ -489,7 +489,7 @@ W sytuacji niedostępności skrzynki pocztowej odbiorcy lub awarii serwera SMTP,
   - [x] Inicjalizacja struktury katalogów kontekstu InvestmentProject (warstwy Domain, Application, Infrastructure).
   - [x] Domenowe Value Objects dla budżetu, stóp procentowych, parametrów pożyczek i stawek VAT.
   - [x] Agregat InvestmentProject z encjami CapexStage, FinancingStructure i DebtFacility.
-  - [ ] Migracje bazy danych dla projektów inwestycyjnych, etapów CAPEX, instrumentów dłużnych i dotacji.
+  - [x] Migracje bazy danych dla projektów inwestycyjnych, etapów CAPEX, instrumentów dłużnych i dotacji.
   - [ ] Implementacja InvestmentProjectRepositoryInterface i repozytorium Eloquent z izolacją wielonajemcową.
 - [ ] **Faza 39: Inżynieria Finansowa, Kredyt Inwestycyjny, Kredyt Pomostowy VAT i Dotacje**
   - [ ] Komendy i handlery CQRS dla inicjalizacji projektu oraz zarządzania etapami CAPEX.

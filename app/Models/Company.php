@@ -66,4 +66,14 @@ class Company extends Model
     {
         return $this->hasMany(Invitation::class, 'company_id');
     }
+
+    /**
+     * Investment projects for this company.
+     *
+     * @return HasMany<InvestmentProject>
+     */
+    public function investmentProjects(): HasMany
+    {
+        return $this->hasMany(InvestmentProject::class, 'company_id');
+    }
 }
