@@ -528,7 +528,7 @@ W sytuacji niedostępności skrzynki pocztowej odbiorcy lub awarii serwera SMTP,
   - [x] Komponent BankingCovenantsStrip wyświetlający w czasie rzeczywistym wskaźniki DSCR, ICR i płynności.
   - [x] Testy Vitest hierarchii ThreeStatementGrid, kalkulacji wyceny wyjścia i progów kowenantów bankowych.
 - [ ] **Faza 45: Diagnostyka Organizacyjna, Raporty Definiowane, Dossier PDF i Dokumentacja**
-  - [ ] Komponent InvestmentReadinessScorecard oceniający gotowość formalno-prawną, techniczną i rynkową.
+  - [x] Komponent InvestmentReadinessScorecard oceniający gotowość formalno-prawną, techniczną i rynkową.
   - [ ] Komponent CustomReportBuilder umożliwiający dowolne zestawianie pozycji sprawozdań na osi czasu.
   - [ ] Generator InvestmentDossierPdfGenerator kompilujący 15-letni model, wykresy i pieczęć integralności SHA-256.
   - [ ] Testy end-to-end (E2E) weryfikujące pełny przepływ planowania inwestycji od założeń do dossier PDF.

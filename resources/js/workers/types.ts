@@ -441,6 +441,57 @@ export interface BankingCovenantsResult {
     yearlyMetrics: YearlyCovenantMetric[];
 }
 
+/**
+ * Phase 45 Commit 222: Investment Readiness Scorecard Types
+ */
+export type ReadinessCriterionStatus = 'passed' | 'in_progress' | 'failed' | 'na';
+export type ReadinessPillarKey = 'legal' | 'technical' | 'market' | 'financial';
+export type ReadinessBankabilityStatus = 'bankable' | 'conditional' | 'in_preparation' | 'unbankable';
+
+export interface ReadinessCriterion {
+    id: string;
+    pillar: ReadinessPillarKey;
+    name: string;
+    description: string;
+    weight: number;
+    status: ReadinessCriterionStatus;
+    isConditionPrecedent: boolean;
+    autoKey?: 'has_land_title' | 'has_building_permit' | 'has_grid_connection' | 'has_corporate_approvals' | 'has_detailed_engineering' | 'has_epc_contract' | 'has_om_contract' | 'has_capex_schedule' | 'has_offtake_ppa' | 'has_market_dd' | 'has_feedstock_supply' | 'has_rampup_plan' | 'min_equity_ratio' | 'balance_zero_variance' | 'min_dscr_compliant' | 'dsrf_buffer_compliant';
+    notes?: string;
+}
+
+export interface ReadinessPillarScore {
+    pillar: ReadinessPillarKey;
+    title: string;
+    earnedPoints: number;
+    maxPoints: number;
+    percentage: number;
+    criteriaCount: number;
+    passedCount: number;
+    inProgressCount: number;
+    failedCount: number;
+    naCount: number;
+    status: 'compliant' | 'warning' | 'breach';
+}
+
+export interface InvestmentReadinessResult {
+    overallScore: number; // 0 - 100
+    totalEarnedPoints: number;
+    totalMaxPoints: number;
+    bankabilityStatus: ReadinessBankabilityStatus;
+    statusLabel: string;
+    recommendation: string;
+    pillars: Record<ReadinessPillarKey, ReadinessPillarScore>;
+    criteria: ReadinessCriterion[];
+    conditionsPrecedent: {
+        totalCount: number;
+        passedCount: number;
+        pendingCount: number;
+        items: ReadinessCriterion[];
+    };
+    redFlags: ReadinessCriterion[];
+}
+
 export interface WorkerRequestMessage {
     type: 'CALCULATE_SIMULATION';
     requestId: string | number;

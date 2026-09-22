@@ -31,6 +31,7 @@ import { ThreeStatementGrid } from '../components/investments/ThreeStatementGrid
 import { ExitValuationOverlay } from '../components/investments/ExitValuationOverlay';
 import { ExitWaterfallVisualizer } from '../components/investments/ExitWaterfallVisualizer';
 import { BankingCovenantsStrip } from '../components/investments/BankingCovenantsStrip';
+import { InvestmentReadinessScorecard } from '../components/investments/InvestmentReadinessScorecard';
 
 export const InvestmentPlanningView = () => {
     const { activeCompany } = useAuth();
@@ -318,21 +319,9 @@ export const InvestmentPlanningView = () => {
                         )}
 
                         {activeTab === 'dossier' && (
-                            <Card
-                                title="Scoring Gotowości Inwestycyjnej & Dossier PDF (Faza 45)"
-                                subtitle="Kompleksowy raport dla instytucji finansowych i inwestorów Private Equity"
-                            >
-                                <div className="text-xs text-zinc-400 space-y-3 py-4">
-                                    <p>
-                                        Moduł Fazy 45 umożliwi wygenerowanie instytucjonalnego memorandum inwestycyjnego:
-                                    </p>
-                                    <ul className="list-disc list-inside space-y-1 text-zinc-300 text-[11px]">
-                                        <li>Matryca Investment Readiness Scorecard (kryteria formalno-prawne, techniczne, finansowe)</li>
-                                        <li>Kompilator raportu PDF z wykresami spłat długu, profilami przepływów i pieczęcią SHA-256</li>
-                                        <li>Gotowość do prezentacji w komitetach kredytowych banków i funduszy</li>
-                                    </ul>
-                                </div>
-                            </Card>
+                            <div className="space-y-6">
+                                <InvestmentReadinessScorecard />
+                            </div>
                         )}
                     </div>
                 </>

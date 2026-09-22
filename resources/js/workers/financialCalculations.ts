@@ -21,7 +21,13 @@ import {
     WaterfallInvestorMetrics,
     CovenantThresholds,
     YearlyCovenantMetric,
-    BankingCovenantsResult
+    BankingCovenantsResult,
+    ReadinessCriterionStatus,
+    ReadinessPillarKey,
+    ReadinessBankabilityStatus,
+    ReadinessCriterion,
+    ReadinessPillarScore,
+    InvestmentReadinessResult
 } from './types';
 
 // Standard Polish KŚT Asset Depreciation Rates (% per year)
@@ -1677,3 +1683,478 @@ export function runSimulation(
         covenants
     };
 }
+
+/**
+ * Phase 45 Commit 222: Default Investment Readiness Criteria & Scoring Matrix
+ */
+export const READINESS_PILLARS: Record<ReadinessPillarKey, { key: ReadinessPillarKey; title: string; weight: number }> = {
+    legal: { key: 'legal', title: 'Formalno-Prawny (Legal & Permits)', weight: 25 },
+    technical: { key: 'technical', title: 'Techniczno-Realizacyjny (Engineering & EPC)', weight: 25 },
+    market: { key: 'market', title: 'Rynkowo-Handlowy (Market & Offtake)', weight: 25 },
+    financial: { key: 'financial', title: 'Finansowo-Modelowy (Bankability & Model)', weight: 25 }
+};
+
+export const DEFAULT_READINESS_CRITERIA: ReadinessCriterion[] = [
+    // 1. Legal & Permitting (25 pts)
+    {
+        id: 'leg_land_title',
+        pillar: 'legal',
+        name: 'Tytuł prawny do nieruchomości / gruntów',
+        description: 'Własność, prawo wieczystego użytkowania lub notarialna umowa dzierżawy długoterminowej na min. 25 lat.',
+        weight: 6,
+        status: 'passed',
+        isConditionPrecedent: true,
+        autoKey: 'has_land_title',
+    },
+    {
+        id: 'leg_permits',
+        pillar: 'legal',
+        name: 'Prawomocne Pozwolenie na Budowę & DŚU',
+        description: 'Ostateczna decyzja o środowiskowych uwarunkowaniach (DŚU) oraz prawomocne pozwolenie na budowę (PnB).',
+        weight: 7,
+        status: 'passed',
+        isConditionPrecedent: true,
+        autoKey: 'has_building_permit',
+    },
+    {
+        id: 'leg_grid_connection',
+        pillar: 'legal',
+        name: 'Warunki i umowa przyłączeniowa (WTP / Grid)',
+        description: 'Podpisana umowa o przyłączenie do sieci elektroenergetycznej lub infrastruktury technicznej z zabezpieczoną mocą.',
+        weight: 7,
+        status: 'in_progress',
+        isConditionPrecedent: true,
+        autoKey: 'has_grid_connection',
+    },
+    {
+        id: 'leg_corporate',
+        pillar: 'legal',
+        name: 'Czysta struktura SPV & zgody korporacyjne',
+        description: 'Dedykowana spółka celowa (SPV), komplet uchwał wspólników, pozytywny audyt Due Diligence i brak roszczeń osób trzecich.',
+        weight: 5,
+        status: 'passed',
+        isConditionPrecedent: false,
+        autoKey: 'has_corporate_approvals',
+    },
+
+    // 2. Technical & Engineering (25 pts)
+    {
+        id: 'tech_engineering',
+        pillar: 'technical',
+        name: 'Projekt wykonawczy i specyfikacja (FEED)',
+        description: 'Kompletny projekt budowlano-wykonawczy (Front End Engineering Design) z autoryzacją rzeczoznawców technicznych.',
+        weight: 6,
+        status: 'passed',
+        isConditionPrecedent: false,
+        autoKey: 'has_detailed_engineering',
+    },
+    {
+        id: 'tech_epc_contract',
+        pillar: 'technical',
+        name: 'Kontrakt EPC Turnkey w formule Fixed-Price',
+        description: 'Zryczałtowana umowa z Generalnym Wykonawcą (EPC) w standardzie FIDIC/turnkey z gwarancjami terminowości i karami umownymi.',
+        weight: 7,
+        status: 'in_progress',
+        isConditionPrecedent: true,
+        autoKey: 'has_epc_contract',
+    },
+    {
+        id: 'tech_om_warranty',
+        pillar: 'technical',
+        name: 'Wieloletnia umowa serwisu (O&M) i gwarancje OEM',
+        description: 'Długoterminowa umowa serwisowa (O&M min. 10-15 lat), gwarancje dostępności (Availability SLA >= 97%) i sprawności technologicznej.',
+        weight: 6,
+        status: 'in_progress',
+        isConditionPrecedent: true,
+        autoKey: 'has_om_contract',
+    },
+    {
+        id: 'tech_capex_breakdown',
+        pillar: 'technical',
+        name: 'Dojrzałość harmonogramu CAPEX & KŚT',
+        description: 'Szczegółowy harmonogram etapów budowy powiązany ze stawkami amortyzacji podatkowej KŚT i certyfikacją wydatków.',
+        weight: 6,
+        status: 'passed',
+        isConditionPrecedent: false,
+        autoKey: 'has_capex_schedule',
+    },
+
+    // 3. Market & Commercial (25 pts)
+    {
+        id: 'mkt_offtake_ppa',
+        pillar: 'market',
+        name: 'Kontrakty długoterminowe / PPA / Take-or-Pay',
+        description: 'Zabezpieczenie min. 60-70% prognozowanych przychodów kontraktami długoterminowymi (c-PPA, kontrakty różnicowe, umowy odbioru).',
+        weight: 8,
+        status: 'in_progress',
+        isConditionPrecedent: true,
+        autoKey: 'has_offtake_ppa',
+    },
+    {
+        id: 'mkt_independent_dd',
+        pillar: 'market',
+        name: 'Niezależny audyt rynkowy & prognoza cenowa',
+        description: 'Raport rynkowy renomowanego doradcy (Market Due Diligence) weryfikujący popyt, podaż i prognozy cenowe.',
+        weight: 6,
+        status: 'passed',
+        isConditionPrecedent: false,
+        autoKey: 'has_market_dd',
+    },
+    {
+        id: 'mkt_supply_contracts',
+        pillar: 'market',
+        name: 'Zabezpieczenie łańcucha dostaw / surowców',
+        description: 'Zabezpieczone długoterminowe umowy na dostawę mediów, surowców i kluczowych komponentów operacyjnych.',
+        weight: 6,
+        status: 'passed',
+        isConditionPrecedent: false,
+        autoKey: 'has_feedstock_supply',
+    },
+    {
+        id: 'mkt_rampup_plan',
+        pillar: 'market',
+        name: 'Realistyczny profil dojścia do mocy (Ramp-up)',
+        description: 'Zweryfikowany profil osiągania pełnej zdolności produkcyjnej/operacyjnej (Capacity Ramp-up) w pierwszych latach komercyjnych.',
+        weight: 5,
+        status: 'passed',
+        isConditionPrecedent: false,
+        autoKey: 'has_rampup_plan',
+    },
+
+    // 4. Financial & Bankability (25 pts)
+    {
+        id: 'fin_equity_share',
+        pillar: 'financial',
+        name: 'Wkład własny kapitału (Equity Contribution >= 20%)',
+        description: 'Udział kapitału własnego inwestora / sponsora na poziomie min. 20-30% całkowitych nakładów inwestycyjnych.',
+        weight: 7,
+        status: 'passed',
+        isConditionPrecedent: true,
+        autoKey: 'min_equity_ratio',
+    },
+    {
+        id: 'fin_zero_variance',
+        pillar: 'financial',
+        name: 'Spójność 3-Statement & Bilans Zero Variance',
+        description: 'Dynamiczny model finansowy zintegrowany z RZiS, Bilansem i RPP bez odchyleń tożsamości księgowej we wszystkich 15 latach.',
+        weight: 6,
+        status: 'passed',
+        isConditionPrecedent: false,
+        autoKey: 'balance_zero_variance',
+    },
+    {
+        id: 'fin_dscr_covenant',
+        pillar: 'financial',
+        name: 'Wskaźnik DSCR zgodny z wymogami LMA (min >= 1.20x)',
+        description: 'Wszystkie okresy spłaty kredytu spełniają wymóg minimalnego wskaźnika pokrycia długu (DSCR >= 1.20x, brak naruszeń).',
+        weight: 7,
+        status: 'passed',
+        isConditionPrecedent: true,
+        autoKey: 'min_dscr_compliant',
+    },
+    {
+        id: 'fin_dsrf_buffer',
+        pillar: 'financial',
+        name: 'Rezerwa obsługi długu (DSRF >= 6 miesięcy)',
+        description: 'Zapewniony rachunek rezerwy obsługi długu (DSRF) zabezpieczający min. 6 miesięcy rat kapitałowo-odsetkowych.',
+        weight: 5,
+        status: 'passed',
+        isConditionPrecedent: true,
+        autoKey: 'dsrf_buffer_compliant',
+    },
+];
+
+export const READINESS_PRESETS: Record<string, { label: string; description: string; statusOverrides: Record<string, ReadinessCriterionStatus> }> = {
+    greenfield: {
+        label: 'Wczesny Etap (Greenfield)',
+        description: 'Projekt w fazie wstępnej koncepcji; brak prawomocnych pozwoleń i kontraktów wykonawczych.',
+        statusOverrides: {
+            leg_land_title: 'in_progress',
+            leg_permits: 'failed',
+            leg_grid_connection: 'failed',
+            leg_corporate: 'in_progress',
+            tech_engineering: 'in_progress',
+            tech_epc_contract: 'failed',
+            tech_om_warranty: 'failed',
+            tech_capex_breakdown: 'in_progress',
+            mkt_offtake_ppa: 'failed',
+            mkt_independent_dd: 'in_progress',
+            mkt_supply_contracts: 'failed',
+            mkt_rampup_plan: 'in_progress',
+            fin_equity_share: 'in_progress',
+            fin_zero_variance: 'passed',
+            fin_dscr_covenant: 'failed',
+            fin_dsrf_buffer: 'failed',
+        }
+    },
+    development: {
+        label: 'W Fazie Rozwoju (Development)',
+        description: 'Zabezpieczony grunt, trwają procedury środowiskowe i uzgodnienia techniczne.',
+        statusOverrides: {
+            leg_land_title: 'passed',
+            leg_permits: 'in_progress',
+            leg_grid_connection: 'in_progress',
+            leg_corporate: 'passed',
+            tech_engineering: 'in_progress',
+            tech_epc_contract: 'in_progress',
+            tech_om_warranty: 'in_progress',
+            tech_capex_breakdown: 'passed',
+            mkt_offtake_ppa: 'in_progress',
+            mkt_independent_dd: 'passed',
+            mkt_supply_contracts: 'in_progress',
+            mkt_rampup_plan: 'passed',
+            fin_equity_share: 'passed',
+            fin_zero_variance: 'passed',
+            fin_dscr_covenant: 'in_progress',
+            fin_dsrf_buffer: 'in_progress',
+        }
+    },
+    rtb: {
+        label: 'Gotowy do Budowy (Ready-to-Build)',
+        description: 'Prawomocne PnB, podpisana umowa przyłączeniowa, wynegocjowany kontrakt EPC, wymagane CPs przed drawdown.',
+        statusOverrides: {
+            leg_land_title: 'passed',
+            leg_permits: 'passed',
+            leg_grid_connection: 'passed',
+            leg_corporate: 'passed',
+            tech_engineering: 'passed',
+            tech_epc_contract: 'in_progress',
+            tech_om_warranty: 'in_progress',
+            tech_capex_breakdown: 'passed',
+            mkt_offtake_ppa: 'in_progress',
+            mkt_independent_dd: 'passed',
+            mkt_supply_contracts: 'passed',
+            mkt_rampup_plan: 'passed',
+            fin_equity_share: 'passed',
+            fin_zero_variance: 'passed',
+            fin_dscr_covenant: 'passed',
+            fin_dsrf_buffer: 'passed',
+        }
+    },
+    cod: {
+        label: 'Operacyjny / Oddany (COD)',
+        description: 'Zakończona budowa, obiekt oddany do użytkowania komercyjnego, pełna spłata i historia operacyjna.',
+        statusOverrides: {
+            leg_land_title: 'passed',
+            leg_permits: 'passed',
+            leg_grid_connection: 'passed',
+            leg_corporate: 'passed',
+            tech_engineering: 'passed',
+            tech_epc_contract: 'passed',
+            tech_om_warranty: 'passed',
+            tech_capex_breakdown: 'passed',
+            mkt_offtake_ppa: 'passed',
+            mkt_independent_dd: 'passed',
+            mkt_supply_contracts: 'passed',
+            mkt_rampup_plan: 'passed',
+            fin_equity_share: 'passed',
+            fin_zero_variance: 'passed',
+            fin_dscr_covenant: 'passed',
+            fin_dsrf_buffer: 'passed',
+        }
+    }
+};
+
+/**
+ * Calculate Comprehensive Investment Readiness Score and Pillar Breakdown
+ */
+export function calculateInvestmentReadiness(
+    project?: InvestmentProjectInput | null,
+    simulationResult?: Partial<SimulationResult> | null,
+    customCriteria?: ReadinessCriterion[] | null
+): InvestmentReadinessResult {
+    // 1. Initialize Criteria list
+    let criteria: ReadinessCriterion[];
+    if (customCriteria && customCriteria.length > 0) {
+        criteria = customCriteria.map(c => ({ ...c }));
+    } else {
+        criteria = DEFAULT_READINESS_CRITERIA.map(c => ({ ...c }));
+    }
+
+    // 2. Automated evaluation of model-derived criteria if project / simulation data present (when using defaults)
+    if (project && (!customCriteria || customCriteria.length === 0)) {
+        criteria = criteria.map(criterion => {
+            if (!criterion.autoKey) return criterion;
+
+            const updated = { ...criterion };
+
+            switch (criterion.autoKey) {
+                case 'has_capex_schedule': {
+                    const hasStages = Array.isArray(project.capex_stages) && project.capex_stages.length > 0;
+                    if (hasStages && updated.status !== 'in_progress') {
+                        updated.status = 'passed';
+                    }
+                    break;
+                }
+                case 'min_equity_ratio': {
+                    const totalCapex = (project.capex_stages || []).reduce((sum, s) => sum + (Number(s.net_amount) || 0), 0);
+                    const equity = (Number(project.financing_structure?.investor1_equity) || 0) +
+                                   (Number(project.financing_structure?.investor2_equity) || 0) +
+                                   (Number(project.financing_structure?.grant_amount) || 0);
+                    if (totalCapex > 0) {
+                        const ratio = equity / totalCapex;
+                        if (ratio >= 0.20) {
+                            updated.status = 'passed';
+                        } else if (ratio >= 0.10) {
+                            updated.status = 'in_progress';
+                        } else {
+                            updated.status = 'failed';
+                        }
+                    }
+                    break;
+                }
+                case 'balance_zero_variance': {
+                    if (simulationResult?.annualPeriods && simulationResult.annualPeriods.length > 0) {
+                        const hasVariance = simulationResult.annualPeriods.some(p => {
+                            const assets = (p.closingNetPpe ?? 0) + (p.closingCash ?? 0) + (p.closingReceivables ?? 0) + (p.closingInventory ?? 0);
+                            const totalEquity = (simulationResult.summary?.initialEquity ?? 0) + (p.cumulativeNetIncome ?? 0);
+                            const liabilitiesAndEq = totalEquity + (p.closingDebt ?? 0) + (p.closingPayables ?? 0);
+                            return Math.abs(assets - liabilitiesAndEq) > 1.0;
+                        });
+                        updated.status = hasVariance ? 'failed' : 'passed';
+                    }
+                    break;
+                }
+                case 'min_dscr_compliant': {
+                    const covenants = simulationResult?.covenants?.summary;
+                    if (covenants) {
+                        if (covenants.minDscr !== null && covenants.minDscr >= 1.20 && covenants.totalBreachesCount === 0) {
+                            updated.status = 'passed';
+                        } else if (covenants.minDscr !== null && covenants.minDscr >= 1.05) {
+                            updated.status = 'in_progress';
+                        } else if (covenants.minDscr !== null && covenants.minDscr < 1.05) {
+                            updated.status = 'failed';
+                        }
+                    }
+                    break;
+                }
+                case 'dsrf_buffer_compliant': {
+                    const covenants = simulationResult?.covenants?.summary;
+                    if (covenants && covenants.minDsrfMonths !== null) {
+                        if (covenants.minDsrfMonths >= 6) {
+                            updated.status = 'passed';
+                        } else if (covenants.minDsrfMonths >= 3) {
+                            updated.status = 'in_progress';
+                        } else {
+                            updated.status = 'failed';
+                        }
+                    }
+                    break;
+                }
+                default:
+                    break;
+            }
+
+            return updated;
+        });
+    }
+
+    // 3. Compute Pillar scores
+    const pillarKeys: ReadinessPillarKey[] = ['legal', 'technical', 'market', 'financial'];
+    const pillars: Record<ReadinessPillarKey, ReadinessPillarScore> = {} as any;
+
+    let totalEarnedPoints = 0;
+    let totalMaxPoints = 0;
+
+    pillarKeys.forEach(pKey => {
+        const pillarDef = READINESS_PILLARS[pKey];
+        const pillarCriteria = criteria.filter(c => c.pillar === pKey);
+
+        let earned = 0;
+        let max = 0;
+        let passed = 0;
+        let inProg = 0;
+        let failed = 0;
+        let na = 0;
+
+        pillarCriteria.forEach(c => {
+            if (c.status === 'na') {
+                na++;
+                return;
+            }
+
+            max += c.weight;
+            if (c.status === 'passed') {
+                earned += c.weight;
+                passed++;
+            } else if (c.status === 'in_progress') {
+                earned += c.weight * 0.5;
+                inProg++;
+            } else {
+                failed++;
+            }
+        });
+
+        const pct = max > 0 ? Math.round((earned / max) * 100) : 100;
+        const status = pct >= 80 ? 'compliant' : (pct >= 50 ? 'warning' : 'breach');
+
+        pillars[pKey] = {
+            pillar: pKey,
+            title: pillarDef.title,
+            earnedPoints: Math.round(earned * 10) / 10,
+            maxPoints: max,
+            percentage: pct,
+            criteriaCount: pillarCriteria.length,
+            passedCount: passed,
+            inProgressCount: inProg,
+            failedCount: failed,
+            naCount: na,
+            status
+        };
+
+        totalEarnedPoints += earned;
+        totalMaxPoints += max;
+    });
+
+    const overallScore = totalMaxPoints > 0 ? Math.round((totalEarnedPoints / totalMaxPoints) * 100) : 0;
+
+    // 4. Conditions Precedent (CPs)
+    const cpCriteria = criteria.filter(c => c.isConditionPrecedent);
+    const cpPassed = cpCriteria.filter(c => c.status === 'passed').length;
+    const cpPending = cpCriteria.filter(c => c.status === 'in_progress' || c.status === 'failed').length;
+
+    // 5. Red Flags: Critical issues (failed criteria with high weight >= 6 or CP)
+    const redFlags = criteria.filter(c => c.status === 'failed' && (c.weight >= 6 || c.isConditionPrecedent));
+
+    // 6. Classification & Recommendation
+    let bankabilityStatus: ReadinessBankabilityStatus;
+    let statusLabel: string;
+    let recommendation: string;
+
+    if (overallScore >= 85 && redFlags.length === 0) {
+        bankabilityStatus = 'bankable';
+        statusLabel = 'PROJEKT BANKOWALNY / GOTOWY DO INWESTYCJI';
+        recommendation = `Projekt spełnia rygorystyczne kryteria bankowalności LMA oraz wymogi komitetów kredytowych. Dokumentacja techniczna i model finansowy wykazują pełną dojrzałość. Wymagane finalne spełnienie ${cpPending} warunków zawieszających (CP) przed wypłatą kredytu.`;
+    } else if (overallScore >= 65) {
+        bankabilityStatus = 'conditional';
+        statusLabel = 'WARUNKOWO GOTOWY (WYMAGANE CP)';
+        recommendation = `Projekt posiada mocne fundamenty strukturalne i rentowność, lecz wymaga formalnego zamknięcia ${cpPending} warunków zawieszających (CP) oraz uzupełnienia ${redFlags.length} kluczowych pozycji przed podjęciem ostatecznej decyzji kredytowej.`;
+    } else if (overallScore >= 45) {
+        bankabilityStatus = 'in_preparation';
+        statusLabel = 'W FAZIE PRZYGOTOWAWCZEJ (UNDERWRITING)';
+        recommendation = `Projekt znajduje się w trakcie developmentu. Zidentyfikowano ${redFlags.length} istotnych braków w dokumentacji lub umowach przyłączeniowych/odbioru. Wymagane dalsze prace przygotowawcze przed przedłożeniem bankom.`;
+    } else {
+        bankabilityStatus = 'unbankable';
+        statusLabel = 'NIEBANKOWALNY / BRAKI KRYTYCZNE';
+        recommendation = `Projekt obarczony jest wysokim ryzykiem strukturalnym (${redFlags.length} czerwonych flag blokujących pozyskanie długu). Wymagana głęboka restrukturyzacja założeń techniczno-finansowych i zabezpieczenie kluczowych pozwoleń.`;
+    }
+
+    return {
+        overallScore,
+        totalEarnedPoints: Math.round(totalEarnedPoints * 10) / 10,
+        totalMaxPoints,
+        bankabilityStatus,
+        statusLabel,
+        recommendation,
+        pillars,
+        criteria,
+        conditionsPrecedent: {
+            totalCount: cpCriteria.length,
+            passedCount: cpPassed,
+            pendingCount: cpPending,
+            items: cpCriteria
+        },
+        redFlags
+    };
+}
+
