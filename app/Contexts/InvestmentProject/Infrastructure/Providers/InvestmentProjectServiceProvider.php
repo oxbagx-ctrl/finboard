@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Contexts\InvestmentProject\Infrastructure\Providers;
 
 use App\Contexts\InvestmentProject\Domain\Repositories\InvestmentProjectRepositoryInterface;
+use App\Contexts\InvestmentProject\Domain\Services\BalanceSheetService;
+use App\Contexts\InvestmentProject\Domain\Services\CashFlowService;
 use App\Contexts\InvestmentProject\Domain\Services\DebtAmortizationService;
 use App\Contexts\InvestmentProject\Domain\Services\DepreciationScheduleService;
 use App\Contexts\InvestmentProject\Domain\Services\GrantAllocationService;
@@ -33,6 +35,15 @@ final class InvestmentProjectServiceProvider extends ServiceProvider
             $app->make(DepreciationScheduleService::class),
             $app->make(DebtAmortizationService::class),
             $app->make(VatBridgeLoanService::class)
+        ));
+        $this->app->singleton(CashFlowService::class, fn () => new CashFlowService());
+        $this->app->singleton(BalanceSheetService::class, fn ($app) => new BalanceSheetService(
+            $app->make(CashFlowService::class),
+            $app->make(IncomeStatementService::class),
+            $app->make(DepreciationScheduleService::class),
+            $app->make(DebtAmortizationService::class),
+            $app->make(VatBridgeLoanService::class),
+            $app->make(GrantAllocationService::class)
         ));
     }
 

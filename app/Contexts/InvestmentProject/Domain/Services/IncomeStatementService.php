@@ -131,6 +131,9 @@ final class IncomeStatementService
                 : Money::zero($currency);
 
             $monthInterestExpense = $debtInterest->add($vatInterest);
+            if ($m === 1 && $amortSchedule->upfrontFee()->isPositive()) {
+                $monthInterestExpense = $monthInterestExpense->add($amortSchedule->upfrontFee());
+            }
             $monthEbt = $monthEbit->subtract($monthInterestExpense);
 
             // 4. CIT & Tax Loss Carry-Forward
