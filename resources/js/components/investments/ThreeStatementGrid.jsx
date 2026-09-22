@@ -361,7 +361,7 @@ export const ThreeStatementGrid = ({
     }
 
     return (
-        <div className={`space-y-4 font-mono ${className}`}>
+        <div data-testid="three-statement-grid" className={`space-y-4 font-mono ${className}`}>
             {/* Top Toolbar: Statement Type Tabs, Granularity, Scale & Actions */}
             <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3 sm:p-4 shadow-sm flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
                 {/* Statement Type Segmented Control */}

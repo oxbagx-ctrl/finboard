@@ -230,7 +230,7 @@ export function BankingCovenantsStrip({
     };
 
     return (
-        <div className={`bg-zinc-900/90 border border-zinc-800 rounded-xl overflow-hidden shadow-xl ${className}`}>
+        <div data-testid="banking-covenants-strip" className={`bg-zinc-900/90 border border-zinc-800 rounded-xl overflow-hidden shadow-xl ${className}`}>
             {/* Header Strip Bar */}
             <div className="p-4 bg-zinc-950/60 border-b border-zinc-800 flex flex-wrap items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
