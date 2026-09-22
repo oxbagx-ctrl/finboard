@@ -199,11 +199,16 @@ final class InvestmentAppraisalController
     {
         $currency = $project->financingStructure()->totalEquity()->currency();
 
-        if (empty($data['annual_revenue_base']) || (float) $data['annual_revenue_base'] <= 0) {
+        $eloquent = \App\Models\InvestmentProject::query()->find($project->id());
+        $stored = $eloquent?->operating_assumptions ?? [];
+
+        $merged = array_merge($stored, array_filter($data, fn ($v) => $v !== null));
+
+        if (empty($merged['annual_revenue_base']) || (float) $merged['annual_revenue_base'] <= 0) {
             $capexTotal = (float) $project->budget()->netCapex()->amount();
-            $data['annual_revenue_base'] = $capexTotal > 0 ? (string) ($capexTotal * 0.5) : '1000000.0000';
+            $merged['annual_revenue_base'] = $capexTotal > 0 ? (string) ($capexTotal * 0.5) : '1000000.0000';
         }
 
-        return OperatingAssumptions::fromArray($data, $currency);
+        return OperatingAssumptions::fromArray($merged, $currency);
     }
 }

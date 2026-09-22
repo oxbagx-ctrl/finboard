@@ -59,7 +59,7 @@ final class InvestmentProjectDatabaseMigrationTest extends TestCase
         $this->assertTrue(Schema::hasTable('investment_projects'));
         $this->assertTrue(Schema::hasColumns('investment_projects', [
             'id', 'company_id', 'name', 'description', 'status', 'currency',
-            'commercial_operation_date', 'created_by', 'created_at', 'updated_at',
+            'commercial_operation_date', 'operating_assumptions', 'created_by', 'created_at', 'updated_at',
         ]));
 
         $this->assertTrue(Schema::hasTable('investment_capex_stages'));

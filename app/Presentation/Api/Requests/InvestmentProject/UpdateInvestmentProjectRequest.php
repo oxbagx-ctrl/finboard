@@ -37,6 +37,23 @@ final class UpdateInvestmentProjectRequest extends FormRequest
             'upfront_fee_rate' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'facility_name' => ['nullable', 'string', 'max:255'],
             'base_rate_type' => ['nullable', 'string', 'max:32'],
+            'operating_assumptions' => ['nullable', 'array'],
+            'operating_assumptions.annual_revenue_base' => ['nullable', 'numeric', 'min:0'],
+            'operating_assumptions.revenue_growth_rate_percent' => ['nullable', 'numeric'],
+            'operating_assumptions.variable_cost_percent' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'operating_assumptions.annual_fixed_costs_base' => ['nullable', 'numeric', 'min:0'],
+            'operating_assumptions.fixed_cost_growth_rate_percent' => ['nullable', 'numeric'],
+            'operating_assumptions.annual_payroll_base' => ['nullable', 'numeric', 'min:0'],
+            'operating_assumptions.payroll_growth_rate_percent' => ['nullable', 'numeric'],
+            'operating_assumptions.revenue_lines' => ['nullable', 'array'],
+            'operating_assumptions.headcount_matrix' => ['nullable', 'array'],
+            'operating_assumptions.capacity_ramp_up' => ['nullable', 'array'],
+            'operating_assumptions.cit_rate_percent' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'operating_assumptions.tax_loss_carry_forward_enabled' => ['nullable', 'boolean'],
+            'operating_assumptions.tax_loss_offset_cap_percent' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'operating_assumptions.dso' => ['nullable', 'integer', 'min:0', 'max:365'],
+            'operating_assumptions.dpo' => ['nullable', 'integer', 'min:0', 'max:365'],
+            'operating_assumptions.dio' => ['nullable', 'integer', 'min:0', 'max:365'],
         ];
     }
 }

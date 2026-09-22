@@ -448,6 +448,47 @@ final class InvestmentValuationApiTest extends TestCase
         $updateResponse->assertJsonPath('data.debt_facilities.0.upfront_fee_percent', 1.5);
     }
 
+    public function test_can_update_and_persist_operating_assumptions(): void
+    {
+        Sanctum::actingAs($this->clientA);
+        $projectId = $this->createStandardProject('Projekt z Założeniami Operacyjnymi');
+
+        $updateResponse = $this->putJson("/api/v1/investment-projects/{$projectId}", [
+            'operating_assumptions' => [
+                'annual_revenue_base' => 12500000.0,
+                'revenue_growth_rate_percent' => 3.5,
+                'variable_cost_percent' => 32.0,
+                'annual_fixed_costs_base' => 650000.0,
+                'fixed_cost_growth_rate_percent' => 2.5,
+                'annual_payroll_base' => 1200000.0,
+                'payroll_growth_rate_percent' => 4.0,
+                'dso' => 45,
+                'dpo' => 60,
+                'dio' => 15,
+                'cit_rate_percent' => 19.0,
+                'capacity_ramp_up' => [
+                    '1' => 70.0,
+                    '2' => 90.0,
+                    '3' => 100.0,
+                ],
+                'revenue_lines' => [
+                    ['name' => 'Sprzedaż energii elektrycznej', 'unit' => 'MWh', 'volume' => 25000, 'price' => 500, 'total' => 12500000],
+                ],
+            ],
+        ]);
+
+        $updateResponse->assertStatus(200);
+        $updateResponse->assertJsonPath('data.operating_assumptions.annual_revenue_base', 12500000);
+        $updateResponse->assertJsonPath('data.operating_assumptions.variable_cost_percent', 32);
+        $updateResponse->assertJsonPath('data.operating_assumptions.dso', 45);
+
+        // Verify that statement calculation uses these persisted operating assumptions
+        $incomeResponse = $this->getJson("/api/v1/investment-projects/{$projectId}/statements/income-statement");
+        $incomeResponse->assertStatus(200);
+        $incomeResponse->assertJsonPath('data.assumptions.annual_revenue_base', '12500000.0000');
+        $incomeResponse->assertJsonPath('data.assumptions.variable_cost_percent', 32);
+    }
+
     private function createStandardProject(string $name): string
     {
         $response = $this->postJson('/api/v1/investment-projects', [

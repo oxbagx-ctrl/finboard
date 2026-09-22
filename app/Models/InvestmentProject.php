@@ -30,10 +30,12 @@ final class InvestmentProject extends Model
         'currency',
         'commercial_operation_date',
         'created_by',
+        'operating_assumptions',
     ];
 
     protected $casts = [
         'commercial_operation_date' => 'date:Y-m-d',
+        'operating_assumptions' => 'array',
     ];
 
     /**

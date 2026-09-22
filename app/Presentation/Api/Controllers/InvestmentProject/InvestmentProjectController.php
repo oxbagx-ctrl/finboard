@@ -238,6 +238,13 @@ final class InvestmentProjectController
             }
         }
 
+        // Update operating assumptions
+        if (isset($validated['operating_assumptions'])) {
+            $existing = $projectModel->operating_assumptions ?? [];
+            $projectModel->operating_assumptions = array_merge($existing, $validated['operating_assumptions']);
+            $projectModel->save();
+        }
+
         $projectModel->load(['capexStages', 'financingStructure', 'debtFacilities']);
 
         return new JsonResponse([

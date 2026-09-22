@@ -513,7 +513,7 @@ W sytuacji niedostępności skrzynki pocztowej odbiorcy lub awarii serwera SMTP,
   - [x] Konfiguracja routingu, nawigacji i layoutu dla modułu Planowania Inwestycji w interfejsie FinBoard.
   - [x] Komponent CapexScheduleManager z podziałem na etapy, walidacją dat i przypisaniem stawek KŚT.
   - [x] Komponent FinancingStructureConfigurator z suwakami wkładu własnego, kredytem, pożyczką VAT i dotacjami.
-  - [ ] Komponent OperatingAssumptionsForm z liniami przychodów, driverami OPEX, cyklem NWC i matrycą etatów.
+  - [x] Komponent OperatingAssumptionsForm z liniami przychodów, driverami OPEX, cyklem NWC i matrycą etatów.
   - [ ] Testy komponentowe Vitest sprawdzające walidację stanu CapexScheduleManager i konfiguratora finansowania.
 - [ ] **Faza 43: Reaktywny Silnik w Przeglądarce i Cockpit Analizy Wrażliwości Real-Time**
   - [ ] Implementacja Web Workera investmentCalculationWorker w TypeScript dla 15-letnich symulacji w tle.
