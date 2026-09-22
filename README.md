@@ -530,7 +530,7 @@ W sytuacji niedostępności skrzynki pocztowej odbiorcy lub awarii serwera SMTP,
 - [ ] **Faza 45: Diagnostyka Organizacyjna, Raporty Definiowane, Dossier PDF i Dokumentacja**
   - [x] Komponent InvestmentReadinessScorecard oceniający gotowość formalno-prawną, techniczną i rynkową.
   - [x] Komponent CustomReportBuilder umożliwiający dowolne zestawianie pozycji sprawozdań na osi czasu.
-  - [ ] Generator InvestmentDossierPdfGenerator kompilujący 15-letni model, wykresy i pieczęć integralności SHA-256.
+  - [x] Generator InvestmentDossierPdfGenerator kompilujący 15-letni model, wykresy i pieczęć integralności SHA-256.
   - [ ] Testy end-to-end (E2E) weryfikujące pełny przepływ planowania inwestycji od założeń do dossier PDF.
   - [ ] Aktualizacja changelogu i README.md z pełną dokumentacją modułu Project Finance & Investment Valuation.
 
