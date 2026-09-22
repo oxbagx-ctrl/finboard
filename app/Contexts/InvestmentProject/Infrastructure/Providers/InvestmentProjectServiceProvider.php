@@ -13,6 +13,7 @@ use App\Contexts\InvestmentProject\Domain\Services\GrantAllocationService;
 use App\Contexts\InvestmentProject\Domain\Services\IncomeStatementService;
 use App\Contexts\InvestmentProject\Domain\Services\LiquidityBalancingService;
 use App\Contexts\InvestmentProject\Domain\Services\VatBridgeLoanService;
+use App\Contexts\InvestmentProject\Domain\Services\WaccCalculatorService;
 use App\Contexts\InvestmentProject\Infrastructure\Repositories\EloquentInvestmentProjectRepository;
 use Illuminate\Support\ServiceProvider;
 
@@ -47,6 +48,7 @@ final class InvestmentProjectServiceProvider extends ServiceProvider
             $app->make(GrantAllocationService::class)
         ));
         $this->app->singleton(LiquidityBalancingService::class, fn () => new LiquidityBalancingService());
+        $this->app->singleton(WaccCalculatorService::class, fn () => new WaccCalculatorService());
     }
 
     /**
