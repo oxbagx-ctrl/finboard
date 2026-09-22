@@ -488,7 +488,7 @@ W sytuacji niedostępności skrzynki pocztowej odbiorcy lub awarii serwera SMTP,
 - [ ] **Faza 38: Fundamenty Domenowe Kontekstu InvestmentProject i Schematy Bazy Danych**
   - [x] Inicjalizacja struktury katalogów kontekstu InvestmentProject (warstwy Domain, Application, Infrastructure).
   - [x] Domenowe Value Objects dla budżetu, stóp procentowych, parametrów pożyczek i stawek VAT.
-  - [ ] Agregat InvestmentProject z encjami CapexStage, FinancingStructure i DebtFacility.
+  - [x] Agregat InvestmentProject z encjami CapexStage, FinancingStructure i DebtFacility.
   - [ ] Migracje bazy danych dla projektów inwestycyjnych, etapów CAPEX, instrumentów dłużnych i dotacji.
   - [ ] Implementacja InvestmentProjectRepositoryInterface i repozytorium Eloquent z izolacją wielonajemcową.
 - [ ] **Faza 39: Inżynieria Finansowa, Kredyt Inwestycyjny, Kredyt Pomostowy VAT i Dotacje**
