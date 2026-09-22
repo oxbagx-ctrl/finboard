@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Contexts\InvestmentProject\Infrastructure\Providers;
 
 use App\Contexts\InvestmentProject\Domain\Repositories\InvestmentProjectRepositoryInterface;
+use App\Contexts\InvestmentProject\Domain\Services\DebtAmortizationService;
 use App\Contexts\InvestmentProject\Infrastructure\Repositories\EloquentInvestmentProjectRepository;
 use Illuminate\Support\ServiceProvider;
 
@@ -19,6 +20,8 @@ final class InvestmentProjectServiceProvider extends ServiceProvider
             InvestmentProjectRepositoryInterface::class,
             EloquentInvestmentProjectRepository::class
         );
+
+        $this->app->singleton(DebtAmortizationService::class, fn () => new DebtAmortizationService());
     }
 
     /**

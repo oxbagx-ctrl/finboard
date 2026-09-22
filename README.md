@@ -486,14 +486,14 @@ W sytuacji niedostępności skrzynki pocztowej odbiorcy lub awarii serwera SMTP,
   - Aktualizacja changelogu z architekturą doręczania poczty, restrykcjami portu 25 i wytycznymi SMTP.
   - Aktualizacja dokumentacji `README.md` opisującej produkcyjną konfigurację i diagnostykę poczty.
 - [x] **Faza 38: Fundamenty Domenowe Kontekstu InvestmentProject i Schematy Bazy Danych**
-  - [x] Inicjalizacja struktury katalogów kontekstu InvestmentProject (warstwy Domain, Application, Infrastructure).
-  - [x] Domenowe Value Objects dla budżetu, stóp procentowych, parametrów pożyczek i stawek VAT.
-  - [x] Agregat InvestmentProject z encjami CapexStage, FinancingStructure i DebtFacility.
-  - [x] Migracje bazy danych dla projektów inwestycyjnych, etapów CAPEX, instrumentów dłużnych i dotacji.
-  - [x] Implementacja InvestmentProjectRepositoryInterface i repozytorium Eloquent z izolacją wielonajemcową.
+  - Inicjalizacja struktury katalogów kontekstu InvestmentProject (warstwy Domain, Application, Infrastructure).
+  - Domenowe Value Objects dla budżetu, stóp procentowych, parametrów pożyczek i stawek VAT.
+  - Agregat InvestmentProject z encjami CapexStage, FinancingStructure i DebtFacility.
+  - Migracje bazy danych dla projektów inwestycyjnych, etapów CAPEX, instrumentów dłużnych i dotacji.
+  - Implementacja InvestmentProjectRepositoryInterface i repozytorium Eloquent z izolacją wielonajemcową.
 - [ ] **Faza 39: Inżynieria Finansowa, Kredyt Inwestycyjny, Kredyt Pomostowy VAT i Dotacje**
   - [x] Komendy i handlery CQRS dla inicjalizacji projektu oraz zarządzania etapami CAPEX.
-  - [ ] Serwis DebtAmortizationService obsługujący raty równe vs malejące z WIBOR, marżą i prowizjami.
+  - [x] Serwis DebtAmortizationService obsługujący raty równe vs malejące z WIBOR, marżą i prowizjami.
   - [ ] Serwis VatBridgeLoanService modelujący finansowanie VAT od nakładów budowlanych i zwroty z US.
   - [ ] Serwis GrantAllocationService obliczający koszty kwalifikowane, dofinansowanie i transze refundacji.
   - [ ] Testy jednostkowe i integracyjne weryfikujące krzywe amortyzacji długu, obrót kredytu VAT i reguły dotacji.
