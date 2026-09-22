@@ -180,6 +180,55 @@ final class OperatingAssumptions implements ValueObject
     }
 
     /**
+     * @param array<string, mixed> $data
+     */
+    public static function fromArray(array $data, ?Currency $fallbackCurrency = null): self
+    {
+        $currencyCode = $data['currency'] ?? ($fallbackCurrency ? $fallbackCurrency->value : 'PLN');
+        $currency = Currency::tryFrom((string) $currencyCode) ?? Currency::PLN;
+
+        $revenue = (string) ($data['annual_revenue_base'] ?? '0.0000');
+        $fixedCosts = (string) ($data['annual_fixed_costs_base'] ?? '0.0000');
+        $payroll = (string) ($data['annual_payroll_base'] ?? '0.0000');
+
+        $rampUp = $data['capacity_ramp_up'] ?? [1 => 60.0, 2 => 85.0, 3 => 100.0];
+        if (is_array($rampUp)) {
+            $formattedRampUp = [];
+            foreach ($rampUp as $year => $rate) {
+                $formattedRampUp[(int) $year] = (float) $rate;
+            }
+            $rampUp = $formattedRampUp;
+        } else {
+            $rampUp = [];
+        }
+
+        $annualRevenueBase = Money::fromDecimal($revenue, $currency);
+        $revenueGrowthRatePercent = (float) ($data['revenue_growth_rate_percent'] ?? 2.5);
+        $variableCostPercent = (float) ($data['variable_cost_percent'] ?? 40.0);
+        $annualFixedCostsBase = Money::fromDecimal($fixedCosts, $currency);
+        $fixedCostGrowthRatePercent = (float) ($data['fixed_cost_growth_rate_percent'] ?? 2.5);
+        $annualPayrollBase = Money::fromDecimal($payroll, $currency);
+        $payrollGrowthRatePercent = (float) ($data['payroll_growth_rate_percent'] ?? 3.0);
+        $citRatePercent = (float) ($data['cit_rate_percent'] ?? 19.0);
+        $taxLossCarryForwardEnabled = (bool) ($data['tax_loss_carry_forward_enabled'] ?? true);
+        $taxLossOffsetCapPercent = (float) ($data['tax_loss_offset_cap_percent'] ?? 50.0);
+
+        return new self(
+            $annualRevenueBase,
+            $revenueGrowthRatePercent,
+            $variableCostPercent,
+            $annualFixedCostsBase,
+            $fixedCostGrowthRatePercent,
+            $annualPayrollBase,
+            $payrollGrowthRatePercent,
+            $rampUp,
+            $citRatePercent,
+            $taxLossCarryForwardEnabled,
+            $taxLossOffsetCapPercent
+        );
+    }
+
+    /**
      * @return array<string, mixed>
      */
     public function toArray(): array
@@ -200,3 +249,4 @@ final class OperatingAssumptions implements ValueObject
         ];
     }
 }
+

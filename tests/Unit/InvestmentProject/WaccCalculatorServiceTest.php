@@ -308,4 +308,27 @@ final class WaccCalculatorServiceTest extends TestCase
         $this->assertIsArray($schedule->toArray());
         $this->assertTrue($schedule->equals($schedule));
     }
+
+    public function test_wacc_calculation_with_cost_of_equity_override(): void
+    {
+        $params = new WaccParameters(
+            riskFreeRatePercent: 5.25,
+            equityRiskPremiumPercent: 5.50,
+            beta: 1.00,
+            sizeRiskPremiumPercent: 1.50,
+            preTaxCostOfDebtPercent: 8.00,
+            costOfEquityOverridePercent: 14.50
+        );
+
+        $this->assertEquals(14.50, $params->costOfEquityPercent());
+        $this->assertEquals(14.50, $params->costOfEquityOverridePercent());
+
+        $equity = Money::fromDecimal('500000.0000', Currency::PLN);
+        $debt = Money::fromDecimal('500000.0000', Currency::PLN);
+
+        $wacc = $this->service->calculateStaticWacc($params, $equity, $debt);
+        $this->assertEquals(14.50, $wacc->costOfEquityPercent());
+        // WACC = 0.5 * 14.50% + 0.5 * (8.00% * 0.81) = 7.25% + 3.24% = 10.49%
+        $this->assertEquals(10.49, $wacc->nominalWaccPercent());
+    }
 }

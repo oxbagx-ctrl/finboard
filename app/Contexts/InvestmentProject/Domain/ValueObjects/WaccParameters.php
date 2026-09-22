@@ -17,7 +17,8 @@ final class WaccParameters implements ValueObject
         private readonly ?float $preTaxCostOfDebtPercent = null,
         private readonly float $taxRatePercent = 19.0,
         private readonly float $inflationRatePercent = 2.50,
-        private readonly ?float $unleveredBeta = null
+        private readonly ?float $unleveredBeta = null,
+        private readonly ?float $costOfEquityOverridePercent = null
     ) {
         if ($this->riskFreeRatePercent < 0.0 || $this->riskFreeRatePercent > 50.0) {
             throw new InvalidArgumentException(
@@ -64,6 +65,12 @@ final class WaccParameters implements ValueObject
         if ($this->unleveredBeta !== null && ($this->unleveredBeta <= 0.0 || $this->unleveredBeta > 5.0)) {
             throw new InvalidArgumentException(
                 sprintf('Unlevered beta must be positive and at most 5.0, %.2f given.', $this->unleveredBeta)
+            );
+        }
+
+        if ($this->costOfEquityOverridePercent !== null && ($this->costOfEquityOverridePercent < 0.0 || $this->costOfEquityOverridePercent > 100.0)) {
+            throw new InvalidArgumentException(
+                sprintf('Cost of equity override must be between 0.0%% and 100.0%%, %.2f%% given.', $this->costOfEquityOverridePercent)
             );
         }
     }
@@ -125,11 +132,20 @@ final class WaccParameters implements ValueObject
         return $this->unleveredBeta;
     }
 
+    public function costOfEquityOverridePercent(): ?float
+    {
+        return $this->costOfEquityOverridePercent;
+    }
+
     /**
-     * CAPM Cost of Equity: Ke = Rf + Beta * ERP + SizePremium
+     * CAPM Cost of Equity: Ke = Rf + Beta * ERP + SizePremium (or direct override if set)
      */
     public function costOfEquityPercent(): float
     {
+        if ($this->costOfEquityOverridePercent !== null) {
+            return $this->costOfEquityOverridePercent;
+        }
+
         return round($this->riskFreeRatePercent + ($this->beta * $this->equityRiskPremiumPercent) + $this->sizeRiskPremiumPercent, 4);
     }
 
@@ -151,7 +167,8 @@ final class WaccParameters implements ValueObject
             preTaxCostOfDebtPercent: $rate,
             taxRatePercent: $this->taxRatePercent,
             inflationRatePercent: $this->inflationRatePercent,
-            unleveredBeta: $this->unleveredBeta
+            unleveredBeta: $this->unleveredBeta,
+            costOfEquityOverridePercent: $this->costOfEquityOverridePercent
         );
     }
 
@@ -165,7 +182,8 @@ final class WaccParameters implements ValueObject
             preTaxCostOfDebtPercent: $this->preTaxCostOfDebtPercent,
             taxRatePercent: $this->taxRatePercent,
             inflationRatePercent: $this->inflationRatePercent,
-            unleveredBeta: $this->unleveredBeta
+            unleveredBeta: $this->unleveredBeta,
+            costOfEquityOverridePercent: $this->costOfEquityOverridePercent
         );
     }
 
@@ -194,6 +212,7 @@ final class WaccParameters implements ValueObject
             'beta' => $this->beta,
             'size_risk_premium_percent' => $this->sizeRiskPremiumPercent,
             'cost_of_equity_percent' => $this->costOfEquityPercent(),
+            'cost_of_equity_override_percent' => $this->costOfEquityOverridePercent,
             'pre_tax_cost_of_debt_percent' => $this->preTaxCostOfDebtPercent,
             'tax_rate_percent' => $this->taxRatePercent,
             'tax_shield_multiplier' => $this->taxShieldMultiplier(),

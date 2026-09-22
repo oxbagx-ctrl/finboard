@@ -11,6 +11,10 @@ use App\Presentation\Api\Controllers\FinancialCategoryController;
 use App\Presentation\Api\Controllers\FinancialImportController;
 use App\Presentation\Api\Controllers\FinancialRecordController;
 use App\Presentation\Api\Controllers\HealthController;
+use App\Presentation\Api\Controllers\InvestmentProject\InvestmentAppraisalController;
+use App\Presentation\Api\Controllers\InvestmentProject\InvestmentCapexStageController;
+use App\Presentation\Api\Controllers\InvestmentProject\InvestmentProjectController;
+use App\Presentation\Api\Controllers\InvestmentProject\InvestmentStatementController;
 use App\Presentation\Api\Controllers\InvitationController;
 use App\Presentation\Api\Controllers\KpiController;
 use Illuminate\Support\Facades\Route;
@@ -172,5 +176,31 @@ Route::prefix('v1')->group(function () {
             Route::get('/{id}/audit-logs', [DocumentController::class, 'auditLogs']
                 )->name('api.documents.audit-logs');
         });
+
+        // Investment Projects & Valuation Module Endpoints
+        Route::prefix('investment-projects')->group(function () {
+            Route::get('/', [InvestmentProjectController::class, 'index'])->name('api.investment-projects.index');
+            Route::post('/', [InvestmentProjectController::class, 'store'])->name('api.investment-projects.store');
+            Route::get('/{id}', [InvestmentProjectController::class, 'show'])->name('api.investment-projects.show');
+            Route::put('/{id}', [InvestmentProjectController::class, 'update'])->name('api.investment-projects.update');
+            Route::delete('/{id}', [InvestmentProjectController::class, 'destroy'])->name('api.investment-projects.destroy');
+
+            // CAPEX Stages Management
+            Route::post('/{projectId}/capex-stages', [InvestmentCapexStageController::class, 'store'])->name('api.investment-projects.capex-stages.store');
+            Route::put('/{projectId}/capex-stages/{stageId}', [InvestmentCapexStageController::class, 'update'])->name('api.investment-projects.capex-stages.update');
+            Route::delete('/{projectId}/capex-stages/{stageId}', [InvestmentCapexStageController::class, 'destroy'])->name('api.investment-projects.capex-stages.destroy');
+
+            // 15-Year Financial Statements (3-Statement & Depreciation)
+            Route::get('/{id}/statements/three-statement', [InvestmentStatementController::class, 'threeStatement'])->name('api.investment-projects.statements.three-statement');
+            Route::get('/{id}/statements/income-statement', [InvestmentStatementController::class, 'incomeStatement'])->name('api.investment-projects.statements.income-statement');
+            Route::get('/{id}/statements/balance-sheet', [InvestmentStatementController::class, 'balanceSheet'])->name('api.investment-projects.statements.balance-sheet');
+            Route::get('/{id}/statements/cash-flow', [InvestmentStatementController::class, 'cashFlow'])->name('api.investment-projects.statements.cash-flow');
+            Route::get('/{id}/statements/depreciation', [InvestmentStatementController::class, 'depreciation'])->name('api.investment-projects.statements.depreciation');
+
+            // Valuation & Equity Waterfall
+            Route::get('/{id}/appraisal', [InvestmentAppraisalController::class, 'appraisal'])->name('api.investment-projects.appraisal');
+            Route::post('/{id}/waterfall', [InvestmentAppraisalController::class, 'waterfall'])->name('api.investment-projects.waterfall');
+        });
     });
 });
+
