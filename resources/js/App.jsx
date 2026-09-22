@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
 import { DealProvider } from './context/DealContext';
+import { InvestmentProjectProvider } from './context/InvestmentProjectContext';
 import { AppLayout } from './components/layout/AppLayout';
 import { LoginView } from './views/LoginView';
 import { AcceptInvitationView } from './views/AcceptInvitationView';
 import { DashboardView } from './views/DashboardView';
 import { AnalyticsView } from './views/AnalyticsView';
 import { RecordsView } from './views/RecordsView';
+import { InvestmentPlanningView } from './views/InvestmentPlanningView';
 import { ImportView } from './views/ImportView';
 import { DataRoomView } from './views/DataRoomView';
 import { ReportsView } from './views/ReportsView';
@@ -66,6 +68,8 @@ const MainRouter = () => {
                 return <AnalyticsView key={refreshKey} />;
             case 'records':
                 return <RecordsView key={refreshKey} />;
+            case 'investments':
+                return <InvestmentPlanningView key={refreshKey} />;
             case 'import':
                 return <ImportView key={refreshKey} />;
             case 'data-room':
@@ -97,7 +101,9 @@ export const App = () => {
         <NotificationProvider>
             <AuthProvider>
                 <DealProvider>
-                    <MainRouter />
+                    <InvestmentProjectProvider>
+                        <MainRouter />
+                    </InvestmentProjectProvider>
                 </DealProvider>
             </AuthProvider>
         </NotificationProvider>

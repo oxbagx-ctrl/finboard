@@ -14,6 +14,7 @@ export const Header = ({ currentRoute, onToggleSidebar, onRefreshData, refreshin
         'dashboard': 'Pulpit Zarządczy (Executive Overview)',
         'analytics': 'Analityka P&L, Marże i Wskaźniki Płynności',
         'records': 'Księga Transakcji Finansowych',
+        'investments': 'Planowanie Inwestycji i Montaż Finansowy (Project Finance)',
         'import': 'Moduł Importu Wyciągów i Zbiorów CSV',
         'data-room': 'Virtual Data Room (VDR) – Dokumentacja Transakcyjna',
         'reports': 'Raporty Zarządcze & Generator PDF',

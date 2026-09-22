@@ -11,7 +11,8 @@ import {
     LogOut,
     User,
     ChevronRight,
-    Users
+    Users,
+    Calculator
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { UserProfileModal } from '../auth/UserProfileModal';
@@ -26,6 +27,7 @@ export const Sidebar = ({ currentRoute, onRouteChange, isOpen, onClose }) => {
         { id: 'dashboard', label: 'Executive Dashboard', code: 'DSH', icon: LayoutDashboard },
         { id: 'analytics', label: 'Analiza P&L i Wskaźniki', code: 'ANL', icon: TrendingUp },
         { id: 'records', label: 'Ewidencja Operacji', code: 'REC', icon: TableProperties },
+        { id: 'investments', label: 'Planowanie Inwestycji', code: 'PRJ', icon: Calculator },
         { id: 'import', label: 'Import Danych Finansowych', code: 'IMP', icon: FileSpreadsheet },
         { id: 'data-room', label: 'Virtual Data Room (VDR)', code: 'VDR', icon: FolderLock },
         { id: 'reports', label: 'Raporty Zarządcze & PDF', code: 'REP', icon: FileText },
