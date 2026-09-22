@@ -11,6 +11,7 @@ use App\Contexts\InvestmentProject\Domain\Services\DebtAmortizationService;
 use App\Contexts\InvestmentProject\Domain\Services\DepreciationScheduleService;
 use App\Contexts\InvestmentProject\Domain\Services\GrantAllocationService;
 use App\Contexts\InvestmentProject\Domain\Services\IncomeStatementService;
+use App\Contexts\InvestmentProject\Domain\Services\LiquidityBalancingService;
 use App\Contexts\InvestmentProject\Domain\Services\VatBridgeLoanService;
 use App\Contexts\InvestmentProject\Infrastructure\Repositories\EloquentInvestmentProjectRepository;
 use Illuminate\Support\ServiceProvider;
@@ -45,6 +46,7 @@ final class InvestmentProjectServiceProvider extends ServiceProvider
             $app->make(VatBridgeLoanService::class),
             $app->make(GrantAllocationService::class)
         ));
+        $this->app->singleton(LiquidityBalancingService::class, fn () => new LiquidityBalancingService());
     }
 
     /**

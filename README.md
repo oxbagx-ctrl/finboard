@@ -501,7 +501,7 @@ W sytuacji niedostępności skrzynki pocztowej odbiorcy lub awarii serwera SMTP,
   - [x] Serwis DepreciationScheduleService generujący ruch środków trwałych i amortyzację liniową KŚT.
   - [x] Serwis IncomeStatementService modelujący 15-letni RZiS ze strumieniami przychodów, OPEX, płacami i CIT.
   - [x] Serwisy BalanceSheetService i CashFlowService z domknięciem bilansowym w ujęciu miesięcznym i rocznym.
-  - [ ] Serwis LiquidityBalancingService z detekcją luki gotówkowej, symulacją limitu i alertami ujemnego salda.
+  - [x] Serwis LiquidityBalancingService z detekcją luki gotówkowej, symulacją limitu i alertami ujemnego salda.
   - [ ] Kompleksowe testy PHPUnit weryfikujące spójność matematyczną 3-Statement i zerową wariancję bilansową.
 - [ ] **Faza 41: Dynamiczny WACC, Wycena Efektywności (NPV, IRR) i Equity Waterfall**
   - [ ] Serwis WaccCalculatorService wyliczający średni ważony koszt kapitału z tarczą podatkową i inflacją.
