@@ -480,11 +480,59 @@ W sytuacji niedostępności skrzynki pocztowej odbiorcy lub awarii serwera SMTP,
   - Widżet weryfikacji poczty SMTP i modal testowy w widoku ustawień administracyjnych.
   - Testy komponentów dla kopiowania linku aktywacyjnego i akcji zaproszeń.
 - [x] **Faza 37: Odporność Kolejek, Testy Integracyjne i Dokumentacja**
-  - [x] Konfiguracja polityki ponowień (retry/backoff) dla maili zaproszeń w `SendInvitationEmailListener`.
-  - [x] Testy integracyjne symulujące timeouty połączeń SMTP i odporność kolejki zadań.
-  - [x] Testy E2E dla tworzenia zaproszeń, regeneracji tokenów i awaryjnego przepływu aktywacji.
-  - [x] Aktualizacja changelogu z architekturą doręczania poczty, restrykcjami portu 25 i wytycznymi SMTP.
-  - [x] Aktualizacja dokumentacji `README.md` opisującej produkcyjną konfigurację i diagnostykę poczty.
+  - Konfiguracja polityki ponowień (retry/backoff) dla maili zaproszeń w `SendInvitationEmailListener`.
+  - Testy integracyjne symulujące timeouty połączeń SMTP i odporność kolejki zadań.
+  - Testy E2E dla tworzenia zaproszeń, regeneracji tokenów i awaryjnego przepływu aktywacji.
+  - Aktualizacja changelogu z architekturą doręczania poczty, restrykcjami portu 25 i wytycznymi SMTP.
+  - Aktualizacja dokumentacji `README.md` opisującej produkcyjną konfigurację i diagnostykę poczty.
+- [ ] **Faza 38: Fundamenty Domenowe Kontekstu InvestmentProject i Schematy Bazy Danych**
+  - [x] Inicjalizacja struktury katalogów kontekstu InvestmentProject (warstwy Domain, Application, Infrastructure).
+  - [ ] Domenowe Value Objects dla budżetu, stóp procentowych, parametrów pożyczek i stawek VAT.
+  - [ ] Agregat InvestmentProject z encjami CapexStage, FinancingStructure i DebtFacility.
+  - [ ] Migracje bazy danych dla projektów inwestycyjnych, etapów CAPEX, instrumentów dłużnych i dotacji.
+  - [ ] Implementacja InvestmentProjectRepositoryInterface i repozytorium Eloquent z izolacją wielonajemcową.
+- [ ] **Faza 39: Inżynieria Finansowa, Kredyt Inwestycyjny, Kredyt Pomostowy VAT i Dotacje**
+  - [ ] Komendy i handlery CQRS dla inicjalizacji projektu oraz zarządzania etapami CAPEX.
+  - [ ] Serwis DebtAmortizationService obsługujący raty równe vs malejące z WIBOR, marżą i prowizjami.
+  - [ ] Serwis VatBridgeLoanService modelujący finansowanie VAT od nakładów budowlanych i zwroty z US.
+  - [ ] Serwis GrantAllocationService obliczający koszty kwalifikowane, dofinansowanie i transze refundacji.
+  - [ ] Testy jednostkowe i integracyjne weryfikujące krzywe amortyzacji długu, obrót kredytu VAT i reguły dotacji.
+- [ ] **Faza 40: 15-letni Silnik 3-Statement (RZiS, Bilans, Cash Flow & Test Płynności)**
+  - [ ] Serwis DepreciationScheduleService generujący ruch środków trwałych i amortyzację liniową KŚT.
+  - [ ] Serwis IncomeStatementService modelujący 15-letni RZiS ze strumieniami przychodów, OPEX, płacami i CIT.
+  - [ ] Serwisy BalanceSheetService i CashFlowService z domknięciem bilansowym w ujęciu miesięcznym i rocznym.
+  - [ ] Serwis LiquidityBalancingService z detekcją luki gotówkowej, symulacją limitu i alertami ujemnego salda.
+  - [ ] Kompleksowe testy PHPUnit weryfikujące spójność matematyczną 3-Statement i zerową wariancję bilansową.
+- [ ] **Faza 41: Dynamiczny WACC, Wycena Efektywności (NPV, IRR) i Equity Waterfall**
+  - [ ] Serwis WaccCalculatorService wyliczający średni ważony koszt kapitału z tarczą podatkową i inflacją.
+  - [ ] Serwis InvestmentAppraisalService obliczający zdyskontowane FCFF/FCFE, NPV, Project IRR, RV i okres zwrotu.
+  - [ ] Numeryczny solver EquityWaterfallSolverService wyznaczający udziały inwestorów i docelowe stopy IRR.
+  - [ ] Kontrolery REST API dla zarządzania projektami, pobierania sprawozdań i wskaźników wyceny.
+  - [ ] Testy API weryfikujące endpointy wyceny inwestycji, wielonajemcowość i kalkulacje waterfall.
+- [ ] **Faza 42: Frontend: Kreator Założeń Inwestycyjnych i Harmonogramu CAPEX**
+  - [ ] Konfiguracja routingu, nawigacji i layoutu dla modułu Planowania Inwestycji w interfejsie FinBoard.
+  - [ ] Komponent CapexScheduleManager z podziałem na etapy, walidacją dat i przypisaniem stawek KŚT.
+  - [ ] Komponent FinancingStructureConfigurator z suwakami wkładu własnego, kredytem, pożyczką VAT i dotacjami.
+  - [ ] Komponent OperatingAssumptionsForm z liniami przychodów, driverami OPEX, cyklem NWC i matrycą etatów.
+  - [ ] Testy komponentowe Vitest sprawdzające walidację stanu CapexScheduleManager i konfiguratora finansowania.
+- [ ] **Faza 43: Reaktywny Silnik w Przeglądarce i Cockpit Analizy Wrażliwości Real-Time**
+  - [ ] Implementacja Web Workera investmentCalculationWorker w TypeScript dla 15-letnich symulacji w tle.
+  - [ ] Widok SensitivityCockpitView z suwakami What-If dla CAPEX, przychodów, kosztów zmiennych/stałych i płac.
+  - [ ] Komponent ReinvestmentManager obsługujący cykliczne nakłady odtworzeniowe (Nakłady A, B, C).
+  - [ ] Przełącznik scenariuszy (Bazowy, Pesymistyczny, Optymistyczny) i trybu spłaty długu.
+  - [ ] Testy integracyjne Vitest weryfikujące komunikację z Web Workerem i natychmiastowe odświeżanie KPI.
+- [ ] **Faza 44: Prezentacja 15-letnich Sprawozdań i Nakładka Inwestorska Exit Valuation**
+  - [ ] Komponent ThreeStatementGrid renderujący 15-letni RZiS, Bilans i Cash Flow (widok miesięczny/roczny).
+  - [ ] Komponent ExitValuationOverlay modelujący moment wyjścia, mnożniki EV/EBITDA i yield kupującego.
+  - [ ] Komponent ExitWaterfallVisualizer prezentujący spłatę długu netto, podział wpływów, MoIC i Equity IRR.
+  - [ ] Komponent BankingCovenantsStrip wyświetlający w czasie rzeczywistym wskaźniki DSCR, ICR i płynności.
+  - [ ] Testy Vitest hierarchii ThreeStatementGrid, kalkulacji wyceny wyjścia i progów kowenantów bankowych.
+- [ ] **Faza 45: Diagnostyka Organizacyjna, Raporty Definiowane, Dossier PDF i Dokumentacja**
+  - [ ] Komponent InvestmentReadinessScorecard oceniający gotowość formalno-prawną, techniczną i rynkową.
+  - [ ] Komponent CustomReportBuilder umożliwiający dowolne zestawianie pozycji sprawozdań na osi czasu.
+  - [ ] Generator InvestmentDossierPdfGenerator kompilujący 15-letni model, wykresy i pieczęć integralności SHA-256.
+  - [ ] Testy end-to-end (E2E) weryfikujące pełny przepływ planowania inwestycji od założeń do dossier PDF.
+  - [ ] Aktualizacja changelogu i README.md z pełną dokumentacją modułu Project Finance & Investment Valuation.
 
 ---
 
