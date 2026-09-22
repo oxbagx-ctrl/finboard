@@ -414,6 +414,40 @@ final class InvestmentValuationApiTest extends TestCase
         $invalidStageResponse->assertJsonValidationErrors(['stage_name', 'net_amount']);
     }
 
+    public function test_can_update_project_financing_structure_and_debt_facility(): void
+    {
+        Sanctum::actingAs($this->clientA);
+        $projectId = $this->createStandardProject('Projekt Przed Aktualizacją');
+
+        $updateResponse = $this->putJson("/api/v1/investment-projects/{$projectId}", [
+            'name' => 'Projekt Po Aktualizacji Montażu',
+            'equity_contribution' => 4500000.00,
+            'bank_loan_principal' => 8500000.00,
+            'grant_amount' => 1500000.00,
+            'vat_bridge_loan' => 1800000.00,
+            'bank_base_rate' => 6.25,
+            'bank_margin' => 1.95,
+            'bank_tenor_months' => 144,
+            'bank_grace_period_months' => 18,
+            'amortization_type' => 'LINEAR',
+            'upfront_fee_rate' => 1.5,
+        ]);
+
+        $updateResponse->assertStatus(200);
+        $updateResponse->assertJsonPath('data.name', 'Projekt Po Aktualizacji Montażu');
+        $updateResponse->assertJsonPath('data.financing_structure.equity_contribution', 4500000);
+        $updateResponse->assertJsonPath('data.financing_structure.bank_loan_amount', 8500000);
+        $updateResponse->assertJsonPath('data.financing_structure.grant_amount', 1500000);
+        $updateResponse->assertJsonPath('data.financing_structure.vat_bridge_loan', 1800000);
+        $updateResponse->assertJsonPath('data.debt_facilities.0.principal_amount', 8500000);
+        $updateResponse->assertJsonPath('data.debt_facilities.0.base_rate_percent', 6.25);
+        $updateResponse->assertJsonPath('data.debt_facilities.0.margin_percent', 1.95);
+        $updateResponse->assertJsonPath('data.debt_facilities.0.tenor_months', 144);
+        $updateResponse->assertJsonPath('data.debt_facilities.0.grace_period_months', 18);
+        $updateResponse->assertJsonPath('data.debt_facilities.0.amortization_type', 'LINEAR');
+        $updateResponse->assertJsonPath('data.debt_facilities.0.upfront_fee_percent', 1.5);
+    }
+
     private function createStandardProject(string $name): string
     {
         $response = $this->postJson('/api/v1/investment-projects', [

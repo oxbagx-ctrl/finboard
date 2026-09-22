@@ -139,6 +139,105 @@ final class InvestmentProjectController
             'commercial_operation_date' => $validated['commercial_operation_date'] ?? null,
         ], fn ($val) => $val !== null));
 
+        // Update or create financing structure
+        $hasFsFields = isset($validated['equity_contribution'])
+            || isset($validated['bank_loan_principal'])
+            || isset($validated['grant_amount'])
+            || isset($validated['vat_bridge_loan']);
+
+        if ($hasFsFields) {
+            $fs = $projectModel->financingStructure;
+            $fsData = [];
+            if (isset($validated['equity_contribution'])) {
+                $fsData['equity_contribution'] = (string) $validated['equity_contribution'];
+            }
+            if (isset($validated['bank_loan_principal'])) {
+                $fsData['bank_loan_amount'] = (string) $validated['bank_loan_principal'];
+            }
+            if (isset($validated['grant_amount'])) {
+                $fsData['grant_amount'] = (string) $validated['grant_amount'];
+            }
+            if (isset($validated['vat_bridge_loan'])) {
+                $fsData['vat_bridge_loan'] = (string) $validated['vat_bridge_loan'];
+            }
+
+            if ($fs) {
+                $fs->update($fsData);
+            } else {
+                $projectModel->financingStructure()->create(array_merge([
+                    'company_id' => $companyId,
+                    'currency' => $projectModel->currency ?? 'PLN',
+                    'equity_contribution' => '0.0000',
+                    'bank_loan_amount' => '0.0000',
+                    'grant_amount' => '0.0000',
+                    'vat_bridge_loan' => '0.0000',
+                ], $fsData));
+            }
+        }
+
+        // Update or create debt facility
+        $hasDfFields = isset($validated['bank_loan_principal'])
+            || isset($validated['bank_base_rate'])
+            || isset($validated['bank_margin'])
+            || isset($validated['bank_tenor_months'])
+            || isset($validated['bank_grace_period_months'])
+            || isset($validated['amortization_type'])
+            || isset($validated['upfront_fee_rate'])
+            || isset($validated['facility_name'])
+            || isset($validated['base_rate_type']);
+
+        if ($hasDfFields) {
+            $df = $projectModel->debtFacilities()->first();
+            $dfData = [];
+            if (isset($validated['bank_loan_principal'])) {
+                $dfData['principal_amount'] = (string) $validated['bank_loan_principal'];
+            }
+            if (isset($validated['bank_base_rate'])) {
+                $dfData['base_rate_percent'] = (string) $validated['bank_base_rate'];
+            }
+            if (isset($validated['bank_margin'])) {
+                $dfData['margin_percent'] = (string) $validated['bank_margin'];
+            }
+            if (isset($validated['bank_tenor_months'])) {
+                $dfData['tenor_months'] = (int) $validated['bank_tenor_months'];
+            }
+            if (isset($validated['bank_grace_period_months'])) {
+                $dfData['grace_period_months'] = (int) $validated['bank_grace_period_months'];
+            }
+            if (isset($validated['amortization_type'])) {
+                $dfData['amortization_type'] = strtoupper((string) $validated['amortization_type']);
+            }
+            if (isset($validated['upfront_fee_rate'])) {
+                $dfData['upfront_fee_percent'] = (string) $validated['upfront_fee_rate'];
+            }
+            if (isset($validated['facility_name'])) {
+                $dfData['facility_name'] = (string) $validated['facility_name'];
+            }
+            if (isset($validated['base_rate_type'])) {
+                $dfData['base_rate_type'] = (string) $validated['base_rate_type'];
+            }
+
+            if ($df) {
+                $df->update($dfData);
+            } else if (!empty($dfData)) {
+                $projectModel->debtFacilities()->create(array_merge([
+                    'company_id' => $companyId,
+                    'facility_name' => 'Kredyt Bankowy Senior Debt',
+                    'facility_type' => 'term_loan',
+                    'principal_amount' => '0.0000',
+                    'currency' => $projectModel->currency ?? 'PLN',
+                    'base_rate_type' => 'WIBOR_3M',
+                    'base_rate_percent' => '5.8500',
+                    'margin_percent' => '2.0000',
+                    'tenor_months' => 120,
+                    'grace_period_months' => 0,
+                    'amortization_type' => 'ANNUITY',
+                    'upfront_fee_percent' => '0.00',
+                    'commitment_fee_percent' => '0.00',
+                ], $dfData));
+            }
+        }
+
         $projectModel->load(['capexStages', 'financingStructure', 'debtFacilities']);
 
         return new JsonResponse([

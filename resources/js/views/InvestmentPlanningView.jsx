@@ -23,6 +23,7 @@ import { Badge } from '../components/ui/Badge';
 import { Card, MetricCard } from '../components/ui/Card';
 import { CreateProjectModal } from '../components/investments/CreateProjectModal';
 import { CapexScheduleManager } from '../components/investments/CapexScheduleManager';
+import { FinancingStructureConfigurator } from '../components/investments/FinancingStructureConfigurator';
 
 export const InvestmentPlanningView = () => {
     const { activeCompany } = useAuth();
@@ -283,34 +284,21 @@ export const InvestmentPlanningView = () => {
                                 {/* Live CapexScheduleManager Component (Commit 208) */}
                                 <CapexScheduleManager />
 
-                                {/* Upcoming Slots for Commits 209, 210 */}
-                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                                    {/* Commit 209 Slot */}
-                                    <Card
-                                        title="Montaż Kapitałowy (Commit 209)"
-                                        subtitle="FinancingStructureConfigurator"
-                                        className="border-dashed"
-                                    >
-                                        <div className="text-xs text-zinc-400 space-y-2">
-                                            <p>Suwaki wkładu własnego, kredytu bankowego z karencją, pożyczki pomostowej VAT i dotacji unijnych.</p>
-                                            <div className="p-2 bg-zinc-950 rounded border border-zinc-850 text-[11px] text-zinc-500">
-                                                Senior Debt Tenor: 120 mies. | Grace: 12 mies.<br />
-                                                WIBOR/EURIBOR + Marża bankowa
-                                            </div>
-                                        </div>
-                                    </Card>
+                                {/* Live FinancingStructureConfigurator Component (Commit 209) */}
+                                <FinancingStructureConfigurator />
 
+                                {/* Upcoming Slot for Commit 210 */}
+                                <div className="grid grid-cols-1 gap-4">
                                     {/* Commit 210 Slot */}
                                     <Card
-                                        title="Założenia Operacyjne (Commit 210)"
+                                        title="Założenia Operacyjne & Kapitał Obrotowy (Commit 210)"
                                         subtitle="OperatingAssumptionsForm"
                                         className="border-dashed"
                                     >
                                         <div className="text-xs text-zinc-400 space-y-2">
                                             <p>Strumienie przychodów, dynamika ramp-up, drivery OPEX, cykl rotacji kapitału obrotowego (NWC) i płace.</p>
                                             <div className="p-2 bg-zinc-950 rounded border border-zinc-850 text-[11px] text-zinc-500">
-                                                Ramp-up COD: 36 mies. do 100% mocy<br />
-                                                DSO: 45 dni | DPO: 60 dni | DIO: 30 dni
+                                                Ramp-up COD: 36 mies. do 100% mocy | DSO: 45 dni | DPO: 60 dni | DIO: 30 dni
                                             </div>
                                         </div>
                                     </Card>

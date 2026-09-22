@@ -3,7 +3,7 @@ import { useAuth } from './AuthContext';
 import { useNotification } from './NotificationContext';
 import { investmentProjectsApi } from '../api/investmentProjects';
 
-const InvestmentProjectContext = createContext(null);
+export const InvestmentProjectContext = createContext(null);
 
 export const InvestmentProjectProvider = ({ children }) => {
     const { activeCompany } = useAuth();
@@ -96,6 +96,43 @@ export const InvestmentProjectProvider = ({ children }) => {
         }
     }, [fetchProjects, success, notifyError]);
 
+    // Update project
+    const updateProject = useCallback(async (id, payload) => {
+        setLoading(true);
+        try {
+            const response = await investmentProjectsApi.updateProject(id, payload);
+            const updated = response.data?.data;
+            success('Projekt inwestycyjny został pomyślnie zaktualizowany.');
+            setSelectedProject(updated);
+            await fetchProjects(id);
+            return updated;
+        } catch (err) {
+            const msg = err.response?.data?.message || 'Błąd podczas aktualizacji projektu inwestycyjnego.';
+            notifyError(msg);
+            throw err;
+        } finally {
+            setLoading(false);
+        }
+    }, [fetchProjects, success, notifyError]);
+
+    // Delete project
+    const deleteProject = useCallback(async (id) => {
+        setLoading(true);
+        try {
+            await investmentProjectsApi.deleteProject(id);
+            success('Projekt inwestycyjny został pomyślnie usunięty.');
+            setSelectedProject(null);
+            setSelectedProjectId(null);
+            await fetchProjects();
+        } catch (err) {
+            const msg = err.response?.data?.message || 'Błąd podczas usuwania projektu inwestycyjnego.';
+            notifyError(msg);
+            throw err;
+        } finally {
+            setLoading(false);
+        }
+    }, [fetchProjects, success, notifyError]);
+
     const value = {
         projects,
         selectedProjectId,
@@ -107,6 +144,8 @@ export const InvestmentProjectProvider = ({ children }) => {
         selectProject,
         loadProjectDetails,
         createProject,
+        updateProject,
+        deleteProject,
         refreshProjects: () => fetchProjects(selectedProjectId),
     };
 
