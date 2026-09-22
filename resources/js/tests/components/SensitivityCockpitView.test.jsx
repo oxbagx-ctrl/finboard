@@ -137,11 +137,12 @@ describe('SensitivityCockpitView Component (Phase 43 Commit 213)', () => {
         expect(screen.getByText('Worker:')).toBeInTheDocument();
 
         // Preset buttons
-        expect(screen.getByRole('button', { name: 'Bazowy' })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'Optymistyczny' })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'Stres-test Pesymistyczny' })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'Presja Płacowa' })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: /Reset/i })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Bazowy/i })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Optymistyczny/i })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Stres-Test Bankowy/i })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Stagflacja/i })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Presja Płacowa/i })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Przywróć Bazę/i })).toBeInTheDocument();
 
         // KPI card titles
         expect(screen.getByText('PROJECT NPV')).toBeInTheDocument();
@@ -149,6 +150,12 @@ describe('SensitivityCockpitView Component (Phase 43 Commit 213)', () => {
         expect(screen.getByText('EQUITY MoIC')).toBeInTheDocument();
         expect(screen.getByText('OKRES ZWROTU')).toBeInTheDocument();
         expect(screen.getByText('KOWENANT DSCR')).toBeInTheDocument();
+
+        // Debt Repayment Switcher Component
+        expect(screen.getByText(/Profil Amortyzacji Długu Bankowego/i)).toBeInTheDocument();
+        expect(screen.getByText('Raty Równe (Annuity)')).toBeInTheDocument();
+        expect(screen.getByText('Raty Malejące (Linear)')).toBeInTheDocument();
+        expect(screen.getByText('Spłata Balonowa (Bullet)')).toBeInTheDocument();
 
         // Sliders
         expect(screen.getByText('Nakłady CAPEX')).toBeInTheDocument();
@@ -208,10 +215,10 @@ describe('SensitivityCockpitView Component (Phase 43 Commit 213)', () => {
         renderWithContext();
 
         await waitFor(() => {
-            expect(screen.getByRole('button', { name: 'Stres-test Pesymistyczny' })).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: /Stres-Test Bankowy/i })).toBeInTheDocument();
         });
 
-        fireEvent.click(screen.getByRole('button', { name: 'Stres-test Pesymistyczny' }));
+        fireEvent.click(screen.getByRole('button', { name: /Stres-Test Bankowy/i }));
 
         await waitFor(() => {
             // Should apply +20% CAPEX, -15% Revenue, +10% VarCost, +10% FixedCost, +8% Payroll
@@ -226,10 +233,10 @@ describe('SensitivityCockpitView Component (Phase 43 Commit 213)', () => {
         renderWithContext();
 
         await waitFor(() => {
-            expect(screen.getByRole('button', { name: 'Optymistyczny' })).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: /Optymistyczny/i })).toBeInTheDocument();
         });
 
-        fireEvent.click(screen.getByRole('button', { name: 'Optymistyczny' }));
+        fireEvent.click(screen.getByRole('button', { name: /Optymistyczny/i }));
 
         await waitFor(() => {
             // -5% CAPEX, +15% Revenue, -5% VarCost
@@ -242,18 +249,18 @@ describe('SensitivityCockpitView Component (Phase 43 Commit 213)', () => {
         renderWithContext();
 
         await waitFor(() => {
-            expect(screen.getByRole('button', { name: /Reset/i })).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: /Przywróć Bazę/i })).toBeInTheDocument();
         });
 
         // First apply pessimistic scenario
-        fireEvent.click(screen.getByRole('button', { name: 'Stres-test Pesymistyczny' }));
+        fireEvent.click(screen.getByRole('button', { name: /Stres-Test Bankowy/i }));
 
         await waitFor(() => {
             expect(screen.getAllByText('+20%').length).toBeGreaterThanOrEqual(1);
         });
 
         // Click Reset
-        fireEvent.click(screen.getByRole('button', { name: /Reset/i }));
+        fireEvent.click(screen.getByRole('button', { name: /Przywróć Bazę/i }));
 
         await waitFor(() => {
             // All sliders back to 0%
@@ -265,15 +272,31 @@ describe('SensitivityCockpitView Component (Phase 43 Commit 213)', () => {
         renderWithContext();
 
         await waitFor(() => {
-            expect(screen.getByText('KOWENANT DSCR')).toBeInTheDocument();
-            expect(screen.getByText(/RISK \(< 1\.2x\)/i)).toBeInTheDocument();
+            expect(screen.getAllByText('KOWENANT DSCR').length).toBeGreaterThanOrEqual(1);
+            expect(screen.getAllByText(/RISK \(< 1\.2x\)/i).length).toBeGreaterThanOrEqual(1);
         });
 
         // Switch to Optimistic scenario (+15% revenue, -5% capex)
-        fireEvent.click(screen.getByRole('button', { name: 'Optymistyczny' }));
+        fireEvent.click(screen.getByRole('button', { name: /Optymistyczny/i }));
 
         await waitFor(() => {
-            expect(screen.getByText(/BANKABLE/i)).toBeInTheDocument();
+            expect(screen.getAllByText(/BANKABLE/i).length).toBeGreaterThanOrEqual(1);
+        });
+    });
+
+    it('switches debt repayment mode from annuity to linear in real-time', async () => {
+        renderWithContext();
+
+        await waitFor(() => {
+            expect(screen.getByText('Raty Malejące (Linear)')).toBeInTheDocument();
+        });
+
+        // Click on Linear mode card
+        fireEvent.click(screen.getByText('Raty Malejące (Linear)'));
+
+        await waitFor(() => {
+            expect(screen.getAllByText('SYMULACJA ALTERNATYWNA').length).toBeGreaterThanOrEqual(1);
+            expect(screen.getAllByText('LINEAR').length).toBeGreaterThanOrEqual(1);
         });
     });
 });

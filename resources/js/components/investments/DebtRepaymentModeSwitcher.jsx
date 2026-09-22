@@ -1,0 +1,227 @@
+import React from 'react';
+import {
+    Landmark,
+    TrendingDown,
+    CircleDot,
+    Clock,
+    ShieldCheck,
+    AlertTriangle,
+    Coins,
+    RotateCcw,
+    Layers,
+    DollarSign,
+    Info
+} from 'lucide-react';
+import { Badge } from '../ui/Badge';
+import { Button } from '../ui/Button';
+
+export const REPAYMENT_MODES = [
+    {
+        id: 'annuity',
+        title: 'Raty Równe (Annuity)',
+        shortTitle: 'Annuity',
+        badge: 'PROJECT FINANCE',
+        badgeVariant: 'brand',
+        icon: Layers,
+        summary: 'Stała miesięczna rata kapitałowo-odsetkowa.',
+        description: 'Optymalizuje wskaźnik pokrycia długu (DSCR) w pierwszych latach po uruchomieniu komercyjnym. Chroni płynność operacyjną.',
+        bestFor: 'Kredyty Project Finance, instalacje OZE, magazyny energii BESS'
+    },
+    {
+        id: 'linear',
+        title: 'Raty Malejące (Linear)',
+        shortTitle: 'Liniowy',
+        badge: 'LOWEST COST',
+        badgeVariant: 'success',
+        icon: TrendingDown,
+        summary: 'Równa rata kapitałowa, malejące odsetki.',
+        description: 'Najszybsze tempo oddłużenia i najniższy łączny koszt odsetek w 15 latach. Wymaga wyższego bufora EBITDA w początkowym okresie.',
+        bestFor: 'Kredyty komercyjne, leasing maszyn i urządzeń technologicznych'
+    },
+    {
+        id: 'bullet',
+        title: 'Spłata Balonowa (Bullet)',
+        shortTitle: 'Bullet (Balon)',
+        badge: 'REFINANCING RISK',
+        badgeVariant: 'warning',
+        icon: CircleDot,
+        summary: 'Bieżące odsetki, kapitał na koniec tenoru.',
+        description: 'Maksymalizuje bieżące wolne przepływy dla akcjonariuszy (FCFE). Wymaga refinansowania lub wyjścia kapitałowego w roku zapadalności.',
+        bestFor: 'Obligacje korporacyjne, pożyczki mezzanine, dług pomostowy'
+    }
+];
+
+export const DebtRepaymentModeSwitcher = ({
+    facility,
+    activeMode = 'annuity', // 'annuity' | 'linear' | 'bullet'
+    contractMode = 'annuity',
+    onChangeMode,
+    onResetToContract,
+    minDscr = null,
+    avgDscr = null,
+    totalInterest = null,
+    baseInterest = null,
+    currency = 'PLN',
+    className = ''
+}) => {
+    const isOverrideActive = activeMode !== contractMode;
+
+    const formatMoney = (val) => {
+        if (val === null || val === undefined || isNaN(val)) return '—';
+        return new Intl.NumberFormat('pl-PL', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+        }).format(val) + ' ' + currency;
+    };
+
+    const isBankable = minDscr !== null && minDscr >= 1.20;
+
+    return (
+        <div className={`bg-zinc-900 border border-zinc-800 rounded-lg p-5 font-mono space-y-4 ${className}`}>
+            {/* Header & Contract Info */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-800 pb-3">
+                <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded bg-blue-950/80 border border-blue-800/80 flex items-center justify-center text-blue-400">
+                        <Landmark className="w-4 h-4" />
+                    </div>
+                    <div>
+                        <div className="flex items-center gap-2">
+                            <h3 className="text-xs font-bold text-zinc-100 uppercase tracking-wide">
+                                Profil Amortyzacji Długu Bankowego (Debt Repayment Structure)
+                            </h3>
+                            {isOverrideActive ? (
+                                <Badge variant="warning">SYMULACJA ALTERNATYWNA</Badge>
+                            ) : (
+                                <Badge variant="default">ZGODNY Z UMOWĄ</Badge>
+                            )}
+                        </div>
+                        <p className="text-[11px] text-zinc-400 mt-0.5">
+                            Porównaj wpływ formuły spłaty kapitału na kowenanty bankowe (DSCR) i łączny koszt odsetkowy w horyzoncie 15 lat.
+                        </p>
+                    </div>
+                </div>
+
+                {isOverrideActive && (
+                    <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        onClick={onResetToContract}
+                        className="gap-1.5 text-xs shrink-0"
+                    >
+                        <RotateCcw className="w-3.5 h-3.5" />
+                        <span>Przywróć umowę ({contractMode})</span>
+                    </Button>
+                )}
+            </div>
+
+            {/* 3-Way Mode Selector Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                {REPAYMENT_MODES.map((mode) => {
+                    const Icon = mode.icon;
+                    const isSelected = activeMode === mode.id;
+                    const isContract = contractMode === mode.id;
+
+                    return (
+                        <div
+                            key={mode.id}
+                            onClick={() => onChangeMode && onChangeMode(mode.id)}
+                            className={`p-3.5 rounded-lg border cursor-pointer transition-all flex flex-col justify-between ${
+                                isSelected
+                                    ? 'bg-zinc-950 border-blue-500/80 shadow-sm ring-1 ring-blue-500/30'
+                                    : 'bg-zinc-950/40 border-zinc-800 hover:border-zinc-700 hover:bg-zinc-950/70'
+                            }`}
+                        >
+                            <div>
+                                <div className="flex items-center justify-between gap-2 mb-2">
+                                    <div className="flex items-center gap-2">
+                                        <div className={`p-1.5 rounded ${isSelected ? 'bg-blue-500/10 text-blue-400 border border-blue-500/30' : 'bg-zinc-800 text-zinc-400'}`}>
+                                            <Icon className="w-4 h-4" />
+                                        </div>
+                                        <div>
+                                            <div className="text-xs font-bold text-zinc-100">
+                                                {mode.title}
+                                            </div>
+                                            {isContract && (
+                                                <span className="text-[9px] text-zinc-500 uppercase tracking-wider">
+                                                    [PROFIL Z UMOWY]
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <Badge variant={mode.badgeVariant || 'default'}>
+                                        {mode.badge}
+                                    </Badge>
+                                </div>
+
+                                <p className="text-[11px] text-zinc-300 font-sans leading-relaxed mb-2">
+                                    {mode.summary}
+                                </p>
+                                <p className="text-[10px] text-zinc-500 font-sans leading-relaxed">
+                                    {mode.description}
+                                </p>
+                            </div>
+
+                            <div className="mt-3 pt-2.5 border-t border-zinc-850 flex items-center justify-between text-[10px]">
+                                <span className="text-zinc-500">Zastosowanie:</span>
+                                <span className="text-zinc-300 font-medium truncate max-w-[160px]" title={mode.bestFor}>
+                                    {mode.bestFor}
+                                </span>
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+
+            {/* Live Covenant & Cost Impact Bar */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-zinc-950/60 p-3 rounded-lg border border-zinc-800/80">
+                <div>
+                    <span className="text-[10px] text-zinc-500 uppercase tracking-wider block font-semibold">
+                        KOWENANT MIN DSCR
+                    </span>
+                    <div className="flex items-center gap-2 mt-1">
+                        <span className={`text-base font-bold ${minDscr && minDscr >= 1.20 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                            {minDscr !== null && !isNaN(minDscr) ? `${minDscr.toFixed(2)}x` : '—'}
+                        </span>
+                        <Badge variant={isBankable ? 'success' : 'danger'}>
+                            {isBankable ? 'BANKOWALNY (≥ 1.2x)' : 'NARUSZENIE (< 1.2x)'}
+                        </Badge>
+                    </div>
+                </div>
+
+                <div>
+                    <span className="text-[10px] text-zinc-500 uppercase tracking-wider block font-semibold">
+                        ŚREDNI DSCR (15 LAT)
+                    </span>
+                    <div className="text-base font-bold text-zinc-200 mt-1">
+                        {avgDscr !== null && !isNaN(avgDscr) ? `${avgDscr.toFixed(2)}x` : '—'}
+                    </div>
+                </div>
+
+                <div>
+                    <span className="text-[10px] text-zinc-500 uppercase tracking-wider block font-semibold">
+                        ŁĄCZNY KOSZT ODSETEK
+                    </span>
+                    <div className="text-base font-bold text-amber-400 mt-1">
+                        {totalInterest !== null ? formatMoney(totalInterest) : '—'}
+                    </div>
+                </div>
+
+                <div>
+                    <span className="text-[10px] text-zinc-500 uppercase tracking-wider block font-semibold">
+                        OSZCZĘDNOŚĆ / KOSZT WOBEC BAZY
+                    </span>
+                    <div className="text-base font-bold mt-1">
+                        {totalInterest !== null && baseInterest !== null && totalInterest !== baseInterest ? (
+                            <span className={totalInterest < baseInterest ? 'text-emerald-400' : 'text-rose-400'}>
+                                {totalInterest < baseInterest ? '-' : '+'}{formatMoney(Math.abs(totalInterest - baseInterest))}
+                            </span>
+                        ) : (
+                            <span className="text-zinc-500">Wzorzec bazowy</span>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};

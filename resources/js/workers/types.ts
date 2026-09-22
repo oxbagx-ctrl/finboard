@@ -230,6 +230,7 @@ export interface SimulationResult {
         totalRevenue15Y: number;
         totalEbitda15Y: number;
         totalNetIncome15Y: number;
+        totalInterest15Y?: number;
         projectNpv: number;
         projectIrrPercent: number | null;
         simplePaybackYears: number | null;

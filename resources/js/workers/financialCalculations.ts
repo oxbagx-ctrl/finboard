@@ -950,6 +950,7 @@ export function runSimulation(
     const totalRevenue15Y = statements.annualPeriods.reduce((sum, p) => sum + p.revenue, 0);
     const totalEbitda15Y = statements.annualPeriods.reduce((sum, p) => sum + p.ebitda, 0);
     const totalNetIncome15Y = statements.annualPeriods.reduce((sum, p) => sum + p.netIncome, 0);
+    const totalInterest15Y = statements.annualPeriods.reduce((sum, p) => sum + p.interestExpense, 0);
 
     const t1 = typeof performance !== 'undefined' ? performance.now() : Date.now();
     const executionTimeMs = Math.round((t1 - t0) * 100) / 100;
@@ -964,6 +965,7 @@ export function runSimulation(
             totalRevenue15Y: Math.round(totalRevenue15Y),
             totalEbitda15Y: Math.round(totalEbitda15Y),
             totalNetIncome15Y: Math.round(totalNetIncome15Y),
+            totalInterest15Y: Math.round(totalInterest15Y),
             projectNpv: appraisal.projectNpv,
             projectIrrPercent: appraisal.projectIrrPercent,
             simplePaybackYears: appraisal.simplePaybackYears,

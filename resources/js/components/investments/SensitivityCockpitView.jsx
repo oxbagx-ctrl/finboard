@@ -37,6 +37,8 @@ import { Card, MetricCard } from '../ui/Card';
 import { CustomChartTooltip } from '../charts/CustomChartTooltip';
 import { getInvestmentWorkerClient } from '../../workers/InvestmentWorkerClient';
 import { ReinvestmentManager } from './ReinvestmentManager';
+import { ScenarioPresetSelector, SCENARIO_PRESETS } from './ScenarioPresetSelector';
+import { DebtRepaymentModeSwitcher } from './DebtRepaymentModeSwitcher';
 
 export const SensitivityCockpitView = () => {
     const { selectedProject } = useInvestmentProject();
@@ -51,6 +53,7 @@ export const SensitivityCockpitView = () => {
     const [reinvestmentsEnabled, setReinvestmentsEnabled] = useState(true);
     const [showReinvestmentDetails, setShowReinvestmentDetails] = useState(false);
     const [waccOverride, setWaccOverride] = useState(null); // null or number (4.0 .. 18.0)
+    const [repaymentTypeOverride, setRepaymentTypeOverride] = useState(null); // 'annuity' | 'linear' | 'bullet' | null
     const [activeScenario, setActiveScenario] = useState('base');
 
     // Simulation calculation results
@@ -121,6 +124,7 @@ export const SensitivityCockpitView = () => {
             reinvestmentMultiplier: 1.0 + reinvestmentDelta / 100.0,
             reinvestmentsEnabled: reinvestmentsEnabled,
             waccOverridePercent: waccOverride,
+            repaymentTypeOverride: repaymentTypeOverride,
         };
 
         const t0 = performance.now();
@@ -152,11 +156,27 @@ export const SensitivityCockpitView = () => {
         reinvestmentDelta,
         reinvestmentsEnabled,
         waccOverride,
+        repaymentTypeOverride,
         workerClient
     ]);
 
-    // Scenario Presets Handlers
-    const applyBaseScenario = () => {
+    // Scenario Selection Handler
+    const handleSelectScenario = (scenarioId, deltas) => {
+        setCapexDelta(deltas.capexDelta ?? 0);
+        setRevenueDelta(deltas.revenueDelta ?? 0);
+        setVarCostDelta(deltas.varCostDelta ?? 0);
+        setFixedCostDelta(deltas.fixedCostDelta ?? 0);
+        setPayrollDelta(deltas.payrollDelta ?? 0);
+        setReinvestmentDelta(deltas.reinvestmentDelta ?? 0);
+        setReinvestmentsEnabled(true);
+        setWaccOverride(deltas.waccOverride ?? null);
+        if (deltas.repaymentTypeOverride !== undefined) {
+            setRepaymentTypeOverride(deltas.repaymentTypeOverride);
+        }
+        setActiveScenario(scenarioId);
+    };
+
+    const handleResetAll = () => {
         setCapexDelta(0);
         setRevenueDelta(0);
         setVarCostDelta(0);
@@ -165,44 +185,15 @@ export const SensitivityCockpitView = () => {
         setReinvestmentDelta(0);
         setReinvestmentsEnabled(true);
         setWaccOverride(null);
+        setRepaymentTypeOverride(null);
         setActiveScenario('base');
     };
 
-    const applyOptimisticScenario = () => {
-        setCapexDelta(-5);
-        setRevenueDelta(15);
-        setVarCostDelta(-5);
-        setFixedCostDelta(0);
-        setPayrollDelta(2);
-        setReinvestmentDelta(-10);
-        setReinvestmentsEnabled(true);
-        setWaccOverride(null);
-        setActiveScenario('optimistic');
-    };
-
-    const applyPessimisticScenario = () => {
-        setCapexDelta(20);
-        setRevenueDelta(-15);
-        setVarCostDelta(10);
-        setFixedCostDelta(10);
-        setPayrollDelta(8);
-        setReinvestmentDelta(25);
-        setReinvestmentsEnabled(true);
-        setWaccOverride(null);
-        setActiveScenario('pessimistic');
-    };
-
-    const applyWageShockScenario = () => {
-        setCapexDelta(0);
-        setRevenueDelta(0);
-        setVarCostDelta(5);
-        setFixedCostDelta(5);
-        setPayrollDelta(15);
-        setReinvestmentDelta(5);
-        setReinvestmentsEnabled(true);
-        setWaccOverride(null);
-        setActiveScenario('wage_shock');
-    };
+    // Legacy handler aliases for tests and quick buttons
+    const applyBaseScenario = () => handleResetAll();
+    const applyOptimisticScenario = () => handleSelectScenario('optimistic', SCENARIO_PRESETS.find(p => p.id === 'optimistic')?.deltas || {});
+    const applyPessimisticScenario = () => handleSelectScenario('pessimistic', SCENARIO_PRESETS.find(p => p.id === 'pessimistic')?.deltas || {});
+    const applyWageShockScenario = () => handleSelectScenario('wage_shock', SCENARIO_PRESETS.find(p => p.id === 'wage_shock')?.deltas || {});
 
     // Calculate deltas between What-If and Base
     const deltas = useMemo(() => {
@@ -288,7 +279,7 @@ export const SensitivityCockpitView = () => {
     return (
         <div className="space-y-6 font-mono">
             {/* Header & Scenario Control Strip */}
-            <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 shadow-sm flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+            <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded bg-emerald-950/80 border border-emerald-800/80 flex items-center justify-center text-emerald-400">
                         <Activity className="w-5 h-5" />
@@ -306,74 +297,23 @@ export const SensitivityCockpitView = () => {
                     </div>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2">
+                <div className="flex items-center gap-2">
                     {/* Execution Time Badge */}
                     <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-zinc-950 border border-zinc-800 text-[11px] text-zinc-400">
                         <Zap className="w-3.5 h-3.5 text-amber-400" />
                         <span>Worker:</span>
                         <span className="font-bold text-zinc-200">{lastExecutionMs || 1.8} ms</span>
                     </div>
-
-                    {/* Scenario Presets */}
-                    <div className="flex items-center gap-1 bg-zinc-950 p-1 rounded border border-zinc-800">
-                        <button
-                            type="button"
-                            onClick={applyBaseScenario}
-                            className={`px-2.5 py-1 text-[11px] rounded font-semibold transition-colors ${
-                                activeScenario === 'base'
-                                    ? 'bg-zinc-800 text-zinc-100'
-                                    : 'text-zinc-400 hover:text-zinc-200'
-                            }`}
-                        >
-                            Bazowy
-                        </button>
-                        <button
-                            type="button"
-                            onClick={applyOptimisticScenario}
-                            className={`px-2.5 py-1 text-[11px] rounded font-semibold transition-colors ${
-                                activeScenario === 'optimistic'
-                                    ? 'bg-emerald-950 text-emerald-300 border border-emerald-800/60'
-                                    : 'text-zinc-400 hover:text-emerald-400'
-                            }`}
-                        >
-                            Optymistyczny
-                        </button>
-                        <button
-                            type="button"
-                            onClick={applyPessimisticScenario}
-                            className={`px-2.5 py-1 text-[11px] rounded font-semibold transition-colors ${
-                                activeScenario === 'pessimistic'
-                                    ? 'bg-rose-950 text-rose-300 border border-rose-800/60'
-                                    : 'text-zinc-400 hover:text-rose-400'
-                            }`}
-                        >
-                            Stres-test Pesymistyczny
-                        </button>
-                        <button
-                            type="button"
-                            onClick={applyWageShockScenario}
-                            className={`px-2.5 py-1 text-[11px] rounded font-semibold transition-colors ${
-                                activeScenario === 'wage_shock'
-                                    ? 'bg-amber-950 text-amber-300 border border-amber-800/60'
-                                    : 'text-zinc-400 hover:text-amber-400'
-                            }`}
-                        >
-                            Presja Płacowa
-                        </button>
-                    </div>
-
-                    <Button
-                        type="button"
-                        variant="secondary"
-                        size="sm"
-                        onClick={applyBaseScenario}
-                        className="gap-1.5"
-                    >
-                        <RotateCcw className="w-3.5 h-3.5" />
-                        Reset
-                    </Button>
                 </div>
             </div>
+
+            {/* Scenario Preset Selector (Commit 215) */}
+            <ScenarioPresetSelector
+                activeScenario={activeScenario}
+                baseWacc={baseResult?.appraisal?.waccPercent ?? 8.50}
+                onSelectScenario={handleSelectScenario}
+                onReset={handleResetAll}
+            />
 
             {/* Live KPI Metric Cards Strip */}
             <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
@@ -723,6 +663,25 @@ export const SensitivityCockpitView = () => {
                 </div>
             )}
 
+            {/* Debt Repayment Mode Switcher (Commit 215) */}
+            <DebtRepaymentModeSwitcher
+                facility={selectedProject?.debt_facility}
+                contractMode={selectedProject?.debt_facility?.repayment_type || 'annuity'}
+                activeMode={repaymentTypeOverride || selectedProject?.debt_facility?.repayment_type || 'annuity'}
+                onChangeMode={(mode) => {
+                    setRepaymentTypeOverride(mode);
+                    setActiveScenario('custom');
+                }}
+                onResetToContract={() => {
+                    setRepaymentTypeOverride(null);
+                }}
+                minDscr={whatIfResult?.summary?.minDscr}
+                avgDscr={whatIfResult?.summary?.avgDscr}
+                totalInterest={whatIfResult?.summary?.totalInterest15Y}
+                baseInterest={baseResult?.summary?.totalInterest15Y}
+                currency={selectedProject?.currency || 'PLN'}
+            />
+
             {/* 15-Year Financial Evolution Chart */}
             <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-5">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 border-b border-zinc-800 pb-3">
@@ -1007,6 +966,55 @@ export const SensitivityCockpitView = () => {
                                 <td className="py-3 px-4 text-center">
                                     <Badge variant={isBankable ? 'success' : 'danger'}>
                                         {isBankable ? 'BANKOWALNY' : 'RYZYKO KREDYTOWE'}
+                                    </Badge>
+                                </td>
+                            </tr>
+
+                            {/* 8. Debt Repayment Profile */}
+                            <tr className="hover:bg-zinc-850/40 transition-colors">
+                                <td className="py-3 px-4 font-semibold text-zinc-200">
+                                    Profil Amortyzacji Długu (Formuła)
+                                </td>
+                                <td className="py-3 px-4 text-right text-zinc-300">
+                                    {(selectedProject?.debt_facility?.repayment_type || 'annuity').toUpperCase()}
+                                </td>
+                                <td className="py-3 px-4 text-right font-bold text-zinc-100">
+                                    {(repaymentTypeOverride || selectedProject?.debt_facility?.repayment_type || 'annuity').toUpperCase()}
+                                </td>
+                                <td className="py-3 px-4 text-right">
+                                    <span className={repaymentTypeOverride ? 'text-amber-400 font-semibold' : 'text-zinc-400'}>
+                                        {repaymentTypeOverride ? 'ZMODYFIKOWANY' : 'ZGODNY Z UMOWĄ'}
+                                    </span>
+                                </td>
+                                <td className="py-3 px-4 text-center">
+                                    <Badge variant={repaymentTypeOverride ? 'warning' : 'default'}>
+                                        {repaymentTypeOverride ? 'SYMULACJA' : 'BAZOWY'}
+                                    </Badge>
+                                </td>
+                            </tr>
+
+                            {/* 9. Total 15Y Interest Expense */}
+                            <tr className="hover:bg-zinc-850/40 transition-colors">
+                                <td className="py-3 px-4 font-semibold text-zinc-200">
+                                    Łączny Koszt Odsetek (15 Lat)
+                                </td>
+                                <td className="py-3 px-4 text-right text-zinc-300">
+                                    {formatMoney(baseResult?.summary?.totalInterest15Y ?? 0)}
+                                </td>
+                                <td className="py-3 px-4 text-right font-bold text-zinc-100">
+                                    {formatMoney(whatIfResult?.summary?.totalInterest15Y ?? 0)}
+                                </td>
+                                <td className="py-3 px-4 text-right">
+                                    {baseResult && whatIfResult && (
+                                        <span className={(whatIfResult.summary?.totalInterest15Y ?? 0) <= (baseResult.summary?.totalInterest15Y ?? 0) ? 'text-emerald-400' : 'text-rose-400'}>
+                                            {(whatIfResult.summary?.totalInterest15Y ?? 0) > (baseResult.summary?.totalInterest15Y ?? 0) ? '+' : ''}
+                                            {formatMoney((whatIfResult.summary?.totalInterest15Y ?? 0) - (baseResult.summary?.totalInterest15Y ?? 0))}
+                                        </span>
+                                    )}
+                                </td>
+                                <td className="py-3 px-4 text-center">
+                                    <Badge variant={(whatIfResult?.summary?.totalInterest15Y ?? 0) <= (baseResult?.summary?.totalInterest15Y ?? 0) ? 'success' : 'danger'}>
+                                        {(whatIfResult?.summary?.totalInterest15Y ?? 0) <= (baseResult?.summary?.totalInterest15Y ?? 0) ? 'OSZCZĘDNOŚĆ' : 'WYŻSZY KOSZT'}
                                     </Badge>
                                 </td>
                             </tr>
