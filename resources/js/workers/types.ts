@@ -311,6 +311,66 @@ export interface ExitValuationResult {
     sensitivityGrid: ExitSensitivityCell[][];
 }
 
+export interface WaterfallInvestorMetrics {
+    investorIndex: number;
+    name: string;
+    initialEquity: number;
+    sharePercent: number;
+    preExitDistributions: number;
+    exitProceeds: number;
+    totalProceeds: number;
+    netGain: number;
+    moic: number;
+    irrPercent: number | null;
+}
+
+export interface ExitWaterfallParams {
+    exitYear?: number;
+    exitMultiple?: number;
+    structure?: 'pari_passu' | 'two_tier_hurdle';
+    sponsorSharePercent?: number;
+    hurdleRatePercent?: number;
+    carrySharePercent?: number;
+}
+
+export interface ExitWaterfallResult {
+    exitYear: number;
+    exitMultiple: number;
+    currency: string;
+    structure: 'pari_passu' | 'two_tier_hurdle';
+    hurdleRatePercent: number;
+    carrySharePercent: number;
+
+    // EV to Equity Bridge
+    enterpriseValue: number;
+    grossDebt: number;
+    cash: number;
+    netDebt: number;
+    exitEquityValue: number;
+
+    // Total Equity Overview
+    initialEquityTotal: number;
+    preExitDistributionsTotal: number;
+    exitProceedsTotal: number;
+    totalProceedsTotal: number;
+    netGainTotal: number;
+    totalMoic: number;
+    totalIrrPercent: number | null;
+
+    // Investor Breakdown
+    investor1: WaterfallInvestorMetrics;
+    investor2: WaterfallInvestorMetrics;
+
+    // Waterfall Chart Steps
+    waterfallSteps: {
+        id: string;
+        label: string;
+        amount: number;
+        runningBalance: number;
+        category: 'ev' | 'debt' | 'cash' | 'equity' | 'sponsor' | 'partner';
+    }[];
+}
+
 export interface WorkerRequestMessage {
     type: 'CALCULATE_SIMULATION';
     requestId: string | number;

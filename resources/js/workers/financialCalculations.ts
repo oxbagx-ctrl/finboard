@@ -16,7 +16,10 @@ import {
     SimulationResult,
     ExitValuationParams,
     ExitValuationResult,
-    ExitSensitivityCell
+    ExitSensitivityCell,
+    ExitWaterfallParams,
+    ExitWaterfallResult,
+    WaterfallInvestorMetrics
 } from './types';
 
 // Standard Polish KŚT Asset Depreciation Rates (% per year)
@@ -1106,6 +1109,228 @@ export function calculateExitValuation(
         sensitivityMultiples,
         sensitivityYears,
         sensitivityGrid
+    };
+}
+
+/**
+ * Calculate Comprehensive Exit Waterfall & Investor Proceeds Split
+ */
+export function calculateExitWaterfall(
+    annualPeriods: AnnualStatementPeriod[],
+    initialEquity: number,
+    currency: string = 'PLN',
+    params?: ExitWaterfallParams
+): ExitWaterfallResult {
+    const horizonYears = annualPeriods.length || 15;
+    const requestedYear = params?.exitYear ?? Math.min(5, horizonYears);
+    const exitYear = Math.max(1, Math.min(requestedYear, horizonYears));
+    const exitMultiple = params?.exitMultiple ?? 7.5;
+    const structure = params?.structure ?? 'pari_passu';
+    const sponsorSharePercent = params?.sponsorSharePercent ?? 60.0; // 60% Sponsor, 40% LP
+    const hurdleRatePercent = params?.hurdleRatePercent ?? 8.0; // 8% p.a. Hurdle
+    const carrySharePercent = params?.carrySharePercent ?? 80.0; // 80% to Sponsor in Tier 2
+
+    const lpSharePercent = Math.max(0, 100.0 - sponsorSharePercent);
+
+    const exitPeriod = annualPeriods[exitYear - 1];
+    const exitEbitda = exitPeriod ? exitPeriod.ebitda : 0;
+    const grossDebt = exitPeriod ? exitPeriod.closingDebt : 0;
+    const cash = exitPeriod ? exitPeriod.closingCash : 0;
+    const netDebt = grossDebt - cash;
+
+    const enterpriseValue = Math.max(0, Math.round(exitEbitda * exitMultiple));
+    const exitEquityValue = Math.max(0, Math.round(enterpriseValue - netDebt));
+
+    // Initial Equity per investor
+    const inv1Initial = Math.round(initialEquity * (sponsorSharePercent / 100.0));
+    const inv2Initial = Math.round(initialEquity - inv1Initial);
+
+    // Annual cash flows available to equity up to exitYear
+    const distributableByYear: number[] = [];
+    for (let y = 1; y <= exitYear; y++) {
+        const p = annualPeriods[y - 1];
+        let flow = p ? Math.max(0, p.fcfe) : 0;
+        if (y === exitYear) {
+            flow += exitEquityValue;
+        }
+        distributableByYear.push(Math.round(flow));
+    }
+
+    const inv1Distributions: number[] = [];
+    const inv2Distributions: number[] = [];
+
+    if (structure === 'pari_passu' || inv2Initial <= 0) {
+        // Strict Pro-Rata
+        for (let y = 1; y <= exitYear; y++) {
+            const total = distributableByYear[y - 1];
+            const inv1 = Math.round(total * (sponsorSharePercent / 100.0));
+            const inv2 = total - inv1;
+            inv1Distributions.push(inv1);
+            inv2Distributions.push(inv2);
+        }
+    } else {
+        // Two-Tier Hurdle Waterfall
+        // Tier 1: Return of Capital & Hurdle Rate to LP (hurdleRatePercent compounded) in Pro-Rata split
+        // Tier 2: Carried Interest (carrySharePercent to Sponsor / remainder to LP)
+        const r = hurdleRatePercent / 100.0;
+        let inv2AccruedTarget = inv2Initial;
+
+        for (let y = 1; y <= exitYear; y++) {
+            const total = distributableByYear[y - 1];
+            let remaining = total;
+            let inv1Year = 0;
+            let inv2Year = 0;
+
+            // Grow LP accrued requirement
+            inv2AccruedTarget = inv2AccruedTarget * (1.0 + r);
+
+            // Tier 1 capacity needed for LP
+            const lpTier1Share = lpSharePercent / 100.0;
+            const sponsorTier1Share = sponsorSharePercent / 100.0;
+
+            if (inv2AccruedTarget > 0 && lpTier1Share > 0) {
+                const totalNeededForLpTarget = inv2AccruedTarget / lpTier1Share;
+                const tier1Total = Math.min(remaining, totalNeededForLpTarget);
+
+                const inv1Part = Math.round(tier1Total * sponsorTier1Share);
+                const inv2Part = tier1Total - inv1Part;
+
+                inv1Year += inv1Part;
+                inv2Year += inv2Part;
+                inv2AccruedTarget = Math.max(0, inv2AccruedTarget - inv2Part);
+                remaining -= tier1Total;
+            }
+
+            // Tier 2 (Carry): Any excess above hurdle
+            if (remaining > 0) {
+                const carrySponsorShare = carrySharePercent / 100.0;
+                const inv1Carry = Math.round(remaining * carrySponsorShare);
+                const inv2Carry = remaining - inv1Carry;
+
+                inv1Year += inv1Carry;
+                inv2Year += inv2Carry;
+                remaining = 0;
+            }
+
+            inv1Distributions.push(inv1Year);
+            inv2Distributions.push(inv2Year);
+        }
+    }
+
+    // Investor 1 (Sponsor) Metrics
+    const inv1ExitProceeds = inv1Distributions[exitYear - 1] || 0;
+    const inv1TotalProceeds = inv1Distributions.reduce((s, v) => s + v, 0);
+    const inv1PreExitDist = inv1TotalProceeds - inv1ExitProceeds;
+    const inv1NetGain = inv1TotalProceeds - inv1Initial;
+    const inv1Moic = inv1Initial > 0 ? Math.round((inv1TotalProceeds / inv1Initial) * 100) / 100 : 0;
+    const inv1Irr = calculateIrr([-inv1Initial, ...inv1Distributions]);
+
+    // Investor 2 (LP / Financial Partner) Metrics
+    const inv2ExitProceeds = inv2Distributions[exitYear - 1] || 0;
+    const inv2TotalProceeds = inv2Distributions.reduce((s, v) => s + v, 0);
+    const inv2PreExitDist = inv2TotalProceeds - inv2ExitProceeds;
+    const inv2NetGain = inv2TotalProceeds - inv2Initial;
+    const inv2Moic = inv2Initial > 0 ? Math.round((inv2TotalProceeds / inv2Initial) * 100) / 100 : 0;
+    const inv2Irr = calculateIrr([-inv2Initial, ...inv2Distributions]);
+
+    // Total Overview
+    const totalProceedsTotal = inv1TotalProceeds + inv2TotalProceeds;
+    const preExitDistributionsTotal = inv1PreExitDist + inv2PreExitDist;
+    const exitProceedsTotal = inv1ExitProceeds + inv2ExitProceeds;
+    const netGainTotal = totalProceedsTotal - initialEquity;
+    const totalMoic = initialEquity > 0 ? Math.round((totalProceedsTotal / initialEquity) * 100) / 100 : 0;
+    const totalIrr = calculateIrr([-initialEquity, ...distributableByYear]);
+
+    // Waterfall visualizer steps
+    const waterfallSteps = [
+        {
+            id: 'ev',
+            label: 'Enterprise Value (EV)',
+            amount: enterpriseValue,
+            runningBalance: enterpriseValue,
+            category: 'ev' as const
+        },
+        {
+            id: 'debt_payoff',
+            label: 'Spłata Długu Bankowego',
+            amount: -grossDebt,
+            runningBalance: enterpriseValue - grossDebt,
+            category: 'debt' as const
+        },
+        {
+            id: 'cash_released',
+            label: 'Uwolniona Gotówka',
+            amount: cash,
+            runningBalance: enterpriseValue - grossDebt + cash,
+            category: 'cash' as const
+        },
+        {
+            id: 'equity_value',
+            label: 'Wartość Kapitału (EqV)',
+            amount: exitEquityValue,
+            runningBalance: exitEquityValue,
+            category: 'equity' as const
+        },
+        {
+            id: 'sponsor_proceeds',
+            label: `Sponsor (${sponsorSharePercent.toFixed(0)}%)`,
+            amount: inv1ExitProceeds,
+            runningBalance: inv1ExitProceeds,
+            category: 'sponsor' as const
+        },
+        {
+            id: 'partner_proceeds',
+            label: `Partner Finansowy (${lpSharePercent.toFixed(0)}%)`,
+            amount: inv2ExitProceeds,
+            runningBalance: inv2ExitProceeds,
+            category: 'partner' as const
+        }
+    ];
+
+    return {
+        exitYear,
+        exitMultiple,
+        currency,
+        structure,
+        hurdleRatePercent,
+        carrySharePercent,
+        enterpriseValue,
+        grossDebt,
+        cash,
+        netDebt,
+        exitEquityValue,
+        initialEquityTotal: Math.round(initialEquity),
+        preExitDistributionsTotal,
+        exitProceedsTotal,
+        totalProceedsTotal,
+        netGainTotal,
+        totalMoic,
+        totalIrrPercent: totalIrr,
+        investor1: {
+            investorIndex: 1,
+            name: 'Inwestor 1 (Sponsor / GP)',
+            initialEquity: inv1Initial,
+            sharePercent: sponsorSharePercent,
+            preExitDistributions: inv1PreExitDist,
+            exitProceeds: inv1ExitProceeds,
+            totalProceeds: inv1TotalProceeds,
+            netGain: inv1NetGain,
+            moic: inv1Moic,
+            irrPercent: inv1Irr
+        },
+        investor2: {
+            investorIndex: 2,
+            name: 'Inwestor 2 (Partner Finansowy / LP)',
+            initialEquity: inv2Initial,
+            sharePercent: lpSharePercent,
+            preExitDistributions: inv2PreExitDist,
+            exitProceeds: inv2ExitProceeds,
+            totalProceeds: inv2TotalProceeds,
+            netGain: inv2NetGain,
+            moic: inv2Moic,
+            irrPercent: inv2Irr
+        },
+        waterfallSteps
     };
 }
 

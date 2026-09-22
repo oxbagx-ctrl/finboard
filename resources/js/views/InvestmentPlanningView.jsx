@@ -29,6 +29,7 @@ import { OperatingAssumptionsForm } from '../components/investments/OperatingAss
 import { SensitivityCockpitView } from '../components/investments/SensitivityCockpitView';
 import { ThreeStatementGrid } from '../components/investments/ThreeStatementGrid';
 import { ExitValuationOverlay } from '../components/investments/ExitValuationOverlay';
+import { ExitWaterfallVisualizer } from '../components/investments/ExitWaterfallVisualizer';
 
 export const InvestmentPlanningView = () => {
     const { activeCompany } = useAuth();
@@ -309,6 +310,7 @@ export const InvestmentPlanningView = () => {
                         {activeTab === 'statements' && (
                             <div className="space-y-6">
                                 <ExitValuationOverlay />
+                                <ExitWaterfallVisualizer />
                                 <ThreeStatementGrid />
                             </div>
                         )}
