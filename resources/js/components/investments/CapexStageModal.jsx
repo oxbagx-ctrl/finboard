@@ -156,7 +156,7 @@ export const CapexStageModal = ({
                 </div>
 
                 {/* Form */}
-                <form onSubmit={handleSubmit} className="p-6 space-y-4">
+                <form onSubmit={handleSubmit} className="p-6 space-y-4" noValidate>
                     {errors.general && (
                         <div className="p-3 bg-rose-950/60 border border-rose-800/80 rounded text-rose-300 text-xs">
                             {errors.general}

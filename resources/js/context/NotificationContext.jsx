@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { CheckCircle2, AlertCircle, Info, AlertTriangle, X } from 'lucide-react';
 
-const NotificationContext = createContext(null);
+export const NotificationContext = createContext(null);
 
 export const NotificationProvider = ({ children }) => {
     const [notifications, setNotifications] = useState([]);
