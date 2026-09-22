@@ -8,6 +8,7 @@ use App\Contexts\InvestmentProject\Domain\Repositories\InvestmentProjectReposito
 use App\Contexts\InvestmentProject\Domain\Services\DebtAmortizationService;
 use App\Contexts\InvestmentProject\Domain\Services\DepreciationScheduleService;
 use App\Contexts\InvestmentProject\Domain\Services\GrantAllocationService;
+use App\Contexts\InvestmentProject\Domain\Services\IncomeStatementService;
 use App\Contexts\InvestmentProject\Domain\Services\VatBridgeLoanService;
 use App\Contexts\InvestmentProject\Infrastructure\Repositories\EloquentInvestmentProjectRepository;
 use Illuminate\Support\ServiceProvider;
@@ -28,6 +29,11 @@ final class InvestmentProjectServiceProvider extends ServiceProvider
         $this->app->singleton(VatBridgeLoanService::class, fn () => new VatBridgeLoanService());
         $this->app->singleton(GrantAllocationService::class, fn () => new GrantAllocationService());
         $this->app->singleton(DepreciationScheduleService::class, fn () => new DepreciationScheduleService());
+        $this->app->singleton(IncomeStatementService::class, fn ($app) => new IncomeStatementService(
+            $app->make(DepreciationScheduleService::class),
+            $app->make(DebtAmortizationService::class),
+            $app->make(VatBridgeLoanService::class)
+        ));
     }
 
     /**
