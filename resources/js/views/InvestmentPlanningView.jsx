@@ -22,6 +22,7 @@ import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { Card, MetricCard } from '../components/ui/Card';
 import { CreateProjectModal } from '../components/investments/CreateProjectModal';
+import { CapexScheduleManager } from '../components/investments/CapexScheduleManager';
 
 export const InvestmentPlanningView = () => {
     const { activeCompany } = useAuth();
@@ -279,23 +280,11 @@ export const InvestmentPlanningView = () => {
                                     <Badge variant="brand">WORK IN PROGRESS</Badge>
                                 </div>
 
-                                {/* Placeholder Slots for Commits 208, 209, 210 */}
-                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                                    {/* Commit 208 Slot */}
-                                    <Card
-                                        title="Harmonogram CAPEX (Commit 208)"
-                                        subtitle="CapexScheduleManager"
-                                        className="border-dashed"
-                                    >
-                                        <div className="text-xs text-zinc-400 space-y-2">
-                                            <p>Zarządzanie etapami nakładów inwestycyjnych z walidacją dat i przypisaniem stawek amortyzacji KŚT.</p>
-                                            <div className="p-2 bg-zinc-950 rounded border border-zinc-850 text-[11px] text-zinc-500">
-                                                Etap 1: Prace budowlano-montażowe<br />
-                                                Etap 2: Park maszynowy i linie technologiczne
-                                            </div>
-                                        </div>
-                                    </Card>
+                                {/* Live CapexScheduleManager Component (Commit 208) */}
+                                <CapexScheduleManager />
 
+                                {/* Upcoming Slots for Commits 209, 210 */}
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                                     {/* Commit 209 Slot */}
                                     <Card
                                         title="Montaż Kapitałowy (Commit 209)"
