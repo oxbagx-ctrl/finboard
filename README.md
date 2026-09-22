@@ -498,7 +498,7 @@ W sytuacji niedostępności skrzynki pocztowej odbiorcy lub awarii serwera SMTP,
   - [x] Serwis GrantAllocationService obliczający koszty kwalifikowane, dofinansowanie i transze refundacji.
   - [x] Testy jednostkowe i integracyjne weryfikujące krzywe amortyzacji długu, obrót kredytu VAT i reguły dotacji.
 - [ ] **Faza 40: 15-letni Silnik 3-Statement (RZiS, Bilans, Cash Flow & Test Płynności)**
-  - [ ] Serwis DepreciationScheduleService generujący ruch środków trwałych i amortyzację liniową KŚT.
+  - [x] Serwis DepreciationScheduleService generujący ruch środków trwałych i amortyzację liniową KŚT.
   - [ ] Serwis IncomeStatementService modelujący 15-letni RZiS ze strumieniami przychodów, OPEX, płacami i CIT.
   - [ ] Serwisy BalanceSheetService i CashFlowService z domknięciem bilansowym w ujęciu miesięcznym i rocznym.
   - [ ] Serwis LiquidityBalancingService z detekcją luki gotówkowej, symulacją limitu i alertami ujemnego salda.
