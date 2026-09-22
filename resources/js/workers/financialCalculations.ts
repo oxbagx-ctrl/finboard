@@ -13,7 +13,10 @@ import {
     MonthlyStatementPeriod,
     AnnualStatementPeriod,
     AppraisalMetrics,
-    SimulationResult
+    SimulationResult,
+    ExitValuationParams,
+    ExitValuationResult,
+    ExitSensitivityCell
 } from './types';
 
 // Standard Polish KŚT Asset Depreciation Rates (% per year)
@@ -939,6 +942,174 @@ export function calculateAppraisalMetrics(
 }
 
 /**
+ * Calculate Comprehensive Exit Valuation & Buyer Economics
+ */
+export function calculateExitValuation(
+    annualPeriods: AnnualStatementPeriod[],
+    initialEquity: number,
+    waccPercent: number = 8.50,
+    currency: string = 'PLN',
+    params?: ExitValuationParams
+): ExitValuationResult {
+    const horizonYears = annualPeriods.length || 15;
+    const requestedYear = params?.exitYear ?? Math.min(5, horizonYears);
+    const exitYear = Math.max(1, Math.min(requestedYear, horizonYears));
+    const exitMultiple = params?.exitMultiple ?? 7.5;
+    const tvMethod = params?.tvMethod ?? 'exit_multiple';
+    const perpetualGrowthRatePercent = params?.perpetualGrowthRatePercent ?? 2.5;
+
+    const exitPeriod = annualPeriods[exitYear - 1];
+    const exitEbitda = exitPeriod ? exitPeriod.ebitda : 0;
+    const exitRevenue = exitPeriod ? exitPeriod.revenue : 0;
+    const exitFcff = exitPeriod ? exitPeriod.fcff : 0;
+    const exitFcfe = exitPeriod ? exitPeriod.fcfe : 0;
+    const grossDebtAtExit = exitPeriod ? exitPeriod.closingDebt : 0;
+    const cashAtExit = exitPeriod ? exitPeriod.closingCash : 0;
+    const netDebtAtExit = grossDebtAtExit - cashAtExit;
+
+    // 1. Enterprise Value at Exit
+    let enterpriseValue = 0;
+    if (tvMethod === 'gordon_growth') {
+        const g = perpetualGrowthRatePercent / 100.0;
+        const wacc = waccPercent / 100.0;
+        if (wacc > g) {
+            enterpriseValue = Math.max(0, Math.round((exitFcff * (1.0 + g)) / (wacc - g)));
+        } else {
+            enterpriseValue = Math.max(0, Math.round(exitEbitda * exitMultiple));
+        }
+    } else if (tvMethod === 'book_value') {
+        enterpriseValue = Math.max(0, Math.round(grossDebtAtExit + cashAtExit));
+    } else {
+        enterpriseValue = Math.max(0, Math.round(exitEbitda * exitMultiple));
+    }
+
+    // 2. Equity Value at Exit
+    const equityValue = Math.max(0, Math.round(enterpriseValue - netDebtAtExit));
+
+    // 3. Buyer Yield Metrics
+    const buyerEbitdaYieldPercent = enterpriseValue > 0
+        ? Math.round((exitEbitda / enterpriseValue) * 10000) / 100
+        : (exitMultiple > 0 ? Math.round((1.0 / exitMultiple) * 10000) / 100 : 0);
+    const buyerFcffYieldPercent = enterpriseValue > 0
+        ? Math.round((exitFcff / enterpriseValue) * 10000) / 100
+        : 0;
+    const buyerFcfeYieldPercent = equityValue > 0
+        ? Math.round((exitFcfe / equityValue) * 10000) / 100
+        : 0;
+    const buyerYieldSpreadPercent = Math.round((buyerEbitdaYieldPercent - waccPercent) * 100) / 100;
+    const buyerImpliedPaybackYears = exitEbitda > 0
+        ? Math.round((enterpriseValue / exitEbitda) * 10) / 10
+        : 0;
+
+    // 4. Existing Investor Returns up to Exit
+    let cumulativeDividendsUpToExit = 0;
+    const equityNominalFlows: number[] = [-initialEquity];
+
+    for (let y = 1; y <= exitYear; y++) {
+        const p = annualPeriods[y - 1];
+        const fcfe = p ? p.fcfe : 0;
+        if (fcfe > 0) {
+            cumulativeDividendsUpToExit += fcfe;
+        }
+        let flow = fcfe;
+        if (y === exitYear) {
+            flow += equityValue;
+        }
+        equityNominalFlows.push(flow);
+    }
+
+    const totalInvestorInflows = cumulativeDividendsUpToExit + equityValue;
+    const equityMoic = initialEquity > 0
+        ? Math.round((totalInvestorInflows / initialEquity) * 100) / 100
+        : 0;
+    const equityIrrPercent = calculateIrr(equityNominalFlows);
+    const netCapitalGain = Math.round(totalInvestorInflows - initialEquity);
+
+    // 5. Sensitivity Grid (Multiples vs Exit Years)
+    const baseMult = exitMultiple;
+    const rawMultiples = [baseMult - 2.0, baseMult - 1.0, baseMult, baseMult + 1.0, baseMult + 2.0]
+        .map(m => Math.round(m * 10) / 10)
+        .filter(m => m >= 1.0);
+    const sensitivityMultiples = Array.from(new Set(rawMultiples)).sort((a, b) => a - b);
+
+    const candidateYears = [3, 5, 7, 10, 15].filter(y => y <= horizonYears);
+    if (!candidateYears.includes(exitYear)) {
+        candidateYears.push(exitYear);
+        candidateYears.sort((a, b) => a - b);
+    }
+    const sensitivityYears = candidateYears;
+
+    const sensitivityGrid: ExitSensitivityCell[][] = sensitivityMultiples.map(mult => {
+        return sensitivityYears.map(yr => {
+            const period = annualPeriods[yr - 1];
+            const ebitda = period ? period.ebitda : 0;
+            const debt = period ? period.closingDebt : 0;
+            const cash = period ? period.closingCash : 0;
+            const netDebt = debt - cash;
+            const ev = Math.max(0, Math.round(ebitda * mult));
+            const eqVal = Math.max(0, Math.round(ev - netDebt));
+
+            let cumDiv = 0;
+            const flows: number[] = [-initialEquity];
+            for (let y = 1; y <= yr; y++) {
+                const pr = annualPeriods[y - 1];
+                const fcfe = pr ? pr.fcfe : 0;
+                if (fcfe > 0) cumDiv += fcfe;
+                let fl = fcfe;
+                if (y === yr) fl += eqVal;
+                flows.push(fl);
+            }
+            const totalIn = cumDiv + eqVal;
+            const moic = initialEquity > 0 ? Math.round((totalIn / initialEquity) * 100) / 100 : 0;
+            const irr = calculateIrr(flows);
+            const ebitdaYield = ev > 0 ? Math.round((ebitda / ev) * 10000) / 100 : (mult > 0 ? Math.round((1.0 / mult) * 10000) / 100 : 0);
+
+            return {
+                year: yr,
+                multiple: mult,
+                enterpriseValue: ev,
+                equityValue: eqVal,
+                equityMoic: moic,
+                equityIrrPercent: irr,
+                buyerEbitdaYieldPercent: ebitdaYield
+            };
+        });
+    });
+
+    return {
+        exitYear,
+        horizonYears,
+        currency,
+        exitEbitda: Math.round(exitEbitda),
+        exitRevenue: Math.round(exitRevenue),
+        exitFcff: Math.round(exitFcff),
+        exitFcfe: Math.round(exitFcfe),
+        grossDebtAtExit: Math.round(grossDebtAtExit),
+        cashAtExit: Math.round(cashAtExit),
+        netDebtAtExit: Math.round(netDebtAtExit),
+        enterpriseValue,
+        equityValue,
+        method: tvMethod,
+        exitMultiple,
+        perpetualGrowthRatePercent,
+        buyerEbitdaYieldPercent,
+        buyerFcffYieldPercent,
+        buyerFcfeYieldPercent,
+        buyerYieldSpreadPercent,
+        buyerImpliedPaybackYears,
+        initialEquity: Math.round(initialEquity),
+        cumulativeDividendsUpToExit: Math.round(cumulativeDividendsUpToExit),
+        totalInvestorInflows: Math.round(totalInvestorInflows),
+        equityMoic,
+        equityIrrPercent,
+        netCapitalGain,
+        sensitivityMultiples,
+        sensitivityYears,
+        sensitivityGrid
+    };
+}
+
+/**
  * Execute Complete 15-Year Simulation
  */
 export function runSimulation(
@@ -956,6 +1127,19 @@ export function runSimulation(
         statements.initialCapex,
         statements.initialEquity,
         overrides
+    );
+
+    const defaultExitMultiple = overrides?.exitMultipleOverride ?? project.valuation_multiple?.multiple ?? 7.5;
+    const exitValuation = calculateExitValuation(
+        statements.annualPeriods,
+        statements.initialEquity,
+        appraisal.waccPercent,
+        project.currency || 'PLN',
+        {
+            exitYear: Math.min(5, horizonYears),
+            exitMultiple: defaultExitMultiple,
+            waccPercent: appraisal.waccPercent
+        }
     );
 
     const totalRevenue15Y = statements.annualPeriods.reduce((sum, p) => sum + p.revenue, 0);
@@ -991,6 +1175,7 @@ export function runSimulation(
         annualPeriods: statements.annualPeriods,
         monthlyPeriods: statements.monthlyPeriods,
         monthlyPeriodsCount: statements.monthlyPeriods.length,
-        executionTimeMs
+        executionTimeMs,
+        exitValuation
     };
 }

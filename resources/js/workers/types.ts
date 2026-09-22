@@ -252,6 +252,63 @@ export interface SimulationResult {
     monthlyPeriods?: MonthlyStatementPeriod[];
     monthlyPeriodsCount: number;
     executionTimeMs: number;
+    exitValuation?: ExitValuationResult;
+}
+
+export interface ExitValuationParams {
+    exitYear?: number;
+    exitMultiple?: number;
+    tvMethod?: 'exit_multiple' | 'gordon_growth' | 'book_value';
+    perpetualGrowthRatePercent?: number;
+    waccPercent?: number;
+}
+
+export interface ExitSensitivityCell {
+    year: number;
+    multiple: number;
+    enterpriseValue: number;
+    equityValue: number;
+    equityMoic: number;
+    equityIrrPercent: number | null;
+    buyerEbitdaYieldPercent: number;
+}
+
+export interface ExitValuationResult {
+    exitYear: number;
+    horizonYears: number;
+    currency: string;
+    exitEbitda: number;
+    exitRevenue: number;
+    exitFcff: number;
+    exitFcfe: number;
+    grossDebtAtExit: number;
+    cashAtExit: number;
+    netDebtAtExit: number;
+    enterpriseValue: number;
+    equityValue: number;
+    method: 'exit_multiple' | 'gordon_growth' | 'book_value';
+    exitMultiple: number;
+    perpetualGrowthRatePercent: number;
+
+    // Buyer Yield metrics
+    buyerEbitdaYieldPercent: number;
+    buyerFcffYieldPercent: number;
+    buyerFcfeYieldPercent: number;
+    buyerYieldSpreadPercent: number;
+    buyerImpliedPaybackYears: number;
+
+    // Existing Investor Returns up to Exit
+    initialEquity: number;
+    cumulativeDividendsUpToExit: number;
+    totalInvestorInflows: number;
+    equityMoic: number;
+    equityIrrPercent: number | null;
+    netCapitalGain: number;
+
+    // Sensitivity Matrix
+    sensitivityMultiples: number[];
+    sensitivityYears: number[];
+    sensitivityGrid: ExitSensitivityCell[][];
 }
 
 export interface WorkerRequestMessage {

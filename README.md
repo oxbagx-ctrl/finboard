@@ -516,14 +516,14 @@ W sytuacji niedostępności skrzynki pocztowej odbiorcy lub awarii serwera SMTP,
   - Komponent OperatingAssumptionsForm z liniami przychodów, driverami OPEX, cyklem NWC i matrycą etatów.
   - Testy komponentowe Vitest sprawdzające walidację stanu CapexScheduleManager i konfiguratora finansowania.
 - [x] **Faza 43: Reaktywny Silnik w Przeglądarce i Cockpit Analizy Wrażliwości Real-Time**
-  - [x] Implementacja Web Workera investmentCalculationWorker w TypeScript dla 15-letnich symulacji w tle.
-  - [x] Widok SensitivityCockpitView z suwakami What-If dla CAPEX, przychodów, kosztów zmiennych/stałych i płac.
-  - [x] Komponent ReinvestmentManager obsługujący cykliczne nakłady odtworzeniowe (Nakłady A, B, C).
-  - [x] Przełącznik scenariuszy (Bazowy, Pesymistyczny, Optymistyczny) i trybu spłaty długu.
-  - [x] Testy integracyjne Vitest weryfikujące komunikację z Web Workerem i natychmiastowe odświeżanie KPI.
+  - Implementacja Web Workera investmentCalculationWorker w TypeScript dla 15-letnich symulacji w tle.
+  - Widok SensitivityCockpitView z suwakami What-If dla CAPEX, przychodów, kosztów zmiennych/stałych i płac.
+  - Komponent ReinvestmentManager obsługujący cykliczne nakłady odtworzeniowe (Nakłady A, B, C).
+  - Przełącznik scenariuszy (Bazowy, Pesymistyczny, Optymistyczny) i trybu spłaty długu.
+  - Testy integracyjne Vitest weryfikujące komunikację z Web Workerem i natychmiastowe odświeżanie KPI.
 - [ ] **Faza 44: Prezentacja 15-letnich Sprawozdań i Nakładka Inwestorska Exit Valuation**
   - [x] Komponent ThreeStatementGrid renderujący 15-letni RZiS, Bilans i Cash Flow (widok miesięczny/roczny).
-  - [ ] Komponent ExitValuationOverlay modelujący moment wyjścia, mnożniki EV/EBITDA i yield kupującego.
+  - [x] Komponent ExitValuationOverlay modelujący moment wyjścia, mnożniki EV/EBITDA i yield kupującego.
   - [ ] Komponent ExitWaterfallVisualizer prezentujący spłatę długu netto, podział wpływów, MoIC i Equity IRR.
   - [ ] Komponent BankingCovenantsStrip wyświetlający w czasie rzeczywistym wskaźniki DSCR, ICR i płynności.
   - [ ] Testy Vitest hierarchii ThreeStatementGrid, kalkulacji wyceny wyjścia i progów kowenantów bankowych.

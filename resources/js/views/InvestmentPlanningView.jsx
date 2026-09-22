@@ -28,6 +28,7 @@ import { FinancingStructureConfigurator } from '../components/investments/Financ
 import { OperatingAssumptionsForm } from '../components/investments/OperatingAssumptionsForm';
 import { SensitivityCockpitView } from '../components/investments/SensitivityCockpitView';
 import { ThreeStatementGrid } from '../components/investments/ThreeStatementGrid';
+import { ExitValuationOverlay } from '../components/investments/ExitValuationOverlay';
 
 export const InvestmentPlanningView = () => {
     const { activeCompany } = useAuth();
@@ -306,7 +307,10 @@ export const InvestmentPlanningView = () => {
                         )}
 
                         {activeTab === 'statements' && (
-                            <ThreeStatementGrid />
+                            <div className="space-y-6">
+                                <ExitValuationOverlay />
+                                <ThreeStatementGrid />
+                            </div>
                         )}
 
                         {activeTab === 'dossier' && (
