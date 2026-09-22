@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/../app/Shared/Infrastructure/bcmath_polyfill.php';
+
 use App\Presentation\Api\Middleware\RequireCompanyAccessMiddleware;
 use App\Presentation\Api\Middleware\RoleMiddleware;
 use Illuminate\Foundation\Application;
