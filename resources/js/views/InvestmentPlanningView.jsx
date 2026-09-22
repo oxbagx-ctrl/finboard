@@ -32,6 +32,7 @@ import { ExitValuationOverlay } from '../components/investments/ExitValuationOve
 import { ExitWaterfallVisualizer } from '../components/investments/ExitWaterfallVisualizer';
 import { BankingCovenantsStrip } from '../components/investments/BankingCovenantsStrip';
 import { InvestmentReadinessScorecard } from '../components/investments/InvestmentReadinessScorecard';
+import { CustomReportBuilder } from '../components/investments/CustomReportBuilder';
 
 export const InvestmentPlanningView = () => {
     const { activeCompany } = useAuth();
@@ -321,6 +322,7 @@ export const InvestmentPlanningView = () => {
                         {activeTab === 'dossier' && (
                             <div className="space-y-6">
                                 <InvestmentReadinessScorecard />
+                                <CustomReportBuilder />
                             </div>
                         )}
                     </div>

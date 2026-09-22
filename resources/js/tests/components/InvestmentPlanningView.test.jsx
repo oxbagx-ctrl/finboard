@@ -194,6 +194,7 @@ describe('InvestmentPlanningView Component', () => {
         // Switch to Dossier tab
         fireEvent.click(screen.getByText('4. Scoring & Dossier PDF'));
         expect(screen.getByText('Karta Oceny Gotowości Inwestycyjnej')).toBeInTheDocument();
+        expect(screen.getByText(/Kreator Raportów Finansowych/i)).toBeInTheDocument();
     });
 
     it('opens and closes the CreateProjectModal', async () => {
