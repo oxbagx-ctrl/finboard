@@ -200,6 +200,23 @@ npm test
 - `GET /api/v1/documents/{id}/audit-logs` – Rejestr zdarzeń i pobrań dla wskazanego dokumentu
 - `GET /api/v1/documents/audit-logs` – Zbiorczy dziennik audytowy operacji na dokumentach firmy
 
+### Planowanie Inwestycyjne & Wycena DCF (Deal Advisory & Project Finance)
+- `GET /api/v1/investment-projects` – Lista projektów inwestycyjnych przypisanych do aktywnej spółki
+- `POST /api/v1/investment-projects` – Inicjalizacja nowego projektu inwestycyjnego (budżet, waluta, daty, horyzont)
+- `GET /api/v1/investment-projects/{id}` – Pobranie szczegółów projektu wraz ze strukturą montażu finansowego, etapami CAPEX i instrumentami dłużnymi
+- `PUT /api/v1/investment-projects/{id}` – Aktualizacja parametrów makro, założeń operacyjnych, mnożników wyceny i stóp WACC
+- `DELETE /api/v1/investment-projects/{id}` – Bezpieczne usunięcie projektu i powiązanych harmonogramów długu
+- `POST /api/v1/investment-projects/{projectId}/capex-stages` – Utworzenie etapu CAPEX z kodem KŚT i roczną stawką amortyzacji
+- `PUT /api/v1/investment-projects/{projectId}/capex-stages/{stageId}` – Edycja parametrów nakładu i czasu trwania etapu
+- `DELETE /api/v1/investment-projects/{projectId}/capex-stages/{stageId}` – Usunięcie pojedynczego etapu inwestycyjnego
+- `GET /api/v1/investment-projects/{id}/statements/three-statement` – Kompletny 15-letni model 3-Statement (RZiS, Bilans Zero-Variance, Cash Flow) w ujęciu rocznym lub miesięcznym
+- `GET /api/v1/investment-projects/{id}/statements/income-statement` – Projekcja Rachunku Zysków i Strat z marżami EBITDA, EBIT, EBT i zyskiem netto
+- `GET /api/v1/investment-projects/{id}/statements/balance-sheet` – Projekcja Bilansu z zachowaniem tożsamości Aktywa = Pasywa
+- `GET /api/v1/investment-projects/{id}/statements/cash-flow` – Zestawienie Przepływów Pieniężnych (OCF, ICF, FCF) i salda gotówki
+- `GET /api/v1/investment-projects/{id}/statements/depreciation` – Harmonogram amortyzacji środków trwałych w podziale na grupy KŚT
+- `GET /api/v1/investment-projects/{id}/appraisal` – Wycena DCF, kalkulacja dynamicznego WACC, FCFF, FCFE, NPV, Project/Equity IRR i Payback Period
+- `POST /api/v1/investment-projects/{id}/waterfall` – Rozliczenie kaskady podziału wpływów (Pari Passu vs 2-Tier Hurdle z Carried Interest)
+
 ---
 
 ## ✉️ Konfiguracja Poczty i Diagnostyka SMTP w Środowisku Produkcyjnym
@@ -262,6 +279,69 @@ W sytuacji niedostępności skrzynki pocztowej odbiorcy lub awarii serwera SMTP,
    - Dostępna w widoku `Zarządzanie Doradcami & Uprawnieniami Portfela` w zakładce **Diagnostyka SMTP**.
    - Widżet `SmtpStatusWidget` w czasie rzeczywistym prezentuje status gniazda, host, port, szyfrowanie oraz latencję handshake'u w milisekundach.
    - Przycisk **Testuj SMTP** otwiera modal umożliwiający natychmiastową wysyłkę testowego e-maila w motywie Deal Advisory.
+
+---
+
+## 🏛️ Moduł Deal Advisory, Project Finance & Investment Valuation
+
+Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) to instytucjonalnej klasy podsystem analityczny i silnik modelowania wieloletnich projektów kapitałowych platformy FinBoard, dedykowany dla funduszy Private Equity, bankowości inwestycyjnej, doradców M&A oraz komitetów kredytowych.
+
+### 📐 Architektura Domenowa i Silnik Obliczeniowy
+- **Backend (PHP 8.2 / Laravel 11 / PostgreSQL)**:
+  - Architektura Domain-Driven Design (DDD) i CQRS ze ścisłą separacją warstw *Domain*, *Application* i *Infrastructure*.
+  - Agregat `InvestmentProject` zarządzający encjami: `CapexStage`, `FinancingStructure`, `DebtFacility`, `GrantAllocation`.
+  - Serwisy domenowe: `DebtAmortizationService`, `VatBridgeLoanService`, `GrantAllocationService`, `DepreciationScheduleService`, `IncomeStatementService`, `BalanceSheetService`, `CashFlowService`, `LiquidityBalancingService`, `WaccCalculatorService`, `InvestmentAppraisalService`, `EquityWaterfallSolverService`.
+- **Frontend & Web Worker (React 19 / TypeScript)**:
+  - Dedykowany proces roboczy w tle [`investmentCalculationWorker.ts`](resources/js/workers/investmentCalculationWorker.ts) realizujący 15-letnie symulacje w ujęciu miesięcznym (180 okresów) w czasie poniżej 1 ms, eliminując blokowanie głównego wątku przeglądarki.
+  - Klient singleton [`InvestmentWorkerClient.js`](resources/js/workers/InvestmentWorkerClient.js) zarządzający asynchroniczną kolejką zapytań i memoizacją wyników.
+
+### 📊 15-letni Model 3-Statement & Rygor Bilansowy (Zero Variance)
+- **Rachunek Zysków i Strat (P&L)**:
+  - Dynamika przychodów z krzywą rozruchu technologicznego (Ramp-up mocy).
+  - Klasyfikacja kosztów na zmienne (surowce, media, prowizje), koszty stałe oraz koszty wynagrodzeń z indeksacją płac.
+  - Odpisy amortyzacyjne powiązane z ewidencją Klasyfikacji Środków Trwałych (KŚT).
+  - Obsługa tarczy podatkowej CIT (19%) oraz rozliczania strat podatkowych z lat ubiegłych (Tax Loss Carry-Forward do 50% rocznie).
+- **Bilans (Balance Sheet)**:
+  - Rygorystyczna tożsamość podwójnego zapisu **Zero-Variance**:
+    $$\text{Aktywa Trwałe (Net PPE)} + \text{Aktywa Obrotowe} = \text{Kapitał Własny} + \text{Dług Bankowy} + \text{Zobowiązania Bieżące}$$
+  - Zero-Variance utrzymywane automatycznie we wszystkich 15 latach prognozy z marginesem błędu $\Delta < 1,00\text{ PLN}$.
+- **Rachunek Przepływów Pieniężnych (Cash Flow)**:
+  - Metoda pośrednia uzgadniająca zysk netto z EBITDA, podatkiem CIT oraz zmianami kapitału obrotowego netto ($\Delta\text{NWC}$ bazujące na wskaźnikach rotacji DSO, DPO, DIO).
+  - Ciągłość gotówkowa: $\text{Cash}_t = \text{Cash}_{t-1} + \text{Net Cash Flow}_t$.
+
+### 🏦 Standard Bankowości Inwestycyjnej & Kowenanty LMA
+- **Audyt Bankowalności (LMA Standard)**:
+  - $\text{DSCR} = \frac{\text{CFADS}}{\text{Debt Service}} \ge 1,20\text{x}$ (wskaźnik pokrycia obsługi długu).
+  - $\text{ICR} = \frac{\text{EBITDA}}{\text{Interest}} \ge 2,50\text{x}$ (wskaźnik pokrycia odsetek).
+  - $\text{Leverage} = \frac{\text{Net Debt}}{\text{EBITDA}} \le 3,50\text{x}$ (dźwignia finansowa długu netto).
+  - $\text{Current Ratio} \ge 1,10\text{x}$ (wskaźnik płynności bieżącej).
+  - $\text{DSRF} \ge 6\text{ miesięcy}$ (rezerwa obsługi długu Debt Service Reserve Facility).
+- Komponent [`BankingCovenantsStrip`](resources/js/components/investments/BankingCovenantsStrip.jsx) w czasie rzeczywistym ostrzega o ryzyku naruszenia progów ostrożnościowych i identyfikuje rok krytyczny (Pinch Year).
+
+### 📈 Wycena Inwestycji DCF & Kaskada Wyjścia (Equity Waterfall)
+- **Dynamiczny WACC & DCF**:
+  - Model CAPM z lewarowaną betą, stopą wolną od ryzyka i premią rynkową ERP.
+  - Dyskontowanie wolnych przepływów pieniężnych FCFF (dla firmy) i FCFE (dla właścicieli).
+  - Kalkulacja wartości rezydualnej Terminal Value (model renty wieczystej Gordona-Shapiro).
+- **Nakładka Wyceny Wyjścia ([`ExitValuationOverlay`](resources/js/components/investments/ExitValuationOverlay.jsx))**:
+  - Mostek Enterprise Value do Equity Value przy horyzoncie wyjścia w latach 3–10.
+  - Wycena z perspektywy kupującego (Buyer EBITDA Yield, FCFF Yield, FCFE Yield i spread ponad WACC).
+  - Dwuwymiarowa macierz wrażliwości 5x5 (lata wyjścia $\times$ mnożniki EV/EBITDA).
+- **Kaskada Przepływów Kapitałowych ([`ExitWaterfallVisualizer`](resources/js/components/investments/ExitWaterfallVisualizer.jsx))**:
+  - Modelowanie podziału wpływów ze sprzedaży i dywidend: *Pari Passu* (pro-rata) oraz *Two-Tier Hurdle* (Hurdle Rate 8% + Carried Interest 80% GP / 20% LP).
+  - Wyliczanie wielokrotności zainwestowanego kapitału (MoIC) oraz wewnętrznej stopy zwrotu (Equity IRR) dla każdego z partnerów.
+
+### 📋 Diagnostyka Organizacyjna, Raporty Definiowane & Dossier PDF
+- **Karta Gotowości Inwestycyjnej ([`InvestmentReadinessScorecard`](resources/js/components/investments/InvestmentReadinessScorecard.jsx))**:
+  - 100-punktowa ocena dojrzałości projektu podzielona na 4 filary: Gotowość Formalno-Prawna, Techniczno-Operacyjna, Rynkowa (Offtake/PPA) oraz Finansowa (Bankowalność LMA).
+  - Audyt warunków zawieszających (Conditions Precedent) wymaganych przed uruchomieniem finansowania (Financial Close).
+- **Kreator Raportów Definiowanych ([`CustomReportBuilder`](resources/js/components/investments/CustomReportBuilder.jsx))**:
+  - Dowolne zestawianie pozycji ze sprawozdań finansowych na interaktywnej osi czasu (horyzont 5, 10 lub 15 lat).
+  - Dynamiczny wybór wykresów słupkowych i liniowych, skalowanie kwot (PLN, tys. PLN, mln PLN) oraz eksport do pliku CSV.
+- **Generator Dossier Inwestorskiego ([`InvestmentDossierPdfGenerator`](resources/js/components/investments/InvestmentDossierPdfGenerator.jsx))**:
+  - Kompilacja 15-letniego modelu w oficjalne memorandum inwestycyjne w formacie A4 ze znakami wodnymi (`POUFNE`, `OFICJALNE DOSSIER BANKOWE`, `DRAFT`).
+  - **Certyfikat Integralności SHA-256**: kryptograficzny hash wyliczany z kanonicznych parametrów projektu gwarantujący brak manipulacji danymi (tamper detection).
+  - Natywny wektorowy druk PDF (`window.print`) oraz eksport pełnego dossier audytowego w formacie JSON.
 
 ---
 
@@ -522,17 +602,17 @@ W sytuacji niedostępności skrzynki pocztowej odbiorcy lub awarii serwera SMTP,
   - Przełącznik scenariuszy (Bazowy, Pesymistyczny, Optymistyczny) i trybu spłaty długu.
   - Testy integracyjne Vitest weryfikujące komunikację z Web Workerem i natychmiastowe odświeżanie KPI.
 - [x] **Faza 44: Prezentacja 15-letnich Sprawozdań i Nakładka Inwestorska Exit Valuation**
-  - [x] Komponent ThreeStatementGrid renderujący 15-letni RZiS, Bilans i Cash Flow (widok miesięczny/roczny).
-  - [x] Komponent ExitValuationOverlay modelujący moment wyjścia, mnożniki EV/EBITDA i yield kupującego.
-  - [x] Komponent ExitWaterfallVisualizer prezentujący spłatę długu netto, podział wpływów, MoIC i Equity IRR.
-  - [x] Komponent BankingCovenantsStrip wyświetlający w czasie rzeczywistym wskaźniki DSCR, ICR i płynności.
-  - [x] Testy Vitest hierarchii ThreeStatementGrid, kalkulacji wyceny wyjścia i progów kowenantów bankowych.
-- [ ] **Faza 45: Diagnostyka Organizacyjna, Raporty Definiowane, Dossier PDF i Dokumentacja**
+  - Komponent ThreeStatementGrid renderujący 15-letni RZiS, Bilans i Cash Flow (widok miesięczny/roczny).
+  - Komponent ExitValuationOverlay modelujący moment wyjścia, mnożniki EV/EBITDA i yield kupującego.
+  - Komponent ExitWaterfallVisualizer prezentujący spłatę długu netto, podział wpływów, MoIC i Equity IRR.
+  - Komponent BankingCovenantsStrip wyświetlający w czasie rzeczywistym wskaźniki DSCR, ICR i płynności.
+  - Testy Vitest hierarchii ThreeStatementGrid, kalkulacji wyceny wyjścia i progów kowenantów bankowych.
+- [x] **Faza 45: Diagnostyka Organizacyjna, Raporty Definiowane, Dossier PDF i Dokumentacja**
   - [x] Komponent InvestmentReadinessScorecard oceniający gotowość formalno-prawną, techniczną i rynkową.
   - [x] Komponent CustomReportBuilder umożliwiający dowolne zestawianie pozycji sprawozdań na osi czasu.
   - [x] Generator InvestmentDossierPdfGenerator kompilujący 15-letni model, wykresy i pieczęć integralności SHA-256.
   - [x] Testy end-to-end (E2E) weryfikujące pełny przepływ planowania inwestycji od założeń do dossier PDF.
-  - [ ] Aktualizacja changelogu i README.md z pełną dokumentacją modułu Project Finance & Investment Valuation.
+  - [x] Aktualizacja changelogu i README.md z pełną dokumentacją modułu Project Finance & Investment Valuation.
 
 ---
 
