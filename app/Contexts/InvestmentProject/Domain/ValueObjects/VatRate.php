@@ -57,6 +57,16 @@ final class VatRate implements ValueObject
         return $this->percentage / 100.0;
     }
 
+    public function code(): string
+    {
+        return match ((int) round($this->percentage)) {
+            23 => 'standard',
+            8 => 'reduced',
+            0 => 'zero',
+            default => 'custom',
+        };
+    }
+
     /**
      * Calculate VAT tax amount from a net amount.
      */

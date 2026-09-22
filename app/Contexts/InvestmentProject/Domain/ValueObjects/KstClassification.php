@@ -31,7 +31,7 @@ final class KstClassification implements ValueObject
 
     public function __construct(string $code, ?float $customRate = null, ?string $customName = null)
     {
-        $normalizedCode = strtoupper(trim($code));
+        $normalizedCode = str_replace('-', '_', strtoupper(trim($code)));
 
         if (!array_key_exists($normalizedCode, self::MAPPING)) {
             throw new InvalidArgumentException(
@@ -58,6 +58,11 @@ final class KstClassification implements ValueObject
         return new self($code, $customRate);
     }
 
+    public static function default(): self
+    {
+        return new self('KST_1');
+    }
+
     public function code(): string
     {
         return $this->code;
@@ -69,6 +74,11 @@ final class KstClassification implements ValueObject
     }
 
     public function depreciationRate(): float
+    {
+        return $this->depreciationRate;
+    }
+
+    public function annualDepreciationRate(): float
     {
         return $this->depreciationRate;
     }

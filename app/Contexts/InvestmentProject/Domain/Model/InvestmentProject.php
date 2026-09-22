@@ -230,6 +230,19 @@ final class InvestmentProject extends AggregateRoot
         return $this->capexStages[$stageId] ?? null;
     }
 
+    /**
+     * Reconstitute stages from persistence layer without recording domain events.
+     *
+     * @param array<CapexStage> $stages
+     */
+    public function hydrateCapexStages(array $stages): void
+    {
+        $this->capexStages = [];
+        foreach ($stages as $stage) {
+            $this->capexStages[$stage->id()] = $stage;
+        }
+    }
+
     public function configureDebtFacility(DebtFacility $facility): void
     {
         $this->debtFacility = $facility;

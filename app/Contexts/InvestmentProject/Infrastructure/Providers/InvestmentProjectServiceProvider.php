@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Contexts\InvestmentProject\Infrastructure\Providers;
 
+use App\Contexts\InvestmentProject\Domain\Repositories\InvestmentProjectRepositoryInterface;
+use App\Contexts\InvestmentProject\Infrastructure\Repositories\EloquentInvestmentProjectRepository;
 use Illuminate\Support\ServiceProvider;
 
 final class InvestmentProjectServiceProvider extends ServiceProvider
@@ -13,7 +15,10 @@ final class InvestmentProjectServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // Bindings for repositories and domain services will be registered here.
+        $this->app->bind(
+            InvestmentProjectRepositoryInterface::class,
+            EloquentInvestmentProjectRepository::class
+        );
     }
 
     /**
