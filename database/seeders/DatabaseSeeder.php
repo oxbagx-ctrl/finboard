@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
             IdentitySeeder::class,
             FinancialDataSeeder::class,
             DocumentDataSeeder::class,
+            InvestmentProjectSeeder::class,
         ]);
     }
 }

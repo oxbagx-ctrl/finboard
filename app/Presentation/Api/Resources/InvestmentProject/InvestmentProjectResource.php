@@ -42,6 +42,11 @@ final class InvestmentProjectResource extends JsonResource
                     'vat_bridge_loan' => (float) $fs->vat_bridge_loan,
                     'currency' => $fs->currency,
                     'grant_disbursement_schedule' => $fs->grant_disbursement_schedule,
+                    'investor1_equity' => (float) ($fs->equity_contribution * 0.6),
+                    'investor2_equity' => (float) ($fs->equity_contribution * 0.4),
+                    'equity_amount' => (float) $fs->equity_contribution,
+                    'senior_debt_amount' => (float) $fs->bank_loan_amount,
+                    'debt_facility_amount' => (float) $fs->bank_loan_amount,
                 ];
             }),
             'debt_facilities' => $this->whenLoaded('debtFacilities', function () {
@@ -63,6 +68,38 @@ final class InvestmentProjectResource extends JsonResource
                     ];
                 });
             }),
+            'debt_facility' => $this->whenLoaded('debtFacilities', function () {
+                $df = $this->debtFacilities->first();
+                if ($df === null) {
+                    return null;
+                }
+                return [
+                    'id' => $df->id,
+                    'facility_name' => $df->facility_name,
+                    'principal_amount' => (float) $df->principal_amount,
+                    'base_rate_type' => $df->base_rate_type,
+                    'base_rate_percent' => (float) ($df->base_rate_percent ?? $df->base_rate_value ?? 0),
+                    'base_interest_rate_percent' => (float) ($df->base_rate_percent ?? $df->base_rate_value ?? 0),
+                    'margin_percent' => (float) ($df->margin_percent ?? $df->interest_margin ?? 0),
+                    'interest_margin' => (float) ($df->margin_percent ?? $df->interest_margin ?? 0),
+                    'tenor_months' => (int) $df->tenor_months,
+                    'grace_period_months' => (int) $df->grace_period_months,
+                    'amortization_type' => $df->amortization_type,
+                    'repayment_type' => strtolower($df->amortization_type ?? 'annuity'),
+                    'upfront_fee_percent' => (float) $df->upfront_fee_percent,
+                    'currency' => $df->currency,
+                ];
+            }),
+            'start_date' => $this->relationLoaded('capexStages') && $this->capexStages->isNotEmpty()
+                ? ($this->capexStages->min('start_date')?->format('Y-m-d') ?? '2026-01-01')
+                : '2026-01-01',
+            'planning_horizon_years' => 15,
+            'budget' => [
+                'total_net_capex' => $this->relationLoaded('capexStages')
+                    ? (float) $this->capexStages->sum(fn ($s) => (float) $s->net_amount)
+                    : 0.0,
+                'currency' => $this->currency,
+            ],
             'operating_assumptions' => $this->operating_assumptions,
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),
