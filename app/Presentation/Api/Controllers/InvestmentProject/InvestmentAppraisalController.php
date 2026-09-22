@@ -61,7 +61,8 @@ final class InvestmentAppraisalController
 
         // Terminal value method & parameter
         $tvMethod = isset($validated['tv_method'])
-            ? TerminalValueMethod::tryFrom(strtoupper((string) $validated['tv_method']))
+            ? (TerminalValueMethod::tryFrom(strtolower((string) $validated['tv_method']))
+                ?? TerminalValueMethod::tryFrom(strtoupper((string) $validated['tv_method'])))
             : null;
         $tvParameter = isset($validated['tv_parameter']) ? (float) $validated['tv_parameter'] : null;
 
@@ -115,7 +116,8 @@ final class InvestmentAppraisalController
         $balanceSheet = $this->balanceSheetService->generateStatement($project, $assumptions, $horizonYears, $cashFlow, $incomeStatement, $depSchedule);
 
         $tvMethod = isset($validated['tv_method'])
-            ? TerminalValueMethod::tryFrom(strtoupper((string) $validated['tv_method']))
+            ? (TerminalValueMethod::tryFrom(strtolower((string) $validated['tv_method']))
+                ?? TerminalValueMethod::tryFrom(strtoupper((string) $validated['tv_method'])))
             : null;
         $tvParameter = isset($validated['tv_parameter']) ? (float) $validated['tv_parameter'] : null;
 

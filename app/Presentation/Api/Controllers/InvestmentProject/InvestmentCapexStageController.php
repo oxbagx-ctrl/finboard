@@ -10,7 +10,10 @@ use App\Contexts\InvestmentProject\Application\Commands\RemoveCapexStage\RemoveC
 use App\Contexts\InvestmentProject\Application\Commands\RemoveCapexStage\RemoveCapexStageHandler;
 use App\Contexts\InvestmentProject\Application\Commands\UpdateCapexStage\UpdateCapexStageCommand;
 use App\Contexts\InvestmentProject\Application\Commands\UpdateCapexStage\UpdateCapexStageHandler;
+use App\Contexts\InvestmentProject\Application\Exceptions\CapexStageNotFoundException;
+use App\Contexts\InvestmentProject\Application\Exceptions\InvestmentProjectNotFoundException;
 use App\Models\InvestmentCapexStage;
+use App\Models\InvestmentProject as InvestmentProjectModel;
 use App\Presentation\Api\Requests\InvestmentProject\StoreCapexStageRequest;
 use App\Presentation\Api\Requests\InvestmentProject\UpdateCapexStageRequest;
 use App\Presentation\Api\Resources\InvestmentProject\CapexStageResource;
@@ -18,6 +21,7 @@ use App\Presentation\Api\Traits\ResolvesCompanyContext;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 final class InvestmentCapexStageController
 {
@@ -32,6 +36,11 @@ final class InvestmentCapexStageController
         AddCapexStageHandler $handler
     ): JsonResponse {
         $companyId = $this->resolveCompanyId($request);
+
+        InvestmentProjectModel::query()
+            ->where('company_id', $companyId)
+            ->findOrFail($projectId);
+
         $validated = $request->validated();
 
         $command = new AddCapexStageCommand(
@@ -48,7 +57,11 @@ final class InvestmentCapexStageController
             stageOrder: (int) ($validated['stage_order'] ?? 1)
         );
 
-        $stageId = $handler->handle($command);
+        try {
+            $stageId = $handler->handle($command);
+        } catch (InvestmentProjectNotFoundException | CapexStageNotFoundException $e) {
+            throw new NotFoundHttpException($e->getMessage(), $e);
+        }
 
         $stageModel = InvestmentCapexStage::query()
             ->where('project_id', $projectId)
@@ -72,6 +85,11 @@ final class InvestmentCapexStageController
         UpdateCapexStageHandler $handler
     ): JsonResponse {
         $companyId = $this->resolveCompanyId($request);
+
+        InvestmentProjectModel::query()
+            ->where('company_id', $companyId)
+            ->findOrFail($projectId);
+
         $validated = $request->validated();
 
         $command = new UpdateCapexStageCommand(
@@ -89,7 +107,11 @@ final class InvestmentCapexStageController
             stageOrder: (int) ($validated['stage_order'] ?? 1)
         );
 
-        $handler->handle($command);
+        try {
+            $handler->handle($command);
+        } catch (InvestmentProjectNotFoundException | CapexStageNotFoundException $e) {
+            throw new NotFoundHttpException($e->getMessage(), $e);
+        }
 
         $stageModel = InvestmentCapexStage::query()
             ->where('project_id', $projectId)
@@ -114,13 +136,21 @@ final class InvestmentCapexStageController
     ): JsonResponse {
         $companyId = $this->resolveCompanyId($request);
 
+        InvestmentProjectModel::query()
+            ->where('company_id', $companyId)
+            ->findOrFail($projectId);
+
         $command = new RemoveCapexStageCommand(
             projectId: $projectId,
             companyId: $companyId,
             stageId: $stageId
         );
 
-        $handler->handle($command);
+        try {
+            $handler->handle($command);
+        } catch (InvestmentProjectNotFoundException | CapexStageNotFoundException $e) {
+            throw new NotFoundHttpException($e->getMessage(), $e);
+        }
 
         return new JsonResponse([
             'status' => 'success',

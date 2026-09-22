@@ -155,6 +155,10 @@ final class InvestmentProjectController
     {
         $companyId = $this->resolveCompanyId($request);
 
+        InvestmentProjectModel::query()
+            ->where('company_id', $companyId)
+            ->findOrFail($id);
+
         $this->repository->delete(InvestmentProjectId::fromString($id), $companyId);
 
         return new JsonResponse([

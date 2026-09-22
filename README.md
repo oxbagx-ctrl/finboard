@@ -503,12 +503,12 @@ W sytuacji niedostępności skrzynki pocztowej odbiorcy lub awarii serwera SMTP,
   - Serwisy BalanceSheetService i CashFlowService z domknięciem bilansowym w ujęciu miesięcznym i rocznym.
   - Serwis LiquidityBalancingService z detekcją luki gotówkowej, symulacją limitu i alertami ujemnego salda.
   - Kompleksowe testy PHPUnit weryfikujące spójność matematyczną 3-Statement i zerową wariancję bilansową.
-- [ ] **Faza 41: Dynamiczny WACC, Wycena Efektywności (NPV, IRR) i Equity Waterfall**
+- [x] **Faza 41: Dynamiczny WACC, Wycena Efektywności (NPV, IRR) i Equity Waterfall**
   - [x] Serwis WaccCalculatorService wyliczający średni ważony koszt kapitału z tarczą podatkową i inflacją.
   - [x] Serwis InvestmentAppraisalService obliczający zdyskontowane FCFF/FCFE, NPV, Project IRR, RV i okres zwrotu.
   - [x] Numeryczny solver EquityWaterfallSolverService wyznaczający udziały inwestorów i docelowe stopy IRR.
   - [x] Kontrolery REST API dla zarządzania projektami, pobierania sprawozdań i wskaźników wyceny.
-  - [ ] Testy API weryfikujące endpointy wyceny inwestycji, wielonajemcowość i kalkulacje waterfall.
+  - [x] Testy API weryfikujące endpointy wyceny inwestycji, wielonajemcowość i kalkulacje waterfall.
 - [ ] **Faza 42: Frontend: Kreator Założeń Inwestycyjnych i Harmonogramu CAPEX**
   - [ ] Konfiguracja routingu, nawigacji i layoutu dla modułu Planowania Inwestycji w interfejsie FinBoard.
   - [ ] Komponent CapexScheduleManager z podziałem na etapy, walidacją dat i przypisaniem stawek KŚT.
