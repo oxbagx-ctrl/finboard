@@ -201,6 +201,29 @@ final class GrantAllocationService
     }
 
     /**
+     * Alias for generateFromAggregate.
+     */
+    public function generateSchedule(
+        InvestmentProject $project,
+        string $grantProgramName = 'Dofinansowanie Dotacyjne UE / KPO',
+        ?float $overrideCoFinancingRate = null,
+        ?Money $grantCap = null,
+        float $advanceRatePercent = 20.0,
+        float $finalRetentionPercent = 10.0,
+        int $reimbursementLagMonths = 2
+    ): GrantCalculationResult {
+        return $this->generateFromAggregate(
+            $project,
+            $grantProgramName,
+            $overrideCoFinancingRate,
+            $grantCap,
+            $advanceRatePercent,
+            $finalRetentionPercent,
+            $reimbursementLagMonths
+        );
+    }
+
+    /**
      * Generates detailed tranche schedule for advance, interim milestones, and final settlement.
      *
      * @param array<CapexStage> $capexStages

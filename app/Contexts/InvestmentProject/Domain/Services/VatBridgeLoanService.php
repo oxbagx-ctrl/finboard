@@ -35,6 +35,17 @@ final class VatBridgeLoanService
     }
 
     /**
+     * Alias for generateSchedule.
+     */
+    public function generateFromAggregate(
+        InvestmentProject $project,
+        int $reimbursementLagMonths = 2,
+        float $annualInterestRate = 6.50
+    ): VatBridgeSchedule {
+        return $this->generateSchedule($project, $reimbursementLagMonths, $annualInterestRate);
+    }
+
+    /**
      * Generate VAT Bridge loan schedule from an array of CapexStages.
      *
      * @param array<CapexStage> $stages
@@ -90,15 +101,34 @@ final class VatBridgeLoanService
                 $monthOffset = 0;
             }
 
-            $monthlyCapex = $stage->monthlyCapex();
             $duration = $stage->durationMonths();
+            $stageNet = $stage->netAmount();
+            $stageVat = $vatRate->calculateVat($stageNet);
+            $stageNetAllocated = Money::zero($currency);
+            $stageVatAllocated = Money::zero($currency);
 
             for ($i = 0; $i < $duration; $i++) {
                 $m = 1 + $monthOffset + $i;
                 if (!isset($monthlyNetCapex[$m])) {
                     $monthlyNetCapex[$m] = Money::zero($currency);
                 }
-                $monthlyNetCapex[$m] = $monthlyNetCapex[$m]->add($monthlyCapex);
+                if (!isset($monthlyVatIncurred[$m])) {
+                    $monthlyVatIncurred[$m] = Money::zero($currency);
+                }
+
+                if ($i === $duration - 1) {
+                    $monthNet = $stageNet->subtract($stageNetAllocated);
+                    $monthVat = $stageVat->subtract($stageVatAllocated);
+                } else {
+                    $monthNet = $stage->monthlyCapex();
+                    $monthVat = $vatRate->calculateVat($monthNet);
+                    $stageNetAllocated = $stageNetAllocated->add($monthNet);
+                    $stageVatAllocated = $stageVatAllocated->add($monthVat);
+                }
+
+                $monthlyNetCapex[$m] = $monthlyNetCapex[$m]->add($monthNet);
+                $monthlyVatIncurred[$m] = $monthlyVatIncurred[$m]->add($monthVat);
+
                 if ($m > $maxCapexMonth) {
                     $maxCapexMonth = $m;
                 }
@@ -109,16 +139,12 @@ final class VatBridgeLoanService
         $totalScheduleMonths = $maxCapexMonth + $reimbursementLagMonths;
         $monthlyRate = ($annualInterestRate / 100.0) / 12.0;
 
-        // 2. Map VAT incurred and scheduled refunds
-        /** @var array<int, Money> $monthlyVatIncurred */
-        $monthlyVatIncurred = [];
+        // 2. Map scheduled VAT refunds
         /** @var array<int, Money> $monthlyVatRefunds */
         $monthlyVatRefunds = [];
 
         for ($m = 1; $m <= $totalScheduleMonths; $m++) {
-            $net = $monthlyNetCapex[$m] ?? Money::zero($currency);
-            $vat = $vatRate->calculateVat($net);
-            $monthlyVatIncurred[$m] = $vat;
+            $vat = $monthlyVatIncurred[$m] ?? Money::zero($currency);
 
             // Refund occurs at m + reimbursementLagMonths
             $refundMonth = $m + $reimbursementLagMonths;

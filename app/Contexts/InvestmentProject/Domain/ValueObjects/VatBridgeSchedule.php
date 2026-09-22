@@ -69,6 +69,11 @@ final class VatBridgeSchedule implements ValueObject
         return null;
     }
 
+    public function finalPeriod(): ?VatBridgePeriod
+    {
+        return empty($this->periods) ? null : $this->periods[count($this->periods) - 1];
+    }
+
     public function peakExposure(): Money
     {
         $peak = Money::zero($this->currency());
