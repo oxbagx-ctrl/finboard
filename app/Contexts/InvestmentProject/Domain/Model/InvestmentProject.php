@@ -10,6 +10,8 @@ use App\Contexts\InvestmentProject\Domain\Entities\CapexStage;
 use App\Contexts\InvestmentProject\Domain\Entities\DebtFacility;
 use App\Contexts\InvestmentProject\Domain\Entities\FinancingStructure;
 use App\Contexts\InvestmentProject\Domain\Events\CapexStageAdded;
+use App\Contexts\InvestmentProject\Domain\Events\CapexStageRemoved;
+use App\Contexts\InvestmentProject\Domain\Events\CapexStageUpdated;
 use App\Contexts\InvestmentProject\Domain\Events\DebtFacilityConfigured;
 use App\Contexts\InvestmentProject\Domain\Events\FinancingStructureUpdated;
 use App\Contexts\InvestmentProject\Domain\Events\InvestmentProjectCreated;
@@ -217,11 +219,41 @@ final class InvestmentProject extends AggregateRoot
         );
     }
 
+    public function updateCapexStage(CapexStage $stage): void
+    {
+        if (!isset($this->capexStages[$stage->id()])) {
+            throw new InvalidArgumentException(sprintf('CapexStage %s does not exist on project %s.', $stage->id(), $this->id()));
+        }
+
+        $this->capexStages[$stage->id()] = $stage;
+        $this->touch();
+
+        $this->recordThat(
+            new CapexStageUpdated(
+                $this->id,
+                $stage->stageId(),
+                $stage->name(),
+                $stage->netAmount()->amount(),
+                $stage->netAmount()->currency()->value,
+                $stage->durationMonths(),
+                $stage->kst()->code()
+            )
+        );
+    }
+
     public function removeCapexStage(string $stageId): void
     {
         if (isset($this->capexStages[$stageId])) {
+            $stage = $this->capexStages[$stageId];
             unset($this->capexStages[$stageId]);
             $this->touch();
+
+            $this->recordThat(
+                new CapexStageRemoved(
+                    $this->id,
+                    $stage->stageId()
+                )
+            );
         }
     }
 
