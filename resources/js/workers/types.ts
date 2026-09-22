@@ -165,6 +165,9 @@ export interface MonthlyStatementPeriod {
     netCashFlow: number;
     closingCash: number;
     closingDebt: number;
+    receivables: number;
+    inventory: number;
+    payables: number;
 }
 
 export interface AnnualStatementPeriod {
@@ -191,6 +194,9 @@ export interface AnnualStatementPeriod {
     netCashFlow: number;
     closingCash: number;
     closingDebt: number;
+    closingReceivables: number;
+    closingInventory: number;
+    closingPayables: number;
     fcff: number;
     fcfe: number;
     dscr: number | null;
@@ -243,6 +249,7 @@ export interface SimulationResult {
     };
     appraisal: AppraisalMetrics;
     annualPeriods: AnnualStatementPeriod[];
+    monthlyPeriods?: MonthlyStatementPeriod[];
     monthlyPeriodsCount: number;
     executionTimeMs: number;
 }

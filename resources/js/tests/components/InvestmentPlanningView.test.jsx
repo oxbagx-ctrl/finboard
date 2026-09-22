@@ -189,7 +189,7 @@ describe('InvestmentPlanningView Component', () => {
 
         // Switch to Statements tab
         fireEvent.click(screen.getByText('3. Model 15-letni & Wycena'));
-        expect(screen.getByText('Prezentacja 15-letnich Sprawozdań & Wycena DCF (Faza 44)')).toBeInTheDocument();
+        expect(screen.getByText(/15 Lat \(Rocznie\)/i)).toBeInTheDocument();
 
         // Switch to Dossier tab
         fireEvent.click(screen.getByText('4. Scoring & Dossier PDF'));

@@ -522,7 +522,7 @@ W sytuacji niedostępności skrzynki pocztowej odbiorcy lub awarii serwera SMTP,
   - [x] Przełącznik scenariuszy (Bazowy, Pesymistyczny, Optymistyczny) i trybu spłaty długu.
   - [x] Testy integracyjne Vitest weryfikujące komunikację z Web Workerem i natychmiastowe odświeżanie KPI.
 - [ ] **Faza 44: Prezentacja 15-letnich Sprawozdań i Nakładka Inwestorska Exit Valuation**
-  - [ ] Komponent ThreeStatementGrid renderujący 15-letni RZiS, Bilans i Cash Flow (widok miesięczny/roczny).
+  - [x] Komponent ThreeStatementGrid renderujący 15-letni RZiS, Bilans i Cash Flow (widok miesięczny/roczny).
   - [ ] Komponent ExitValuationOverlay modelujący moment wyjścia, mnożniki EV/EBITDA i yield kupującego.
   - [ ] Komponent ExitWaterfallVisualizer prezentujący spłatę długu netto, podział wpływów, MoIC i Equity IRR.
   - [ ] Komponent BankingCovenantsStrip wyświetlający w czasie rzeczywistym wskaźniki DSCR, ICR i płynności.

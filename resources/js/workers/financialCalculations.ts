@@ -435,7 +435,7 @@ export function calculate15YearStatements(
 
     const monthlyPeriods: MonthlyStatementPeriod[] = [];
     let taxLossPool = 0;
-    let cashBalance = initialEquity + debtSchedule.initialPrincipal;
+    let cashBalance = initialEquity;
     let prevNwc = 0;
 
     for (let m = 1; m <= totalMonths; m++) {
@@ -518,13 +518,15 @@ export function calculate15YearStatements(
         prevNwc = currentNwc;
 
         // Cash flow components
-        const ocf = netIncome + depreciation + changeInNwc;
-        const capex = depSchedule.monthlyCapex[m] || 0;
-        const icf = -capex;
-
         const debtDrawdown = debtSchedule.monthlyDrawdown[m] || 0;
         const debtRepaid = debtSchedule.monthlyPrincipalRepaid[m] || 0;
         const upfrontFee = m === 1 ? debtSchedule.upfrontFee : 0;
+
+        // Upfront fee was expensed in interestExpense (netIncome), so add it back to OCF
+        // to reclassify it as financing cash flow (FCF) and avoid double-deduction.
+        const ocf = netIncome + depreciation + upfrontFee + changeInNwc;
+        const capex = depSchedule.monthlyCapex[m] || 0;
+        const icf = -capex;
         const fcf = debtDrawdown - debtRepaid - upfrontFee;
 
         const netCashFlow = ocf + icf + fcf;
@@ -558,6 +560,9 @@ export function calculate15YearStatements(
             vatLoanRepaid: 0,
             grantReceived: 0,
             changeInNwc,
+            receivables,
+            inventory,
+            payables,
             operatingCashFlow: ocf,
             investingCashFlow: icf,
             financingCashFlow: fcf,
@@ -597,6 +602,9 @@ export function calculate15YearStatements(
         const lastMonth = slice[slice.length - 1];
         const closingCash = lastMonth ? lastMonth.closingCash : 0;
         const closingDebt = lastMonth ? lastMonth.closingDebt : 0;
+        const closingReceivables = lastMonth ? lastMonth.receivables : 0;
+        const closingInventory = lastMonth ? lastMonth.inventory : 0;
+        const closingPayables = lastMonth ? lastMonth.payables : 0;
 
         // FCFF = NOPAT + Depr - Capex + ChangeInNWC
         const nopat = ebit > 0 ? ebit * (1.0 - citRate) : ebit;
@@ -639,6 +647,9 @@ export function calculate15YearStatements(
             netCashFlow,
             closingCash,
             closingDebt,
+            closingReceivables,
+            closingInventory,
+            closingPayables,
             fcff,
             fcfe,
             dscr,
@@ -978,6 +989,7 @@ export function runSimulation(
         },
         appraisal,
         annualPeriods: statements.annualPeriods,
+        monthlyPeriods: statements.monthlyPeriods,
         monthlyPeriodsCount: statements.monthlyPeriods.length,
         executionTimeMs
     };

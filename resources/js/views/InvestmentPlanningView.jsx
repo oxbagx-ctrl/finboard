@@ -27,6 +27,7 @@ import { ReinvestmentManager } from '../components/investments/ReinvestmentManag
 import { FinancingStructureConfigurator } from '../components/investments/FinancingStructureConfigurator';
 import { OperatingAssumptionsForm } from '../components/investments/OperatingAssumptionsForm';
 import { SensitivityCockpitView } from '../components/investments/SensitivityCockpitView';
+import { ThreeStatementGrid } from '../components/investments/ThreeStatementGrid';
 
 export const InvestmentPlanningView = () => {
     const { activeCompany } = useAuth();
@@ -305,22 +306,7 @@ export const InvestmentPlanningView = () => {
                         )}
 
                         {activeTab === 'statements' && (
-                            <Card
-                                title="Prezentacja 15-letnich Sprawozdań & Wycena DCF (Faza 44)"
-                                subtitle="RZiS, Bilans, Przepływy Pieniężne, Exit Valuation & Equity Waterfall"
-                            >
-                                <div className="text-xs text-zinc-400 space-y-3 py-4">
-                                    <p>
-                                        Moduł Fazy 44 zaprezentuje zreconciliowany, 15-letni model finansowy w układzie miesięcznym i rocznym:
-                                    </p>
-                                    <ul className="list-disc list-inside space-y-1 text-zinc-300 text-[11px]">
-                                        <li>Grid 3-Statement z automatyczną weryfikacją testu zbilansowania (Zero Variance)</li>
-                                        <li>Kalkulator wyceny wyjścia (EV/EBITDA multiple, model wzrostu Gordona)</li>
-                                        <li>Wizualizacja podziału wpływów (Pari Passu vs Hurdle & Promote)</li>
-                                        <li>Pasek kowenantów bankowych (DSCR, ICR, Net Debt / EBITDA)</li>
-                                    </ul>
-                                </div>
-                            </Card>
+                            <ThreeStatementGrid />
                         )}
 
                         {activeTab === 'dossier' && (
