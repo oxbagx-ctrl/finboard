@@ -201,6 +201,8 @@ export interface AnnualStatementPeriod {
     fcfe: number;
     dscr: number | null;
     interestCoverageRatio: number | null;
+    debtPrincipalRepaid?: number;
+    debtDrawdown?: number;
 }
 
 export interface AppraisalMetrics {
@@ -253,6 +255,7 @@ export interface SimulationResult {
     monthlyPeriodsCount: number;
     executionTimeMs: number;
     exitValuation?: ExitValuationResult;
+    covenants?: BankingCovenantsResult;
 }
 
 export interface ExitValuationParams {
@@ -369,6 +372,73 @@ export interface ExitWaterfallResult {
         runningBalance: number;
         category: 'ev' | 'debt' | 'cash' | 'equity' | 'sponsor' | 'partner';
     }[];
+}
+
+export interface CovenantThresholds {
+    minDscr: number;           // Standard: 1.20x
+    minIcr: number;            // Standard: 2.50x
+    maxLeverage: number;       // Standard: 3.50x (Net Debt / EBITDA)
+    minCurrentRatio: number;   // Standard: 1.10x
+    minDsrfMonths: number;     // Standard: 6 months
+}
+
+export interface YearlyCovenantMetric {
+    year: number;
+    isCommercial: boolean;
+    hasDebtService: boolean;
+    revenue: number;
+    ebitda: number;
+    ebit: number;
+    interestExpense: number;
+    principalRepaid: number;
+    totalDebtService: number;
+    cfads: number;
+    closingCash: number;
+    closingDebt: number;
+    netDebt: number;
+    currentAssets: number;
+    currentLiabilities: number;
+    dscr: number | null;
+    dscrStatus: 'compliant' | 'warning' | 'breach' | 'na';
+    dscrHeadroom: number | null; // e.g. +0.25 (DSCR - minDscr)
+    dscrHeadroomPercent: number | null; // e.g. +20.8%
+    icr: number | null;
+    icrStatus: 'compliant' | 'warning' | 'breach' | 'na';
+    icrHeadroom: number | null;
+    currentRatio: number | null;
+    currentRatioStatus: 'compliant' | 'warning' | 'breach' | 'na';
+    quickRatio: number | null;
+    leverageRatio: number | null; // Net Debt / EBITDA
+    leverageStatus: 'compliant' | 'warning' | 'breach' | 'na';
+    dsrfMonths: number | null; // Cash / (DebtService / 12)
+    dsrfStatus: 'compliant' | 'warning' | 'breach' | 'na';
+    isCompliant: boolean;
+    breaches: string[];
+}
+
+export interface BankingCovenantsResult {
+    currency: string;
+    thresholds: CovenantThresholds;
+    summary: {
+        minDscr: number | null;
+        avgDscr: number | null;
+        minIcr: number | null;
+        avgIcr: number | null;
+        peakLeverage: number | null;
+        minCurrentRatio: number | null;
+        avgCurrentRatio: number | null;
+        minDsrfMonths: number | null;
+        isBankable: boolean;
+        bankabilityStatus: 'compliant' | 'warning' | 'breach';
+        totalBreachesCount: number;
+        yearsWithBreachCount: number;
+        commercialYearsCount: number;
+        debtServiceYearsCount: number;
+        pinchYear: number | null;
+        pinchDscr: number | null;
+        pinchHeadroomPercent: number | null;
+    };
+    yearlyMetrics: YearlyCovenantMetric[];
 }
 
 export interface WorkerRequestMessage {

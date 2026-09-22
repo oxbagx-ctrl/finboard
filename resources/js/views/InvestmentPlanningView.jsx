@@ -30,6 +30,7 @@ import { SensitivityCockpitView } from '../components/investments/SensitivityCoc
 import { ThreeStatementGrid } from '../components/investments/ThreeStatementGrid';
 import { ExitValuationOverlay } from '../components/investments/ExitValuationOverlay';
 import { ExitWaterfallVisualizer } from '../components/investments/ExitWaterfallVisualizer';
+import { BankingCovenantsStrip } from '../components/investments/BankingCovenantsStrip';
 
 export const InvestmentPlanningView = () => {
     const { activeCompany } = useAuth();
@@ -309,6 +310,7 @@ export const InvestmentPlanningView = () => {
 
                         {activeTab === 'statements' && (
                             <div className="space-y-6">
+                                <BankingCovenantsStrip />
                                 <ExitValuationOverlay />
                                 <ExitWaterfallVisualizer />
                                 <ThreeStatementGrid />

@@ -16,10 +16,12 @@ import {
     SimulationResult,
     ExitValuationParams,
     ExitValuationResult,
-    ExitSensitivityCell,
     ExitWaterfallParams,
     ExitWaterfallResult,
-    WaterfallInvestorMetrics
+    WaterfallInvestorMetrics,
+    CovenantThresholds,
+    YearlyCovenantMetric,
+    BankingCovenantsResult
 } from './types';
 
 // Standard Polish KŚT Asset Depreciation Rates (% per year)
@@ -659,7 +661,9 @@ export function calculate15YearStatements(
             fcff,
             fcfe,
             dscr,
-            interestCoverageRatio: icr
+            interestCoverageRatio: icr,
+            debtPrincipalRepaid: debtRepaidAnnual,
+            debtDrawdown: debtDrawdownAnnual
         });
     }
 
@@ -1335,6 +1339,268 @@ export function calculateExitWaterfall(
 }
 
 /**
+ * Calculate Institutional Banking Covenants (DSCR, ICR, Liquidity, Leverage, DSRF)
+ */
+export function calculateBankingCovenants(
+    annualPeriods: AnnualStatementPeriod[] = [],
+    thresholdsInput?: Partial<CovenantThresholds>,
+    currency: string = 'PLN'
+): BankingCovenantsResult {
+    const thresholds: CovenantThresholds = {
+        minDscr: thresholdsInput?.minDscr ?? 1.20,
+        minIcr: thresholdsInput?.minIcr ?? 2.50,
+        maxLeverage: thresholdsInput?.maxLeverage ?? 3.50,
+        minCurrentRatio: thresholdsInput?.minCurrentRatio ?? 1.10,
+        minDsrfMonths: thresholdsInput?.minDsrfMonths ?? 6,
+    };
+
+    const yearlyMetrics: YearlyCovenantMetric[] = [];
+    let totalBreachesCount = 0;
+    let yearsWithBreachCount = 0;
+    let pinchYear: number | null = null;
+    let pinchDscr: number | null = null;
+    let pinchHeadroomPercent: number | null = null;
+
+    const validDscrList: number[] = [];
+    const validIcrList: number[] = [];
+    const validCurrentRatios: number[] = [];
+    const validLeverages: number[] = [];
+    const validDsrfList: number[] = [];
+
+    let commercialYearsCount = 0;
+    let debtServiceYearsCount = 0;
+
+    for (let i = 0; i < annualPeriods.length; i++) {
+        const period = annualPeriods[i];
+        const year = period.year;
+
+        const principalRepaid = period.debtPrincipalRepaid ?? 0;
+        const interestExpense = period.interestExpense || 0;
+        const totalDebtService = principalRepaid + interestExpense;
+        const hasDebtService = totalDebtService > 0;
+        if (hasDebtService) {
+            debtServiceYearsCount++;
+        }
+
+        const isCommercial = period.revenue > 0 || period.ebitda > 0;
+        if (isCommercial) {
+            commercialYearsCount++;
+        }
+
+        const cfads = Math.max(0, period.ebitda - period.cit + period.changeInNwc);
+        const dscr = period.dscr;
+
+        const breaches: string[] = [];
+
+        // DSCR Status & Headroom
+        let dscrStatus: 'compliant' | 'warning' | 'breach' | 'na' = 'na';
+        let dscrHeadroom: number | null = null;
+        let dscrHeadroomPercent: number | null = null;
+
+        if (dscr !== null && dscr > 0) {
+            validDscrList.push(dscr);
+            dscrHeadroom = Math.round((dscr - thresholds.minDscr) * 100) / 100;
+            dscrHeadroomPercent = Math.round(((dscr - thresholds.minDscr) / thresholds.minDscr) * 1000) / 10;
+
+            if (pinchDscr === null || dscr < pinchDscr) {
+                pinchDscr = dscr;
+                pinchYear = year;
+                pinchHeadroomPercent = dscrHeadroomPercent;
+            }
+
+            if (dscr < thresholds.minDscr) {
+                dscrStatus = 'breach';
+                breaches.push(`DSCR (${dscr.toFixed(2)}x < ${thresholds.minDscr.toFixed(2)}x)`);
+            } else if (dscr < thresholds.minDscr * 1.10) {
+                dscrStatus = 'warning';
+            } else {
+                dscrStatus = 'compliant';
+            }
+        }
+
+        // ICR Status & Headroom
+        const icr = period.interestCoverageRatio;
+        let icrStatus: 'compliant' | 'warning' | 'breach' | 'na' = 'na';
+        let icrHeadroom: number | null = null;
+
+        if (icr !== null && interestExpense > 0) {
+            validIcrList.push(icr);
+            icrHeadroom = Math.round((icr - thresholds.minIcr) * 100) / 100;
+
+            if (icr < thresholds.minIcr) {
+                icrStatus = 'breach';
+                breaches.push(`ICR (${icr.toFixed(2)}x < ${thresholds.minIcr.toFixed(2)}x)`);
+            } else if (icr < thresholds.minIcr * 1.15) {
+                icrStatus = 'warning';
+            } else {
+                icrStatus = 'compliant';
+            }
+        }
+
+        // Current Assets & Liabilities
+        const currentAssets = period.closingCash + period.closingReceivables + period.closingInventory;
+        const currentLiabilities = Math.max(1, period.closingPayables);
+
+        const currentRatio = currentLiabilities > 0
+            ? Math.round((currentAssets / currentLiabilities) * 100) / 100
+            : null;
+        const quickRatio = currentLiabilities > 0
+            ? Math.round(((period.closingCash + period.closingReceivables) / currentLiabilities) * 100) / 100
+            : null;
+
+        let currentRatioStatus: 'compliant' | 'warning' | 'breach' | 'na' = 'na';
+        if (currentRatio !== null && isCommercial) {
+            validCurrentRatios.push(currentRatio);
+            if (currentRatio < thresholds.minCurrentRatio) {
+                currentRatioStatus = 'breach';
+                breaches.push(`Płynność bieżąca (${currentRatio.toFixed(2)}x < ${thresholds.minCurrentRatio.toFixed(2)}x)`);
+            } else if (currentRatio < thresholds.minCurrentRatio * 1.10) {
+                currentRatioStatus = 'warning';
+            } else {
+                currentRatioStatus = 'compliant';
+            }
+        }
+
+        // Net Debt & Leverage (Net Debt / EBITDA)
+        const netDebt = Math.max(0, period.closingDebt - period.closingCash);
+        let leverageRatio: number | null = null;
+        let leverageStatus: 'compliant' | 'warning' | 'breach' | 'na' = 'na';
+
+        if (period.ebitda > 0 && period.closingDebt > 0) {
+            leverageRatio = Math.round((netDebt / period.ebitda) * 100) / 100;
+            validLeverages.push(leverageRatio);
+
+            if (leverageRatio > thresholds.maxLeverage) {
+                leverageStatus = 'breach';
+                breaches.push(`Dźwignia Net Debt/EBITDA (${leverageRatio.toFixed(2)}x > ${thresholds.maxLeverage.toFixed(2)}x)`);
+            } else if (leverageRatio > thresholds.maxLeverage * 0.90) {
+                leverageStatus = 'warning';
+            } else {
+                leverageStatus = 'compliant';
+            }
+        } else if (period.closingDebt === 0) {
+            leverageRatio = 0;
+            leverageStatus = 'compliant';
+        }
+
+        // DSRF Months Coverage (Closing Cash / (Annual Debt Service / 12))
+        let dsrfMonths: number | null = null;
+        let dsrfStatus: 'compliant' | 'warning' | 'breach' | 'na' = 'na';
+
+        if (isCommercial && hasDebtService && totalDebtService > 0) {
+            const monthlyDebtService = totalDebtService / 12;
+            dsrfMonths = Math.round((period.closingCash / monthlyDebtService) * 10) / 10;
+            validDsrfList.push(dsrfMonths);
+
+            if (dsrfMonths < thresholds.minDsrfMonths) {
+                dsrfStatus = 'breach';
+                breaches.push(`Rezerwa DSRF (${dsrfMonths.toFixed(1)} m. < ${thresholds.minDsrfMonths} m.)`);
+            } else if (dsrfMonths < thresholds.minDsrfMonths * 1.25) {
+                dsrfStatus = 'warning';
+            } else {
+                dsrfStatus = 'compliant';
+            }
+        }
+
+        const isCompliant = breaches.length === 0;
+        if (!isCompliant) {
+            yearsWithBreachCount++;
+            totalBreachesCount += breaches.length;
+        }
+
+        yearlyMetrics.push({
+            year,
+            isCommercial,
+            hasDebtService,
+            revenue: period.revenue,
+            ebitda: period.ebitda,
+            ebit: period.ebit,
+            interestExpense,
+            principalRepaid,
+            totalDebtService,
+            cfads,
+            closingCash: period.closingCash,
+            closingDebt: period.closingDebt,
+            netDebt,
+            currentAssets,
+            currentLiabilities,
+            dscr,
+            dscrStatus,
+            dscrHeadroom,
+            dscrHeadroomPercent,
+            icr,
+            icrStatus,
+            icrHeadroom,
+            currentRatio,
+            currentRatioStatus,
+            quickRatio,
+            leverageRatio,
+            leverageStatus,
+            dsrfMonths,
+            dsrfStatus,
+            isCompliant,
+            breaches,
+        });
+    }
+
+    const minDscr = validDscrList.length > 0 ? Math.min(...validDscrList) : null;
+    const avgDscr = validDscrList.length > 0
+        ? Math.round((validDscrList.reduce((a, b) => a + b, 0) / validDscrList.length) * 100) / 100
+        : null;
+
+    const minIcr = validIcrList.length > 0 ? Math.min(...validIcrList) : null;
+    const avgIcr = validIcrList.length > 0
+        ? Math.round((validIcrList.reduce((a, b) => a + b, 0) / validIcrList.length) * 100) / 100
+        : null;
+
+    const peakLeverage = validLeverages.length > 0 ? Math.max(...validLeverages) : null;
+
+    const minCurrentRatio = validCurrentRatios.length > 0 ? Math.min(...validCurrentRatios) : null;
+    const avgCurrentRatio = validCurrentRatios.length > 0
+        ? Math.round((validCurrentRatios.reduce((a, b) => a + b, 0) / validCurrentRatios.length) * 100) / 100
+        : null;
+
+    const minDsrfMonths = validDsrfList.length > 0 ? Math.min(...validDsrfList) : null;
+
+    const isBankable = totalBreachesCount === 0 && (minDscr === null || minDscr >= thresholds.minDscr);
+
+    let bankabilityStatus: 'compliant' | 'warning' | 'breach' = 'compliant';
+    if (totalBreachesCount > 0) {
+        bankabilityStatus = 'breach';
+    } else if (
+        (minDscr !== null && minDscr < thresholds.minDscr * 1.10) ||
+        (minIcr !== null && minIcr < thresholds.minIcr * 1.15)
+    ) {
+        bankabilityStatus = 'warning';
+    }
+
+    return {
+        currency,
+        thresholds,
+        summary: {
+            minDscr,
+            avgDscr,
+            minIcr,
+            avgIcr,
+            peakLeverage,
+            minCurrentRatio,
+            avgCurrentRatio,
+            minDsrfMonths,
+            isBankable,
+            bankabilityStatus,
+            totalBreachesCount,
+            yearsWithBreachCount,
+            commercialYearsCount,
+            debtServiceYearsCount,
+            pinchYear,
+            pinchDscr,
+            pinchHeadroomPercent,
+        },
+        yearlyMetrics,
+    };
+}
+
+/**
  * Execute Complete 15-Year Simulation
  */
 export function runSimulation(
@@ -1365,6 +1631,12 @@ export function runSimulation(
             exitMultiple: defaultExitMultiple,
             waccPercent: appraisal.waccPercent
         }
+    );
+
+    const covenants = calculateBankingCovenants(
+        statements.annualPeriods,
+        undefined,
+        project.currency || 'PLN'
     );
 
     const totalRevenue15Y = statements.annualPeriods.reduce((sum, p) => sum + p.revenue, 0);
@@ -1401,6 +1673,7 @@ export function runSimulation(
         monthlyPeriods: statements.monthlyPeriods,
         monthlyPeriodsCount: statements.monthlyPeriods.length,
         executionTimeMs,
-        exitValuation
+        exitValuation,
+        covenants
     };
 }
