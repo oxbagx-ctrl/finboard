@@ -6,6 +6,7 @@ namespace App\Contexts\InvestmentProject\Infrastructure\Providers;
 
 use App\Contexts\InvestmentProject\Domain\Repositories\InvestmentProjectRepositoryInterface;
 use App\Contexts\InvestmentProject\Domain\Services\DebtAmortizationService;
+use App\Contexts\InvestmentProject\Domain\Services\VatBridgeLoanService;
 use App\Contexts\InvestmentProject\Infrastructure\Repositories\EloquentInvestmentProjectRepository;
 use Illuminate\Support\ServiceProvider;
 
@@ -22,6 +23,7 @@ final class InvestmentProjectServiceProvider extends ServiceProvider
         );
 
         $this->app->singleton(DebtAmortizationService::class, fn () => new DebtAmortizationService());
+        $this->app->singleton(VatBridgeLoanService::class, fn () => new VatBridgeLoanService());
     }
 
     /**

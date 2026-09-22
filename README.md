@@ -494,7 +494,7 @@ W sytuacji niedostępności skrzynki pocztowej odbiorcy lub awarii serwera SMTP,
 - [ ] **Faza 39: Inżynieria Finansowa, Kredyt Inwestycyjny, Kredyt Pomostowy VAT i Dotacje**
   - [x] Komendy i handlery CQRS dla inicjalizacji projektu oraz zarządzania etapami CAPEX.
   - [x] Serwis DebtAmortizationService obsługujący raty równe vs malejące z WIBOR, marżą i prowizjami.
-  - [ ] Serwis VatBridgeLoanService modelujący finansowanie VAT od nakładów budowlanych i zwroty z US.
+  - [x] Serwis VatBridgeLoanService modelujący finansowanie VAT od nakładów budowlanych i zwroty z US.
   - [ ] Serwis GrantAllocationService obliczający koszty kwalifikowane, dofinansowanie i transze refundacji.
   - [ ] Testy jednostkowe i integracyjne weryfikujące krzywe amortyzacji długu, obrót kredytu VAT i reguły dotacji.
 - [ ] **Faza 40: 15-letni Silnik 3-Statement (RZiS, Bilans, Cash Flow & Test Płynności)**
