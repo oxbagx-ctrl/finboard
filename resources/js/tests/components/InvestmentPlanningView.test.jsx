@@ -185,7 +185,7 @@ describe('InvestmentPlanningView Component', () => {
 
         // Switch to Sensitivity tab
         fireEvent.click(screen.getByText('2. Symulator What-If'));
-        expect(screen.getByText('Reaktywny Cockpit Analizy Wrażliwości (Faza 43)')).toBeInTheDocument();
+        expect(screen.getByText('Cockpit Analizy Wrażliwości & Symulator What-If')).toBeInTheDocument();
 
         // Switch to Statements tab
         fireEvent.click(screen.getByText('3. Model 15-letni & Wycena'));

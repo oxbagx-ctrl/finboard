@@ -25,6 +25,7 @@ import { CreateProjectModal } from '../components/investments/CreateProjectModal
 import { CapexScheduleManager } from '../components/investments/CapexScheduleManager';
 import { FinancingStructureConfigurator } from '../components/investments/FinancingStructureConfigurator';
 import { OperatingAssumptionsForm } from '../components/investments/OperatingAssumptionsForm';
+import { SensitivityCockpitView } from '../components/investments/SensitivityCockpitView';
 
 export const InvestmentPlanningView = () => {
     const { activeCompany } = useAuth();
@@ -294,22 +295,7 @@ export const InvestmentPlanningView = () => {
                         )}
 
                         {activeTab === 'sensitivity' && (
-                            <Card
-                                title="Reaktywny Cockpit Analizy Wrażliwości (Faza 43)"
-                                subtitle="Symulacje What-If w tle za pomocą dedykowanego Web Workera"
-                            >
-                                <div className="text-xs text-zinc-400 space-y-3 py-4">
-                                    <p>
-                                        Moduł Fazy 43 dostarczy interaktywny pulpit analityczny umożliwiający natychmiastowe przeliczanie 15-letniego modelu przy dynamicznych zmianach suwaków:
-                                    </p>
-                                    <ul className="list-disc list-inside space-y-1 text-zinc-300 text-[11px]">
-                                        <li>Odchylenie CAPEX (-20% do +30%) i opóźnienie harmonogramu (1–12 mies.)</li>
-                                        <li>Wrażliwość przychodów ze sprzedaży i marży brutto na produktach</li>
-                                        <li>Cykliczne nakłady odtworzeniowe (Reinvestment A, B, C)</li>
-                                        <li>Scenariusze makro: Bazowy, Pesymistyczny (Stres-test), Optymistyczny</li>
-                                    </ul>
-                                </div>
-                            </Card>
+                            <SensitivityCockpitView />
                         )}
 
                         {activeTab === 'statements' && (

@@ -517,7 +517,7 @@ W sytuacji niedostępności skrzynki pocztowej odbiorcy lub awarii serwera SMTP,
   - Testy komponentowe Vitest sprawdzające walidację stanu CapexScheduleManager i konfiguratora finansowania.
 - [ ] **Faza 43: Reaktywny Silnik w Przeglądarce i Cockpit Analizy Wrażliwości Real-Time**
   - [x] Implementacja Web Workera investmentCalculationWorker w TypeScript dla 15-letnich symulacji w tle.
-  - [ ] Widok SensitivityCockpitView z suwakami What-If dla CAPEX, przychodów, kosztów zmiennych/stałych i płac.
+  - [x] Widok SensitivityCockpitView z suwakami What-If dla CAPEX, przychodów, kosztów zmiennych/stałych i płac.
   - [ ] Komponent ReinvestmentManager obsługujący cykliczne nakłady odtworzeniowe (Nakłady A, B, C).
   - [ ] Przełącznik scenariuszy (Bazowy, Pesymistyczny, Optymistyczny) i trybu spłaty długu.
   - [ ] Testy integracyjne Vitest weryfikujące komunikację z Web Workerem i natychmiastowe odświeżanie KPI.
