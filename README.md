@@ -495,7 +495,7 @@ W sytuacji niedostępności skrzynki pocztowej odbiorcy lub awarii serwera SMTP,
   - [x] Komendy i handlery CQRS dla inicjalizacji projektu oraz zarządzania etapami CAPEX.
   - [x] Serwis DebtAmortizationService obsługujący raty równe vs malejące z WIBOR, marżą i prowizjami.
   - [x] Serwis VatBridgeLoanService modelujący finansowanie VAT od nakładów budowlanych i zwroty z US.
-  - [ ] Serwis GrantAllocationService obliczający koszty kwalifikowane, dofinansowanie i transze refundacji.
+  - [x] Serwis GrantAllocationService obliczający koszty kwalifikowane, dofinansowanie i transze refundacji.
   - [ ] Testy jednostkowe i integracyjne weryfikujące krzywe amortyzacji długu, obrót kredytu VAT i reguły dotacji.
 - [ ] **Faza 40: 15-letni Silnik 3-Statement (RZiS, Bilans, Cash Flow & Test Płynności)**
   - [ ] Serwis DepreciationScheduleService generujący ruch środków trwałych i amortyzację liniową KŚT.
