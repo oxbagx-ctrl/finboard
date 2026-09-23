@@ -98,6 +98,17 @@ describe('OperatingAssumptionsForm Component', () => {
         expect(screen.getAllByText(/5.*100.*000,00/i).length).toBeGreaterThanOrEqual(1);
     });
 
+    it('displays live projection for revenues factoring ramp-up and organic growth', () => {
+        renderWithContext(mockProject);
+
+        const revPanel = screen.getByTestId('revenue-projection-panel');
+        expect(revPanel).toBeInTheDocument();
+        expect(screen.getByText(/Szacowane Przychody Wieloletnie:/i)).toBeInTheDocument();
+
+        // Year 1 COD: 5 000 000 * 0.65 ramp-up = 3 250 000 PLN
+        expect(screen.getByText(/R1 COD:\s*3\s*250\s*000/i)).toBeInTheDocument();
+    });
+
     it('switches to OPEX sub-tab and updates variable cost percentage', () => {
         renderWithContext(mockProject);
 
@@ -110,6 +121,39 @@ describe('OperatingAssumptionsForm Component', () => {
         const fixedCostInput = screen.getByLabelText(/Roczne Koszty Stałe Bazowe/i);
         fireEvent.change(fixedCostInput, { target: { value: '450000' } });
         expect(fixedCostInput.value).toBe('450000');
+    });
+
+    it('displays multi-year live projection panel for fixed costs and reacts to inflation slider changes', () => {
+        renderWithContext(mockProject);
+
+        const opexTab = screen.getByRole('button', { name: /2\. Koszty OPEX/i });
+        fireEvent.click(opexTab);
+
+        const projectionPanel = screen.getByTestId('fixed-cost-projection-panel');
+        expect(projectionPanel).toBeInTheDocument();
+        expect(screen.getByText(/Projekcja Eskalacji Kosztów Stałych \(15 lat\):/i)).toBeInTheDocument();
+
+        // Base 400 000 PLN, 2.5% inflation:
+        // (1 + 0.025)^14 - 1 = +41.3% in Year 15
+        expect(screen.getByText(/\+41\.3% w R15/i)).toBeInTheDocument();
+        // Year 5: 400 000 * (1.025)^4 = 441 525,16 PLN
+        expect(screen.getByText(/Rok 5 \(\+10\.4%\)/i)).toBeInTheDocument();
+        // Year 10: 400 000 * (1.025)^9 = 499 545,19 PLN
+        expect(screen.getByText(/Rok 10 \(\+24\.9%\)/i)).toBeInTheDocument();
+
+        // Check explanatory formula callout
+        expect(screen.getByText(/Baza × \(1 \+ r\)\^\(t-1\)/i)).toBeInTheDocument();
+
+        // Adjust inflation slider to 5.0%
+        const sliders = screen.getAllByRole('slider');
+        // The fixed cost slider is the second slider in OPEX tab (first is variable cost %)
+        const fixedCostSlider = sliders[1];
+        fireEvent.change(fixedCostSlider, { target: { value: '5.0' } });
+
+        // (1 + 0.05)^14 - 1 = +98.0% in Year 15
+        expect(screen.getByText(/\+98\.0% w R15/i)).toBeInTheDocument();
+        expect(screen.getByText(/Rok 5 \(\+21\.6%\)/i)).toBeInTheDocument();
+        expect(screen.getByText(/Rok 10 \(\+55\.1%\)/i)).toBeInTheDocument();
     });
 
     it('switches to NWC sub-tab and calculates cash conversion cycle', () => {

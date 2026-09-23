@@ -657,6 +657,11 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
   - [x] Aktualizacja repozytorium domenowego `EloquentInvestmentProjectRepository` i zasobu API `CapexStageResource` gwarantująca bezstratny zapis i odczyt kwoty kwalifikowanej.
   - [x] Dostosowanie okna modalnego `CapexStageModal.jsx` oraz widoku `CapexScheduleManager.jsx` zapewniające zachowanie ręcznie wprowadzonej kwoty zamiast nadpisywania maksymalną kwotą netto.
   - [x] Rozszerzenie testów integracyjnych PHPUnit (`InvestmentValuationApiTest.php`) oraz frontendowych Vitest (`CapexScheduleManager.test.jsx`).
+  - [x] Eliminacja luki prezentacyjnej (UX/UI Feedback Gap) w sekcji *Założenia Operacyjne & Model P&L* (`OperatingAssumptionsForm.jsx`).
+  - [x] Dodanie interaktywnego panelu projekcji eskalacji kosztów stałych (`fixed-cost-projection-panel`) pod suwakiem *„Eskalacja Inflacyjna Kosztów Stałych (%)”*.
+  - [x] Kalkulacja w czasie rzeczywistym trajektorii wieloletniej (Rok 5, Rok 10, skumulowany narzut 15-letni $\Sigma$, dynamika wzrostu procentowego w R15) oraz nota objaśniająca formułę $Baza \times (1 + r)^{t-1}$.
+  - [x] Dodanie towarzyszącego panelu szacunków wieloletnich przychodów (`revenue-projection-panel`) uwzględniającego dynamikę organiczną i krzywą ramp-up.
+  - [x] Rozszerzenie zestawu testów Vitest (`OperatingAssumptionsForm.test.jsx`) o weryfikację reaktywności suwaków i projekcji wieloletniej.
 
 ---
 

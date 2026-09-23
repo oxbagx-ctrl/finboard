@@ -180,6 +180,73 @@ export const OperatingAssumptionsForm = () => {
     const calculatedEbitda = calculatedAnnualRevenueBase - calculatedVariableCosts - annualFixedCostsBase - calculatedAnnualPayrollBase;
     const calculatedEbitdaMargin = calculatedAnnualRevenueBase > 0 ? (calculatedEbitda / calculatedAnnualRevenueBase) * 100 : 0;
 
+    // Fixed cost inflation trajectory projection (15-year horizon)
+    const fixedCostProjection = useMemo(() => {
+        const base = Number(annualFixedCostsBase) || 0;
+        const rate = (Number(fixedCostGrowthRate) || 0) / 100;
+
+        // Year 1 (COD): base * (1 + rate)^0 = base
+        const year1 = base;
+        // Year 5: base * (1 + rate)^4
+        const year5 = base * Math.pow(1 + rate, 4);
+        // Year 10: base * (1 + rate)^9
+        const year10 = base * Math.pow(1 + rate, 9);
+        // Year 15: base * (1 + rate)^14
+        const year15 = base * Math.pow(1 + rate, 14);
+
+        let total15Y = 0;
+        for (let t = 1; t <= 15; t++) {
+            total15Y += base * Math.pow(1 + rate, t - 1);
+        }
+
+        const inflationSurcharge15Y = Math.max(0, total15Y - (15 * base));
+        const growthPercent5Y = base > 0 ? ((year5 - base) / base) * 100 : 0;
+        const growthPercent10Y = base > 0 ? ((year10 - base) / base) * 100 : 0;
+        const growthPercent15Y = base > 0 ? ((year15 - base) / base) * 100 : 0;
+
+        return {
+            year1,
+            year5,
+            year10,
+            year15,
+            total15Y,
+            inflationSurcharge15Y,
+            growthPercent5Y,
+            growthPercent10Y,
+            growthPercent15Y,
+        };
+    }, [annualFixedCostsBase, fixedCostGrowthRate]);
+
+    // Revenue multi-year trajectory projection (15-year horizon factoring in ramp-up)
+    const revenueProjection = useMemo(() => {
+        const base = Number(calculatedAnnualRevenueBase) || 0;
+        const rate = (Number(revenueGrowthRate) || 0) / 100;
+        const r1 = (Number(capacityRampUp[1]) || 100) / 100;
+        const r2 = (Number(capacityRampUp[2]) || 100) / 100;
+        const r3 = (Number(capacityRampUp[3]) || 100) / 100;
+
+        const year1 = base * Math.pow(1 + rate, 0) * r1;
+        const year2 = base * Math.pow(1 + rate, 1) * r2;
+        const year5 = base * Math.pow(1 + rate, 4) * r3;
+        const year10 = base * Math.pow(1 + rate, 9) * r3;
+        const year15 = base * Math.pow(1 + rate, 14) * r3;
+
+        let total15Y = 0;
+        for (let t = 1; t <= 15; t++) {
+            const ramp = t === 1 ? r1 : t === 2 ? r2 : r3;
+            total15Y += base * Math.pow(1 + rate, t - 1) * ramp;
+        }
+
+        return {
+            year1,
+            year2,
+            year5,
+            year10,
+            year15,
+            total15Y,
+        };
+    }, [calculatedAnnualRevenueBase, revenueGrowthRate, capacityRampUp]);
+
     // Cash Conversion Cycle: CCC = DIO + DSO - DPO
     const cashConversionCycle = dio + dso - dpo;
 
@@ -543,6 +610,33 @@ export const OperatingAssumptionsForm = () => {
                             <p className="text-[11px] text-zinc-500">
                                 Dynamika indeksacji cen lub wzrostu wolumenu sprzedaży w kolejnych latach operacyjnych.
                             </p>
+
+                            {/* Live Projection Feedback for Revenue Growth */}
+                            <div className="p-3 bg-zinc-900/80 rounded-lg border border-zinc-800/90 space-y-2 mt-2" data-testid="revenue-projection-panel">
+                                <div className="flex items-center justify-between text-xs">
+                                    <span className="text-zinc-300 font-medium flex items-center gap-1.5">
+                                        <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />
+                                        Szacowane Przychody Wieloletnie:
+                                    </span>
+                                    <span className="text-[11px] text-emerald-400 font-mono font-medium">
+                                        R1 COD: {formatCurrency(revenueProjection.year1, currency)}
+                                    </span>
+                                </div>
+                                <div className="grid grid-cols-2 gap-2 text-xs font-mono">
+                                    <div className="bg-zinc-950/70 p-2 rounded border border-zinc-800/80">
+                                        <span className="text-[10px] text-zinc-400 block mb-0.5">Rok 5 ({capacityRampUp[3] || 100}% Ramp-Up)</span>
+                                        <span className="text-zinc-100 font-semibold block truncate" title={formatCurrency(revenueProjection.year5, currency)}>
+                                            {formatCurrency(revenueProjection.year5, currency)}
+                                        </span>
+                                    </div>
+                                    <div className="bg-zinc-950/70 p-2 rounded border border-zinc-800/80">
+                                        <span className="text-[10px] text-zinc-400 block mb-0.5">Rok 10 ({capacityRampUp[3] || 100}% Ramp-Up)</span>
+                                        <span className="text-zinc-100 font-semibold block truncate" title={formatCurrency(revenueProjection.year10, currency)}>
+                                            {formatCurrency(revenueProjection.year10, currency)}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div className="bg-zinc-950/60 p-4 rounded-lg border border-zinc-800/80 space-y-3">
@@ -664,6 +758,51 @@ export const OperatingAssumptionsForm = () => {
                                     onChange={(e) => setFixedCostGrowthRate(parseFloat(e.target.value) || 0)}
                                     className="w-full accent-amber-500 cursor-pointer"
                                 />
+                            </div>
+
+                            {/* Live Compounding & Multi-Year Projection Feedback */}
+                            <div className="p-3.5 bg-zinc-900/80 rounded-lg border border-zinc-800/90 space-y-3" data-testid="fixed-cost-projection-panel">
+                                <div className="flex items-center justify-between text-xs">
+                                    <span className="text-zinc-300 font-medium flex items-center gap-1.5">
+                                        <TrendingUp className="w-3.5 h-3.5 text-amber-400" />
+                                        Projekcja Eskalacji Kosztów Stałych (15 lat):
+                                    </span>
+                                    <span className={`font-mono text-[11px] px-2 py-0.5 rounded font-semibold ${
+                                        fixedCostGrowthRate > 0
+                                            ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                                            : 'bg-zinc-800 text-zinc-400'
+                                    }`}>
+                                        +{fixedCostProjection.growthPercent15Y.toFixed(1)}% w R15
+                                    </span>
+                                </div>
+
+                                <div className="grid grid-cols-3 gap-2 text-xs font-mono">
+                                    <div className="bg-zinc-950/70 p-2 rounded border border-zinc-800/80">
+                                        <span className="text-[10px] text-zinc-400 block mb-0.5">Rok 5 (+{fixedCostProjection.growthPercent5Y.toFixed(1)}%)</span>
+                                        <span className="text-zinc-100 font-semibold block truncate" title={formatCurrency(fixedCostProjection.year5, currency)}>
+                                            {formatCurrency(fixedCostProjection.year5, currency)}
+                                        </span>
+                                    </div>
+                                    <div className="bg-zinc-950/70 p-2 rounded border border-zinc-800/80">
+                                        <span className="text-[10px] text-zinc-400 block mb-0.5">Rok 10 (+{fixedCostProjection.growthPercent10Y.toFixed(1)}%)</span>
+                                        <span className="text-zinc-100 font-semibold block truncate" title={formatCurrency(fixedCostProjection.year10, currency)}>
+                                            {formatCurrency(fixedCostProjection.year10, currency)}
+                                        </span>
+                                    </div>
+                                    <div className="bg-zinc-950/70 p-2 rounded border border-zinc-800/80">
+                                        <span className="text-[10px] text-amber-400/90 block mb-0.5">Narzut 15L (&Sigma;)</span>
+                                        <span className="text-amber-400 font-bold block truncate" title={formatCurrency(fixedCostProjection.inflationSurcharge15Y, currency)}>
+                                            +{formatCurrency(fixedCostProjection.inflationSurcharge15Y, currency)}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-start gap-1.5 text-[11px] text-zinc-400 leading-relaxed pt-1 border-t border-zinc-800/60">
+                                    <Info className="w-3.5 h-3.5 text-amber-400/80 shrink-0 mt-0.5" />
+                                    <span>
+                                        Stopa eskalacji indeksuje koszty stałe (O&M, podatki, ubezpieczenia) w latach operacyjnych Y2–Y15 wg formuły <code className="text-zinc-300 font-mono bg-zinc-800 px-1 py-0.5 rounded text-[10px]">Baza &times; (1 + r)^(t-1)</code>. Wpływa na wieloletni RZiS, marże EBITDA, wskaźniki DSCR i wycenę DCF.
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
