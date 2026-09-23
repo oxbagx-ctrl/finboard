@@ -646,6 +646,9 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
   - [x] Odblokowanie edycji pól „Nazwa Programu” oraz „Opis i Zakres Rzeczowy” dla nakładów odtworzeniowych w `ReinvestmentManager.jsx` z eliminacją sztywnych danych OZE/SCADA.
   - [x] Reaktywna synchronizacja zmienionych nazw programów z 15-letnią osią czasu (*Timeline Grid*) i dymkami zdarzeń odtworzeniowych.
   - [x] Rozszerzenie testów Vitest weryfikujących edycję, zapis do API i odtwarzanie własnych nazw programów (`ReinvestmentManager.test.jsx`).
+  - [x] Dynamiczna legenda 15-letniej osi czasu reinvestmentu (`ReinvestmentManager.jsx`) odzwierciedlająca aktualne nazwy programów i kolory wskaźników.
+  - [x] Reaktywne filtrowanie legendy wykluczające wyłączone programy (`enabled === false`) oraz obsługa stanów pustych (*Brak aktywnych nakładów*, *Reinvestment wyłączony w modelu*).
+  - [x] Rozszerzenie testów Vitest o weryfikację reaktywności legendy, dynamicznych nazw i filtrowania aktywnych nakładów (`ReinvestmentManager.test.jsx`).
 
 ---
 

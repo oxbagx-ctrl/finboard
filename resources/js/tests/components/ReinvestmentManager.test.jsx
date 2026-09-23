@@ -340,6 +340,42 @@ describe('ReinvestmentManager Component (Phase 43 Commit 214)', () => {
         expect(screen.getByLabelText(/Nazwa Programu A/i).value).toBe('Program A: Wymiana Robotów Spawalniczych');
         expect(screen.getByLabelText(/Opis i Zakres Rzeczowy A/i).value).toBe('Modernizacja osprzętu robotów na linii nadwozi');
     });
+
+    it('renders dynamic legend with reactive names and filters out disabled programs (Commit 235)', () => {
+        renderComponent();
+
+        const legend = screen.getByTestId('timeline-legend');
+
+        // Initially all 3 programs are enabled with default names
+        expect(legend).toHaveTextContent(/Nakład A \(Elektronika, SCADA i Falowniki\)/i);
+        expect(legend).toHaveTextContent(/Nakład B \(Remont Kapitalny Maszyn i Ciągów\)/i);
+        expect(legend).toHaveTextContent(/Nakład C \(Tabor i Osprzęt Pomocniczy\)/i);
+
+        // Rename Program A to "Program A: Lorem" and Program B to "Program B: Ipsum"
+        const nameInputA = screen.getByLabelText(/Nazwa Programu A/i);
+        const nameInputB = screen.getByLabelText(/Nazwa Programu B/i);
+        fireEvent.change(nameInputA, { target: { value: 'Program A: Lorem' } });
+        fireEvent.change(nameInputB, { target: { value: 'Program B: Ipsum' } });
+
+        expect(legend).toHaveTextContent('Nakład A (Lorem)');
+        expect(legend).toHaveTextContent('Nakład B (Ipsum)');
+
+        // Disable Program C
+        const checkboxes = screen.getAllByRole('checkbox');
+        // checkboxes[0] = master, checkboxes[1] = A, checkboxes[2] = B, checkboxes[3] = C
+        fireEvent.click(checkboxes[3]);
+
+        // Program C should now be absent from the legend
+        expect(legend).not.toHaveTextContent(/Nakład C/i);
+        expect(legend).toHaveTextContent('Nakład A (Lorem)');
+        expect(legend).toHaveTextContent('Nakład B (Ipsum)');
+
+        // Disable master reinvestments switch
+        fireEvent.click(checkboxes[0]);
+        expect(legend).toHaveTextContent(/Reinvestment wyłączony w modelu/i);
+        expect(legend).not.toHaveTextContent(/Nakład A/i);
+    });
 });
+
 
 

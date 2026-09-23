@@ -657,16 +657,28 @@ export const ReinvestmentManager = ({
                     </div>
 
                     {/* Legend */}
-                    <div className="flex items-center gap-3 text-[10px]">
-                        <span className="flex items-center gap-1 text-cyan-400">
-                            <span className="w-2 h-2 rounded-full bg-cyan-400" /> Nakład A (IT/SCADA)
-                        </span>
-                        <span className="flex items-center gap-1 text-emerald-400">
-                            <span className="w-2 h-2 rounded-full bg-emerald-400" /> Nakład B (Maszyny)
-                        </span>
-                        <span className="flex items-center gap-1 text-purple-400">
-                            <span className="w-2 h-2 rounded-full bg-purple-400" /> Nakład C (Tabor)
-                        </span>
+                    <div className="flex flex-wrap items-center gap-3 text-[10px]" data-testid="timeline-legend">
+                        {reinvestmentsEnabled ? (
+                            programs.filter(p => p.enabled).length > 0 ? (
+                                programs.filter(p => p.enabled).map(p => {
+                                    const badgeLabel = p.program_type === 'program_a' ? 'Nakład A' : p.program_type === 'program_b' ? 'Nakład B' : 'Nakład C';
+                                    const cleanName = p.name ? p.name.replace(/^Program\s+[A-C]:\s*/i, '').trim() : '';
+                                    const displayLabel = cleanName ? `${badgeLabel} (${cleanName})` : badgeLabel;
+                                    const textColor = p.color === 'cyan' ? 'text-cyan-400' : p.color === 'emerald' ? 'text-emerald-400' : 'text-purple-400';
+                                    const dotColor = p.color === 'cyan' ? 'bg-cyan-400' : p.color === 'emerald' ? 'bg-emerald-400' : 'bg-purple-400';
+
+                                    return (
+                                        <span key={p.id} className={`flex items-center gap-1 ${textColor}`} title={p.name}>
+                                            <span className={`w-2 h-2 rounded-full ${dotColor}`} /> {displayLabel}
+                                        </span>
+                                    );
+                                })
+                            ) : (
+                                <span className="text-zinc-500 italic">Brak aktywnych nakładów</span>
+                            )
+                        ) : (
+                            <span className="text-zinc-500 italic">Reinvestment wyłączony w modelu</span>
+                        )}
                     </div>
                 </div>
 
