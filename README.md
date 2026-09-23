@@ -626,42 +626,56 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
   - Naprawa układu horyzontalnej osi czasu w sekcji *Matryca Wdrożeń Reinvestmentu (15-Year Timeline)* w `ReinvestmentManager.jsx` z zabezpieczeniem stylu inline.
   - Weryfikacja spójności wizualnej kafelków lat Y1–Y15, plakietek programów A, B, C oraz kwot rocznego zapotrzebowania CAPEX.
 - [x] **Faza 48: Poprawki Modułu Planowania Inwestycyjnego**
-  - [x] Usunięcie błędu retencji danych historycznych w oknie modalnym tworzenia projektu (`CreateProjectModal.jsx`).
-  - [x] Automatyczny reset stanu formularza przy otwarciu (`isOpen`), anulowaniu oraz pomyślnym utworzeniu projektu.
-  - [x] Warunkowe montowanie komponentu `{isCreateModalOpen && <CreateProjectModal ... />}` w widoku `InvestmentPlanningView.jsx`.
-  - [x] Testy automatyczne Vitest weryfikujące pełną czystość formularza przy dodawaniu kolejnych projektów portfelowych.
-  - [x] Usunięcie developerskich oznaczeń etapów wdrożeniowych (`Faza 42`, `Faza 43`, `Faza 44`, `Faza 45`) z zakładek nawigacyjnych widoku `InvestmentPlanningView.jsx`.
-  - [x] Zastąpienie tymczasowej plakietki `WORK IN PROGRESS` profesjonalnym identyfikatorem sekcji `PARAMETRY WEJŚCIOWE`, a w `ReinvestmentManager.jsx` zastąpienie `FAZA 43` technicznym oznaczeniem `KŚT / 15L`.
-  - [x] Dostosowanie i pomyślna weryfikacja asercji w testach jednostkowych i integracyjnych (`InvestmentPlanningView.test.jsx`, `investmentPlanningE2EWorkflow.test.jsx`, `ReinvestmentManager.test.jsx`).
-  - [x] Usunięcie zaszłości prototypowych (sztywnych strumieni OZE MWh, etatów inżynierów i kosztów stałych 350k PLN) z formularza założeń operacyjnych (`OperatingAssumptionsForm.jsx`).
-  - [x] Generator czystych parametrów początkowych (`getDefaultAssumptions`) oraz pełny reset stanu w `useEffect` i `handleReset` eliminujący wyciek danych między projektami.
-  - [x] Wprowadzenie profesjonalnych wierszy Empty State w tabelach strumieni przychodowych oraz matrycy etatów (Headcount Matrix) z możliwością usuwania wierszy powracając do czystego stanu początkowego.
-  - [x] Rozszerzenie testów Vitest weryfikujących zachowanie czystego projektu, dodawanie strumieni z Empty State i izolację projektów (`OperatingAssumptionsForm.test.jsx`, `InvestmentStateValidation.test.jsx`).
-  - [x] Naprawa reguł walidacji FormRequest (`UpdateInvestmentProjectRequest.php`) zapobiegająca odrzucaniu pól `reinvestment_programs` i `reinvestments_enabled` przez `$request->validated()`.
-  - [x] Usunięcie problemu resetowania wyłączonych nakładów odtworzeniowych (NAKŁAD A, B, C) i utraty założeń reinwestycyjnych po kliknięciu „Zapisz Założenia Reinvestmentu”.
-  - [x] Rozszerzenie testów integracyjnych Laravel Feature Test (`InvestmentValuationApiTest.php`) oraz frontendowych Vitest (`ReinvestmentManager.test.jsx`) weryfikujących trwałość flagi `enabled: false`.
-  - [x] Inteligentna obsługa wskaźników struktury kapitałowej w sekcji Montażu Finansowego (`FinancingStructureConfigurator.jsx`) dla projektów z zerowym CAPEX (tryb dualny: `% Kapitału` przy zdefiniowanym kapitale oraz fallback `0.0% CAPEX`).
-  - [x] Zabezpieczenie przycisków szybkiego wyboru (`20% CAPEX`, `30% CAPEX`, `50% LTV`, `70% LTV`, `VAT 23%`) przed zerowaniem wartości przy braku etapów w harmonogramie CAPEX.
-  - [x] Rozszerzenie testów Vitest o weryfikację wskaźników kapitałowych i stanów zerowego CAPEX (`FinancingStructureConfigurator.test.jsx`).
-  - [x] Odblokowanie edycji pól „Nazwa Programu” oraz „Opis i Zakres Rzeczowy” dla nakładów odtworzeniowych w `ReinvestmentManager.jsx` z eliminacją sztywnych danych OZE/SCADA.
-  - [x] Reaktywna synchronizacja zmienionych nazw programów z 15-letnią osią czasu (*Timeline Grid*) i dymkami zdarzeń odtworzeniowych.
-  - [x] Rozszerzenie testów Vitest weryfikujących edycję, zapis do API i odtwarzanie własnych nazw programów (`ReinvestmentManager.test.jsx`).
-  - [x] Dynamiczna legenda 15-letniej osi czasu reinvestmentu (`ReinvestmentManager.jsx`) odzwierciedlająca aktualne nazwy programów i kolory wskaźników.
-  - [x] Reaktywne filtrowanie legendy wykluczające wyłączone programy (`enabled === false`) oraz obsługa stanów pustych (*Brak aktywnych nakładów*, *Reinvestment wyłączony w modelu*).
-  - [x] Rozszerzenie testów Vitest o weryfikację reaktywności legendy, dynamicznych nazw i filtrowania aktywnych nakładów (`ReinvestmentManager.test.jsx`).
-  - [x] Wielotrybowy kokpit wizualizacji reinvestmentu (View Switcher) w `ReinvestmentManager.jsx` z 3 trybami: Siatka 15L (`matrix`), Słupki Skumulowane `BarChart` (`stacked_bars`) oraz Wykres Łączony `ComposedChart` / S-Curve (`combo_curve`).
-  - [x] Dedykowany institutional tooltip analityczny (`ReinvestmentChartTooltip`) prezentujący rok, wykaz programów z kwotami i procentowym udziałem, roczną sumę CAPEX oraz skumulowany wydatek od początku projektu.
-  - [x] Rozszerzenie testów jednostkowych Vitest o weryfikację selektora widoków, przełączania trybów oraz wskaźnika S-Curve w legendzie (`ReinvestmentManager.test.jsx`).
-  - [x] Trwałość i precyzja kwoty wydatków kwalifikowanych (Grant Eligible Amount) w harmonogramie etapów CAPEX (`investment_capex_stages`).
-  - [x] Migracja bazy danych dodająca kolumnę `grant_eligible_amount` (decimal 15,4, nullable) oraz mapowanie w encji Eloquent i modelu domenowym `CapexStage`.
-  - [x] Aktualizacja repozytorium domenowego `EloquentInvestmentProjectRepository` i zasobu API `CapexStageResource` gwarantująca bezstratny zapis i odczyt kwoty kwalifikowanej.
-  - [x] Dostosowanie okna modalnego `CapexStageModal.jsx` oraz widoku `CapexScheduleManager.jsx` zapewniające zachowanie ręcznie wprowadzonej kwoty zamiast nadpisywania maksymalną kwotą netto.
-  - [x] Rozszerzenie testów integracyjnych PHPUnit (`InvestmentValuationApiTest.php`) oraz frontendowych Vitest (`CapexScheduleManager.test.jsx`).
-  - [x] Eliminacja luki prezentacyjnej (UX/UI Feedback Gap) w sekcji *Założenia Operacyjne & Model P&L* (`OperatingAssumptionsForm.jsx`).
-  - [x] Dodanie interaktywnego panelu projekcji eskalacji kosztów stałych (`fixed-cost-projection-panel`) pod suwakiem *„Eskalacja Inflacyjna Kosztów Stałych (%)”*.
-  - [x] Kalkulacja w czasie rzeczywistym trajektorii wieloletniej (Rok 5, Rok 10, skumulowany narzut 15-letni $\Sigma$, dynamika wzrostu procentowego w R15) oraz nota objaśniająca formułę $Baza \times (1 + r)^{t-1}$.
-  - [x] Dodanie towarzyszącego panelu szacunków wieloletnich przychodów (`revenue-projection-panel`) uwzględniającego dynamikę organiczną i krzywą ramp-up.
-  - [x] Rozszerzenie zestawu testów Vitest (`OperatingAssumptionsForm.test.jsx`) o weryfikację reaktywności suwaków i projekcji wieloletniej.
+  - Usunięcie błędu retencji danych historycznych w oknie modalnym tworzenia projektu (`CreateProjectModal.jsx`).
+  - Automatyczny reset stanu formularza przy otwarciu (`isOpen`), anulowaniu oraz pomyślnym utworzeniu projektu.
+  - Warunkowe montowanie komponentu `{isCreateModalOpen && <CreateProjectModal ... />}` w widoku `InvestmentPlanningView.jsx`.
+  - Testy automatyczne Vitest weryfikujące pełną czystość formularza przy dodawaniu kolejnych projektów portfelowych.
+  - Usunięcie developerskich oznaczeń etapów wdrożeniowych (`Faza 42`, `Faza 43`, `Faza 44`, `Faza 45`) z zakładek nawigacyjnych widoku `InvestmentPlanningView.jsx`.
+  - Zastąpienie tymczasowej plakietki `WORK IN PROGRESS` profesjonalnym identyfikatorem sekcji `PARAMETRY WEJŚCIOWE`, a w `ReinvestmentManager.jsx` zastąpienie `FAZA 43` technicznym oznaczeniem `KŚT / 15L`.
+  - Dostosowanie i pomyślna weryfikacja asercji w testach jednostkowych i integracyjnych (`InvestmentPlanningView.test.jsx`, `investmentPlanningE2EWorkflow.test.jsx`, `ReinvestmentManager.test.jsx`).
+  - Usunięcie zaszłości prototypowych (sztywnych strumieni OZE MWh, etatów inżynierów i kosztów stałych 350k PLN) z formularza założeń operacyjnych (`OperatingAssumptionsForm.jsx`).
+  - Generator czystych parametrów początkowych (`getDefaultAssumptions`) oraz pełny reset stanu w `useEffect` i `handleReset` eliminujący wyciek danych między projektami.
+  - Wprowadzenie profesjonalnych wierszy Empty State w tabelach strumieni przychodowych oraz matrycy etatów (Headcount Matrix) z możliwością usuwania wierszy powracając do czystego stanu początkowego.
+  - Rozszerzenie testów Vitest weryfikujących zachowanie czystego projektu, dodawanie strumieni z Empty State i izolację projektów (`OperatingAssumptionsForm.test.jsx`, `InvestmentStateValidation.test.jsx`).
+  - Naprawa reguł walidacji FormRequest (`UpdateInvestmentProjectRequest.php`) zapobiegająca odrzucaniu pól `reinvestment_programs` i `reinvestments_enabled` przez `$request->validated()`.
+  - Usunięcie problemu resetowania wyłączonych nakładów odtworzeniowych (NAKŁAD A, B, C) i utraty założeń reinwestycyjnych po kliknięciu „Zapisz Założenia Reinvestmentu”.
+  - Rozszerzenie testów integracyjnych Laravel Feature Test (`InvestmentValuationApiTest.php`) oraz frontendowych Vitest (`ReinvestmentManager.test.jsx`) weryfikujących trwałość flagi `enabled: false`.
+  - Inteligentna obsługa wskaźników struktury kapitałowej w sekcji Montażu Finansowego (`FinancingStructureConfigurator.jsx`) dla projektów z zerowym CAPEX (tryb dualny: `% Kapitału` przy zdefiniowanym kapitale oraz fallback `0.0% CAPEX`).
+  - Zabezpieczenie przycisków szybkiego wyboru (`20% CAPEX`, `30% CAPEX`, `50% LTV`, `70% LTV`, `VAT 23%`) przed zerowaniem wartości przy braku etapów w harmonogramie CAPEX.
+  - Rozszerzenie testów Vitest o weryfikację wskaźników kapitałowych i stanów zerowego CAPEX (`FinancingStructureConfigurator.test.jsx`).
+  - Odblokowanie edycji pól „Nazwa Programu” oraz „Opis i Zakres Rzeczowy” dla nakładów odtworzeniowych w `ReinvestmentManager.jsx` z eliminacją sztywnych danych OZE/SCADA.
+  - Reaktywna synchronizacja zmienionych nazw programów z 15-letnią osią czasu (*Timeline Grid*) i dymkami zdarzeń odtworzeniowych.
+  - Rozszerzenie testów Vitest weryfikujących edycję, zapis do API i odtwarzanie własnych nazw programów (`ReinvestmentManager.test.jsx`).
+  - Dynamiczna legenda 15-letniej osi czasu reinvestmentu (`ReinvestmentManager.jsx`) odzwierciedlająca aktualne nazwy programów i kolory wskaźników.
+  - Reaktywne filtrowanie legendy wykluczające wyłączone programy (`enabled === false`) oraz obsługa stanów pustych (*Brak aktywnych nakładów*, *Reinvestment wyłączony w modelu*).
+  - Rozszerzenie testów Vitest o weryfikację reaktywności legendy, dynamicznych nazw i filtrowania aktywnych nakładów (`ReinvestmentManager.test.jsx`).
+  - Wielotrybowy kokpit wizualizacji reinvestmentu (View Switcher) w `ReinvestmentManager.jsx` z 3 trybami: Siatka 15L (`matrix`), Słupki Skumulowane `BarChart` (`stacked_bars`) oraz Wykres Łączony `ComposedChart` / S-Curve (`combo_curve`).
+  - Dedykowany institutional tooltip analityczny (`ReinvestmentChartTooltip`) prezentujący rok, wykaz programów z kwotami i procentowym udziałem, roczną sumę CAPEX oraz skumulowany wydatek od początku projektu.
+  - Rozszerzenie testów jednostkowych Vitest o weryfikację selektora widoków, przełączania trybów oraz wskaźnika S-Curve w legendzie (`ReinvestmentManager.test.jsx`).
+  - Trwałość i precyzja kwoty wydatków kwalifikowanych (Grant Eligible Amount) w harmonogramie etapów CAPEX (`investment_capex_stages`).
+  - Migracja bazy danych dodająca kolumnę `grant_eligible_amount` (decimal 15,4, nullable) oraz mapowanie w encji Eloquent i modelu domenowym `CapexStage`.
+  - Aktualizacja repozytorium domenowego `EloquentInvestmentProjectRepository` i zasobu API `CapexStageResource` gwarantująca bezstratny zapis i odczyt kwoty kwalifikowanej.
+  - Dostosowanie okna modalnego `CapexStageModal.jsx` oraz widoku `CapexScheduleManager.jsx` zapewniające zachowanie ręcznie wprowadzonej kwoty zamiast nadpisywania maksymalną kwotą netto.
+  - Rozszerzenie testów integracyjnych PHPUnit (`InvestmentValuationApiTest.php`) oraz frontendowych Vitest (`CapexScheduleManager.test.jsx`).
+  - Eliminacja luki prezentacyjnej (UX/UI Feedback Gap) w sekcji *Założenia Operacyjne & Model P&L* (`OperatingAssumptionsForm.jsx`).
+  - Dodanie interaktywnego panelu projekcji eskalacji kosztów stałych (`fixed-cost-projection-panel`) pod suwakiem *„Eskalacja Inflacyjna Kosztów Stałych (%)”*.
+  - Kalkulacja w czasie rzeczywistym trajektorii wieloletniej (Rok 5, Rok 10, skumulowany narzut 15-letni $\Sigma$, dynamika wzrostu procentowego w R15) oraz nota objaśniająca formułę $Baza \times (1 + r)^{t-1}$.
+  - Dodanie towarzyszącego panelu szacunków wieloletnich przychodów (`revenue-projection-panel`) uwzględniającego dynamikę organiczną i krzywą ramp-up.
+  - Rozszerzenie zestawu testów Vitest (`OperatingAssumptionsForm.test.jsx`) o weryfikację reaktywności suwaków i projekcji wieloletniej.
+
+- [ ] **Faza 49: Bankowalny model podatkowy (CIT & Tax Loss Carry-Forward) zgodny z art. 7 ust. 5 i art. 19 ustawy o CIT**
+  - [x] **Commit 239**: Korekta UI, synchronizacja stawki CIT z tarczą podatkową WACC i parametryzacja FormRequest.
+    - Eliminacja literówki w `OperatingAssumptionsForm.jsx` (*Limit Rocznego Odliczenia Straty (%)*).
+    - Synchronizacja tarczy podatkowej długu WACC $K_d \cdot (1 - T)$ z dynamiczną stawką CIT projektu (19% lub preferencyjne 9% dla małych podatników).
+    - Rozszerzenie metody fabrycznej `WaccParameters::defaultForPoland(?float $preTaxCostOfDebt = null, ?float $taxRatePercent = null)` oraz `WaccCalculatorService`.
+    - Dodanie interaktywnej karty tarczy podatkowej WACC w zakładce *5. Podatki & CIT*.
+    - Parametryzacja reguł walidacyjnych w żądaniach `UpdateInvestmentProjectRequest`, `InvestmentStatementQueryRequest` oraz `InvestmentAppraisalQueryRequest`.
+    - Testy jednostkowe WACC (`WaccCalculatorServiceTest.php`) oraz frontendowe (`OperatingAssumptionsForm.test.jsx`).
+  - [ ] **Commit 240**: Model domenowy rocznikowania strat podatkowych (Tax Loss Vintages & 5-Year Expiry).
+  - [ ] **Commit 241**: Roczny model zaliczek CIT (YTD) i obsługa jednorazowego odliczenia 5 mln zł w IncomeStatementService.
+  - [ ] **Commit 242**: Parzystość matematyczna w silniku Web Worker (financialCalculations.ts).
+  - [ ] **Commit 243**: Interfejs UI fiskalnego panelu CIT i podgląd trajektorii tarczy podatkowej (Tax Loss Roll-Forward).
+  - [ ] **Commit 244**: Kompleksowe testy integracyjne, regresja 3-Statement & aktualizacja dokumentacji README.md.
 
 ---
 

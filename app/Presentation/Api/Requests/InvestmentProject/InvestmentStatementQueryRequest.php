@@ -33,6 +33,8 @@ final class InvestmentStatementQueryRequest extends FormRequest
             'cit_rate_percent' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'tax_loss_carry_forward_enabled' => ['nullable', 'boolean'],
             'tax_loss_offset_cap_percent' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'tax_loss_settlement_mode' => ['nullable', 'string', 'in:standard_loss_cap,one_off_5m,ebt_cap'],
+            'tax_loss_one_off_cap_amount' => ['nullable', 'numeric', 'min:0'],
         ];
     }
 }

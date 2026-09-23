@@ -78,7 +78,7 @@ final class WaccParameters implements ValueObject
     /**
      * Standard parameters calibrated for Polish corporate finance and 10Y Polish Treasury bonds.
      */
-    public static function defaultForPoland(?float $preTaxCostOfDebt = null): self
+    public static function defaultForPoland(?float $preTaxCostOfDebt = null, ?float $taxRatePercent = null): self
     {
         return new self(
             riskFreeRatePercent: 5.25,      // Rentowność 10-letnich obligacji skarbowych RP
@@ -86,7 +86,7 @@ final class WaccParameters implements ValueObject
             beta: 1.00,                     // Rynkowa beta bazowa
             sizeRiskPremiumPercent: 1.50,   // Premia za wielkość / specyficzne ryzyko projektu
             preTaxCostOfDebtPercent: $preTaxCostOfDebt,
-            taxRatePercent: 19.0,           // Stawka podatku CIT
+            taxRatePercent: $taxRatePercent ?? 19.0, // Stawka podatku CIT (domyślnie 19%)
             inflationRatePercent: 2.50,     // Cel inflacyjny NBP
             unleveredBeta: 0.80             // Domyślna nieoddźwignięta beta aktywów
         );
@@ -189,7 +189,7 @@ final class WaccParameters implements ValueObject
 
     public function equals(ValueObject $other): bool
     {
-        if (!$other instanceof self) {
+        if (! $other instanceof self) {
             return false;
         }
 

@@ -14,8 +14,14 @@ use InvalidArgumentException;
 
 final class WaccCalculatorService
 {
-    public function __construct()
+    public function __construct() {}
+
+    /**
+     * Factory helper to instantiate standard Polish WACC parameters with customizable debt cost and CIT rate.
+     */
+    public static function defaultForPoland(?float $preTaxCostOfDebt = null, ?float $taxRatePercent = null): WaccParameters
     {
+        return WaccParameters::defaultForPoland($preTaxCostOfDebt, $taxRatePercent);
     }
 
     /**

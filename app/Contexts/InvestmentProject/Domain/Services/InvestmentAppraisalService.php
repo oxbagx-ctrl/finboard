@@ -13,8 +13,10 @@ use App\Contexts\InvestmentProject\Domain\ValueObjects\BalanceSheet;
 use App\Contexts\InvestmentProject\Domain\ValueObjects\CashFlowStatement;
 use App\Contexts\InvestmentProject\Domain\ValueObjects\DynamicWaccSchedule;
 use App\Contexts\InvestmentProject\Domain\ValueObjects\IncomeStatement;
+use App\Contexts\InvestmentProject\Domain\ValueObjects\OperatingAssumptions;
 use App\Contexts\InvestmentProject\Domain\ValueObjects\TerminalValue;
 use App\Contexts\InvestmentProject\Domain\ValueObjects\TerminalValueMethod;
+use App\Contexts\InvestmentProject\Domain\ValueObjects\WaccParameters;
 use App\Contexts\InvestmentProject\Domain\ValueObjects\WaccResult;
 use InvalidArgumentException;
 
@@ -22,8 +24,7 @@ final class InvestmentAppraisalService
 {
     public function __construct(
         private readonly WaccCalculatorService $waccService
-    ) {
-    }
+    ) {}
 
     /**
      * Perform full discounted cash flow (DCF) valuation and project/equity appraisal.
@@ -36,14 +37,20 @@ final class InvestmentAppraisalService
         ?WaccResult $wacc = null,
         ?DynamicWaccSchedule $dynamicWacc = null,
         ?TerminalValueMethod $tvMethod = null,
-        ?float $tvParameter = null
+        ?float $tvParameter = null,
+        ?OperatingAssumptions $assumptions = null
     ): AppraisalResult {
         $currency = $project->financingStructure()->totalEquity()->currency();
         $horizon = $project->planningHorizonYears();
 
+        $citRatePercent = $assumptions?->citRatePercent()
+            ?? $incomeStatement->assumptions()->citRatePercent()
+            ?? 19.0;
+        $defaultParams = WaccParameters::defaultForPoland(null, $citRatePercent);
+
         // 1. Resolve WACC and Dynamic WACC if not provided
-        $effectiveWacc = $wacc ?? $this->waccService->calculateFromProject($project);
-        $effectiveDynamicWacc = $dynamicWacc ?? $this->waccService->calculateDynamicSchedule($project, $balanceSheet);
+        $effectiveWacc = $wacc ?? $this->waccService->calculateFromProject($project, $defaultParams);
+        $effectiveDynamicWacc = $dynamicWacc ?? $this->waccService->calculateDynamicSchedule($project, $balanceSheet, $defaultParams);
 
         // 2. Prepare Terminal Value method and parameter defaults
         $method = $tvMethod ?? TerminalValueMethod::EXIT_MULTIPLE;
@@ -64,7 +71,7 @@ final class InvestmentAppraisalService
         $cumDiscountedFcfe = Money::zero($currency);
         $sumPvCapex = Money::zero($currency);
 
-        $citRateDecimal = ($incomeStatement->assumptions()->citRatePercent() ?? 19.0) / 100.0;
+        $citRateDecimal = $citRatePercent / 100.0;
 
         for ($y = 1; $y <= $horizon; $y++) {
             $is = $incomeStatement->annualStatement($y);
@@ -260,7 +267,7 @@ final class InvestmentAppraisalService
     /**
      * Calculate Terminal Value for Enterprise and Equity.
      *
-     * @param array<int, AnnualAppraisalPeriod> $annualPeriods
+     * @param  array<int, AnnualAppraisalPeriod>  $annualPeriods
      */
     public function calculateTerminalValue(
         InvestmentProject $project,
@@ -287,7 +294,7 @@ final class InvestmentAppraisalService
 
         // 1. Enterprise Terminal Value
         $nomTvEnterprise = match ($method) {
-            TerminalValueMethod::GORDON_GROWTH => (function () use ($lastFcff, $parameter, $dynamicWacc, $wacc, $horizon, $currency): Money {
+            TerminalValueMethod::GORDON_GROWTH => (function () use ($lastFcff, $parameter, $dynamicWacc, $wacc, $horizon): Money {
                 $g = $parameter / 100.0;
                 $terminalWacc = ($dynamicWacc->annualWacc($horizon)?->nominalWaccPercent() ?? $wacc->nominalWaccPercent()) / 100.0;
 
@@ -310,7 +317,7 @@ final class InvestmentAppraisalService
             TerminalValueMethod::EXIT_MULTIPLE => $lastEbitda->multiply($parameter),
 
             TerminalValueMethod::BOOK_VALUE => (function () use ($lastBs, $currency): Money {
-                if (!$lastBs) {
+                if (! $lastBs) {
                     return Money::zero($currency);
                 }
                 $nbv = $lastBs->netBookValue();
@@ -359,8 +366,8 @@ final class InvestmentAppraisalService
      * Production-grade numerical Internal Rate of Return (IRR) solver.
      * Uses Newton-Raphson with bracketed Bisection fallback, bounded within [-99.9%, +1000%].
      *
-     * @param array<int, float> $cashFlows Period index (0..N or 1..N) => Cash flow amount
-     * @param float $guess Initial discount rate guess (default 0.10 for 10%)
+     * @param  array<int, float>  $cashFlows  Period index (0..N or 1..N) => Cash flow amount
+     * @param  float  $guess  Initial discount rate guess (default 0.10 for 10%)
      * @return ?float Annual IRR in percent (e.g. 14.85 for 14.85%), or null if no valid root
      */
     public function calculateIrr(array $cashFlows, float $guess = 0.10): ?float
@@ -376,7 +383,7 @@ final class InvestmentAppraisalService
             }
         }
 
-        if (!$hasPositive || !$hasNegative) {
+        if (! $hasPositive || ! $hasNegative) {
             return null;
         }
 
@@ -494,8 +501,8 @@ final class InvestmentAppraisalService
     /**
      * Calculate Simple Payback Period using exact linear fractional interpolation.
      *
-     * @param array<int, float> $cashFlows Year => Cash flow amount
-     * @param float $initialOutlay Optional upfront investment outlay at t = 0
+     * @param  array<int, float>  $cashFlows  Year => Cash flow amount
+     * @param  float  $initialOutlay  Optional upfront investment outlay at t = 0
      * @return ?float Payback period in years, or null if not recovered within horizon
      */
     public function calculatePaybackPeriod(array $cashFlows, float $initialOutlay = 0.0): ?float
@@ -509,14 +516,16 @@ final class InvestmentAppraisalService
             if ($t === 0 && abs($flow) > 1e-6) {
                 $cum = $flow;
                 $hasStarted = true;
+
                 continue;
             }
 
-            if (!$hasStarted) {
+            if (! $hasStarted) {
                 if ($flow < -1e-6) {
                     $cum = $flow;
                     $hasStarted = true;
                 }
+
                 continue;
             }
 
@@ -541,8 +550,8 @@ final class InvestmentAppraisalService
     /**
      * Calculate Discounted Payback Period using discounted cash flows.
      *
-     * @param array<int, float> $discountedCashFlows Year => Discounted cash flow
-     * @param float $initialOutlay Optional upfront investment outlay at t = 0
+     * @param  array<int, float>  $discountedCashFlows  Year => Discounted cash flow
+     * @param  float  $initialOutlay  Optional upfront investment outlay at t = 0
      * @return ?float Discounted payback period in years, or null if not recovered
      */
     public function calculateDiscountedPaybackPeriod(array $discountedCashFlows, float $initialOutlay = 0.0): ?float

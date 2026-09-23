@@ -36,18 +36,19 @@ use PHPUnit\Framework\TestCase;
 final class WaccCalculatorServiceTest extends TestCase
 {
     private WaccCalculatorService $service;
+
     private BalanceSheetService $balanceSheetService;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $depService = new DepreciationScheduleService();
-        $debtService = new DebtAmortizationService();
-        $vatService = new VatBridgeLoanService();
-        $grantService = new GrantAllocationService();
+        $depService = new DepreciationScheduleService;
+        $debtService = new DebtAmortizationService;
+        $vatService = new VatBridgeLoanService;
+        $grantService = new GrantAllocationService;
         $incomeService = new IncomeStatementService($depService, $debtService, $vatService);
-        $cashFlowService = new CashFlowService();
+        $cashFlowService = new CashFlowService;
 
         $this->balanceSheetService = new BalanceSheetService(
             $cashFlowService,
@@ -58,7 +59,7 @@ final class WaccCalculatorServiceTest extends TestCase
             $grantService
         );
 
-        $this->service = new WaccCalculatorService();
+        $this->service = new WaccCalculatorService;
     }
 
     public function test_static_wacc_calculation_with_standard_polish_market_parameters(): void
@@ -267,7 +268,7 @@ final class WaccCalculatorServiceTest extends TestCase
         $this->assertCount(15, $factors);
         $this->assertLessThan(1.0, $factors[1]);
         for ($y = 2; $y <= 15; $y++) {
-            $this->assertLessThan($factors[$y - 1], $factors[$y], "Discount factor in year {$y} must be strictly less than in year " . ($y - 1));
+            $this->assertLessThan($factors[$y - 1], $factors[$y], "Discount factor in year {$y} must be strictly less than in year ".($y - 1));
         }
     }
 
@@ -309,26 +310,33 @@ final class WaccCalculatorServiceTest extends TestCase
         $this->assertTrue($schedule->equals($schedule));
     }
 
-    public function test_wacc_calculation_with_cost_of_equity_override(): void
+    public function test_wacc_calculation_with_nine_percent_preferential_cit_rate(): void
     {
-        $params = new WaccParameters(
-            riskFreeRatePercent: 5.25,
-            equityRiskPremiumPercent: 5.50,
-            beta: 1.00,
-            sizeRiskPremiumPercent: 1.50,
-            preTaxCostOfDebtPercent: 8.00,
-            costOfEquityOverridePercent: 14.50
-        );
+        // Compare standard 19% CIT vs 9% preferential CIT
+        $kdPreTax = 8.0;
 
-        $this->assertEquals(14.50, $params->costOfEquityPercent());
-        $this->assertEquals(14.50, $params->costOfEquityOverridePercent());
+        $params19 = WaccParameters::defaultForPoland($kdPreTax, 19.0);
+        $params9 = WaccCalculatorService::defaultForPoland($kdPreTax, 9.0);
 
-        $equity = Money::fromDecimal('500000.0000', Currency::PLN);
-        $debt = Money::fromDecimal('500000.0000', Currency::PLN);
+        $this->assertEquals(19.0, $params19->taxRatePercent());
+        $this->assertEquals(0.81, $params19->taxShieldMultiplier());
 
-        $wacc = $this->service->calculateStaticWacc($params, $equity, $debt);
-        $this->assertEquals(14.50, $wacc->costOfEquityPercent());
-        // WACC = 0.5 * 14.50% + 0.5 * (8.00% * 0.81) = 7.25% + 3.24% = 10.49%
-        $this->assertEquals(10.49, $wacc->nominalWaccPercent());
+        $this->assertEquals(9.0, $params9->taxRatePercent());
+        $this->assertEquals(0.91, $params9->taxShieldMultiplier());
+
+        $equity = Money::fromDecimal('1000000.0000', Currency::PLN);
+        $debt = Money::fromDecimal('1000000.0000', Currency::PLN);
+
+        $result19 = $this->service->calculateStaticWacc($params19, $equity, $debt);
+        $result9 = $this->service->calculateStaticWacc($params9, $equity, $debt);
+
+        // After-tax Kd: 8.0 * 0.81 = 6.48% (19% CIT) vs 8.0 * 0.91 = 7.28% (9% CIT)
+        $this->assertEquals(6.48, $result19->afterTaxCostOfDebtPercent());
+        $this->assertEquals(7.28, $result9->afterTaxCostOfDebtPercent());
+
+        // Because after-tax cost of debt is higher under 9% CIT (smaller tax shield benefit),
+        // nominal WACC under 9% CIT must be strictly greater than nominal WACC under 19% CIT
+        $this->assertGreaterThan($result19->nominalWaccPercent(), $result9->nominalWaccPercent());
+        $this->assertEquals(round((0.5 * $params9->costOfEquityPercent()) + (0.5 * 7.28), 4), $result9->nominalWaccPercent());
     }
 }

@@ -38,8 +38,7 @@ final class InvestmentAppraisalController
         private readonly BalanceSheetService $balanceSheetService,
         private readonly CashFlowService $cashFlowService,
         private readonly DepreciationScheduleService $depreciationService
-    ) {
-    }
+    ) {}
 
     /**
      * Calculate comprehensive DCF valuation, Enterprise/Equity KPI metrics (NPV, IRR, TV, Payback).
@@ -66,17 +65,23 @@ final class InvestmentAppraisalController
             : null;
         $tvParameter = isset($validated['tv_parameter']) ? (float) $validated['tv_parameter'] : null;
 
-        // Custom WACC parameters override if specified
+        // Custom WACC parameters override if specified, synchronized with project's CIT rate
         $waccResult = null;
+        $waccParams = null;
         if (isset($validated['risk_free_rate_percent']) || isset($validated['cost_of_equity_percent'])) {
             $waccParams = new WaccParameters(
                 riskFreeRatePercent: (float) ($validated['risk_free_rate_percent'] ?? 5.50),
                 equityRiskPremiumPercent: (float) ($validated['equity_risk_premium_percent'] ?? 6.00),
                 beta: (float) ($validated['levered_beta'] ?? 1.10),
-                costOfEquityOverridePercent: isset($validated['cost_of_equity_percent']) ? (float) $validated['cost_of_equity_percent'] : null
+                costOfEquityOverridePercent: isset($validated['cost_of_equity_percent']) ? (float) $validated['cost_of_equity_percent'] : null,
+                taxRatePercent: $assumptions->citRatePercent()
             );
             $waccResult = $this->waccService->calculateFromProject($project, $waccParams);
+        } else {
+            $waccParams = WaccParameters::defaultForPoland(taxRatePercent: $assumptions->citRatePercent());
         }
+
+        $dynamicWaccResult = $this->waccService->calculateDynamicSchedule($project, $balanceSheet, $waccParams);
 
         $appraisalResult = $this->appraisalService->appraise(
             project: $project,
@@ -84,9 +89,10 @@ final class InvestmentAppraisalController
             cashFlowStatement: $cashFlow,
             balanceSheet: $balanceSheet,
             wacc: $waccResult,
-            dynamicWacc: null,
+            dynamicWacc: $dynamicWaccResult,
             tvMethod: $tvMethod,
-            tvParameter: $tvParameter
+            tvParameter: $tvParameter,
+            assumptions: $assumptions
         );
 
         return new JsonResponse([
@@ -121,15 +127,20 @@ final class InvestmentAppraisalController
             : null;
         $tvParameter = isset($validated['tv_parameter']) ? (float) $validated['tv_parameter'] : null;
 
+        $waccParams = WaccParameters::defaultForPoland(taxRatePercent: $assumptions->citRatePercent());
+        $waccResult = $this->waccService->calculateFromProject($project, $waccParams);
+        $dynamicWaccResult = $this->waccService->calculateDynamicSchedule($project, $balanceSheet, $waccParams);
+
         $appraisalResult = $this->appraisalService->appraise(
             project: $project,
             incomeStatement: $incomeStatement,
             cashFlowStatement: $cashFlow,
             balanceSheet: $balanceSheet,
-            wacc: null,
-            dynamicWacc: null,
+            wacc: $waccResult,
+            dynamicWacc: $dynamicWaccResult,
             tvMethod: $tvMethod,
-            tvParameter: $tvParameter
+            tvParameter: $tvParameter,
+            assumptions: $assumptions
         );
 
         // Check if numerical target IRR solver is requested
@@ -193,7 +204,7 @@ final class InvestmentAppraisalController
     }
 
     /**
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      */
     private function resolveAssumptions(InvestmentProject $project, array $data): OperatingAssumptions
     {
