@@ -640,7 +640,10 @@ export const ReinvestmentManager = ({
 
                 {/* Grid of 15 Years */}
                 <div className="overflow-x-auto pb-2">
-                    <div className="grid grid-cols-15 min-w-[750px] gap-1.5">
+                    <div 
+                        className="grid grid-cols-15 min-w-[750px] gap-1.5"
+                        style={{ gridTemplateColumns: 'repeat(15, minmax(0, 1fr))' }}
+                    >
                         {timelineData.map(({ year, hits, totalCapex }) => {
                             const hasHits = hits.length > 0;
                             return (
