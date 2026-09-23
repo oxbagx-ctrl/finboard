@@ -100,28 +100,24 @@ export const InvestmentPlanningView = () => {
             label: '1. Założenia & CAPEX',
             sublabel: 'Harmonogram etapów, montaż kapitałowy i driver OPEX',
             icon: Sliders,
-            badge: 'FAZA 42',
         },
         {
             id: 'sensitivity',
             label: '2. Symulator What-If',
             sublabel: 'Analiza wrażliwości real-time w Web Workerze',
             icon: Activity,
-            badge: 'FAZA 43',
         },
         {
             id: 'statements',
             label: '3. Model 15-letni & Wycena',
             sublabel: '3-Statement, DCF, WACC i Equity Waterfall',
             icon: FileSpreadsheet,
-            badge: 'FAZA 44',
         },
         {
             id: 'dossier',
             label: '4. Scoring & Dossier PDF',
             sublabel: 'Test gotowości, kowenanty i raport inwestorski',
             icon: FileCheck2,
-            badge: 'FAZA 45',
         },
     ];
 
@@ -259,13 +255,6 @@ export const InvestmentPlanningView = () => {
                                     >
                                         <Icon className={`w-4 h-4 ${isActive ? 'text-emerald-400' : 'text-zinc-500'}`} />
                                         <span>{tab.label}</span>
-                                        <span className={`text-[9px] px-1.5 py-0.5 rounded font-mono ${
-                                            isActive
-                                                ? 'bg-emerald-950/80 text-emerald-300 border border-emerald-800'
-                                                : 'bg-zinc-800 text-zinc-400'
-                                        }`}>
-                                            {tab.badge}
-                                        </span>
                                     </button>
                                 );
                             })}
@@ -283,14 +272,14 @@ export const InvestmentPlanningView = () => {
                                         </div>
                                         <div>
                                             <span className="font-bold text-zinc-100 uppercase">
-                                                Konfigurator Założeń Projektu Finance (Faza 42)
+                                                Konfigurator Założeń Projektu Finance
                                             </span>
                                             <p className="text-zinc-400 text-[11px] mt-0.5">
                                                 Wprowadzaj etapy CAPEX z klasyfikacją KŚT, konfiguruj instrumenty dłużne i definiuj prognozy operacyjne.
                                             </p>
                                         </div>
                                     </div>
-                                    <Badge variant="brand">WORK IN PROGRESS</Badge>
+                                    <Badge variant="neutral">PARAMETRY WEJŚCIOWE</Badge>
                                 </div>
 
                                 {/* Live CapexScheduleManager Component (Commit 208) */}

@@ -630,6 +630,9 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
   - [x] Automatyczny reset stanu formularza przy otwarciu (`isOpen`), anulowaniu oraz pomyślnym utworzeniu projektu.
   - [x] Warunkowe montowanie komponentu `{isCreateModalOpen && <CreateProjectModal ... />}` w widoku `InvestmentPlanningView.jsx`.
   - [x] Testy automatyczne Vitest weryfikujące pełną czystość formularza przy dodawaniu kolejnych projektów portfelowych.
+  - [x] Usunięcie developerskich oznaczeń etapów wdrożeniowych (`Faza 42`, `Faza 43`, `Faza 44`, `Faza 45`) z zakładek nawigacyjnych widoku `InvestmentPlanningView.jsx`.
+  - [x] Zastąpienie tymczasowej plakietki `WORK IN PROGRESS` profesjonalnym identyfikatorem sekcji `PARAMETRY WEJŚCIOWE`, a w `ReinvestmentManager.jsx` zastąpienie `FAZA 43` technicznym oznaczeniem `KŚT / 15L`.
+  - [x] Dostosowanie i pomyślna weryfikacja asercji w testach jednostkowych i integracyjnych (`InvestmentPlanningView.test.jsx`, `investmentPlanningE2EWorkflow.test.jsx`, `ReinvestmentManager.test.jsx`).
 
 ---
 

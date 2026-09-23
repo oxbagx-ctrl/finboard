@@ -351,7 +351,7 @@ export const ReinvestmentManager = ({
                                 <h3 className="text-base font-bold text-zinc-100 uppercase tracking-wide">
                                     Harmonogram Nakładów Odtworzeniowych (Reinvestment CAPEX)
                                 </h3>
-                                <Badge variant="brand">FAZA 43</Badge>
+                                <Badge variant="neutral">KŚT / 15L</Badge>
                             </div>
                             <p className="text-xs text-zinc-400 mt-1">
                                 Cykliczne odtworzenia środków trwałych (Nakłady A, B, C) z indywidualną amortyzacją KŚT w horyzoncie 15 lat.

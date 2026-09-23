@@ -172,7 +172,7 @@ describe('Phase 45 Commit 225: End-to-End (E2E) Investment Planning Lifecycle Te
 
             // --- TAB 1: ZAŁOŻENIA & CAPEX ---
             expect(screen.getByText('1. Założenia & CAPEX')).toBeInTheDocument();
-            expect(screen.getByText('Konfigurator Założeń Projektu Finance (Faza 42)')).toBeInTheDocument();
+            expect(screen.getByText('Konfigurator Założeń Projektu Finance')).toBeInTheDocument();
 
             // Verify Capex Schedule and Financing Structure components are present
             expect(screen.getByText(/Harmonogram Etapów CAPEX/i)).toBeInTheDocument();

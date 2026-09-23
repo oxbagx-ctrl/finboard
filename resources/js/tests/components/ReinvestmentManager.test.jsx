@@ -86,7 +86,7 @@ describe('ReinvestmentManager Component (Phase 43 Commit 214)', () => {
         renderComponent();
 
         expect(screen.getByText(/Harmonogram Nakładów Odtworzeniowych/i)).toBeInTheDocument();
-        expect(screen.getByText(/FAZA 43/i)).toBeInTheDocument();
+        expect(screen.getByText(/KŚT \/ 15L/i)).toBeInTheDocument();
         expect(screen.getByText(/Włącz Reinvestment w Modelu/i)).toBeInTheDocument();
 
         // 3 Program badges

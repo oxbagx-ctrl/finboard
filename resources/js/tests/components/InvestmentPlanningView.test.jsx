@@ -181,7 +181,7 @@ describe('InvestmentPlanningView Component', () => {
         });
 
         // Default tab is assumptions
-        expect(screen.getByText('Konfigurator Założeń Projektu Finance (Faza 42)')).toBeInTheDocument();
+        expect(screen.getByText('Konfigurator Założeń Projektu Finance')).toBeInTheDocument();
 
         // Switch to Sensitivity tab
         fireEvent.click(screen.getByText('2. Symulator What-If'));
