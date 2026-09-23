@@ -277,5 +277,69 @@ describe('ReinvestmentManager Component (Phase 43 Commit 214)', () => {
         const updatedCheckboxes = screen.getAllByRole('checkbox');
         expect(updatedCheckboxes[2]).not.toBeChecked();
     });
+
+    it('allows editing program name and description, saves to backend, and persists upon reload (Commit 234)', async () => {
+        const { rerender } = renderComponent();
+
+        const nameInputA = screen.getByLabelText(/Nazwa Programu A/i);
+        const descInputA = screen.getByLabelText(/Opis i Zakres Rzeczowy A/i);
+
+        expect(nameInputA.value).toBe('Program A: Elektronika, SCADA i Falowniki');
+        expect(descInputA.value).toBe('Wymiana falowników i SCADA');
+
+        // Change name and description
+        fireEvent.change(nameInputA, { target: { value: 'Program A: Wymiana Robotów Spawalniczych' } });
+        fireEvent.change(descInputA, { target: { value: 'Modernizacja osprzętu robotów na linii nadwozi' } });
+
+        expect(nameInputA.value).toBe('Program A: Wymiana Robotów Spawalniczych');
+        expect(descInputA.value).toBe('Modernizacja osprzętu robotów na linii nadwozi');
+
+        // Card header reflects new title immediately
+        expect(screen.getByText('Program A: Wymiana Robotów Spawalniczych')).toBeInTheDocument();
+
+        // Save
+        const saveButton = screen.getByRole('button', { name: /Zapisz Założenia Reinvestmentu/i });
+        fireEvent.click(saveButton);
+
+        await waitFor(() => {
+            expect(investmentProjectsApi.updateProject).toHaveBeenCalledWith(
+                'proj-solar-bess',
+                expect.objectContaining({
+                    operating_assumptions: expect.objectContaining({
+                        reinvestment_programs: expect.arrayContaining([
+                            expect.objectContaining({
+                                program_type: 'program_a',
+                                name: 'Program A: Wymiana Robotów Spawalniczych',
+                                description: 'Modernizacja osprzętu robotów na linii nadwozi',
+                            })
+                        ])
+                    })
+                })
+            );
+        });
+
+        // Simulate reload with updated project from API
+        const updatedProject = {
+            ...mockProject,
+            operating_assumptions: {
+                ...mockProject.operating_assumptions,
+                reinvestment_programs: mockProject.operating_assumptions.reinvestment_programs.map(p =>
+                    p.program_type === 'program_a'
+                        ? { ...p, name: 'Program A: Wymiana Robotów Spawalniczych', description: 'Modernizacja osprzętu robotów na linii nadwozi' }
+                        : p
+                )
+            }
+        };
+
+        rerender(
+            <InvestmentProjectContext.Provider value={{ selectedProject: updatedProject, loadProjectDetails: mockLoadProjectDetails }}>
+                <ReinvestmentManager onProgramsChange={mockOnProgramsChange} />
+            </InvestmentProjectContext.Provider>
+        );
+
+        expect(screen.getByLabelText(/Nazwa Programu A/i).value).toBe('Program A: Wymiana Robotów Spawalniczych');
+        expect(screen.getByLabelText(/Opis i Zakres Rzeczowy A/i).value).toBe('Modernizacja osprzętu robotów na linii nadwozi');
+    });
 });
+
 

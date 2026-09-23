@@ -643,6 +643,9 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
   - [x] Inteligentna obsługa wskaźników struktury kapitałowej w sekcji Montażu Finansowego (`FinancingStructureConfigurator.jsx`) dla projektów z zerowym CAPEX (tryb dualny: `% Kapitału` przy zdefiniowanym kapitale oraz fallback `0.0% CAPEX`).
   - [x] Zabezpieczenie przycisków szybkiego wyboru (`20% CAPEX`, `30% CAPEX`, `50% LTV`, `70% LTV`, `VAT 23%`) przed zerowaniem wartości przy braku etapów w harmonogramie CAPEX.
   - [x] Rozszerzenie testów Vitest o weryfikację wskaźników kapitałowych i stanów zerowego CAPEX (`FinancingStructureConfigurator.test.jsx`).
+  - [x] Odblokowanie edycji pól „Nazwa Programu” oraz „Opis i Zakres Rzeczowy” dla nakładów odtworzeniowych w `ReinvestmentManager.jsx` z eliminacją sztywnych danych OZE/SCADA.
+  - [x] Reaktywna synchronizacja zmienionych nazw programów z 15-letnią osią czasu (*Timeline Grid*) i dymkami zdarzeń odtworzeniowych.
+  - [x] Rozszerzenie testów Vitest weryfikujących edycję, zapis do API i odtwarzanie własnych nazw programów (`ReinvestmentManager.test.jsx`).
 
 ---
 

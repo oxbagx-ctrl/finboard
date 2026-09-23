@@ -120,6 +120,8 @@ export const ReinvestmentManager = ({
                     return {
                         ...def,
                         ...found,
+                        name: found.name || def.name,
+                        description: found.description !== undefined ? found.description : def.description,
                         net_amount: Number(found.net_amount) || def.net_amount,
                         frequency_years: Number(found.frequency_years) || def.frequency_years,
                         first_occurrence_year: Number(found.first_occurrence_year) || def.first_occurrence_year,
@@ -498,9 +500,37 @@ export const ReinvestmentManager = ({
                                     </label>
                                 </div>
 
-                                <p className="text-[11px] text-zinc-400 leading-relaxed min-h-[32px]">
-                                    {prog.description}
-                                </p>
+                                {/* Program Name & Description Fields */}
+                                <div className="space-y-2 pt-1">
+                                    <div>
+                                        <label className="block text-[10px] uppercase font-semibold text-zinc-400 mb-1">
+                                            Nazwa Programu
+                                        </label>
+                                        <input
+                                            type="text"
+                                            aria-label={`Nazwa Programu ${prog.program_type === 'program_a' ? 'A' : prog.program_type === 'program_b' ? 'B' : 'C'}`}
+                                            value={prog.name}
+                                            disabled={!prog.enabled}
+                                            onChange={(e) => handleProgramChange(index, 'name', e.target.value)}
+                                            placeholder="Nazwa programu odtworzeniowego..."
+                                            className="w-full bg-zinc-950 border border-zinc-800 rounded px-2.5 py-1.5 text-xs font-semibold text-zinc-100 placeholder:text-zinc-600 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 disabled:opacity-50"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-[10px] uppercase font-semibold text-zinc-400 mb-1">
+                                            Opis i Zakres Rzeczowy
+                                        </label>
+                                        <textarea
+                                            rows={2}
+                                            aria-label={`Opis i Zakres Rzeczowy ${prog.program_type === 'program_a' ? 'A' : prog.program_type === 'program_b' ? 'B' : 'C'}`}
+                                            value={prog.description || ''}
+                                            disabled={!prog.enabled}
+                                            onChange={(e) => handleProgramChange(index, 'description', e.target.value)}
+                                            placeholder="Zakres planowanych prac i odtworzeń..."
+                                            className="w-full bg-zinc-950 border border-zinc-800 rounded px-2.5 py-1.5 text-[11px] text-zinc-300 placeholder:text-zinc-600 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 disabled:opacity-50 resize-none leading-relaxed"
+                                        />
+                                    </div>
+                                </div>
 
                                 {/* Input fields */}
                                 <div className="space-y-3 pt-2 border-t border-zinc-800">
