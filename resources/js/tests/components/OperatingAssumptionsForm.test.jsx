@@ -182,4 +182,79 @@ describe('OperatingAssumptionsForm Component', () => {
             expect(screen.getByText(/Założenia operacyjne zostały pomyślnie zapisane/i)).toBeInTheDocument();
         });
     });
+
+    it('renders clean empty state for a newly created project without operating assumptions', () => {
+        const brandNewProject = {
+            id: 'proj-new-999',
+            name: 'Nowy Projekt Portfelowy',
+            currency: 'PLN',
+            status: 'draft',
+            commercial_operation_date: null,
+            operating_assumptions: null,
+        };
+
+        renderWithContext(brandNewProject);
+
+        expect(screen.getByText(/Brak zdefiniowanych strumieni przychodowych/i)).toBeInTheDocument();
+        expect(screen.getByText(/Kliknij „Dodaj Strumień”, aby zdefiniować model sprzedaży projektu/i)).toBeInTheDocument();
+
+        // Base revenue is 0,00 PLN
+        expect(screen.getAllByText(/0,00\s*zł/i).length).toBeGreaterThanOrEqual(1);
+
+        // Check Payroll tab has empty state as well
+        const payrollTab = screen.getByRole('button', { name: /4\. Matryca Etatów/i });
+        fireEvent.click(payrollTab);
+
+        expect(screen.getByText(/Brak zdefiniowanych stanowisk operacyjnych/i)).toBeInTheDocument();
+        expect(screen.getAllByText(/0 FTE/i).length).toBeGreaterThanOrEqual(1);
+    });
+
+    it('allows adding first revenue stream from empty state', () => {
+        const brandNewProject = {
+            id: 'proj-new-999',
+            name: 'Nowy Projekt Portfelowy',
+            currency: 'PLN',
+            operating_assumptions: {},
+        };
+
+        renderWithContext(brandNewProject);
+
+        expect(screen.getByText(/Brak zdefiniowanych strumieni przychodowych/i)).toBeInTheDocument();
+
+        const addBtn = screen.getByRole('button', { name: /Dodaj Strumień/i });
+        fireEvent.click(addBtn);
+
+        expect(screen.queryByText(/Brak zdefiniowanych strumieni przychodowych/i)).not.toBeInTheDocument();
+        const streamInputs = screen.getAllByLabelText(/Nazwa Strumienia/i);
+        expect(streamInputs.length).toBe(1);
+    });
+
+    it('resets state when switching from configured project to an unconfigured project', () => {
+        const brandNewProject = {
+            id: 'proj-new-999',
+            name: 'Nowy Czysty Projekt',
+            currency: 'PLN',
+            operating_assumptions: {},
+        };
+
+        const { rerender } = render(
+            <InvestmentProjectContext.Provider value={{ selectedProject: mockProject, loadProjectDetails: mockLoadProjectDetails }}>
+                <OperatingAssumptionsForm />
+            </InvestmentProjectContext.Provider>
+        );
+
+        // Initial project has 5 000 000 PLN revenue
+        expect(screen.getAllByText(/5.*000.*000,00/i).length).toBeGreaterThanOrEqual(1);
+
+        // Switch project to brandNewProject
+        rerender(
+            <InvestmentProjectContext.Provider value={{ selectedProject: brandNewProject, loadProjectDetails: mockLoadProjectDetails }}>
+                <OperatingAssumptionsForm />
+            </InvestmentProjectContext.Provider>
+        );
+
+        // Should now show empty state and not retain 5 000 000 PLN
+        expect(screen.getByText(/Brak zdefiniowanych strumieni przychodowych/i)).toBeInTheDocument();
+        expect(screen.queryByText(/5.*000.*000,00/i)).not.toBeInTheDocument();
+    });
 });

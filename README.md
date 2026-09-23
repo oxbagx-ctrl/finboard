@@ -633,6 +633,10 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
   - [x] Usunięcie developerskich oznaczeń etapów wdrożeniowych (`Faza 42`, `Faza 43`, `Faza 44`, `Faza 45`) z zakładek nawigacyjnych widoku `InvestmentPlanningView.jsx`.
   - [x] Zastąpienie tymczasowej plakietki `WORK IN PROGRESS` profesjonalnym identyfikatorem sekcji `PARAMETRY WEJŚCIOWE`, a w `ReinvestmentManager.jsx` zastąpienie `FAZA 43` technicznym oznaczeniem `KŚT / 15L`.
   - [x] Dostosowanie i pomyślna weryfikacja asercji w testach jednostkowych i integracyjnych (`InvestmentPlanningView.test.jsx`, `investmentPlanningE2EWorkflow.test.jsx`, `ReinvestmentManager.test.jsx`).
+  - [x] Usunięcie zaszłości prototypowych (sztywnych strumieni OZE MWh, etatów inżynierów i kosztów stałych 350k PLN) z formularza założeń operacyjnych (`OperatingAssumptionsForm.jsx`).
+  - [x] Generator czystych parametrów początkowych (`getDefaultAssumptions`) oraz pełny reset stanu w `useEffect` i `handleReset` eliminujący wyciek danych między projektami.
+  - [x] Wprowadzenie profesjonalnych wierszy Empty State w tabelach strumieni przychodowych oraz matrycy etatów (Headcount Matrix) z możliwością usuwania wierszy powracając do czystego stanu początkowego.
+  - [x] Rozszerzenie testów Vitest weryfikujących zachowanie czystego projektu, dodawanie strumieni z Empty State i izolację projektów (`OperatingAssumptionsForm.test.jsx`, `InvestmentStateValidation.test.jsx`).
 
 ---
 

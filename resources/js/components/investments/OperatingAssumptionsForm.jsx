@@ -28,21 +28,95 @@ const formatCurrency = (val, currency = 'PLN') => {
     }).format(Number(val) || 0);
 };
 
+const getDefaultAssumptions = (project = null) => {
+    const wcd = project?.working_capital_days;
+    return {
+        revenueLines: [],
+        revenueGrowthRate: 2.5,
+        capacityRampUp: { 1: 100, 2: 100, 3: 100 },
+        variableCostPercent: 0.0,
+        annualFixedCostsBase: 0,
+        fixedCostGrowthRate: 2.5,
+        dso: Number(wcd?.dso ?? project?.dso ?? 30),
+        dpo: Number(wcd?.dpo ?? project?.dpo ?? 30),
+        dio: Number(wcd?.dio ?? project?.dio ?? 0),
+        headcountMatrix: [],
+        payrollGrowthRate: 3.0,
+        citRatePercent: 19.0,
+        taxLossCarryForward: true,
+        taxLossOffsetCap: 50.0,
+    };
+};
+
+const parseProjectAssumptions = (project) => {
+    const defaults = getDefaultAssumptions(project);
+    if (!project) return defaults;
+
+    const oa = project.operating_assumptions || {};
+
+    let revLines = defaults.revenueLines;
+    const rawRev = oa.revenue_lines ?? oa.revenueLines;
+    if (Array.isArray(rawRev) && rawRev.length > 0) {
+        revLines = rawRev;
+    } else if (oa.annual_revenue_base && Number(oa.annual_revenue_base) > 0) {
+        revLines = [
+            {
+                id: 'rev-1',
+                name: 'Przychody operacyjne bazowe',
+                unit: 'usł.',
+                volume: 1,
+                price: Number(oa.annual_revenue_base),
+                total: Number(oa.annual_revenue_base)
+            }
+        ];
+    }
+
+    let hcMatrix = defaults.headcountMatrix;
+    const rawHc = oa.headcount_matrix ?? oa.headcountMatrix;
+    if (Array.isArray(rawHc) && rawHc.length > 0) {
+        hcMatrix = rawHc;
+    }
+
+    let rampUp = defaults.capacityRampUp;
+    if (oa.capacity_ramp_up && typeof oa.capacity_ramp_up === 'object') {
+        rampUp = {
+            1: Number(oa.capacity_ramp_up[1] ?? oa.capacity_ramp_up['1'] ?? 100),
+            2: Number(oa.capacity_ramp_up[2] ?? oa.capacity_ramp_up['2'] ?? 100),
+            3: Number(oa.capacity_ramp_up[3] ?? oa.capacity_ramp_up['3'] ?? 100),
+        };
+    }
+
+    return {
+        revenueLines: revLines,
+        revenueGrowthRate: oa.revenue_growth_rate_percent !== undefined ? Number(oa.revenue_growth_rate_percent) : defaults.revenueGrowthRate,
+        capacityRampUp: rampUp,
+        variableCostPercent: oa.variable_cost_percent !== undefined ? Number(oa.variable_cost_percent) : defaults.variableCostPercent,
+        annualFixedCostsBase: oa.annual_fixed_costs_base !== undefined ? Number(oa.annual_fixed_costs_base) : defaults.annualFixedCostsBase,
+        fixedCostGrowthRate: oa.fixed_cost_growth_rate_percent !== undefined ? Number(oa.fixed_cost_growth_rate_percent) : defaults.fixedCostGrowthRate,
+        dso: oa.dso !== undefined ? Number(oa.dso) : defaults.dso,
+        dpo: oa.dpo !== undefined ? Number(oa.dpo) : defaults.dpo,
+        dio: oa.dio !== undefined ? Number(oa.dio) : defaults.dio,
+        headcountMatrix: hcMatrix,
+        payrollGrowthRate: oa.payroll_growth_rate_percent !== undefined ? Number(oa.payroll_growth_rate_percent) : defaults.payrollGrowthRate,
+        citRatePercent: oa.cit_rate_percent !== undefined ? Number(oa.cit_rate_percent) : defaults.citRatePercent,
+        taxLossCarryForward: oa.tax_loss_carry_forward_enabled !== undefined ? Boolean(oa.tax_loss_carry_forward_enabled) : defaults.taxLossCarryForward,
+        taxLossOffsetCap: oa.tax_loss_offset_cap_percent !== undefined ? Number(oa.tax_loss_offset_cap_percent) : defaults.taxLossOffsetCap,
+    };
+};
+
 export const OperatingAssumptionsForm = () => {
     const { selectedProject, loadProjectDetails } = useInvestmentProject();
 
     const [activeSubTab, setActiveSubTab] = useState('revenues');
 
     // Revenue lines & Ramp-up
-    const [revenueLines, setRevenueLines] = useState([
-        { id: 'rev-1', name: 'Przychody ze sprzedaży głównej', unit: 'MWh', volume: 10000, price: 450, total: 4500000 }
-    ]);
+    const [revenueLines, setRevenueLines] = useState([]);
     const [revenueGrowthRate, setRevenueGrowthRate] = useState(2.5);
-    const [capacityRampUp, setCapacityRampUp] = useState({ 1: 60, 2: 85, 3: 100 });
+    const [capacityRampUp, setCapacityRampUp] = useState({ 1: 100, 2: 100, 3: 100 });
 
     // OPEX drivers
-    const [variableCostPercent, setVariableCostPercent] = useState(35.0);
-    const [annualFixedCostsBase, setAnnualFixedCostsBase] = useState(350000);
+    const [variableCostPercent, setVariableCostPercent] = useState(0.0);
+    const [annualFixedCostsBase, setAnnualFixedCostsBase] = useState(0);
     const [fixedCostGrowthRate, setFixedCostGrowthRate] = useState(2.5);
 
     // Working Capital (NWC)
@@ -51,10 +125,7 @@ export const OperatingAssumptionsForm = () => {
     const [dio, setDio] = useState(0);
 
     // Headcount matrix & Payroll
-    const [headcountMatrix, setHeadcountMatrix] = useState([
-        { id: 'hc-1', role: 'Kierownik Techniczny / Inżynier', fte: 1, grossSalary: 12000, employerCostRate: 20.48, annualCost: 173491 },
-        { id: 'hc-2', role: 'Operatorzy / Serwisanci', fte: 2, grossSalary: 7500, employerCostRate: 20.48, annualCost: 216864 }
-    ]);
+    const [headcountMatrix, setHeadcountMatrix] = useState([]);
     const [payrollGrowthRate, setPayrollGrowthRate] = useState(3.0);
 
     // CIT Taxes & Loss offset
@@ -66,45 +137,25 @@ export const OperatingAssumptionsForm = () => {
     const [saveSuccess, setSaveSuccess] = useState(false);
     const [saveError, setSaveError] = useState(null);
 
-    // Load from selectedProject.operating_assumptions if available
+    // Load and synchronize state from selectedProject.operating_assumptions with clean fallback
     useEffect(() => {
         if (!selectedProject) return;
 
-        const oa = selectedProject.operating_assumptions || {};
-
-        if (Array.isArray(oa.revenue_lines) && oa.revenue_lines.length > 0) {
-            setRevenueLines(oa.revenue_lines);
-        } else if (oa.annual_revenue_base) {
-            setRevenueLines([
-                { id: 'rev-1', name: 'Przychody operacyjne bazowe', unit: 'usł.', volume: 1, price: Number(oa.annual_revenue_base), total: Number(oa.annual_revenue_base) }
-            ]);
-        }
-
-        if (oa.revenue_growth_rate_percent !== undefined) setRevenueGrowthRate(Number(oa.revenue_growth_rate_percent));
-        if (oa.variable_cost_percent !== undefined) setVariableCostPercent(Number(oa.variable_cost_percent));
-        if (oa.annual_fixed_costs_base !== undefined) setAnnualFixedCostsBase(Number(oa.annual_fixed_costs_base));
-        if (oa.fixed_cost_growth_rate_percent !== undefined) setFixedCostGrowthRate(Number(oa.fixed_cost_growth_rate_percent));
-        if (oa.dso !== undefined) setDso(Number(oa.dso));
-        if (oa.dpo !== undefined) setDpo(Number(oa.dpo));
-        if (oa.dio !== undefined) setDio(Number(oa.dio));
-
-        if (Array.isArray(oa.headcount_matrix) && oa.headcount_matrix.length > 0) {
-            setHeadcountMatrix(oa.headcount_matrix);
-        }
-
-        if (oa.payroll_growth_rate_percent !== undefined) setPayrollGrowthRate(Number(oa.payroll_growth_rate_percent));
-
-        if (oa.capacity_ramp_up && typeof oa.capacity_ramp_up === 'object') {
-            setCapacityRampUp({
-                1: Number(oa.capacity_ramp_up[1] ?? oa.capacity_ramp_up['1'] ?? 60),
-                2: Number(oa.capacity_ramp_up[2] ?? oa.capacity_ramp_up['2'] ?? 85),
-                3: Number(oa.capacity_ramp_up[3] ?? oa.capacity_ramp_up['3'] ?? 100),
-            });
-        }
-
-        if (oa.cit_rate_percent !== undefined) setCitRatePercent(Number(oa.cit_rate_percent));
-        if (oa.tax_loss_carry_forward_enabled !== undefined) setTaxLossCarryForward(Boolean(oa.tax_loss_carry_forward_enabled));
-        if (oa.tax_loss_offset_cap_percent !== undefined) setTaxLossOffsetCap(Number(oa.tax_loss_offset_cap_percent));
+        const parsed = parseProjectAssumptions(selectedProject);
+        setRevenueLines(parsed.revenueLines);
+        setRevenueGrowthRate(parsed.revenueGrowthRate);
+        setCapacityRampUp(parsed.capacityRampUp);
+        setVariableCostPercent(parsed.variableCostPercent);
+        setAnnualFixedCostsBase(parsed.annualFixedCostsBase);
+        setFixedCostGrowthRate(parsed.fixedCostGrowthRate);
+        setDso(parsed.dso);
+        setDpo(parsed.dpo);
+        setDio(parsed.dio);
+        setHeadcountMatrix(parsed.headcountMatrix);
+        setPayrollGrowthRate(parsed.payrollGrowthRate);
+        setCitRatePercent(parsed.citRatePercent);
+        setTaxLossCarryForward(parsed.taxLossCarryForward);
+        setTaxLossOffsetCap(parsed.taxLossOffsetCap);
 
         setSaveSuccess(false);
         setSaveError(null);
@@ -195,20 +246,21 @@ export const OperatingAssumptionsForm = () => {
 
     const handleReset = () => {
         if (!selectedProject) return;
-        const oa = selectedProject.operating_assumptions || {};
-
-        if (Array.isArray(oa.revenue_lines)) setRevenueLines(oa.revenue_lines);
-        if (oa.revenue_growth_rate_percent !== undefined) setRevenueGrowthRate(Number(oa.revenue_growth_rate_percent));
-        if (oa.variable_cost_percent !== undefined) setVariableCostPercent(Number(oa.variable_cost_percent));
-        if (oa.annual_fixed_costs_base !== undefined) setAnnualFixedCostsBase(Number(oa.annual_fixed_costs_base));
-        if (oa.fixed_cost_growth_rate_percent !== undefined) setFixedCostGrowthRate(Number(oa.fixed_cost_growth_rate_percent));
-        if (oa.dso !== undefined) setDso(Number(oa.dso));
-        if (oa.dpo !== undefined) setDpo(Number(oa.dpo));
-        if (oa.dio !== undefined) setDio(Number(oa.dio));
-        if (Array.isArray(oa.headcount_matrix)) setHeadcountMatrix(oa.headcount_matrix);
-        if (oa.payroll_growth_rate_percent !== undefined) setPayrollGrowthRate(Number(oa.payroll_growth_rate_percent));
-        if (oa.capacity_ramp_up) setCapacityRampUp(oa.capacity_ramp_up);
-        if (oa.cit_rate_percent !== undefined) setCitRatePercent(Number(oa.cit_rate_percent));
+        const parsed = parseProjectAssumptions(selectedProject);
+        setRevenueLines(parsed.revenueLines);
+        setRevenueGrowthRate(parsed.revenueGrowthRate);
+        setCapacityRampUp(parsed.capacityRampUp);
+        setVariableCostPercent(parsed.variableCostPercent);
+        setAnnualFixedCostsBase(parsed.annualFixedCostsBase);
+        setFixedCostGrowthRate(parsed.fixedCostGrowthRate);
+        setDso(parsed.dso);
+        setDpo(parsed.dpo);
+        setDio(parsed.dio);
+        setHeadcountMatrix(parsed.headcountMatrix);
+        setPayrollGrowthRate(parsed.payrollGrowthRate);
+        setCitRatePercent(parsed.citRatePercent);
+        setTaxLossCarryForward(parsed.taxLossCarryForward);
+        setTaxLossOffsetCap(parsed.taxLossOffsetCap);
         setSaveError(null);
     };
 
@@ -391,61 +443,72 @@ export const OperatingAssumptionsForm = () => {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-zinc-800/60 font-mono">
-                                {revenueLines.map(line => (
-                                    <tr key={line.id} className="hover:bg-zinc-850/40">
-                                        <td className="py-2 px-3">
-                                            <input
-                                                type="text"
-                                                aria-label="Nazwa Strumienia"
-                                                value={line.name}
-                                                onChange={(e) => handleUpdateRevenueLine(line.id, 'name', e.target.value)}
-                                                className="w-full bg-zinc-950 border border-zinc-700 rounded px-2 py-1 text-zinc-100 text-xs focus:outline-none focus:border-emerald-500"
-                                            />
-                                        </td>
-                                        <td className="py-2 px-3">
-                                            <input
-                                                type="text"
-                                                aria-label="Jednostka"
-                                                value={line.unit}
-                                                onChange={(e) => handleUpdateRevenueLine(line.id, 'unit', e.target.value)}
-                                                className="w-full bg-zinc-950 border border-zinc-700 rounded px-2 py-1 text-zinc-100 text-xs focus:outline-none focus:border-emerald-500"
-                                            />
-                                        </td>
-                                        <td className="py-2 px-3">
-                                            <input
-                                                type="number"
-                                                aria-label="Wolumen"
-                                                value={line.volume}
-                                                onChange={(e) => handleUpdateRevenueLine(line.id, 'volume', e.target.value)}
-                                                className="w-full bg-zinc-950 border border-zinc-700 rounded px-2 py-1 text-zinc-100 text-xs focus:outline-none focus:border-emerald-500"
-                                            />
-                                        </td>
-                                        <td className="py-2 px-3">
-                                            <input
-                                                type="number"
-                                                aria-label="Cena Jednostkowa"
-                                                step="0.01"
-                                                value={line.price}
-                                                onChange={(e) => handleUpdateRevenueLine(line.id, 'price', e.target.value)}
-                                                className="w-full bg-zinc-950 border border-zinc-700 rounded px-2 py-1 text-zinc-100 text-xs focus:outline-none focus:border-emerald-500"
-                                            />
-                                        </td>
-                                        <td className="py-2 px-3 text-right font-bold text-emerald-400">
-                                            {formatCurrency(line.total, currency)}
-                                        </td>
-                                        <td className="py-2 px-2 text-center">
-                                            <button
-                                                type="button"
-                                                aria-label="Usuń linię"
-                                                onClick={() => handleRemoveRevenueLine(line.id)}
-                                                disabled={revenueLines.length === 1}
-                                                className="p-1 text-zinc-500 hover:text-rose-400 disabled:opacity-30 transition-colors"
-                                            >
-                                                <Trash2 className="w-3.5 h-3.5" />
-                                            </button>
+                                {revenueLines.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={6} className="py-8 text-center text-zinc-500">
+                                            <div className="flex flex-col items-center justify-center gap-1.5">
+                                                <TrendingUp className="w-6 h-6 text-zinc-600 mb-1" />
+                                                <p className="font-semibold text-zinc-400 text-xs">Brak zdefiniowanych strumieni przychodowych</p>
+                                                <p className="text-[11px] text-zinc-500">Kliknij „Dodaj Strumień”, aby zdefiniować model sprzedaży projektu.</p>
+                                            </div>
                                         </td>
                                     </tr>
-                                ))}
+                                ) : (
+                                    revenueLines.map(line => (
+                                        <tr key={line.id} className="hover:bg-zinc-850/40">
+                                            <td className="py-2 px-3">
+                                                <input
+                                                    type="text"
+                                                    aria-label="Nazwa Strumienia"
+                                                    value={line.name}
+                                                    onChange={(e) => handleUpdateRevenueLine(line.id, 'name', e.target.value)}
+                                                    className="w-full bg-zinc-950 border border-zinc-700 rounded px-2 py-1 text-zinc-100 text-xs focus:outline-none focus:border-emerald-500"
+                                                />
+                                            </td>
+                                            <td className="py-2 px-3">
+                                                <input
+                                                    type="text"
+                                                    aria-label="Jednostka"
+                                                    value={line.unit}
+                                                    onChange={(e) => handleUpdateRevenueLine(line.id, 'unit', e.target.value)}
+                                                    className="w-full bg-zinc-950 border border-zinc-700 rounded px-2 py-1 text-zinc-100 text-xs focus:outline-none focus:border-emerald-500"
+                                                />
+                                            </td>
+                                            <td className="py-2 px-3">
+                                                <input
+                                                    type="number"
+                                                    aria-label="Wolumen"
+                                                    value={line.volume}
+                                                    onChange={(e) => handleUpdateRevenueLine(line.id, 'volume', e.target.value)}
+                                                    className="w-full bg-zinc-950 border border-zinc-700 rounded px-2 py-1 text-zinc-100 text-xs focus:outline-none focus:border-emerald-500"
+                                                />
+                                            </td>
+                                            <td className="py-2 px-3">
+                                                <input
+                                                    type="number"
+                                                    aria-label="Cena Jednostkowa"
+                                                    step="0.01"
+                                                    value={line.price}
+                                                    onChange={(e) => handleUpdateRevenueLine(line.id, 'price', e.target.value)}
+                                                    className="w-full bg-zinc-950 border border-zinc-700 rounded px-2 py-1 text-zinc-100 text-xs focus:outline-none focus:border-emerald-500"
+                                                />
+                                            </td>
+                                            <td className="py-2 px-3 text-right font-bold text-emerald-400">
+                                                {formatCurrency(line.total, currency)}
+                                            </td>
+                                            <td className="py-2 px-2 text-center">
+                                                <button
+                                                    type="button"
+                                                    aria-label="Usuń linię"
+                                                    onClick={() => handleRemoveRevenueLine(line.id)}
+                                                    className="p-1 text-zinc-500 hover:text-rose-400 transition-colors"
+                                                >
+                                                    <Trash2 className="w-3.5 h-3.5" />
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
                             </tbody>
                             <tfoot className="bg-zinc-950/90 border-t border-zinc-800 font-mono">
                                 <tr>
@@ -739,63 +802,74 @@ export const OperatingAssumptionsForm = () => {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-zinc-800/60 font-mono">
-                                {headcountMatrix.map(role => (
-                                    <tr key={role.id} className="hover:bg-zinc-850/40">
-                                        <td className="py-2 px-3">
-                                            <input
-                                                type="text"
-                                                aria-label="Nazwa Stanowiska"
-                                                value={role.role}
-                                                onChange={(e) => handleUpdateHeadcountRole(role.id, 'role', e.target.value)}
-                                                className="w-full bg-zinc-950 border border-zinc-700 rounded px-2 py-1 text-zinc-100 text-xs focus:outline-none focus:border-indigo-500"
-                                            />
-                                        </td>
-                                        <td className="py-2 px-3">
-                                            <input
-                                                type="number"
-                                                aria-label="Liczba Etatów"
-                                                min={0.5}
-                                                step={0.5}
-                                                value={role.fte}
-                                                onChange={(e) => handleUpdateHeadcountRole(role.id, 'fte', e.target.value)}
-                                                className="w-full bg-zinc-950 border border-zinc-700 rounded px-2 py-1 text-zinc-100 text-xs focus:outline-none focus:border-indigo-500"
-                                            />
-                                        </td>
-                                        <td className="py-2 px-3">
-                                            <input
-                                                type="number"
-                                                aria-label="Wynagrodzenie Brutto"
-                                                value={role.grossSalary}
-                                                onChange={(e) => handleUpdateHeadcountRole(role.id, 'grossSalary', e.target.value)}
-                                                className="w-full bg-zinc-950 border border-zinc-700 rounded px-2 py-1 text-zinc-100 text-xs focus:outline-none focus:border-indigo-500"
-                                            />
-                                        </td>
-                                        <td className="py-2 px-3">
-                                            <input
-                                                type="number"
-                                                aria-label="Narzut Pracodawcy"
-                                                step={0.1}
-                                                value={role.employerCostRate}
-                                                onChange={(e) => handleUpdateHeadcountRole(role.id, 'employerCostRate', e.target.value)}
-                                                className="w-full bg-zinc-950 border border-zinc-700 rounded px-2 py-1 text-zinc-100 text-xs focus:outline-none focus:border-indigo-500"
-                                            />
-                                        </td>
-                                        <td className="py-2 px-3 text-right font-bold text-indigo-300">
-                                            {formatCurrency(role.annualCost, currency)}
-                                        </td>
-                                        <td className="py-2 px-2 text-center">
-                                            <button
-                                                type="button"
-                                                aria-label="Usuń stanowisko"
-                                                onClick={() => handleRemoveHeadcountRole(role.id)}
-                                                disabled={headcountMatrix.length === 1}
-                                                className="p-1 text-zinc-500 hover:text-rose-400 disabled:opacity-30 transition-colors"
-                                            >
-                                                <Trash2 className="w-3.5 h-3.5" />
-                                            </button>
+                                {headcountMatrix.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={6} className="py-8 text-center text-zinc-500">
+                                            <div className="flex flex-col items-center justify-center gap-1.5">
+                                                <Users className="w-6 h-6 text-zinc-600 mb-1" />
+                                                <p className="font-semibold text-zinc-400 text-xs">Brak zdefiniowanych stanowisk operacyjnych</p>
+                                                <p className="text-[11px] text-zinc-500">Kliknij „Dodaj Stanowisko”, aby zaplanować strukturę zatrudnienia.</p>
+                                            </div>
                                         </td>
                                     </tr>
-                                ))}
+                                ) : (
+                                    headcountMatrix.map(role => (
+                                        <tr key={role.id} className="hover:bg-zinc-850/40">
+                                            <td className="py-2 px-3">
+                                                <input
+                                                    type="text"
+                                                    aria-label="Nazwa Stanowiska"
+                                                    value={role.role}
+                                                    onChange={(e) => handleUpdateHeadcountRole(role.id, 'role', e.target.value)}
+                                                    className="w-full bg-zinc-950 border border-zinc-700 rounded px-2 py-1 text-zinc-100 text-xs focus:outline-none focus:border-indigo-500"
+                                                />
+                                            </td>
+                                            <td className="py-2 px-3">
+                                                <input
+                                                    type="number"
+                                                    aria-label="Liczba Etatów"
+                                                    min={0.5}
+                                                    step={0.5}
+                                                    value={role.fte}
+                                                    onChange={(e) => handleUpdateHeadcountRole(role.id, 'fte', e.target.value)}
+                                                    className="w-full bg-zinc-950 border border-zinc-700 rounded px-2 py-1 text-zinc-100 text-xs focus:outline-none focus:border-indigo-500"
+                                                />
+                                            </td>
+                                            <td className="py-2 px-3">
+                                                <input
+                                                    type="number"
+                                                    aria-label="Wynagrodzenie Brutto"
+                                                    value={role.grossSalary}
+                                                    onChange={(e) => handleUpdateHeadcountRole(role.id, 'grossSalary', e.target.value)}
+                                                    className="w-full bg-zinc-950 border border-zinc-700 rounded px-2 py-1 text-zinc-100 text-xs focus:outline-none focus:border-indigo-500"
+                                                />
+                                            </td>
+                                            <td className="py-2 px-3">
+                                                <input
+                                                    type="number"
+                                                    aria-label="Narzut Pracodawcy"
+                                                    step={0.1}
+                                                    value={role.employerCostRate}
+                                                    onChange={(e) => handleUpdateHeadcountRole(role.id, 'employerCostRate', e.target.value)}
+                                                    className="w-full bg-zinc-950 border border-zinc-700 rounded px-2 py-1 text-zinc-100 text-xs focus:outline-none focus:border-indigo-500"
+                                                />
+                                            </td>
+                                            <td className="py-2 px-3 text-right font-bold text-indigo-300">
+                                                {formatCurrency(role.annualCost, currency)}
+                                            </td>
+                                            <td className="py-2 px-2 text-center">
+                                                <button
+                                                    type="button"
+                                                    aria-label="Usuń stanowisko"
+                                                    onClick={() => handleRemoveHeadcountRole(role.id)}
+                                                    className="p-1 text-zinc-500 hover:text-rose-400 transition-colors"
+                                                >
+                                                    <Trash2 className="w-3.5 h-3.5" />
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
                             </tbody>
                             <tfoot className="bg-zinc-950/90 border-t border-zinc-800 font-mono">
                                 <tr>

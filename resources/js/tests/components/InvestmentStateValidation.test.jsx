@@ -381,7 +381,7 @@ describe('Investment State Validation & Edge Cases (Phase 42 Commit 211)', () =>
             },
         };
 
-        it('disables delete button when only single revenue line remains', () => {
+        it('allows deleting the single revenue line and transitions to empty state', () => {
             const contextValue = {
                 selectedProject: standardProject,
                 loadProjectDetails: mockLoadProjectDetails,
@@ -395,10 +395,12 @@ describe('Investment State Validation & Edge Cases (Phase 42 Commit 211)', () =>
 
             const deleteButtons = screen.getAllByLabelText(/Usuń linię/i);
             expect(deleteButtons.length).toBe(1);
-            expect(deleteButtons[0]).toBeDisabled();
+            fireEvent.click(deleteButtons[0]);
+
+            expect(screen.getByText(/Brak zdefiniowanych strumieni przychodowych/i)).toBeInTheDocument();
         });
 
-        it('disables delete button when only single headcount role remains', () => {
+        it('allows deleting the single headcount role and transitions to empty state', () => {
             const contextValue = {
                 selectedProject: standardProject,
                 loadProjectDetails: mockLoadProjectDetails,
@@ -415,7 +417,9 @@ describe('Investment State Validation & Edge Cases (Phase 42 Commit 211)', () =>
 
             const deleteRoleButtons = screen.getAllByLabelText(/Usuń stanowisko/i);
             expect(deleteRoleButtons.length).toBe(1);
-            expect(deleteRoleButtons[0]).toBeDisabled();
+            fireEvent.click(deleteRoleButtons[0]);
+
+            expect(screen.getByText(/Brak zdefiniowanych stanowisk operacyjnych/i)).toBeInTheDocument();
         });
 
         it('calculates negative cash conversion cycle (CCC) correctly when DPO exceeds DSO + DIO', () => {
