@@ -16,8 +16,22 @@ import {
     Zap,
     Cpu,
     Wrench,
-    Truck
+    Truck,
+    LayoutGrid,
+    BarChart2,
+    TrendingUp
 } from 'lucide-react';
+import {
+    ResponsiveContainer,
+    BarChart,
+    Bar,
+    ComposedChart,
+    Line,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip as RechartsTooltip,
+} from 'recharts';
 import { useInvestmentProject } from '../../context/InvestmentProjectContext';
 import { investmentProjectsApi } from '../../api/investmentProjects';
 import { Button } from '../ui/Button';
@@ -67,6 +81,61 @@ export const DEFAULT_REINVESTMENT_PROGRAMS = [
     }
 ];
 
+// Tooltip component for Recharts reinvestment charts
+const ReinvestmentChartTooltip = ({ active, payload, label, currency = 'PLN', formatShortMoney }) => {
+    if (!active || !payload || !payload.length) return null;
+    const dataPoint = payload[0]?.payload;
+    if (!dataPoint) return null;
+
+    const yearTotal = dataPoint.totalCapex || 0;
+    const cumulative = dataPoint.cumulativeCapex || 0;
+
+    return (
+        <div className="bg-zinc-950/95 border border-zinc-750 rounded p-3 shadow-2xl font-mono text-xs max-w-xs z-50 backdrop-blur-md">
+            <div className="text-[10px] uppercase text-zinc-400 font-semibold border-b border-zinc-800 pb-1.5 mb-2 flex items-center justify-between">
+                <span className="text-zinc-200">OKRES: {label} (Rok {dataPoint.yearNum})</span>
+                <span className="text-emerald-400 font-bold">
+                    {formatShortMoney ? formatShortMoney(yearTotal) : `${yearTotal} ${currency}`}
+                </span>
+            </div>
+
+            {dataPoint.hits && dataPoint.hits.length > 0 ? (
+                <div className="space-y-1.5 mb-2.5">
+                    {dataPoint.hits.map((h, idx) => {
+                        const share = yearTotal > 0 ? Math.round((h.amount / yearTotal) * 100) : 0;
+                        const dotClass = h.color === 'cyan' ? 'bg-cyan-400' : h.color === 'emerald' ? 'bg-emerald-400' : 'bg-purple-400';
+                        return (
+                            <div key={idx} className="flex items-center justify-between gap-3 text-[11px]">
+                                <div className="flex items-center gap-1.5 text-zinc-300 truncate max-w-[150px]">
+                                    <span className={`w-2 h-2 rounded-full shrink-0 ${dotClass}`} />
+                                    <span className="truncate">{h.name}</span>
+                                </div>
+                                <div className="flex items-center gap-1.5 shrink-0">
+                                    <span className="font-bold text-zinc-100 tabular-nums">
+                                        {formatShortMoney ? formatShortMoney(h.amount) : `${h.amount} ${currency}`}
+                                    </span>
+                                    <span className="text-[9px] text-zinc-500 font-normal">({share}%)</span>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            ) : (
+                <div className="text-[11px] text-zinc-500 italic py-1 mb-1">
+                    Brak nakładów odtworzeniowych
+                </div>
+            )}
+
+            <div className="border-t border-zinc-800/80 pt-1.5 flex items-center justify-between text-[10px] text-zinc-400">
+                <span>Skumulowany CAPEX:</span>
+                <span className="font-bold text-amber-400 tabular-nums">
+                    {formatShortMoney ? formatShortMoney(cumulative) : `${cumulative} ${currency}`}
+                </span>
+            </div>
+        </div>
+    );
+};
+
 export const ReinvestmentManager = ({
     onProgramsChange = null,
     initialMultiplier = 1.0,
@@ -78,6 +147,7 @@ export const ReinvestmentManager = ({
     const [programs, setPrograms] = useState(DEFAULT_REINVESTMENT_PROGRAMS);
     const [reinvestmentsEnabled, setReinvestmentsEnabled] = useState(initialEnabled);
     const [multiplier, setMultiplier] = useState(initialMultiplier);
+    const [viewMode, setViewMode] = useState('matrix'); // 'matrix' | 'stacked_bars' | 'combo_curve'
 
     const [isSaving, setIsSaving] = useState(false);
     const [saveSuccess, setSaveSuccess] = useState(false);
@@ -205,6 +275,31 @@ export const ReinvestmentManager = ({
             };
         });
     }, [programs, reinvestmentsEnabled, multiplier, getProgramOccurrences]);
+
+    // Chart-ready Data Transformation for Recharts
+    const chartData = useMemo(() => {
+        let runningCumulative = 0;
+        return timelineData.map(item => {
+            const hitA = item.hits.find(h => h.programType === 'program_a');
+            const hitB = item.hits.find(h => h.programType === 'program_b');
+            const hitC = item.hits.find(h => h.programType === 'program_c');
+            const valA = hitA ? hitA.amount : 0;
+            const valB = hitB ? hitB.amount : 0;
+            const valC = hitC ? hitC.amount : 0;
+            runningCumulative += item.totalCapex;
+
+            return {
+                year: `Y${item.year}`,
+                yearNum: item.year,
+                program_a: valA,
+                program_b: valB,
+                program_c: valC,
+                totalCapex: item.totalCapex,
+                cumulativeCapex: runningCumulative,
+                hits: item.hits
+            };
+        });
+    }, [timelineData]);
 
     // Summary KPIs
     const summaryKpis = useMemo(() => {
@@ -643,9 +738,9 @@ export const ReinvestmentManager = ({
                 })}
             </div>
 
-            {/* Interactive 15-Year Timeline Gantt Grid */}
+            {/* Interactive 15-Year Timeline Gantt & Charts Section */}
             <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-5 space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
                     <div>
                         <h4 className="text-xs font-bold text-zinc-100 uppercase tracking-wider flex items-center gap-2">
                             <Calendar className="w-4 h-4 text-emerald-400" />
@@ -656,8 +751,59 @@ export const ReinvestmentManager = ({
                         </p>
                     </div>
 
-                    {/* Legend */}
-                    <div className="flex flex-wrap items-center gap-3 text-[10px]" data-testid="timeline-legend">
+                    {/* View Mode Switcher */}
+                    <div className="flex items-center bg-zinc-950 p-1 rounded border border-zinc-800 self-start sm:self-auto" role="tablist" aria-label="Wybór trybu wizualizacji">
+                        <button
+                            type="button"
+                            role="tab"
+                            aria-selected={viewMode === 'matrix'}
+                            onClick={() => setViewMode('matrix')}
+                            className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-[11px] font-medium transition-colors ${
+                                viewMode === 'matrix'
+                                    ? 'bg-zinc-800 text-zinc-100 shadow-xs'
+                                    : 'text-zinc-400 hover:text-zinc-200'
+                            }`}
+                            title="Siatka kalendarzowa (15 lat)"
+                        >
+                            <LayoutGrid className="w-3.5 h-3.5 text-emerald-400" />
+                            <span>Siatka 15L</span>
+                        </button>
+                        <button
+                            type="button"
+                            role="tab"
+                            aria-selected={viewMode === 'stacked_bars'}
+                            onClick={() => setViewMode('stacked_bars')}
+                            className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-[11px] font-medium transition-colors ${
+                                viewMode === 'stacked_bars'
+                                    ? 'bg-zinc-800 text-zinc-100 shadow-xs'
+                                    : 'text-zinc-400 hover:text-zinc-200'
+                            }`}
+                            title="Wykres słupkowy skumulowany nakładów rocznych"
+                        >
+                            <BarChart2 className="w-3.5 h-3.5 text-cyan-400" />
+                            <span>Słupki CAPEX</span>
+                        </button>
+                        <button
+                            type="button"
+                            role="tab"
+                            aria-selected={viewMode === 'combo_curve'}
+                            onClick={() => setViewMode('combo_curve')}
+                            className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-[11px] font-medium transition-colors ${
+                                viewMode === 'combo_curve'
+                                    ? 'bg-zinc-800 text-zinc-100 shadow-xs'
+                                    : 'text-zinc-400 hover:text-zinc-200'
+                            }`}
+                            title="Wykres łączony: roczne CAPEX + linia narastająca (S-Curve)"
+                        >
+                            <TrendingUp className="w-3.5 h-3.5 text-amber-400" />
+                            <span>S-Curve (Narastająco)</span>
+                        </button>
+                    </div>
+                </div>
+
+                {/* Sub-bar with Legend */}
+                <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-zinc-800/60 text-[10px]" data-testid="timeline-legend">
+                    <div className="flex flex-wrap items-center gap-3">
                         {reinvestmentsEnabled ? (
                             programs.filter(p => p.enabled).length > 0 ? (
                                 programs.filter(p => p.enabled).map(p => {
@@ -679,69 +825,224 @@ export const ReinvestmentManager = ({
                         ) : (
                             <span className="text-zinc-500 italic">Reinvestment wyłączony w modelu</span>
                         )}
+
+                        {/* Extra legend entry for S-Curve line when combo_curve mode is active */}
+                        {viewMode === 'combo_curve' && reinvestmentsEnabled && programs.some(p => p.enabled) && (
+                            <span className="flex items-center gap-1.5 text-amber-400 font-medium ml-1">
+                                <span className="w-2.5 h-0.5 bg-amber-400 inline-block" /> Skumulowany CAPEX (Krzywa S)
+                            </span>
+                        )}
+                    </div>
+
+                    <div className="text-zinc-500 font-mono text-[9px] uppercase">
+                        Horyzont: 15 Lat • Waluta: {currency}
                     </div>
                 </div>
 
-                {/* Grid of 15 Years */}
-                <div className="overflow-x-auto pb-2">
-                    <div 
-                        className="grid grid-cols-15 min-w-[750px] gap-1.5"
-                        style={{ gridTemplateColumns: 'repeat(15, minmax(0, 1fr))' }}
-                    >
-                        {timelineData.map(({ year, hits, totalCapex }) => {
-                            const hasHits = hits.length > 0;
-                            return (
-                                <div
-                                    key={year}
-                                    className={`flex flex-col items-center justify-between p-2 rounded border text-center transition-all min-h-[110px] ${
-                                        hasHits
-                                            ? 'bg-zinc-950/80 border-zinc-700 hover:border-emerald-500/50'
-                                            : 'bg-zinc-950/20 border-zinc-800/40 text-zinc-600'
-                                    }`}
-                                >
-                                    {/* Year Label */}
-                                    <div className="text-[11px] font-mono font-bold text-zinc-300">
-                                        Y{year}
-                                    </div>
+                {/* VIEW 1: Grid of 15 Years */}
+                {viewMode === 'matrix' && (
+                    <div className="overflow-x-auto pb-2" data-testid="timeline-matrix-view">
+                        <div 
+                            className="grid grid-cols-15 min-w-[750px] gap-1.5"
+                            style={{ gridTemplateColumns: 'repeat(15, minmax(0, 1fr))' }}
+                        >
+                            {timelineData.map(({ year, hits, totalCapex }) => {
+                                const hasHits = hits.length > 0;
+                                return (
+                                    <div
+                                        key={year}
+                                        className={`flex flex-col items-center justify-between p-2 rounded border text-center transition-all min-h-[110px] ${
+                                            hasHits
+                                                ? 'bg-zinc-950/80 border-zinc-700 hover:border-emerald-500/50'
+                                                : 'bg-zinc-950/20 border-zinc-800/40 text-zinc-600'
+                                        }`}
+                                    >
+                                        {/* Year Label */}
+                                        <div className="text-[11px] font-mono font-bold text-zinc-300">
+                                            Y{year}
+                                        </div>
 
-                                    {/* Program Badges */}
-                                    <div className="flex flex-col gap-1 my-1 w-full items-center">
-                                        {hasHits ? (
-                                            hits.map((h, i) => (
-                                                <span
-                                                    key={i}
-                                                    title={`${h.name}: ${formatShortMoney(h.amount)}`}
-                                                    className={`w-full py-0.5 px-1 rounded text-[9px] font-mono font-bold truncate ${
-                                                        h.color === 'cyan'
-                                                            ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
-                                                            : h.color === 'emerald'
-                                                            ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                                                            : 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
-                                                    }`}
-                                                >
-                                                    {h.programType === 'program_a' ? 'A' : h.programType === 'program_b' ? 'B' : 'C'}
+                                        {/* Program Badges */}
+                                        <div className="flex flex-col gap-1 my-1 w-full items-center">
+                                            {hasHits ? (
+                                                hits.map((h, i) => (
+                                                    <span
+                                                        key={i}
+                                                        title={`${h.name}: ${formatShortMoney(h.amount)}`}
+                                                        className={`w-full py-0.5 px-1 rounded text-[9px] font-mono font-bold truncate ${
+                                                            h.color === 'cyan'
+                                                                ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
+                                                                : h.color === 'emerald'
+                                                                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                                                                : 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
+                                                        }`}
+                                                    >
+                                                        {h.programType === 'program_a' ? 'A' : h.programType === 'program_b' ? 'B' : 'C'}
+                                                    </span>
+                                                ))
+                                            ) : (
+                                                <span className="text-[11px] text-zinc-700">—</span>
+                                            )}
+                                        </div>
+
+                                        {/* Total Capex in Year */}
+                                        <div className="text-[9px] font-mono font-bold mt-auto truncate w-full">
+                                            {hasHits ? (
+                                                <span className="text-zinc-100">
+                                                    {formatShortMoney(totalCapex)}
                                                 </span>
-                                            ))
-                                        ) : (
-                                            <span className="text-[11px] text-zinc-700">—</span>
-                                        )}
+                                            ) : (
+                                                <span className="text-zinc-700">0</span>
+                                            )}
+                                        </div>
                                     </div>
-
-                                    {/* Total Capex in Year */}
-                                    <div className="text-[9px] font-mono font-bold mt-auto truncate w-full">
-                                        {hasHits ? (
-                                            <span className="text-zinc-100">
-                                                {formatShortMoney(totalCapex)}
-                                            </span>
-                                        ) : (
-                                            <span className="text-zinc-700">0</span>
-                                        )}
-                                    </div>
-                                </div>
-                            );
-                        })}
+                                );
+                            })}
+                        </div>
                     </div>
-                </div>
+                )}
+
+                {/* VIEW 2: Stacked Bar Chart */}
+                {viewMode === 'stacked_bars' && (
+                    <div className="w-full h-72 pt-2" data-testid="timeline-stacked-bars-view">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart
+                                data={chartData}
+                                margin={{ top: 15, right: 15, left: -5, bottom: 0 }}
+                            >
+                                <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
+                                <XAxis
+                                    dataKey="year"
+                                    stroke="#71717a"
+                                    fontSize={10}
+                                    fontFamily="JetBrains Mono, monospace"
+                                    tickLine={false}
+                                    axisLine={{ stroke: '#3f3f46' }}
+                                />
+                                <YAxis
+                                    stroke="#71717a"
+                                    fontSize={10}
+                                    fontFamily="JetBrains Mono, monospace"
+                                    tickLine={false}
+                                    axisLine={false}
+                                    tickFormatter={(v) => formatShortMoney(v)}
+                                />
+                                <RechartsTooltip
+                                    content={<ReinvestmentChartTooltip currency={currency} formatShortMoney={formatShortMoney} />}
+                                />
+                                {programs.find(p => p.program_type === 'program_a')?.enabled && (
+                                    <Bar
+                                        dataKey="program_a"
+                                        stackId="capex"
+                                        fill="#22d3ee"
+                                        name={programs.find(p => p.program_type === 'program_a')?.name || 'Nakład A'}
+                                        radius={[0, 0, 0, 0]}
+                                    />
+                                )}
+                                {programs.find(p => p.program_type === 'program_b')?.enabled && (
+                                    <Bar
+                                        dataKey="program_b"
+                                        stackId="capex"
+                                        fill="#34d399"
+                                        name={programs.find(p => p.program_type === 'program_b')?.name || 'Nakład B'}
+                                        radius={[0, 0, 0, 0]}
+                                    />
+                                )}
+                                {programs.find(p => p.program_type === 'program_c')?.enabled && (
+                                    <Bar
+                                        dataKey="program_c"
+                                        stackId="capex"
+                                        fill="#c084fc"
+                                        name={programs.find(p => p.program_type === 'program_c')?.name || 'Nakład C'}
+                                        radius={[2, 2, 0, 0]}
+                                    />
+                                )}
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </div>
+                )}
+
+                {/* VIEW 3: Composed S-Curve Chart (Stacked Bars + Cumulative Line) */}
+                {viewMode === 'combo_curve' && (
+                    <div className="w-full h-72 pt-2" data-testid="timeline-combo-curve-view">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <ComposedChart
+                                data={chartData}
+                                margin={{ top: 15, right: 20, left: -5, bottom: 0 }}
+                            >
+                                <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
+                                <XAxis
+                                    dataKey="year"
+                                    stroke="#71717a"
+                                    fontSize={10}
+                                    fontFamily="JetBrains Mono, monospace"
+                                    tickLine={false}
+                                    axisLine={{ stroke: '#3f3f46' }}
+                                />
+                                <YAxis
+                                    yAxisId="left"
+                                    stroke="#71717a"
+                                    fontSize={10}
+                                    fontFamily="JetBrains Mono, monospace"
+                                    tickLine={false}
+                                    axisLine={false}
+                                    tickFormatter={(v) => formatShortMoney(v)}
+                                />
+                                <YAxis
+                                    yAxisId="right"
+                                    orientation="right"
+                                    stroke="#f59e0b"
+                                    fontSize={10}
+                                    fontFamily="JetBrains Mono, monospace"
+                                    tickLine={false}
+                                    axisLine={false}
+                                    tickFormatter={(v) => formatShortMoney(v)}
+                                />
+                                <RechartsTooltip
+                                    content={<ReinvestmentChartTooltip currency={currency} formatShortMoney={formatShortMoney} />}
+                                />
+                                {programs.find(p => p.program_type === 'program_a')?.enabled && (
+                                    <Bar
+                                        yAxisId="left"
+                                        dataKey="program_a"
+                                        stackId="capex"
+                                        fill="#22d3ee"
+                                        name={programs.find(p => p.program_type === 'program_a')?.name || 'Nakład A'}
+                                    />
+                                )}
+                                {programs.find(p => p.program_type === 'program_b')?.enabled && (
+                                    <Bar
+                                        yAxisId="left"
+                                        dataKey="program_b"
+                                        stackId="capex"
+                                        fill="#34d399"
+                                        name={programs.find(p => p.program_type === 'program_b')?.name || 'Nakład B'}
+                                    />
+                                )}
+                                {programs.find(p => p.program_type === 'program_c')?.enabled && (
+                                    <Bar
+                                        yAxisId="left"
+                                        dataKey="program_c"
+                                        stackId="capex"
+                                        fill="#c084fc"
+                                        name={programs.find(p => p.program_type === 'program_c')?.name || 'Nakład C'}
+                                        radius={[2, 2, 0, 0]}
+                                    />
+                                )}
+                                <Line
+                                    yAxisId="right"
+                                    type="monotone"
+                                    dataKey="cumulativeCapex"
+                                    stroke="#f59e0b"
+                                    strokeWidth={2.5}
+                                    dot={{ r: 3, fill: '#f59e0b', stroke: '#09090b', strokeWidth: 1 }}
+                                    activeDot={{ r: 5 }}
+                                    name="Skumulowany CAPEX"
+                                />
+                            </ComposedChart>
+                        </ResponsiveContainer>
+                    </div>
+                )}
             </div>
 
             {/* Bottom Actions & Notifications */}

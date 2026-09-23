@@ -649,6 +649,9 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
   - [x] Dynamiczna legenda 15-letniej osi czasu reinvestmentu (`ReinvestmentManager.jsx`) odzwierciedlająca aktualne nazwy programów i kolory wskaźników.
   - [x] Reaktywne filtrowanie legendy wykluczające wyłączone programy (`enabled === false`) oraz obsługa stanów pustych (*Brak aktywnych nakładów*, *Reinvestment wyłączony w modelu*).
   - [x] Rozszerzenie testów Vitest o weryfikację reaktywności legendy, dynamicznych nazw i filtrowania aktywnych nakładów (`ReinvestmentManager.test.jsx`).
+  - [x] Wielotrybowy kokpit wizualizacji reinvestmentu (View Switcher) w `ReinvestmentManager.jsx` z 3 trybami: Siatka 15L (`matrix`), Słupki Skumulowane `BarChart` (`stacked_bars`) oraz Wykres Łączony `ComposedChart` / S-Curve (`combo_curve`).
+  - [x] Dedykowany institutional tooltip analityczny (`ReinvestmentChartTooltip`) prezentujący rok, wykaz programów z kwotami i procentowym udziałem, roczną sumę CAPEX oraz skumulowany wydatek od początku projektu.
+  - [x] Rozszerzenie testów jednostkowych Vitest o weryfikację selektora widoków, przełączania trybów oraz wskaźnika S-Curve w legendzie (`ReinvestmentManager.test.jsx`).
 
 ---
 

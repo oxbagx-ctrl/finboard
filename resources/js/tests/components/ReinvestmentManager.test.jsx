@@ -12,6 +12,19 @@ vi.mock('../../api/investmentProjects', () => ({
     },
 }));
 
+// Mock Recharts ResponsiveContainer to avoid size observer issues in test DOM
+vi.mock('recharts', async () => {
+    const actual = await vi.importActual('recharts');
+    return {
+        ...actual,
+        ResponsiveContainer: ({ children }) => (
+            <div data-testid="responsive-container" style={{ width: '800px', height: '300px' }}>
+                {children}
+            </div>
+        ),
+    };
+});
+
 describe('ReinvestmentManager Component (Phase 43 Commit 214)', () => {
     const mockLoadProjectDetails = vi.fn();
     const mockOnProgramsChange = vi.fn();
@@ -374,6 +387,49 @@ describe('ReinvestmentManager Component (Phase 43 Commit 214)', () => {
         fireEvent.click(checkboxes[0]);
         expect(legend).toHaveTextContent(/Reinvestment wyłączony w modelu/i);
         expect(legend).not.toHaveTextContent(/Nakład A/i);
+    });
+
+    it('renders view switcher and allows switching between Matrix, Stacked Bars, and S-Curve views (Commit 236)', () => {
+        renderComponent();
+
+        // Check tabs exist
+        const matrixTab = screen.getByRole('tab', { name: /Siatka 15L/i });
+        const stackedBarsTab = screen.getByRole('tab', { name: /Słupki CAPEX/i });
+        const comboCurveTab = screen.getByRole('tab', { name: /S-Curve/i });
+
+        expect(matrixTab).toBeInTheDocument();
+        expect(stackedBarsTab).toBeInTheDocument();
+        expect(comboCurveTab).toBeInTheDocument();
+
+        // Default view: matrix
+        expect(screen.getByTestId('timeline-matrix-view')).toBeInTheDocument();
+        expect(screen.queryByTestId('timeline-stacked-bars-view')).not.toBeInTheDocument();
+        expect(screen.queryByTestId('timeline-combo-curve-view')).not.toBeInTheDocument();
+        expect(matrixTab).toHaveAttribute('aria-selected', 'true');
+
+        // Switch to Stacked Bars
+        fireEvent.click(stackedBarsTab);
+        expect(screen.getByTestId('timeline-stacked-bars-view')).toBeInTheDocument();
+        expect(screen.queryByTestId('timeline-matrix-view')).not.toBeInTheDocument();
+        expect(screen.queryByTestId('timeline-combo-curve-view')).not.toBeInTheDocument();
+        expect(stackedBarsTab).toHaveAttribute('aria-selected', 'true');
+
+        // Switch to Composed S-Curve
+        fireEvent.click(comboCurveTab);
+        expect(screen.getByTestId('timeline-combo-curve-view')).toBeInTheDocument();
+        expect(screen.queryByTestId('timeline-matrix-view')).not.toBeInTheDocument();
+        expect(screen.queryByTestId('timeline-stacked-bars-view')).not.toBeInTheDocument();
+        expect(comboCurveTab).toHaveAttribute('aria-selected', 'true');
+
+        // When in S-Curve mode, the legend should include the S-Curve cumulative line indicator
+        const legend = screen.getByTestId('timeline-legend');
+        expect(legend).toHaveTextContent(/Skumulowany CAPEX \(Krzywa S\)/i);
+
+        // Switch back to Matrix
+        fireEvent.click(matrixTab);
+        expect(screen.getByTestId('timeline-matrix-view')).toBeInTheDocument();
+        expect(screen.queryByTestId('timeline-combo-curve-view')).not.toBeInTheDocument();
+        expect(matrixTab).toHaveAttribute('aria-selected', 'true');
     });
 });
 
