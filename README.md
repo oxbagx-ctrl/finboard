@@ -671,7 +671,13 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Dodanie interaktywnej karty tarczy podatkowej WACC w zakładce *5. Podatki & CIT*.
     - Parametryzacja reguł walidacyjnych w żądaniach `UpdateInvestmentProjectRequest`, `InvestmentStatementQueryRequest` oraz `InvestmentAppraisalQueryRequest`.
     - Testy jednostkowe WACC (`WaccCalculatorServiceTest.php`) oraz frontendowe (`OperatingAssumptionsForm.test.jsx`).
-  - [ ] **Commit 240**: Model domenowy rocznikowania strat podatkowych (Tax Loss Vintages & 5-Year Expiry).
+  - [x] **Commit 240**: Model domenowy rocznikowania strat podatkowych (Tax Loss Vintages & 5-Year Expiry).
+    - Implementacja enum `TaxLossSettlementMode` (`standard_loss_cap`, `one_off_5m`, `ebt_cap`) zgodnie z art. 7 ust. 5 ustawy o CIT.
+    - Implementacja obiektu wartości `TaxLossVintage` (rok powstania, kwota pierwotna, pozostała, rozliczona, rok wygaśnięcia $T+5$).
+    - Implementacja agregatu wartości `TaxLossPool` z kolejką FIFO i bezpowrotnym wygaszaniem strat po upływie 5 lat podatkowych.
+    - Wprowadzenie obiektu `TaxLossSettlementResult` rejestrującego kwoty rozliczone, wygasłe oraz salda otwarcia/zamknięcia.
+    - Rozszerzenie `OperatingAssumptions`, `IncomeStatementPeriod` i `AnnualIncomeStatement` o atrybuty `taxLossExpired` i `taxLossCarryForwardOpening`.
+    - Kompletny zestaw testów jednostkowych (`TaxLossPoolTest.php`).
   - [ ] **Commit 241**: Roczny model zaliczek CIT (YTD) i obsługa jednorazowego odliczenia 5 mln zł w IncomeStatementService.
   - [ ] **Commit 242**: Parzystość matematyczna w silniku Web Worker (financialCalculations.ts).
   - [ ] **Commit 243**: Interfejs UI fiskalnego panelu CIT i podgląd trajektorii tarczy podatkowej (Tax Loss Roll-Forward).

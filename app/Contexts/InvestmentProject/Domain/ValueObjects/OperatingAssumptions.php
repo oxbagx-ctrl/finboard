@@ -15,7 +15,7 @@ final class OperatingAssumptions implements ValueObject
     private array $capacityRampUp;
 
     /**
-     * @param array<int, float> $capacityRampUp Operating Year (1-based) => capacity utilization % (e.g. [1 => 60.0, 2 => 85.0, 3 => 100.0])
+     * @param  array<int, float>  $capacityRampUp  Operating Year (1-based) => capacity utilization % (e.g. [1 => 60.0, 2 => 85.0, 3 => 100.0])
      */
     public function __construct(
         private readonly Money $annualRevenueBase,
@@ -28,7 +28,9 @@ final class OperatingAssumptions implements ValueObject
         array $capacityRampUp = [],
         private readonly float $citRatePercent = 19.0,
         private readonly bool $taxLossCarryForwardEnabled = true,
-        private readonly float $taxLossOffsetCapPercent = 50.0
+        private readonly float $taxLossOffsetCapPercent = 50.0,
+        private readonly TaxLossSettlementMode $taxLossSettlementMode = TaxLossSettlementMode::STANDARD_LOSS_CAP,
+        private readonly ?Money $taxLossOneOffCapAmount = null
     ) {
         if ($this->annualRevenueBase->isNegative()) {
             throw new InvalidArgumentException('Annual revenue base cannot be negative.');
@@ -60,6 +62,10 @@ final class OperatingAssumptions implements ValueObject
             );
         }
 
+        if ($this->taxLossOneOffCapAmount !== null && $this->taxLossOneOffCapAmount->isNegative()) {
+            throw new InvalidArgumentException('Tax loss one-off cap amount cannot be negative.');
+        }
+
         $this->capacityRampUp = $capacityRampUp;
     }
 
@@ -68,7 +74,9 @@ final class OperatingAssumptions implements ValueObject
         float $variableCostPercent = 40.0,
         ?Money $annualFixedCosts = null,
         ?Money $annualPayroll = null,
-        array $capacityRampUp = [1 => 60.0, 2 => 85.0, 3 => 100.0]
+        array $capacityRampUp = [1 => 60.0, 2 => 85.0, 3 => 100.0],
+        TaxLossSettlementMode $taxLossSettlementMode = TaxLossSettlementMode::STANDARD_LOSS_CAP,
+        ?Money $taxLossOneOffCapAmount = null
     ): self {
         $currency = $annualRevenueBase->currency();
 
@@ -83,7 +91,9 @@ final class OperatingAssumptions implements ValueObject
             capacityRampUp: $capacityRampUp,
             citRatePercent: 19.0,
             taxLossCarryForwardEnabled: true,
-            taxLossOffsetCapPercent: 50.0
+            taxLossOffsetCapPercent: 50.0,
+            taxLossSettlementMode: $taxLossSettlementMode,
+            taxLossOneOffCapAmount: $taxLossOneOffCapAmount
         );
     }
 
@@ -136,7 +146,15 @@ final class OperatingAssumptions implements ValueObject
             return $this->capacityRampUp[$operatingYear];
         }
 
-        // If beyond defined years in ramp-up map, assume 100% full capacity
+        if (empty($this->capacityRampUp)) {
+            return 100.0;
+        }
+
+        $maxDefinedYear = max(array_keys($this->capacityRampUp));
+        if ($operatingYear > $maxDefinedYear) {
+            return $this->capacityRampUp[$maxDefinedYear];
+        }
+
         return 100.0;
     }
 
@@ -160,14 +178,27 @@ final class OperatingAssumptions implements ValueObject
         return $this->taxLossOffsetCapPercent;
     }
 
+    public function taxLossSettlementMode(): TaxLossSettlementMode
+    {
+        return $this->taxLossSettlementMode;
+    }
+
+    public function taxLossOneOffCapAmount(): ?Money
+    {
+        return $this->taxLossOneOffCapAmount;
+    }
+
     public function currency(): Currency
     {
         return $this->annualRevenueBase->currency();
     }
 
+    /**
+     * @param  self  $other
+     */
     public function equals(ValueObject $other): bool
     {
-        if (!$other instanceof self) {
+        if (! $other instanceof self) {
             return false;
         }
 
@@ -176,11 +207,13 @@ final class OperatingAssumptions implements ValueObject
             && abs($this->variableCostPercent - $other->variableCostPercent) < 0.0001
             && $this->annualFixedCostsBase->equals($other->annualFixedCostsBase)
             && $this->annualPayrollBase->equals($other->annualPayrollBase)
-            && abs($this->citRatePercent - $other->citRatePercent) < 0.0001;
+            && abs($this->citRatePercent - $other->citRatePercent) < 0.0001
+            && $this->taxLossCarryForwardEnabled === $other->taxLossCarryForwardEnabled
+            && $this->taxLossSettlementMode === $other->taxLossSettlementMode;
     }
 
     /**
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      */
     public static function fromArray(array $data, ?Currency $fallbackCurrency = null): self
     {
@@ -212,6 +245,12 @@ final class OperatingAssumptions implements ValueObject
         $citRatePercent = (float) ($data['cit_rate_percent'] ?? 19.0);
         $taxLossCarryForwardEnabled = (bool) ($data['tax_loss_carry_forward_enabled'] ?? true);
         $taxLossOffsetCapPercent = (float) ($data['tax_loss_offset_cap_percent'] ?? 50.0);
+        $taxLossSettlementMode = TaxLossSettlementMode::fromOrDefault($data['tax_loss_settlement_mode'] ?? null);
+
+        $taxLossOneOffCapAmount = null;
+        if (isset($data['tax_loss_one_off_cap_amount']) && $data['tax_loss_one_off_cap_amount'] !== null && $data['tax_loss_one_off_cap_amount'] !== '') {
+            $taxLossOneOffCapAmount = Money::fromDecimal((float) $data['tax_loss_one_off_cap_amount'], $currency);
+        }
 
         return new self(
             $annualRevenueBase,
@@ -224,7 +263,9 @@ final class OperatingAssumptions implements ValueObject
             $rampUp,
             $citRatePercent,
             $taxLossCarryForwardEnabled,
-            $taxLossOffsetCapPercent
+            $taxLossOffsetCapPercent,
+            $taxLossSettlementMode,
+            $taxLossOneOffCapAmount
         );
     }
 
@@ -246,7 +287,8 @@ final class OperatingAssumptions implements ValueObject
             'cit_rate_percent' => $this->citRatePercent,
             'tax_loss_carry_forward_enabled' => $this->taxLossCarryForwardEnabled,
             'tax_loss_offset_cap_percent' => $this->taxLossOffsetCapPercent,
+            'tax_loss_settlement_mode' => $this->taxLossSettlementMode->value,
+            'tax_loss_one_off_cap_amount' => $this->taxLossOneOffCapAmount?->amount(),
         ];
     }
 }
-

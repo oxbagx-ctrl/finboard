@@ -32,7 +32,9 @@ final class IncomeStatementPeriod implements ValueObject
         private readonly Money $taxableIncome,
         private readonly Money $incomeTax,
         private readonly Money $netIncome,
-        private readonly Money $taxLossCarryForwardClosing
+        private readonly Money $taxLossCarryForwardClosing,
+        private readonly ?Money $taxLossExpired = null,
+        private readonly ?Money $taxLossCarryForwardOpening = null
     ) {
         if ($this->periodNumber < 1) {
             throw new InvalidArgumentException(
@@ -133,6 +135,11 @@ final class IncomeStatementPeriod implements ValueObject
         return $this->taxLossUsed;
     }
 
+    public function taxLossExpired(): Money
+    {
+        return $this->taxLossExpired ?? Money::zero($this->currency());
+    }
+
     public function taxableIncome(): Money
     {
         return $this->taxableIncome;
@@ -148,6 +155,11 @@ final class IncomeStatementPeriod implements ValueObject
         return $this->netIncome;
     }
 
+    public function taxLossCarryForwardOpening(): Money
+    {
+        return $this->taxLossCarryForwardOpening ?? Money::zero($this->currency());
+    }
+
     public function taxLossCarryForwardClosing(): Money
     {
         return $this->taxLossCarryForwardClosing;
@@ -160,7 +172,7 @@ final class IncomeStatementPeriod implements ValueObject
 
     public function equals(ValueObject $other): bool
     {
-        if (!$other instanceof self) {
+        if (! $other instanceof self) {
             return false;
         }
 
@@ -196,9 +208,11 @@ final class IncomeStatementPeriod implements ValueObject
             'interest_expense' => $this->interestExpense->amount(),
             'ebt' => $this->ebt->amount(),
             'tax_loss_used' => $this->taxLossUsed->amount(),
+            'tax_loss_expired' => $this->taxLossExpired()->amount(),
             'taxable_income' => $this->taxableIncome->amount(),
             'income_tax' => $this->incomeTax->amount(),
             'net_income' => $this->netIncome->amount(),
+            'tax_loss_carry_forward_opening' => $this->taxLossCarryForwardOpening()->amount(),
             'tax_loss_carry_forward_closing' => $this->taxLossCarryForwardClosing->amount(),
             'currency' => $this->currency()->value,
         ];
