@@ -209,4 +209,82 @@ describe('FinancingStructureConfigurator Component', () => {
             expect(screen.getByText(/Struktura finansowania została pomyślnie zapisana/i)).toBeInTheDocument();
         });
     });
+
+    it('displays % CAPEX, % LTV, and % Dotacji badges when totalCapex > 0 (Commit 233)', () => {
+        renderWithContext(mockProjectBalanced);
+
+        // 3M / 10M = 30.0% CAPEX
+        expect(screen.getByText(/30\.0% CAPEX/i)).toBeInTheDocument();
+        // 5M / 10M = 50.0% LTV
+        expect(screen.getByText(/50\.0% LTV/i)).toBeInTheDocument();
+        // 2M / 10M = 20.0% Dotacji
+        expect(screen.getByText(/20\.0% Dotacji/i)).toBeInTheDocument();
+    });
+
+    it('displays capital stack badges (% Kapitału) and disables quick buttons when totalCapex is zero (Commit 233)', () => {
+        const mockProjectZeroCapex = {
+            id: 'proj-zero-capex',
+            name: 'Projekt II bez etapów CAPEX',
+            currency: 'PLN',
+            status: 'draft',
+            capex_stages: [], // Zero CAPEX
+            financing_structure: {
+                equity_contribution: 100000,
+                bank_loan_amount: 200000,
+                grant_amount: 50000,
+                vat_bridge_loan: 0,
+            },
+            debt_facilities: [
+                {
+                    principal_amount: 200000,
+                    base_rate_percent: 5.85,
+                    margin_percent: 2.0,
+                    tenor_months: 120,
+                },
+            ],
+        };
+
+        renderWithContext(mockProjectZeroCapex);
+
+        // Nakłady CAPEX helper hint
+        expect(screen.getByText(/Brak etapów w harmonogramie/i)).toBeInTheDocument();
+
+        // Total funding = 350 000
+        // Equity: 100 000 / 350 000 = 28.6% Kapitału
+        expect(screen.getByText(/28\.6% Kapitału/i)).toBeInTheDocument();
+        // Debt: 200 000 / 350 000 = 57.1% Kapitału
+        expect(screen.getByText(/57\.1% Kapitału/i)).toBeInTheDocument();
+        // Grant: 50 000 / 350 000 = 14.3% Kapitału
+        expect(screen.getByText(/14\.3% Kapitału/i)).toBeInTheDocument();
+
+        // Quick set buttons should be disabled
+        expect(screen.getByRole('button', { name: /20% CAPEX/i })).toBeDisabled();
+        expect(screen.getByRole('button', { name: /30% CAPEX/i })).toBeDisabled();
+        expect(screen.getByRole('button', { name: /50% LTV/i })).toBeDisabled();
+        expect(screen.getByRole('button', { name: /70% LTV/i })).toBeDisabled();
+        expect(screen.getByRole('button', { name: /Ustaw standardowy VAT 23% od CAPEX/i })).toBeDisabled();
+    });
+
+    it('displays muted 0.0% badges when both totalCapex and totalFunding are zero (Commit 233)', () => {
+        const mockEmptyProject = {
+            id: 'proj-empty',
+            name: 'Pusty Projekt',
+            currency: 'PLN',
+            capex_stages: [],
+            financing_structure: {
+                equity_contribution: 0,
+                bank_loan_amount: 0,
+                grant_amount: 0,
+                vat_bridge_loan: 0,
+            },
+            debt_facilities: [],
+        };
+
+        renderWithContext(mockEmptyProject);
+
+        expect(screen.getByText(/0\.0% CAPEX/i)).toBeInTheDocument();
+        expect(screen.getByText(/0\.0% LTV/i)).toBeInTheDocument();
+        expect(screen.getByText(/0\.0% Dotacji/i)).toBeInTheDocument();
+    });
 });
+

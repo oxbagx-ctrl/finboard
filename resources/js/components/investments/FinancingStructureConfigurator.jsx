@@ -226,6 +226,11 @@ export const FinancingStructureConfigurator = () => {
                         <span className="text-lg font-bold font-mono text-zinc-100">
                             {formatCurrency(totalCapex, currency)}
                         </span>
+                        {totalCapex === 0 && (
+                            <span className="text-[10px] text-zinc-500 block mt-0.5" title="Dodaj etapy w Harmonogramie CAPEX, aby skalkulować pełny bilans">
+                                Brak etapów w harmonogramie
+                            </span>
+                        )}
                     </div>
 
                     <div className="bg-zinc-950/60 border border-zinc-800/80 rounded-lg p-3.5">
@@ -313,8 +318,15 @@ export const FinancingStructureConfigurator = () => {
                                 <Building2 className="w-4 h-4 text-emerald-400" />
                                 <h4 className="font-medium text-zinc-200">Wkład Własny (Equity)</h4>
                             </div>
-                            <span className="text-xs font-mono text-emerald-400 font-semibold">
-                                {totalCapex > 0 ? `${((equityContribution / totalCapex) * 100).toFixed(1)}% CAPEX` : ''}
+                            <span
+                                className={`text-xs font-mono font-semibold ${totalCapex > 0 ? 'text-emerald-400' : totalFunding > 0 ? 'text-emerald-400/90' : 'text-zinc-500'}`}
+                                title={totalCapex === 0 && totalFunding > 0 ? 'Wartość względem pozyskanego kapitału (nakłady CAPEX projektu = 0,00 zł)' : undefined}
+                            >
+                                {totalCapex > 0
+                                    ? `${((equityContribution / totalCapex) * 100).toFixed(1)}% CAPEX`
+                                    : totalFunding > 0
+                                    ? `${equityPercentOfFunding.toFixed(1)}% Kapitału`
+                                    : '0.0% CAPEX'}
                             </span>
                         </div>
 
@@ -345,15 +357,19 @@ export const FinancingStructureConfigurator = () => {
                             <div className="flex flex-wrap gap-1.5 pt-1">
                                 <button
                                     type="button"
+                                    disabled={totalCapex <= 0}
+                                    title={totalCapex <= 0 ? 'Wymaga zdefiniowania etapów w Harmonogramie CAPEX' : undefined}
                                     onClick={() => handleSetEquityPercent(20)}
-                                    className="px-2 py-1 text-xs rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 transition-colors"
+                                    className="px-2 py-1 text-xs rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                                 >
                                     20% CAPEX
                                 </button>
                                 <button
                                     type="button"
+                                    disabled={totalCapex <= 0}
+                                    title={totalCapex <= 0 ? 'Wymaga zdefiniowania etapów w Harmonogramie CAPEX' : undefined}
                                     onClick={() => handleSetEquityPercent(30)}
-                                    className="px-2 py-1 text-xs rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 transition-colors"
+                                    className="px-2 py-1 text-xs rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                                 >
                                     30% CAPEX
                                 </button>
@@ -406,8 +422,15 @@ export const FinancingStructureConfigurator = () => {
                                 <Landmark className="w-4 h-4 text-amber-400" />
                                 <h4 className="font-medium text-zinc-200">Kredyt Bankowy (Senior Debt)</h4>
                             </div>
-                            <span className="text-xs font-mono text-amber-400 font-semibold">
-                                {totalCapex > 0 ? `${((debtPrincipal / totalCapex) * 100).toFixed(1)}% LTV` : ''}
+                            <span
+                                className={`text-xs font-mono font-semibold ${totalCapex > 0 ? 'text-amber-400' : totalFunding > 0 ? 'text-amber-400/90' : 'text-zinc-500'}`}
+                                title={totalCapex === 0 && totalFunding > 0 ? 'Wartość względem pozyskanego kapitału (nakłady CAPEX projektu = 0,00 zł)' : undefined}
+                            >
+                                {totalCapex > 0
+                                    ? `${((debtPrincipal / totalCapex) * 100).toFixed(1)}% LTV`
+                                    : totalFunding > 0
+                                    ? `${debtPercentOfFunding.toFixed(1)}% Kapitału`
+                                    : '0.0% LTV'}
                             </span>
                         </div>
 
@@ -437,15 +460,19 @@ export const FinancingStructureConfigurator = () => {
                             <div className="flex flex-wrap gap-1.5 pt-1">
                                 <button
                                     type="button"
+                                    disabled={totalCapex <= 0}
+                                    title={totalCapex <= 0 ? 'Wymaga zdefiniowania etapów w Harmonogramie CAPEX' : undefined}
                                     onClick={() => handleSetDebtPercent(50)}
-                                    className="px-2 py-1 text-xs rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 transition-colors"
+                                    className="px-2 py-1 text-xs rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                                 >
                                     50% LTV
                                 </button>
                                 <button
                                     type="button"
+                                    disabled={totalCapex <= 0}
+                                    title={totalCapex <= 0 ? 'Wymaga zdefiniowania etapów w Harmonogramie CAPEX' : undefined}
                                     onClick={() => handleSetDebtPercent(70)}
-                                    className="px-2 py-1 text-xs rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 transition-colors"
+                                    className="px-2 py-1 text-xs rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                                 >
                                     70% LTV
                                 </button>
@@ -550,8 +577,15 @@ export const FinancingStructureConfigurator = () => {
                                 <Sparkles className="w-4 h-4 text-indigo-400" />
                                 <h4 className="font-medium text-zinc-200">Dotacje & Kredyt Pomostowy VAT</h4>
                             </div>
-                            <span className="text-xs font-mono text-indigo-400 font-semibold">
-                                {totalCapex > 0 ? `${((grantAmount / totalCapex) * 100).toFixed(1)}% Dotacji` : ''}
+                            <span
+                                className={`text-xs font-mono font-semibold ${totalCapex > 0 ? 'text-indigo-400' : totalFunding > 0 ? 'text-indigo-400/90' : 'text-zinc-500'}`}
+                                title={totalCapex === 0 && totalFunding > 0 ? 'Wartość względem pozyskanego kapitału (nakłady CAPEX projektu = 0,00 zł)' : undefined}
+                            >
+                                {totalCapex > 0
+                                    ? `${((grantAmount / totalCapex) * 100).toFixed(1)}% Dotacji`
+                                    : totalFunding > 0
+                                    ? `${grantPercentOfFunding.toFixed(1)}% Kapitału`
+                                    : '0.0% Dotacji'}
                             </span>
                         </div>
 
@@ -594,8 +628,10 @@ export const FinancingStructureConfigurator = () => {
                             />
                             <button
                                 type="button"
+                                disabled={totalCapex <= 0}
+                                title={totalCapex <= 0 ? 'Wymaga zdefiniowania etapów w Harmonogramie CAPEX' : undefined}
                                 onClick={handleAutoVatBridge}
-                                className="w-full py-1.5 px-3 text-xs bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded transition-colors flex items-center justify-center gap-1.5"
+                                className="w-full py-1.5 px-3 text-xs bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded transition-colors flex items-center justify-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
                             >
                                 <Percent className="w-3.5 h-3.5 text-zinc-400" />
                                 Ustaw standardowy VAT 23% od CAPEX ({formatCurrency(totalCapex * 0.23, currency)})
