@@ -54,6 +54,21 @@ final class UpdateInvestmentProjectRequest extends FormRequest
             'operating_assumptions.dso' => ['nullable', 'integer', 'min:0', 'max:365'],
             'operating_assumptions.dpo' => ['nullable', 'integer', 'min:0', 'max:365'],
             'operating_assumptions.dio' => ['nullable', 'integer', 'min:0', 'max:365'],
+            'operating_assumptions.reinvestments_enabled' => ['nullable', 'boolean'],
+            'operating_assumptions.reinvestment_programs' => ['nullable', 'array'],
+            'operating_assumptions.reinvestment_programs.*.id' => ['nullable', 'string'],
+            'operating_assumptions.reinvestment_programs.*.program_type' => ['nullable', 'string'],
+            'operating_assumptions.reinvestment_programs.*.name' => ['nullable', 'string'],
+            'operating_assumptions.reinvestment_programs.*.description' => ['nullable', 'string'],
+            'operating_assumptions.reinvestment_programs.*.enabled' => ['nullable', 'boolean'],
+            'operating_assumptions.reinvestment_programs.*.net_amount' => ['nullable', 'numeric', 'min:0'],
+            'operating_assumptions.reinvestment_programs.*.frequency_years' => ['nullable', 'integer', 'min:1'],
+            'operating_assumptions.reinvestment_programs.*.first_occurrence_year' => ['nullable', 'integer', 'min:1'],
+            'operating_assumptions.reinvestment_programs.*.kst_code' => ['nullable', 'string'],
+            'operating_assumptions.reinvestment_programs.*.kst_annual_rate' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'operating_assumptions.reinvestment_programs.*.color' => ['nullable', 'string'],
+            'operating_assumptions.readiness_scorecard' => ['nullable', 'array'],
+            'operating_assumptions.valuation_multiple' => ['nullable', 'array'],
         ];
     }
 }

@@ -474,6 +474,20 @@ final class InvestmentValuationApiTest extends TestCase
                 'revenue_lines' => [
                     ['name' => 'Sprzedaż energii elektrycznej', 'unit' => 'MWh', 'volume' => 25000, 'price' => 500, 'total' => 12500000],
                 ],
+                'reinvestments_enabled' => false,
+                'reinvestment_programs' => [
+                    [
+                        'id' => 'prog-a',
+                        'program_type' => 'program_a',
+                        'name' => 'Program A: Elektronika i SCADA',
+                        'enabled' => false,
+                        'net_amount' => 1500000.0,
+                        'frequency_years' => 5,
+                        'first_occurrence_year' => 5,
+                        'kst_code' => 'KST_IT',
+                        'kst_annual_rate' => 30.0,
+                    ],
+                ],
             ],
         ]);
 
@@ -481,6 +495,8 @@ final class InvestmentValuationApiTest extends TestCase
         $updateResponse->assertJsonPath('data.operating_assumptions.annual_revenue_base', 12500000);
         $updateResponse->assertJsonPath('data.operating_assumptions.variable_cost_percent', 32);
         $updateResponse->assertJsonPath('data.operating_assumptions.dso', 45);
+        $updateResponse->assertJsonPath('data.operating_assumptions.reinvestments_enabled', false);
+        $updateResponse->assertJsonPath('data.operating_assumptions.reinvestment_programs.0.enabled', false);
 
         // Verify that statement calculation uses these persisted operating assumptions
         $incomeResponse = $this->getJson("/api/v1/investment-projects/{$projectId}/statements/income-statement");

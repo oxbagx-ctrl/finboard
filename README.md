@@ -637,8 +637,12 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
   - [x] Generator czystych parametrów początkowych (`getDefaultAssumptions`) oraz pełny reset stanu w `useEffect` i `handleReset` eliminujący wyciek danych między projektami.
   - [x] Wprowadzenie profesjonalnych wierszy Empty State w tabelach strumieni przychodowych oraz matrycy etatów (Headcount Matrix) z możliwością usuwania wierszy powracając do czystego stanu początkowego.
   - [x] Rozszerzenie testów Vitest weryfikujących zachowanie czystego projektu, dodawanie strumieni z Empty State i izolację projektów (`OperatingAssumptionsForm.test.jsx`, `InvestmentStateValidation.test.jsx`).
+  - [x] Naprawa reguł walidacji FormRequest (`UpdateInvestmentProjectRequest.php`) zapobiegająca odrzucaniu pól `reinvestment_programs` i `reinvestments_enabled` przez `$request->validated()`.
+  - [x] Usunięcie problemu resetowania wyłączonych nakładów odtworzeniowych (NAKŁAD A, B, C) i utraty założeń reinwestycyjnych po kliknięciu „Zapisz Założenia Reinvestmentu”.
+  - [x] Rozszerzenie testów integracyjnych Laravel Feature Test (`InvestmentValuationApiTest.php`) oraz frontendowych Vitest (`ReinvestmentManager.test.jsx`) weryfikujących trwałość flagi `enabled: false`.
 
 ---
+
 
 ## 📜 Licencja
 Projekt objęty licencją własną dla platformy FinBoard.

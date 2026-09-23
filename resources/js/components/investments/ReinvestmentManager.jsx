@@ -136,6 +136,8 @@ export const ReinvestmentManager = ({
 
         if (oa.reinvestments_enabled !== undefined) {
             setReinvestmentsEnabled(Boolean(oa.reinvestments_enabled));
+        } else {
+            setReinvestmentsEnabled(initialEnabled);
         }
 
         setHasUnsavedChanges(false);

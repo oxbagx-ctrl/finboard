@@ -225,4 +225,57 @@ describe('ReinvestmentManager Component (Phase 43 Commit 214)', () => {
         expect(amountInputs[0].value).toBe('1500000');
         expect(screen.getByText(/18\s*500\s*000,00 PLN/i)).toBeInTheDocument();
     });
+
+    it('disables a program and preserves enabled: false state across saves and reloads (Commit 232)', async () => {
+        const { rerender } = renderComponent();
+
+        const checkboxes = screen.getAllByRole('checkbox');
+        // checkboxes[0] = master switch, checkboxes[1] = Program A, checkboxes[2] = Program B, checkboxes[3] = Program C
+        expect(checkboxes[2]).toBeChecked();
+
+        // Uncheck Program B
+        fireEvent.click(checkboxes[2]);
+        expect(checkboxes[2]).not.toBeChecked();
+
+        const saveButton = screen.getByRole('button', { name: /Zapisz Założenia Reinvestmentu/i });
+        fireEvent.click(saveButton);
+
+        await waitFor(() => {
+            expect(investmentProjectsApi.updateProject).toHaveBeenCalledWith(
+                'proj-solar-bess',
+                expect.objectContaining({
+                    operating_assumptions: expect.objectContaining({
+                        reinvestments_enabled: true,
+                        reinvestment_programs: expect.arrayContaining([
+                            expect.objectContaining({
+                                program_type: 'program_b',
+                                enabled: false,
+                            })
+                        ])
+                    })
+                })
+            );
+        });
+
+        // Simulate reload with updated project returned from backend
+        const updatedProject = {
+            ...mockProject,
+            operating_assumptions: {
+                ...mockProject.operating_assumptions,
+                reinvestment_programs: mockProject.operating_assumptions.reinvestment_programs.map(p =>
+                    p.program_type === 'program_b' ? { ...p, enabled: false } : p
+                )
+            }
+        };
+
+        rerender(
+            <InvestmentProjectContext.Provider value={{ selectedProject: updatedProject, loadProjectDetails: mockLoadProjectDetails }}>
+                <ReinvestmentManager onProgramsChange={mockOnProgramsChange} />
+            </InvestmentProjectContext.Provider>
+        );
+
+        const updatedCheckboxes = screen.getAllByRole('checkbox');
+        expect(updatedCheckboxes[2]).not.toBeChecked();
+    });
 });
+
