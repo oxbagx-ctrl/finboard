@@ -291,6 +291,33 @@ describe('InvestmentPlanningView Component', () => {
         });
     });
 
+    it('resets form fields cleanly when opening modal again after previous submission or cancellation', async () => {
+        apiClient.get.mockResolvedValue({
+            data: { status: 'success', data: mockProjects },
+        });
+
+        renderWithProviders(<InvestmentPlanningView />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Budowa Centrum Dystrybucyjnego Logistics Hub')).toBeInTheDocument();
+        });
+
+        // 1. Open modal and type data
+        fireEvent.click(screen.getByRole('button', { name: /Nowy Projekt/i }));
+        const nameInput = screen.getByLabelText(/Nazwa Projektu/i);
+        fireEvent.change(nameInput, { target: { value: 'Pierwszy Projekt Testowy' } });
+        expect(nameInput.value).toBe('Pierwszy Projekt Testowy');
+
+        // 2. Cancel and close modal
+        fireEvent.click(screen.getByRole('button', { name: /Anuluj/i }));
+        expect(screen.queryByText('Nowy Projekt Inwestycyjny')).not.toBeInTheDocument();
+
+        // 3. Open modal a second time -> form must be pristine (empty name)
+        fireEvent.click(screen.getByRole('button', { name: /Nowy Projekt/i }));
+        const nameInputSecond = screen.getByLabelText(/Nazwa Projektu/i);
+        expect(nameInputSecond.value).toBe('');
+    });
+
     it('renders Sidebar navigation item with code PRJ and icon', () => {
         const handleRouteChange = vi.fn();
         const authValue = {

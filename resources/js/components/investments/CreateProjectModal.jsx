@@ -1,22 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Calculator, Calendar, DollarSign, FileText } from 'lucide-react';
 import { Button } from '../ui/Button';
 
+const getInitialFormData = () => ({
+    name: '',
+    description: '',
+    start_date: new Date().toISOString().split('T')[0],
+    planning_horizon_years: 15,
+    currency: 'PLN',
+    equity_contribution: '',
+    bank_loan_principal: '',
+});
+
 export const CreateProjectModal = ({ isOpen, onClose, onSubmit }) => {
-    const today = new Date().toISOString().split('T')[0];
-
-    const [formData, setFormData] = useState({
-        name: '',
-        description: '',
-        start_date: today,
-        planning_horizon_years: 15,
-        currency: 'PLN',
-        equity_contribution: '',
-        bank_loan_principal: '',
-    });
-
+    const [formData, setFormData] = useState(getInitialFormData);
     const [errors, setErrors] = useState({});
     const [submitting, setSubmitting] = useState(false);
+
+    // Automatically reset state whenever modal is opened
+    useEffect(() => {
+        if (isOpen) {
+            setFormData(getInitialFormData());
+            setErrors({});
+            setSubmitting(false);
+        }
+    }, [isOpen]);
+
+    const handleClose = () => {
+        if (submitting) return;
+        setFormData(getInitialFormData());
+        setErrors({});
+        onClose();
+    };
 
     if (!isOpen) return null;
 
@@ -55,6 +70,8 @@ export const CreateProjectModal = ({ isOpen, onClose, onSubmit }) => {
             };
 
             await onSubmit(payload);
+            setFormData(getInitialFormData());
+            setErrors({});
             onClose();
         } catch (err) {
             if (err.response?.data?.errors) {
@@ -86,7 +103,8 @@ export const CreateProjectModal = ({ isOpen, onClose, onSubmit }) => {
                         </div>
                     </div>
                     <button
-                        onClick={onClose}
+                        type="button"
+                        onClick={handleClose}
                         disabled={submitting}
                         className="text-zinc-500 hover:text-zinc-300 transition-colors p-1"
                     >
@@ -226,7 +244,7 @@ export const CreateProjectModal = ({ isOpen, onClose, onSubmit }) => {
                         <Button
                             type="button"
                             variant="secondary"
-                            onClick={onClose}
+                            onClick={handleClose}
                             disabled={submitting}
                         >
                             Anuluj

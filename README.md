@@ -616,17 +616,20 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
   - Testy end-to-end (E2E) weryfikujące pełny przepływ planowania inwestycji od założeń do dossier PDF.
   - Aktualizacja changelogu i README.md z pełną dokumentacją modułu Project Finance & Investment Valuation.
 - [x] **Faza 46: Generowanie Danych Demonstracyjnych dla Modułu Inwestycyjnego**
-  - [x] Dedykowany seeder `InvestmentProjectSeeder` zasilający spółkę Acme Manufacturing S.A. (`22222222-2222-2222-2222-222222222222`).
-  - [x] Projekt o budżecie 32 000 000,00 PLN z 4 etapami CAPEX (Grunty KŚT 0, Hala KŚT 1, Linie CNC KŚT 4, Oprogramowanie WNiP).
-  - [x] Montaż finansowy: Wkład własny (8M PLN, podział 60/40), Kredyt Senioralny (14M PLN, WIBOR 1M + marża 2.4%, annuity), Dotacja FENG SMART (10M PLN, 3 transze) oraz Linia pomostowa VAT (5.5M PLN).
-  - [x] Kompletne założenia operacyjne: COD 2027-03-01 (14 m-cy), 2 linie przychodowe, ramp-up 40%–90%, cykl NWC (DSO 45, DPO 30, DIO 20), matryca płac 25 FTE, CIT 19%, reinwestycje Nakład A i B, wycena wyjścia EV/EBITDA 7.5x w R7 z kaskadą waterfall (8% hurdle, 80/20 carried interest).
-  - [x] Integracja w `DatabaseSeeder.php`, ślad audytowy doradcy w `FinancialAuditLog` i testy weryfikujące `InvestmentProjectSeederTest`.
+  - Dedykowany seeder `InvestmentProjectSeeder` zasilający spółkę Acme Manufacturing S.A. (`22222222-2222-2222-2222-222222222222`).
+  - Projekt o budżecie 32 000 000,00 PLN z 4 etapami CAPEX (Grunty KŚT 0, Hala KŚT 1, Linie CNC KŚT 4, Oprogramowanie WNiP).
+  - Montaż finansowy: Wkład własny (8M PLN, podział 60/40), Kredyt Senioralny (14M PLN, WIBOR 1M + marża 2.4%, annuity), Dotacja FENG SMART (10M PLN, 3 transze) oraz Linia pomostowa VAT (5.5M PLN).
+  - Kompletne założenia operacyjne: COD 2027-03-01 (14 m-cy), 2 linie przychodowe, ramp-up 40%–90%, cykl NWC (DSO 45, DPO 30, DIO 20), matryca płac 25 FTE, CIT 19%, reinwestycje Nakład A i B, wycena wyjścia EV/EBITDA 7.5x w R7 z kaskadą waterfall (8% hurdle, 80/20 carried interest).
+  - Integracja w `DatabaseSeeder.php`, ślad audytowy doradcy w `FinancialAuditLog` i testy weryfikujące `InvestmentProjectSeederTest`.
 - [x] **Faza 47: Stabilizacja i Poprawki Wizualne Interfejsu Planowania Inwestycyjnego**
-  - [x] Rozszerzenie konfiguracji Tailwind CSS o klasy `grid-cols-15` i `grid-cols-16` w `theme.extend.gridTemplateColumns`.
-  - [x] Naprawa układu horyzontalnej osi czasu w sekcji *Matryca Wdrożeń Reinvestmentu (15-Year Timeline)* w `ReinvestmentManager.jsx` z zabezpieczeniem stylu inline.
-  - [x] Weryfikacja spójności wizualnej kafelków lat Y1–Y15, plakietek programów A, B, C oraz kwot rocznego zapotrzebowania CAPEX.
-
-
+  - Rozszerzenie konfiguracji Tailwind CSS o klasy `grid-cols-15` i `grid-cols-16` w `theme.extend.gridTemplateColumns`.
+  - Naprawa układu horyzontalnej osi czasu w sekcji *Matryca Wdrożeń Reinvestmentu (15-Year Timeline)* w `ReinvestmentManager.jsx` z zabezpieczeniem stylu inline.
+  - Weryfikacja spójności wizualnej kafelków lat Y1–Y15, plakietek programów A, B, C oraz kwot rocznego zapotrzebowania CAPEX.
+- [x] **Faza 48: Poprawki Modułu Planowania Inwestycyjnego**
+  - [x] Usunięcie błędu retencji danych historycznych w oknie modalnym tworzenia projektu (`CreateProjectModal.jsx`).
+  - [x] Automatyczny reset stanu formularza przy otwarciu (`isOpen`), anulowaniu oraz pomyślnym utworzeniu projektu.
+  - [x] Warunkowe montowanie komponentu `{isCreateModalOpen && <CreateProjectModal ... />}` w widoku `InvestmentPlanningView.jsx`.
+  - [x] Testy automatyczne Vitest weryfikujące pełną czystość formularza przy dodawaniu kolejnych projektów portfelowych.
 
 ---
 

@@ -332,11 +332,13 @@ export const InvestmentPlanningView = () => {
             )}
 
             {/* Create Project Modal */}
-            <CreateProjectModal
-                isOpen={isCreateModalOpen}
-                onClose={() => setIsCreateModalOpen(false)}
-                onSubmit={createProject}
-            />
+            {isCreateModalOpen && (
+                <CreateProjectModal
+                    isOpen={isCreateModalOpen}
+                    onClose={() => setIsCreateModalOpen(false)}
+                    onSubmit={createProject}
+                />
+            )}
         </div>
     );
 };
