@@ -291,7 +291,7 @@ export const CapexScheduleManager = () => {
                                             <td className="py-3 px-4 text-center">
                                                 {isGrant ? (
                                                     <Badge variant="success" size="sm">
-                                                        TAK ({stage.grant_eligible_amount ? formatCurrency(stage.grant_eligible_amount) : '100%'})
+                                                        TAK ({stage.grant_eligible_amount !== null && stage.grant_eligible_amount !== undefined ? formatCurrency(stage.grant_eligible_amount) : '100%'})
                                                     </Badge>
                                                 ) : (
                                                     <Badge variant="default" size="sm">NIE</Badge>

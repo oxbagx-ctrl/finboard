@@ -652,6 +652,11 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
   - [x] Wielotrybowy kokpit wizualizacji reinvestmentu (View Switcher) w `ReinvestmentManager.jsx` z 3 trybami: Siatka 15L (`matrix`), Słupki Skumulowane `BarChart` (`stacked_bars`) oraz Wykres Łączony `ComposedChart` / S-Curve (`combo_curve`).
   - [x] Dedykowany institutional tooltip analityczny (`ReinvestmentChartTooltip`) prezentujący rok, wykaz programów z kwotami i procentowym udziałem, roczną sumę CAPEX oraz skumulowany wydatek od początku projektu.
   - [x] Rozszerzenie testów jednostkowych Vitest o weryfikację selektora widoków, przełączania trybów oraz wskaźnika S-Curve w legendzie (`ReinvestmentManager.test.jsx`).
+  - [x] Trwałość i precyzja kwoty wydatków kwalifikowanych (Grant Eligible Amount) w harmonogramie etapów CAPEX (`investment_capex_stages`).
+  - [x] Migracja bazy danych dodająca kolumnę `grant_eligible_amount` (decimal 15,4, nullable) oraz mapowanie w encji Eloquent i modelu domenowym `CapexStage`.
+  - [x] Aktualizacja repozytorium domenowego `EloquentInvestmentProjectRepository` i zasobu API `CapexStageResource` gwarantująca bezstratny zapis i odczyt kwoty kwalifikowanej.
+  - [x] Dostosowanie okna modalnego `CapexStageModal.jsx` oraz widoku `CapexScheduleManager.jsx` zapewniające zachowanie ręcznie wprowadzonej kwoty zamiast nadpisywania maksymalną kwotą netto.
+  - [x] Rozszerzenie testów integracyjnych PHPUnit (`InvestmentValuationApiTest.php`) oraz frontendowych Vitest (`CapexScheduleManager.test.jsx`).
 
 ---
 

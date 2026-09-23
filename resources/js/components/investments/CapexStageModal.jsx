@@ -33,15 +33,15 @@ export const CapexStageModal = ({
         if (initialData) {
             setFormData({
                 stage_name: initialData.stage_name || '',
-                net_amount: initialData.net_amount !== undefined ? String(initialData.net_amount) : '',
+                net_amount: initialData.net_amount !== undefined && initialData.net_amount !== null ? String(initialData.net_amount) : '',
                 currency: initialData.currency || projectCurrency || 'PLN',
                 start_date: initialData.start_date || projectStartDate || today,
                 duration_months: initialData.duration_months || 6,
                 kst_code: initialData.kst_code || 'KST_1',
                 is_grant_eligible: !!initialData.is_grant_eligible || !!initialData.eligible_for_grant,
-                grant_eligible_amount: initialData.grant_eligible_amount !== undefined
+                grant_eligible_amount: initialData.grant_eligible_amount !== undefined && initialData.grant_eligible_amount !== null
                     ? String(initialData.grant_eligible_amount)
-                    : (initialData.eligible_for_grant ? String(initialData.net_amount) : ''),
+                    : (initialData.eligible_for_grant || initialData.is_grant_eligible ? String(initialData.net_amount) : ''),
                 stage_order: initialData.stage_order || initialData.order_index || 1,
             });
         } else {

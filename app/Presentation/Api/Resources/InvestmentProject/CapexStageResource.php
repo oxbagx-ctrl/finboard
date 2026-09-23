@@ -33,7 +33,13 @@ final class CapexStageResource extends JsonResource
             'kst_code' => $this->kst_code,
             'kst_annual_rate' => (float) $this->kst_annual_rate,
             'eligible_for_grant' => (bool) $this->eligible_for_grant,
+            'is_grant_eligible' => (bool) $this->eligible_for_grant,
+            'grant_eligible_amount' => $this->grant_eligible_amount !== null ? (float) $this->grant_eligible_amount : null,
+            'formatted_grant_eligible_amount' => $this->grant_eligible_amount !== null
+                ? number_format((float) $this->grant_eligible_amount, 2, ',', ' ') . ' ' . $this->currency
+                : null,
             'order_index' => (int) $this->order_index,
+            'stage_order' => (int) $this->order_index,
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),
         ];

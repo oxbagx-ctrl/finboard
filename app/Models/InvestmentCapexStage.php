@@ -33,6 +33,7 @@ final class InvestmentCapexStage extends Model
         'kst_code',
         'kst_annual_rate',
         'eligible_for_grant',
+        'grant_eligible_amount',
         'order_index',
     ];
 
@@ -43,6 +44,7 @@ final class InvestmentCapexStage extends Model
         'start_date' => 'date:Y-m-d',
         'completion_date' => 'date:Y-m-d',
         'eligible_for_grant' => 'boolean',
+        'grant_eligible_amount' => 'string',
         'order_index' => 'integer',
     ];
 

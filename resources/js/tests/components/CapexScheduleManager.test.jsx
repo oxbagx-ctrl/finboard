@@ -47,7 +47,7 @@ const mockProjectWithStages = {
             kst_code: 'KST_2',
             kst_annual_rate: 4.5,
             eligible_for_grant: true,
-            grant_eligible_amount: '4000000.00',
+            grant_eligible_amount: '2500000.00',
             stage_order: 1,
         },
         {
@@ -151,9 +151,9 @@ describe('CapexScheduleManager Component', () => {
         // Total Net CAPEX = 4M + 6M = 10,000,000 PLN
         expect(screen.getByText(/10.*000.*000,00 PLN/)).toBeInTheDocument();
 
-        // Grant eligible = 4M PLN
-        expect(screen.getAllByText(/4.*000.*000,00 PLN/)[0]).toBeInTheDocument();
-        expect(screen.getByText('40.0% bazy dotacyjnej')).toBeInTheDocument();
+        // Grant eligible = 2.5M PLN (granular amount)
+        expect(screen.getAllByText(/2.*500.*000,00 PLN/)[0]).toBeInTheDocument();
+        expect(screen.getByText('25.0% bazy dotacyjnej')).toBeInTheDocument();
 
         // Weighted KŚT rate: (4M * 4.5% + 6M * 10%) / 10M = (18 + 60) / 10 = 7.80%
         expect(screen.getByText('7.80% / ROK')).toBeInTheDocument();
@@ -238,6 +238,39 @@ describe('CapexScheduleManager Component', () => {
                 expect.objectContaining({
                     stage_name: 'Prace ziemne i fundamenty',
                     net_amount: '4500000',
+                })
+            );
+        });
+    });
+
+    it('properly displays and submits granular grant eligible amount in CapexStageModal', async () => {
+        apiClient.put.mockResolvedValueOnce({
+            data: { status: 'success', data: { id: 'stage-1' } },
+        });
+
+        renderWithProviders(<CapexScheduleManager />);
+
+        await waitFor(() => {
+            expect(screen.getAllByText('Prace ziemne i fundamenty')[0]).toBeInTheDocument();
+        });
+
+        // Click edit on stage-1
+        const editButtons = screen.getAllByTitle('Edytuj etap');
+        fireEvent.click(editButtons[0]);
+
+        const grantInput = screen.getByLabelText(/Kwota Wydatków Kwalifikowanych/i);
+        expect(grantInput).toHaveValue(2500000);
+
+        // Update to 3,000,000 PLN
+        fireEvent.change(grantInput, { target: { value: '3000000' } });
+        fireEvent.click(screen.getByRole('button', { name: /Zapisz Zmiany/i }));
+
+        await waitFor(() => {
+            expect(apiClient.put).toHaveBeenCalledWith(
+                '/investment-projects/proj-acme-1/capex-stages/stage-1',
+                expect.objectContaining({
+                    is_grant_eligible: true,
+                    grant_eligible_amount: '3000000',
                 })
             );
         });

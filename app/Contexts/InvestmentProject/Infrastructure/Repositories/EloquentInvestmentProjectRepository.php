@@ -149,6 +149,9 @@ final class EloquentInvestmentProjectRepository implements InvestmentProjectRepo
                         'kst_code' => $stage->kst()->code(),
                         'kst_annual_rate' => (string) $stage->kst()->annualDepreciationRate(),
                         'eligible_for_grant' => $stage->isGrantEligible(),
+                        'grant_eligible_amount' => $stage->isGrantEligible()
+                            ? $stage->grantEligibleAmount()->amount()
+                            : null,
                         'order_index' => $stage->stageOrder(),
                     ]
                 );
@@ -279,6 +282,10 @@ final class EloquentInvestmentProjectRepository implements InvestmentProjectRepo
                 $diff = $sStart->diff($sComp);
                 $durationMonths = max(1, ($diff->y * 12) + $diff->m);
 
+                $grantEligible = ($stage->eligible_for_grant && $stage->grant_eligible_amount !== null)
+                    ? Money::fromDecimal($stage->grant_eligible_amount, $stageCurrency)
+                    : null;
+
                 $domainStages[] = new CapexStage(
                     id: CapexStageId::fromString($stage->id),
                     name: $stage->stage_name,
@@ -287,6 +294,7 @@ final class EloquentInvestmentProjectRepository implements InvestmentProjectRepo
                     durationMonths: $durationMonths,
                     kst: $stage->kst_code ? KstClassification::fromCode($stage->kst_code) : KstClassification::default(),
                     isGrantEligible: (bool) $stage->eligible_for_grant,
+                    grantEligibleAmount: $grantEligible,
                     stageOrder: (int) $stage->order_index
                 );
             }

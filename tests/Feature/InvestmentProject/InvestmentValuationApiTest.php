@@ -6,6 +6,7 @@ namespace Tests\Feature\InvestmentProject;
 
 use App\Contexts\Identity\Domain\ValueObjects\RoleType;
 use App\Models\Company;
+use App\Models\InvestmentCapexStage;
 use App\Models\InvestmentProject as InvestmentProjectModel;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -503,6 +504,80 @@ final class InvestmentValuationApiTest extends TestCase
         $incomeResponse->assertStatus(200);
         $incomeResponse->assertJsonPath('data.assumptions.annual_revenue_base', '12500000.0000');
         $incomeResponse->assertJsonPath('data.assumptions.variable_cost_percent', 32);
+    }
+
+    public function test_capex_stage_granular_grant_eligible_amount_is_persisted_and_returned(): void
+    {
+        Sanctum::actingAs($this->clientA);
+        $projectId = $this->createStandardProject('Projekt z Dofinansowaniem CAPEX');
+
+        // 1. Add CAPEX stage with granular grant_eligible_amount (e.g. 650 000 PLN out of 1 000 000 PLN)
+        $storeResponse = $this->postJson("/api/v1/investment-projects/{$projectId}/capex-stages", [
+            'stage_name' => 'Budowa Hali Produkcyjnej z Dofinansowaniem',
+            'net_amount' => '1000000.0000',
+            'duration_months' => 8,
+            'kst_code' => 'KST_1',
+            'is_grant_eligible' => true,
+            'grant_eligible_amount' => '650000.0000',
+            'stage_order' => 1,
+        ]);
+
+        $storeResponse->assertStatus(201);
+        $stageId = $storeResponse->json('data.id');
+        $this->assertEquals(1000000.0, $storeResponse->json('data.net_amount'));
+        $this->assertTrue($storeResponse->json('data.eligible_for_grant'));
+        $this->assertTrue($storeResponse->json('data.is_grant_eligible'));
+        $this->assertEquals(650000.0, $storeResponse->json('data.grant_eligible_amount'));
+        $this->assertStringContainsString('650 000,00', $storeResponse->json('data.formatted_grant_eligible_amount'));
+
+        // 2. Fetch project details and verify the stage retains granular grant_eligible_amount
+        $projectResponse = $this->getJson("/api/v1/investment-projects/{$projectId}");
+        $projectResponse->assertStatus(200);
+        $stages = $projectResponse->json('data.capex_stages');
+        $this->assertCount(1, $stages);
+        $this->assertEquals(650000.0, $stages[0]['grant_eligible_amount']);
+        $this->assertEquals(1000000.0, $stages[0]['net_amount']);
+
+        // 3. Update CAPEX stage with a modified grant_eligible_amount
+        $updateResponse = $this->putJson("/api/v1/investment-projects/{$projectId}/capex-stages/{$stageId}", [
+            'stage_name' => 'Budowa Hali Produkcyjnej z Dofinansowaniem (Zaktualizowana)',
+            'net_amount' => '1000000.0000',
+            'duration_months' => 8,
+            'kst_code' => 'KST_1',
+            'is_grant_eligible' => true,
+            'grant_eligible_amount' => '450000.0000',
+            'stage_order' => 1,
+        ]);
+
+        $updateResponse->assertStatus(200);
+        $this->assertEquals(450000.0, $updateResponse->json('data.grant_eligible_amount'));
+        $this->assertStringContainsString('450 000,00', $updateResponse->json('data.formatted_grant_eligible_amount'));
+
+        // 4. Verify database record
+        $dbRecord = InvestmentCapexStage::query()->where('id', $stageId)->first();
+        $this->assertNotNull($dbRecord);
+        $this->assertEquals('450000.0000', $dbRecord->grant_eligible_amount);
+        $this->assertTrue($dbRecord->eligible_for_grant);
+
+        // 5. Update stage turning off grant eligibility
+        $updateDisabledResponse = $this->putJson("/api/v1/investment-projects/{$projectId}/capex-stages/{$stageId}", [
+            'stage_name' => 'Budowa Hali Produkcyjnej (Bez Dotacji)',
+            'net_amount' => '1000000.0000',
+            'duration_months' => 8,
+            'kst_code' => 'KST_1',
+            'is_grant_eligible' => false,
+            'grant_eligible_amount' => null,
+            'stage_order' => 1,
+        ]);
+
+        $updateDisabledResponse->assertStatus(200);
+        $this->assertFalse($updateDisabledResponse->json('data.eligible_for_grant'));
+        $this->assertFalse($updateDisabledResponse->json('data.is_grant_eligible'));
+        $this->assertNull($updateDisabledResponse->json('data.grant_eligible_amount'));
+
+        $dbRecord->refresh();
+        $this->assertFalse($dbRecord->eligible_for_grant);
+        $this->assertNull($dbRecord->grant_eligible_amount);
     }
 
     private function createStandardProject(string $name): string
