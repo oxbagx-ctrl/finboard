@@ -292,4 +292,30 @@ describe('ThreeStatementGrid Component (Phase 44 Commit 217)', () => {
         expect(createObjectURLMock).toHaveBeenCalled();
         expect(revokeObjectURLMock).toHaveBeenCalled();
     });
+
+    it('toggles expandable tax breakdown sub-rows under Podatek Dochodowy CIT', async () => {
+        renderWithContext();
+
+        await waitFor(() => {
+            expect(screen.getByText(/\(-\) Podatek Dochodowy CIT \(Tarcza Strat\)/i)).toBeInTheDocument();
+        });
+
+        // Initially tax breakdown rows should not be in the document
+        expect(screen.queryByText(/↳ Saldo Otwarcia Tarczy Podatkowej/i)).not.toBeInTheDocument();
+
+        // Find the toggle button in the CIT row
+        const toggleBtn = screen.getByRole('button', { name: /Rozwiń rozliczenie podatkowe CIT/i });
+        fireEvent.click(toggleBtn);
+
+        // Expanded sub-rows should now be visible
+        expect(screen.getByText(/↳ Saldo Otwarcia Tarczy Podatkowej/i)).toBeInTheDocument();
+        expect(screen.getByText(/↳ Wygasłe Straty Podatkowe/i)).toBeInTheDocument();
+        expect(screen.getByText(/↳ Odliczona Tarcza Podatkowa/i)).toBeInTheDocument();
+        expect(screen.getByText(/↳ Podstawa Opodatkowania CIT/i)).toBeInTheDocument();
+        expect(screen.getByText(/↳ Saldo Zamknięcia Tarczy Podatkowej/i)).toBeInTheDocument();
+
+        // Click again to collapse
+        fireEvent.click(toggleBtn);
+        expect(screen.queryByText(/↳ Saldo Otwarcia Tarczy Podatkowej/i)).not.toBeInTheDocument();
+    });
 });

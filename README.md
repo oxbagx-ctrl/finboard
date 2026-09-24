@@ -690,7 +690,12 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Wzbogacenie modeli `MonthlyStatementPeriod` oraz `AnnualStatementPeriod` o atrybuty tarczy podatkowej (`taxLossCarryForwardOpening`, `taxLossExpired`, `taxLossUsed`, `taxLossCarryForwardClosing`, `taxableIncome`).
     - Dynamiczna synchronizacja stawki podatkowej w formule tarczy długu WACC z parametrami założeń operacyjnych projektu (`cit_rate_percent`).
     - Rozszerzenie zestawu testów Vitest w `investmentCalculationWorker.test.js` (8 nowych testów weryfikujących logikę klas podatkowych, porównanie trybów rozliczeń, równość sumy zaliczek YTD oraz wygasanie strat).
-  - [ ] **Commit 243**: Interfejs UI fiskalnego panelu CIT i podgląd trajektorii tarczy podatkowej (Tax Loss Roll-Forward).
+  - [x] Interfejs UI fiskalnego panelu CIT i podgląd trajektorii tarczy podatkowej (Tax Loss Roll-Forward).
+    - Rozszerzenie formularza założeń operacyjnych (`OperatingAssumptionsForm.jsx`) o obsługę trybów rozliczania strat podatkowych (`tax_loss_settlement_mode`: standardowy 50%, jednorazowy do 5 mln zł wg art. 7 ust. 5 pkt 2 CIT, limit dochodu EBT) oraz konfigurowalny limit jednorazowy `tax_loss_one_off_cap_amount`.
+    - Wdrożenie live symulacji `taxRollForwardTrajectory` z natychmiastowym przeliczaniem 15-letniego modelu i prezentacją 5 syntetycznych wskaźników KPI (straty wygenerowane, wykorzystana tarcza, oszczędność CIT, wygasłe $T+5$, saldo końcowe).
+    - Dedykowana tabela 15-letniej projekcji podatkowej (`tax-loss-rollforward-panel`) z przepływem salda otwarcia, EBT, odliczeń, podatku należnego i salda zamknięcia tarczy.
+    - Rozszerzenie tabeli sprawozdań finansowych (`ThreeStatementGrid.jsx`) o interaktywne rozwijanie pozycji CIT na wiersze analityczne tarczy podatkowej oraz integrację z eksportem CSV.
+    - Zestaw testów jednostkowych i integracyjnych w `OperatingAssumptionsForm.test.jsx`, `ThreeStatementGrid.test.jsx` oraz `InvestmentStateValidation.test.jsx`.
   - [ ] **Commit 244**: Kompleksowe testy integracyjne, regresja 3-Statement & aktualizacja dokumentacji README.md.
 
 ---

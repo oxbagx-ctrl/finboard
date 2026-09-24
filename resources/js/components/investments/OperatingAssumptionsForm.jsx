@@ -16,9 +16,12 @@ import {
   Info,
   ShieldCheck,
   Receipt,
+  ArrowDownRight,
+  Sparkles,
 } from "lucide-react";
 import { useInvestmentProject } from "../../context/InvestmentProjectContext";
 import { investmentProjectsApi } from "../../api/investmentProjects";
+import { calculate15YearStatements } from "../../workers/financialCalculations";
 
 const formatCurrency = (val, currency = "PLN") => {
   return new Intl.NumberFormat("pl-PL", {
@@ -45,6 +48,8 @@ const getDefaultAssumptions = (project = null) => {
     citRatePercent: 19.0,
     taxLossCarryForward: true,
     taxLossOffsetCap: 50.0,
+    taxLossSettlementMode: "standard_loss_cap",
+    taxLossOneOffCapAmount: 5000000.0,
   };
 };
 
@@ -125,6 +130,14 @@ const parseProjectAssumptions = (project) => {
       oa.tax_loss_offset_cap_percent !== undefined
         ? Number(oa.tax_loss_offset_cap_percent)
         : defaults.taxLossOffsetCap,
+    taxLossSettlementMode:
+      oa.tax_loss_settlement_mode !== undefined
+        ? String(oa.tax_loss_settlement_mode)
+        : defaults.taxLossSettlementMode,
+    taxLossOneOffCapAmount:
+      oa.tax_loss_one_off_cap_amount !== undefined
+        ? Number(oa.tax_loss_one_off_cap_amount)
+        : defaults.taxLossOneOffCapAmount,
   };
 };
 
@@ -160,6 +173,8 @@ export const OperatingAssumptionsForm = () => {
   const [citRatePercent, setCitRatePercent] = useState(19.0);
   const [taxLossCarryForward, setTaxLossCarryForward] = useState(true);
   const [taxLossOffsetCap, setTaxLossOffsetCap] = useState(50.0);
+  const [taxLossSettlementMode, setTaxLossSettlementMode] = useState("standard_loss_cap");
+  const [taxLossOneOffCapAmount, setTaxLossOneOffCapAmount] = useState(5000000.0);
 
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -184,6 +199,8 @@ export const OperatingAssumptionsForm = () => {
     setCitRatePercent(parsed.citRatePercent);
     setTaxLossCarryForward(parsed.taxLossCarryForward);
     setTaxLossOffsetCap(parsed.taxLossOffsetCap);
+    setTaxLossSettlementMode(parsed.taxLossSettlementMode);
+    setTaxLossOneOffCapAmount(parsed.taxLossOneOffCapAmount);
 
     setSaveSuccess(false);
     setSaveError(null);
@@ -292,6 +309,101 @@ export const OperatingAssumptionsForm = () => {
     };
   }, [calculatedAnnualRevenueBase, revenueGrowthRate, capacityRampUp]);
 
+  // Live Tax Loss Roll-Forward Simulation Trajectory (15-year horizon)
+  const taxRollForwardTrajectory = useMemo(() => {
+    if (!selectedProject) return null;
+
+    try {
+      const liveAssumptions = {
+        ...(selectedProject.operating_assumptions || {}),
+        annual_revenue_base: calculatedAnnualRevenueBase,
+        revenue_growth_rate_percent: Number(revenueGrowthRate) || 0,
+        variable_cost_percent: Number(variableCostPercent) || 0,
+        annual_fixed_costs_base: Number(annualFixedCostsBase) || 0,
+        fixed_cost_growth_rate_percent: Number(fixedCostGrowthRate) || 0,
+        annual_payroll_base: calculatedAnnualPayrollBase,
+        payroll_growth_rate_percent: Number(payrollGrowthRate) || 0,
+        dso: Number(dso) || 0,
+        dpo: Number(dpo) || 0,
+        dio: Number(dio) || 0,
+        cit_rate_percent: Number(citRatePercent) || 19,
+        tax_loss_carry_forward_enabled: taxLossCarryForward,
+        tax_loss_settlement_mode: taxLossSettlementMode,
+        tax_loss_offset_cap_percent: Number(taxLossOffsetCap) || 50,
+        tax_loss_one_off_cap_amount: Number(taxLossOneOffCapAmount) || 5000000,
+        revenue_lines: revenueLines,
+        headcount_matrix: headcountMatrix,
+        capacity_ramp_up: capacityRampUp,
+      };
+
+      const statements = calculate15YearStatements(
+        selectedProject,
+        liveAssumptions,
+        undefined,
+        15,
+      );
+
+      const annualPeriods = statements.annualPeriods || [];
+
+      let totalLossesGenerated = 0;
+      let totalLossesUsed = 0;
+      let totalLossesExpired = 0;
+      let totalTaxPaid = 0;
+
+      annualPeriods.forEach((p) => {
+        if (p.ebt < 0) {
+          totalLossesGenerated += Math.abs(p.ebt);
+        }
+        totalLossesUsed += p.taxLossUsed || 0;
+        totalLossesExpired += p.taxLossExpired || 0;
+        totalTaxPaid += p.cit || 0;
+      });
+
+      const effectiveCitRate = (Number(citRatePercent) || 19) / 100;
+      const totalTaxSaved = totalLossesUsed * effectiveCitRate;
+      const closingPool =
+        annualPeriods.length > 0
+          ? annualPeriods[annualPeriods.length - 1].taxLossCarryForwardClosing || 0
+          : 0;
+
+      return {
+        annualPeriods,
+        totalLossesGenerated,
+        totalLossesUsed,
+        totalLossesExpired,
+        totalTaxPaid,
+        totalTaxSaved,
+        closingPool,
+      };
+    } catch (err) {
+      console.error(
+        "[OperatingAssumptionsForm] Error computing tax roll-forward trajectory:",
+        err,
+      );
+      return null;
+    }
+  }, [
+    selectedProject,
+    calculatedAnnualRevenueBase,
+    revenueGrowthRate,
+    variableCostPercent,
+    annualFixedCostsBase,
+    fixedCostGrowthRate,
+    calculatedAnnualPayrollBase,
+    payrollGrowthRate,
+    dso,
+    dpo,
+    dio,
+    citRatePercent,
+    taxLossCarryForward,
+    taxLossSettlementMode,
+    taxLossOffsetCap,
+    taxLossOneOffCapAmount,
+    revenueLines,
+    headcountMatrix,
+    capacityRampUp,
+  ]);
+
   // Cash Conversion Cycle: CCC = DIO + DSO - DPO
   const cashConversionCycle = dio + dso - dpo;
 
@@ -390,6 +502,8 @@ export const OperatingAssumptionsForm = () => {
     setCitRatePercent(parsed.citRatePercent);
     setTaxLossCarryForward(parsed.taxLossCarryForward);
     setTaxLossOffsetCap(parsed.taxLossOffsetCap);
+    setTaxLossSettlementMode(parsed.taxLossSettlementMode);
+    setTaxLossOneOffCapAmount(parsed.taxLossOneOffCapAmount);
     setSaveError(null);
   };
 
@@ -419,6 +533,8 @@ export const OperatingAssumptionsForm = () => {
         cit_rate_percent: Number(citRatePercent) || 19,
         tax_loss_carry_forward_enabled: taxLossCarryForward,
         tax_loss_offset_cap_percent: Number(taxLossOffsetCap) || 50,
+        tax_loss_settlement_mode: taxLossSettlementMode,
+        tax_loss_one_off_cap_amount: Number(taxLossOneOffCapAmount) || 5000000,
         revenue_lines: revenueLines,
         headcount_matrix: headcountMatrix,
       },
@@ -1342,8 +1458,7 @@ export const OperatingAssumptionsForm = () => {
               Podatek Dochodowy (CIT) & Tarcza Podatkowa
             </h4>
             <p className="text-xs text-zinc-400 mt-0.5">
-              Parametry fiskalne kalkulacji podatku dochodowego CIT oraz
-              rozliczanie strat podatkowych z etapu inwestycyjnego.
+              Parametry fiskalne kalkulacji podatku dochodowego CIT, tryb rozliczania strat podatkowych oraz wieloletnia trajektoria tarczy (art. 7 ust. 5 i art. 25 ust. 1 CIT).
             </p>
           </div>
 
@@ -1385,14 +1500,41 @@ export const OperatingAssumptionsForm = () => {
                   </button>
                 ))}
               </div>
+
+              {/* WACC Tax Shield Synchronization Info */}
+              <div
+                className="p-3.5 bg-zinc-900/80 rounded-lg border border-zinc-800/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
+                data-testid="wacc-tax-shield-info"
+              >
+                <div className="flex items-center gap-2 text-zinc-300">
+                  <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>
+                    <strong>Synchronizacja Tarczy Podatkowej WACC:</strong>{" "}
+                    Efektywny koszt długu po opodatkowaniu wynosi{" "}
+                    <span className="font-mono text-emerald-400 font-semibold">
+                      Kd × (1 - {citRatePercent}%) = Kd ×{" "}
+                      {((100 - citRatePercent) / 100).toFixed(2)}
+                    </span>{" "}
+                    w modelu DCF i wycenie projektowej.
+                  </span>
+                </div>
+                <span className="font-mono text-xs px-2.5 py-1 rounded bg-zinc-950 border border-zinc-700/80 text-emerald-400 shrink-0 font-semibold">
+                  Tarcza: {citRatePercent}%
+                </span>
+              </div>
             </div>
 
-            {/* Tax Loss Carry Forward */}
+            {/* Tax Loss Carry Forward & Settlement Mode */}
             <div className="bg-zinc-950/60 p-5 rounded-lg border border-zinc-800/80 space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-zinc-200">
-                  Rozliczanie Strat Podatkowych
-                </span>
+                <div>
+                  <span className="text-xs font-semibold text-zinc-200 block">
+                    Rozliczanie Strat Podatkowych
+                  </span>
+                  <span className="text-[11px] text-zinc-400">
+                    Aktywuj tarczę podatkową z etapu budowy / CAPEX
+                  </span>
+                </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
                     type="checkbox"
@@ -1404,55 +1546,264 @@ export const OperatingAssumptionsForm = () => {
                 </label>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-xs text-zinc-400 flex justify-between">
-                  <span>Limit Rocznego Odliczenia Straty (%)</span>
-                  <span className="font-mono text-emerald-400">
-                    {taxLossOffsetCap.toFixed(0)}%
-                  </span>
-                </label>
-                <input
-                  type="range"
-                  min={10}
-                  max={100}
-                  step={10}
-                  disabled={!taxLossCarryForward}
-                  value={taxLossOffsetCap}
-                  onChange={(e) =>
-                    setTaxLossOffsetCap(parseFloat(e.target.value) || 50)
-                  }
-                  className="w-full accent-emerald-500 cursor-pointer disabled:opacity-40"
-                />
-              </div>
+              <div className={`space-y-4 pt-2 border-t border-zinc-800/80 ${!taxLossCarryForward ? "opacity-50" : ""}`}>
+                <div>
+                  <label className="text-xs font-semibold text-zinc-300 block mb-2">
+                    Ustawowy Tryb Rozliczenia Strat (art. 7 ust. 5 CIT)
+                  </label>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    {[
+                      {
+                        id: "standard_loss_cap",
+                        title: "Standardowy (50%)",
+                        art: "art. 7 ust. 5 pkt 1",
+                        desc: "Maks. 50% straty rocznika rocznie",
+                      },
+                      {
+                        id: "one_off_5m",
+                        title: "Jednorazowo (5 mln)",
+                        art: "art. 7 ust. 5 pkt 2",
+                        desc: "Do 5 mln zł w 1 roku, reszta 50%",
+                      },
+                      {
+                        id: "ebt_cap",
+                        title: "Limit Dochodu EBT",
+                        art: "Custom / Legacy",
+                        desc: "Limit % bieżącego dochodu",
+                      },
+                    ].map((mode) => (
+                      <button
+                        key={mode.id}
+                        type="button"
+                        disabled={!taxLossCarryForward}
+                        onClick={() => setTaxLossSettlementMode(mode.id)}
+                        className={`p-2.5 rounded-lg border text-left transition-all disabled:cursor-not-allowed ${
+                          taxLossSettlementMode === mode.id
+                            ? "bg-emerald-500/20 border-emerald-500 text-emerald-300 shadow-sm"
+                            : "bg-zinc-900/80 border-zinc-800 text-zinc-400 hover:border-zinc-700"
+                        }`}
+                      >
+                        <div className="font-semibold text-xs text-zinc-200">
+                          {mode.title}
+                        </div>
+                        <div className="text-[10px] text-emerald-400/90 font-mono mt-0.5">
+                          {mode.art}
+                        </div>
+                        <div className="text-[10px] text-zinc-500 mt-1 line-clamp-2">
+                          {mode.desc}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
 
-              <p className="text-[11px] text-zinc-500 leading-relaxed">
-                Zgodnie z art. 7 ust. 5 ustawy o CIT strata z lat ubiegłych może
-                obniżyć dochód w najbliższych kolejno po sobie następujących 5
-                latach podatkowych, z limitem do 50% kwoty straty w jednym roku.
-              </p>
+                {/* Mode specific configuration */}
+                {taxLossSettlementMode === "one_off_5m" ? (
+                  <div className="space-y-2 p-3 bg-zinc-900/60 rounded-lg border border-zinc-800">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-zinc-300 font-medium">
+                        Limit Odliczenia Jednorazowego (PLN):
+                      </span>
+                      <span className="font-mono text-emerald-400 font-bold text-xs">
+                        {formatCurrency(taxLossOneOffCapAmount, currency)}
+                      </span>
+                    </div>
+                    <input
+                      type="number"
+                      min={0}
+                      step={100000}
+                      disabled={!taxLossCarryForward}
+                      aria-label="Kwota Limitu Jednorazowego"
+                      value={taxLossOneOffCapAmount}
+                      onChange={(e) =>
+                        setTaxLossOneOffCapAmount(
+                          Math.max(0, parseFloat(e.target.value) || 0),
+                        )
+                      }
+                      className="w-full bg-zinc-950 border border-zinc-700 rounded-lg px-3 py-2 text-zinc-100 font-mono text-xs focus:outline-none focus:border-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    />
+                    <p className="text-[11px] text-zinc-500">
+                      Zgodnie z art. 7 ust. 5 pkt 2 ustawy o CIT, kwota straty do 5 mln zł może zostać odliczona jednorazowo w całości w jednym z 5 lat podatkowych.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <label className="text-xs text-zinc-400 flex justify-between">
+                      <span>Limit Rocznego Odliczenia Straty (%)</span>
+                      <span className="font-mono text-emerald-400 font-bold">
+                        {taxLossOffsetCap.toFixed(0)}%
+                      </span>
+                    </label>
+                    <input
+                      type="range"
+                      min={10}
+                      max={100}
+                      step={10}
+                      disabled={!taxLossCarryForward}
+                      aria-label="Limit Rocznego Odliczenia Straty (%)"
+                      value={taxLossOffsetCap}
+                      onChange={(e) =>
+                        setTaxLossOffsetCap(parseFloat(e.target.value) || 50)
+                      }
+                      className="w-full accent-emerald-500 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                    />
+                    <p className="text-[11px] text-zinc-500 leading-relaxed">
+                      Zgodnie z art. 7 ust. 5 pkt 1 ustawy o CIT, kwota odliczenia straty z danego rocznika nie może przekroczyć 50% kwoty tej straty w jednym roku podatkowym.
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
-          {/* WACC Tax Shield Synchronization Info */}
+          {/* Live Tax Loss Roll-Forward Trajectory Schedule */}
           <div
-            className="p-4 bg-zinc-950/60 rounded-lg border border-zinc-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
-            data-testid="wacc-tax-shield-info"
+            className="p-5 bg-zinc-950/70 rounded-xl border border-zinc-800/90 space-y-4"
+            data-testid="tax-loss-rollforward-panel"
           >
-            <div className="flex items-center gap-2 text-zinc-300">
-              <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span>
-                <strong>Synchronizacja Tarczy Podatkowej WACC:</strong>{" "}
-                Efektywny koszt długu po opodatkowaniu wynosi{" "}
-                <span className="font-mono text-emerald-400">
-                  Kd × (1 - {citRatePercent}%) = Kd ×{" "}
-                  {((100 - citRatePercent) / 100).toFixed(2)}
-                </span>{" "}
-                w modelu DCF i wycenie projektowej.
-              </span>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-800/80 pb-3">
+              <div>
+                <h5 className="font-semibold text-zinc-100 flex items-center gap-2 text-sm">
+                  <TrendingUp className="w-4 h-4 text-emerald-400" />
+                  Trajektoria Tarczy Podatkowej & Rozliczenie Strat (Tax Loss Roll-Forward)
+                </h5>
+                <p className="text-xs text-zinc-400 mt-0.5">
+                  Projekcja wykorzystania i wygaszania strat w 15-letnim horyzoncie z uwzględnieniem 5-letniego okna ustawowego (art. 7 ust. 5 CIT).
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800 text-zinc-300 font-mono">
+                  Tryb: <strong className="text-emerald-400">{taxLossSettlementMode === "one_off_5m" ? "Jednorazowo 5M" : taxLossSettlementMode === "ebt_cap" ? "Limit EBT" : "Standard 50%"}</strong>
+                </span>
+              </div>
             </div>
-            <span className="font-mono text-xs px-2.5 py-1 rounded bg-zinc-900 border border-zinc-700/80 text-zinc-400 shrink-0">
-              Tarcza: {citRatePercent}%
-            </span>
+
+            {/* KPI Cards */}
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+              <div className="p-3 bg-zinc-900/60 rounded-lg border border-zinc-800/80">
+                <span className="text-[11px] text-zinc-400 block">Wygenerowane Straty</span>
+                <span className="font-mono text-sm font-bold text-rose-400 mt-1 block">
+                  {formatCurrency(taxRollForwardTrajectory?.totalLossesGenerated, currency)}
+                </span>
+              </div>
+
+              <div className="p-3 bg-zinc-900/60 rounded-lg border border-zinc-800/80">
+                <span className="text-[11px] text-zinc-400 block">Wykorzystana Tarcza</span>
+                <span className="font-mono text-sm font-bold text-emerald-400 mt-1 block">
+                  {formatCurrency(taxRollForwardTrajectory?.totalLossesUsed, currency)}
+                </span>
+              </div>
+
+              <div className="p-3 bg-zinc-900/60 rounded-lg border border-zinc-800/80">
+                <span className="text-[11px] text-zinc-400 block">Oszczędność CIT</span>
+                <span className="font-mono text-sm font-bold text-emerald-300 mt-1 block">
+                  {formatCurrency(taxRollForwardTrajectory?.totalTaxSaved, currency)}
+                </span>
+              </div>
+
+              <div className="p-3 bg-zinc-900/60 rounded-lg border border-zinc-800/80">
+                <span className="text-[11px] text-zinc-400 block">Wygasłe Straty (T+5)</span>
+                <span className={`font-mono text-sm font-bold mt-1 block ${
+                  (taxRollForwardTrajectory?.totalLossesExpired || 0) > 0 ? "text-rose-400" : "text-zinc-500"
+                }`}>
+                  {formatCurrency(taxRollForwardTrajectory?.totalLossesExpired, currency)}
+                </span>
+              </div>
+
+              <div className="p-3 bg-zinc-900/60 rounded-lg border border-zinc-800/80 col-span-2 sm:col-span-1">
+                <span className="text-[11px] text-zinc-400 block">Saldo Końcowe Tarczy</span>
+                <span className="font-mono text-sm font-bold text-amber-400 mt-1 block">
+                  {formatCurrency(taxRollForwardTrajectory?.closingPool, currency)}
+                </span>
+              </div>
+            </div>
+
+            {/* Roll-Forward Table */}
+            <div className="overflow-x-auto border border-zinc-800/80 rounded-lg">
+              <table className="w-full text-left text-xs font-mono">
+                <thead className="bg-zinc-900/90 text-zinc-400 border-b border-zinc-800">
+                  <tr>
+                    <th className="py-2 px-3">Okres</th>
+                    <th className="py-2 px-3 text-right">Saldo Otwarcia</th>
+                    <th className="py-2 px-3 text-right">Wynik Brutto (EBT)</th>
+                    <th className="py-2 px-3 text-right">Wygasłe (T+5)</th>
+                    <th className="py-2 px-3 text-right">Odliczona Tarcza</th>
+                    <th className="py-2 px-3 text-right">Podstawa CIT</th>
+                    <th className="py-2 px-3 text-right">Należny CIT</th>
+                    <th className="py-2 px-3 text-right">Saldo Zamknięcia</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-zinc-800/50">
+                  {taxRollForwardTrajectory?.annualPeriods && taxRollForwardTrajectory.annualPeriods.length > 0 ? (
+                    taxRollForwardTrajectory.annualPeriods.map((period) => {
+                      const hasExpired = (period.taxLossExpired || 0) > 0;
+                      const hasLossUsed = (period.taxLossUsed || 0) > 0;
+                      const isLossYear = period.ebt < 0;
+
+                      return (
+                        <tr
+                          key={period.year}
+                          className={`hover:bg-zinc-900/40 transition-colors ${
+                            isLossYear
+                              ? "bg-rose-950/10"
+                              : hasLossUsed
+                              ? "bg-emerald-950/10"
+                              : ""
+                          }`}
+                        >
+                          <td className="py-2 px-3 font-semibold text-zinc-300">
+                            Rok {period.year}
+                          </td>
+                          <td className="py-2 px-3 text-right text-zinc-400">
+                            {formatCurrency(period.taxLossCarryForwardOpening ?? 0, currency)}
+                          </td>
+                          <td
+                            className={`py-2 px-3 text-right font-medium ${
+                              isLossYear ? "text-rose-400" : "text-zinc-200"
+                            }`}
+                          >
+                            {formatCurrency(period.ebt, currency)}
+                          </td>
+                          <td
+                            className={`py-2 px-3 text-right ${
+                              hasExpired ? "text-rose-400 font-bold" : "text-zinc-600"
+                            }`}
+                          >
+                            {hasExpired ? `-${formatCurrency(period.taxLossExpired, currency)}` : "-"}
+                          </td>
+                          <td
+                            className={`py-2 px-3 text-right font-semibold ${
+                              hasLossUsed ? "text-emerald-400" : "text-zinc-600"
+                            }`}
+                          >
+                            {hasLossUsed ? formatCurrency(period.taxLossUsed, currency) : "-"}
+                          </td>
+                          <td className="py-2 px-3 text-right text-zinc-300">
+                            {formatCurrency(period.taxableIncome ?? 0, currency)}
+                          </td>
+                          <td
+                            className={`py-2 px-3 text-right font-semibold ${
+                              period.cit > 0 ? "text-amber-400" : "text-zinc-500"
+                            }`}
+                          >
+                            {formatCurrency(period.cit, currency)}
+                          </td>
+                          <td className="py-2 px-3 text-right text-amber-300/90 font-medium">
+                            {formatCurrency(period.taxLossCarryForwardClosing ?? 0, currency)}
+                          </td>
+                        </tr>
+                      );
+                    })
+                  ) : (
+                    <tr>
+                      <td colSpan={8} className="py-4 text-center text-zinc-500">
+                        Brak danych projekcji wieloletniej.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       )}

@@ -406,4 +406,102 @@ describe("OperatingAssumptionsForm Component", () => {
     ).toBeInTheDocument();
     expect(screen.queryByText(/5.*000.*000,00/i)).not.toBeInTheDocument();
   });
+
+  it("switches statutory tax loss settlement mode and displays one-off cap amount input", () => {
+    renderWithContext(mockProject);
+
+    const taxesTab = screen.getByRole("button", { name: /5\. Podatki & CIT/i });
+    fireEvent.click(taxesTab);
+
+    // Initial default mode is standard_loss_cap
+    expect(screen.getByText(/Ustawowy Tryb Rozliczenia Strat/i)).toBeInTheDocument();
+    const standardBtn = screen.getByRole("button", { name: /Standardowy \(50%\)/i });
+    expect(standardBtn).toHaveClass("border-emerald-500");
+
+    // Click Jednorazowo (5 mln)
+    const oneOffBtn = screen.getByRole("button", { name: /Jednorazowo \(5 mln\)/i });
+    fireEvent.click(oneOffBtn);
+
+    expect(oneOffBtn).toHaveClass("border-emerald-500");
+    const capInput = screen.getByLabelText(/Kwota Limitu Jednorazowego/i);
+    expect(capInput).toBeInTheDocument();
+    expect(capInput.value).toBe("5000000");
+
+    // Change cap amount
+    fireEvent.change(capInput, { target: { value: "3500000" } });
+    expect(capInput.value).toBe("3500000");
+
+    // Switch to EBT cap
+    const ebtBtn = screen.getByRole("button", { name: /Limit Dochodu EBT/i });
+    fireEvent.click(ebtBtn);
+    expect(ebtBtn).toHaveClass("border-emerald-500");
+    expect(screen.queryByLabelText(/Kwota Limitu Jednorazowego/i)).not.toBeInTheDocument();
+  });
+
+  it("renders live tax loss roll-forward trajectory panel with KPIs and 15-year projection schedule", () => {
+    renderWithContext(mockProject);
+
+    const taxesTab = screen.getByRole("button", { name: /5\. Podatki & CIT/i });
+    fireEvent.click(taxesTab);
+
+    const rollForwardPanel = screen.getByTestId("tax-loss-rollforward-panel");
+    expect(rollForwardPanel).toBeInTheDocument();
+
+    expect(
+      screen.getByText(/Trajektoria Tarczy Podatkowej & Rozliczenie Strat \(Tax Loss Roll-Forward\)/i),
+    ).toBeInTheDocument();
+
+    // Verify KPI titles
+    expect(screen.getByText(/Wygenerowane Straty/i)).toBeInTheDocument();
+    expect(screen.getByText(/Wykorzystana Tarcza/i)).toBeInTheDocument();
+    expect(screen.getByText(/Oszczędność CIT/i)).toBeInTheDocument();
+    expect(screen.getByText(/Wygasłe Straty \(T\+5\)/i)).toBeInTheDocument();
+    expect(screen.getByText(/Saldo Końcowe Tarczy/i)).toBeInTheDocument();
+
+    // Verify table headers
+    expect(screen.getByText(/Saldo Otwarcia/i)).toBeInTheDocument();
+    expect(screen.getByText(/Wynik Brutto \(EBT\)/i)).toBeInTheDocument();
+    expect(screen.getByText(/Odliczona Tarcza/i)).toBeInTheDocument();
+    expect(screen.getByText(/Podstawa CIT/i)).toBeInTheDocument();
+    expect(screen.getByText(/Należny CIT/i)).toBeInTheDocument();
+    expect(screen.getByText(/Saldo Zamknięcia/i)).toBeInTheDocument();
+
+    // Check that multi-year rows are rendered
+    expect(screen.getByText(/^Rok 1$/i)).toBeInTheDocument();
+    expect(screen.getByText(/^Rok 15$/i)).toBeInTheDocument();
+  });
+
+  it("includes tax loss settlement mode and one-off cap amount in updateProject API payload", async () => {
+    investmentProjectsApi.updateProject.mockResolvedValueOnce({
+      data: { status: "success", data: mockProject },
+    });
+
+    renderWithContext(mockProject);
+
+    const taxesTab = screen.getByRole("button", { name: /5\. Podatki & CIT/i });
+    fireEvent.click(taxesTab);
+
+    const oneOffBtn = screen.getByRole("button", { name: /Jednorazowo \(5 mln\)/i });
+    fireEvent.click(oneOffBtn);
+
+    const capInput = screen.getByLabelText(/Kwota Limitu Jednorazowego/i);
+    fireEvent.change(capInput, { target: { value: "4000000" } });
+
+    const saveBtn = screen.getByRole("button", {
+      name: /Zapisz Założenia Operacyjne/i,
+    });
+    fireEvent.click(saveBtn);
+
+    await waitFor(() => {
+      expect(investmentProjectsApi.updateProject).toHaveBeenCalledWith(
+        "proj-101",
+        expect.objectContaining({
+          operating_assumptions: expect.objectContaining({
+            tax_loss_settlement_mode: "one_off_5m",
+            tax_loss_one_off_cap_amount: 4000000,
+          }),
+        }),
+      );
+    });
+  });
 });

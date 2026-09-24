@@ -47,6 +47,7 @@ export const ThreeStatementGrid = ({
         assets_breakdown: true,
         liabilities_breakdown: true,
         cf_breakdown: true,
+        tax_breakdown: false,
     });
 
     // Simulation Data State
@@ -101,6 +102,7 @@ export const ThreeStatementGrid = ({
             assets_breakdown: true,
             liabilities_breakdown: true,
             cf_breakdown: true,
+            tax_breakdown: true,
         });
     };
 
@@ -111,6 +113,7 @@ export const ThreeStatementGrid = ({
             assets_breakdown: false,
             liabilities_breakdown: false,
             cf_breakdown: false,
+            tax_breakdown: false,
         });
     };
 
@@ -294,6 +297,11 @@ export const ThreeStatementGrid = ({
         pushRow('Koszty Finansowe (Odsetki)', (p) => p.interestExpense);
         pushRow('EBT (Zysk Brutto)', (p) => p.ebt);
         pushRow('Podatek Dochodowy CIT', (p) => p.cit);
+        pushRow('  ↳ Saldo Otwarcia Tarczy Podatkowej', (p) => p.taxLossCarryForwardOpening ?? 0);
+        pushRow('  ↳ Wygasłe Straty Podatkowe (T+5)', (p) => p.taxLossExpired ? -p.taxLossExpired : 0);
+        pushRow('  ↳ Odliczona Tarcza Podatkowa', (p) => p.taxLossUsed ?? 0);
+        pushRow('  ↳ Podstawa Opodatkowania CIT', (p) => p.taxableIncome ?? 0);
+        pushRow('  ↳ Saldo Zamknięcia Tarczy Podatkowej', (p) => p.taxLossCarryForwardClosing ?? 0);
         pushRow('Wynik Finansowy Netto', (p) => p.netIncome);
 
         // Bilans
@@ -797,15 +805,84 @@ export const ThreeStatementGrid = ({
                                     {/* Podatek CIT */}
                                     {matchesSearch('Podatek CIT') && (
                                         <tr className="hover:bg-zinc-850/50">
-                                            <td className="py-2 px-4 sticky left-0 z-10 bg-zinc-900 text-zinc-400 border-r border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
-                                                (-) Podatek Dochodowy CIT (Tarcza Strat)
+                                            <td className="py-2 px-4 sticky left-0 z-10 bg-zinc-900 text-zinc-400 flex items-center justify-between border-r border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
+                                                <span>(-) Podatek Dochodowy CIT (Tarcza Strat)</span>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => toggleSection('tax_breakdown')}
+                                                    className="p-1 hover:text-zinc-100 text-zinc-400"
+                                                    title="Rozwiń rozliczenie podatkowe CIT"
+                                                    aria-label="Rozwiń rozliczenie podatkowe CIT"
+                                                >
+                                                    {expandedSections.tax_breakdown ? (
+                                                        <ChevronDown className="w-3.5 h-3.5" />
+                                                    ) : (
+                                                        <ChevronRight className="w-3.5 h-3.5" />
+                                                    )}
+                                                </button>
                                             </td>
                                             {columns.map((c) => (
-                                                <td key={c.id} className="py-2 px-3 text-right text-rose-400/80 border-r border-zinc-850">
+                                                <td key={c.id} className="py-2 px-3 text-right text-rose-400/80 border-r border-zinc-850 font-mono">
                                                     {formatValue(-c.data.cit)}
                                                 </td>
                                             ))}
                                         </tr>
+                                    )}
+
+                                    {/* Expanded: Tax Details */}
+                                    {expandedSections.tax_breakdown && matchesSearch('Podatek CIT') && (
+                                        <>
+                                            <tr className="text-zinc-400 bg-zinc-950/20 text-[11px]">
+                                                <td className="py-1.5 px-4 pl-8 sticky left-0 z-10 bg-zinc-950/80 border-r border-zinc-800 italic">
+                                                    ↳ Saldo Otwarcia Tarczy Podatkowej (Opening Pool)
+                                                </td>
+                                                {columns.map((c) => (
+                                                    <td key={c.id} className="py-1.5 px-3 text-right border-r border-zinc-850 text-zinc-400 font-mono">
+                                                        {formatValue(c.data.taxLossCarryForwardOpening ?? 0)}
+                                                    </td>
+                                                ))}
+                                            </tr>
+                                            <tr className="text-zinc-400 bg-zinc-950/20 text-[11px]">
+                                                <td className="py-1.5 px-4 pl-8 sticky left-0 z-10 bg-zinc-950/80 border-r border-zinc-800 italic">
+                                                    ↳ Wygasłe Straty Podatkowe (Przedawnienie T+5)
+                                                </td>
+                                                {columns.map((c) => (
+                                                    <td key={c.id} className="py-1.5 px-3 text-right border-r border-zinc-850 text-rose-400/90 font-mono">
+                                                        {formatValue(c.data.taxLossExpired ? -c.data.taxLossExpired : 0)}
+                                                    </td>
+                                                ))}
+                                            </tr>
+                                            <tr className="text-zinc-400 bg-zinc-950/20 text-[11px]">
+                                                <td className="py-1.5 px-4 pl-8 sticky left-0 z-10 bg-zinc-950/80 border-r border-zinc-800 italic">
+                                                    ↳ Odliczona Tarcza Podatkowa (Rozliczone Straty)
+                                                </td>
+                                                {columns.map((c) => (
+                                                    <td key={c.id} className="py-1.5 px-3 text-right border-r border-zinc-850 text-emerald-400/90 font-mono">
+                                                        {formatValue(c.data.taxLossUsed ?? 0)}
+                                                    </td>
+                                                ))}
+                                            </tr>
+                                            <tr className="text-zinc-400 bg-zinc-950/20 text-[11px]">
+                                                <td className="py-1.5 px-4 pl-8 sticky left-0 z-10 bg-zinc-950/80 border-r border-zinc-800 italic">
+                                                    ↳ Podstawa Opodatkowania CIT (Taxable Income)
+                                                </td>
+                                                {columns.map((c) => (
+                                                    <td key={c.id} className="py-1.5 px-3 text-right border-r border-zinc-850 text-zinc-300 font-mono">
+                                                        {formatValue(c.data.taxableIncome ?? 0)}
+                                                    </td>
+                                                ))}
+                                            </tr>
+                                            <tr className="text-zinc-400 bg-zinc-950/20 text-[11px]">
+                                                <td className="py-1.5 px-4 pl-8 sticky left-0 z-10 bg-zinc-950/80 border-r border-zinc-800 italic">
+                                                    ↳ Saldo Zamknięcia Tarczy Podatkowej (Closing Pool)
+                                                </td>
+                                                {columns.map((c) => (
+                                                    <td key={c.id} className="py-1.5 px-3 text-right border-r border-zinc-850 text-amber-400/80 font-mono">
+                                                        {formatValue(c.data.taxLossCarryForwardClosing ?? 0)}
+                                                    </td>
+                                                ))}
+                                            </tr>
+                                        </>
                                     )}
 
                                     {/* Zysk Netto */}
