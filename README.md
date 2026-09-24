@@ -662,23 +662,27 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
   - Kalkulacja w czasie rzeczywistym trajektorii wieloletniej (Rok 5, Rok 10, skumulowany narzut 15-letni $\Sigma$, dynamika wzrostu procentowego w R15) oraz nota objaśniająca formułę $Baza \times (1 + r)^{t-1}$.
   - Dodanie towarzyszącego panelu szacunków wieloletnich przychodów (`revenue-projection-panel`) uwzględniającego dynamikę organiczną i krzywą ramp-up.
   - Rozszerzenie zestawu testów Vitest (`OperatingAssumptionsForm.test.jsx`) o weryfikację reaktywności suwaków i projekcji wieloletniej.
-
 - [ ] **Faza 49: Bankowalny model podatkowy (CIT & Tax Loss Carry-Forward) zgodny z art. 7 ust. 5 i art. 19 ustawy o CIT**
-  - [x] **Commit 239**: Korekta UI, synchronizacja stawki CIT z tarczą podatkową WACC i parametryzacja FormRequest.
+  - [x] Korekta UI, synchronizacja stawki CIT z tarczą podatkową WACC i parametryzacja FormRequest.
     - Eliminacja literówki w `OperatingAssumptionsForm.jsx` (*Limit Rocznego Odliczenia Straty (%)*).
     - Synchronizacja tarczy podatkowej długu WACC $K_d \cdot (1 - T)$ z dynamiczną stawką CIT projektu (19% lub preferencyjne 9% dla małych podatników).
     - Rozszerzenie metody fabrycznej `WaccParameters::defaultForPoland(?float $preTaxCostOfDebt = null, ?float $taxRatePercent = null)` oraz `WaccCalculatorService`.
     - Dodanie interaktywnej karty tarczy podatkowej WACC w zakładce *5. Podatki & CIT*.
     - Parametryzacja reguł walidacyjnych w żądaniach `UpdateInvestmentProjectRequest`, `InvestmentStatementQueryRequest` oraz `InvestmentAppraisalQueryRequest`.
     - Testy jednostkowe WACC (`WaccCalculatorServiceTest.php`) oraz frontendowe (`OperatingAssumptionsForm.test.jsx`).
-  - [x] **Commit 240**: Model domenowy rocznikowania strat podatkowych (Tax Loss Vintages & 5-Year Expiry).
+  - [x] Model domenowy rocznikowania strat podatkowych (Tax Loss Vintages & 5-Year Expiry).
     - Implementacja enum `TaxLossSettlementMode` (`standard_loss_cap`, `one_off_5m`, `ebt_cap`) zgodnie z art. 7 ust. 5 ustawy o CIT.
     - Implementacja obiektu wartości `TaxLossVintage` (rok powstania, kwota pierwotna, pozostała, rozliczona, rok wygaśnięcia $T+5$).
     - Implementacja agregatu wartości `TaxLossPool` z kolejką FIFO i bezpowrotnym wygaszaniem strat po upływie 5 lat podatkowych.
     - Wprowadzenie obiektu `TaxLossSettlementResult` rejestrującego kwoty rozliczone, wygasłe oraz salda otwarcia/zamknięcia.
     - Rozszerzenie `OperatingAssumptions`, `IncomeStatementPeriod` i `AnnualIncomeStatement` o atrybuty `taxLossExpired` i `taxLossCarryForwardOpening`.
     - Kompletny zestaw testów jednostkowych (`TaxLossPoolTest.php`).
-  - [ ] **Commit 241**: Roczny model zaliczek CIT (YTD) i obsługa jednorazowego odliczenia 5 mln zł w IncomeStatementService.
+  - [x] Roczny model zaliczek CIT (YTD) i obsługa jednorazowego odliczenia 5 mln zł w IncomeStatementService.
+    - Implementacja ustawowego, narastającego modelu zaliczek na CIT (YTD - Year-To-Date) zgodnie z art. 25 ust. 1 ustawy o CIT w `IncomeStatementService`.
+    - Eliminacja błędu zniekształcenia podatkowego w ujęciu miesięcznym (zaliczka CIT należna wyłącznie przy dodatnim rocznym dochodzie narastającym po odliczeniu strat z lat ubiegłych).
+    - Integracja agregatu domenowego `TaxLossPool` z mechanizmem rocznikowania (vintages) i obsługą trybów rozliczeń: standardowy limit 50% (`STANDARD_LOSS_CAP`), jednorazowe odliczenie do 5 mln zł (`ONE_OFF_5M`) wg art. 7 ust. 5 pkt 2 CIT oraz legacy limit EBT (`EBT_CAP`).
+    - Obsługa bezpowrotnego wygasania strat podatkowych po 5 kolejno następujących po sobie latach podatkowych ($T+5$) oraz ewidencja salda otwarcia i wygasłych strat w okresach miesięcznych i rocznych.
+    - Rozszerzenie zestawu testów jednostkowych w `IncomeStatementServiceTest.php` weryfikujących pełne odliczenie do 5 mln zł vs standardowe 50%, progresję miesięcznych zaliczek YTD oraz 5-letnie wygasanie strat.
   - [ ] **Commit 242**: Parzystość matematyczna w silniku Web Worker (financialCalculations.ts).
   - [ ] **Commit 243**: Interfejs UI fiskalnego panelu CIT i podgląd trajektorii tarczy podatkowej (Tax Loss Roll-Forward).
   - [ ] **Commit 244**: Kompleksowe testy integracyjne, regresja 3-Statement & aktualizacja dokumentacji README.md.
