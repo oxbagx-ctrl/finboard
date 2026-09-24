@@ -333,6 +333,336 @@ export function calculateDebtSchedule(
     };
 }
 
+export type TaxLossSettlementMode = 'standard_loss_cap' | 'one_off_5m' | 'ebt_cap';
+
+export interface TaxLossSettlementDetail {
+    vintage_year: number;
+    deducted: number;
+    remaining_before: number;
+    remaining_after: number;
+    used_one_off: boolean;
+}
+
+export interface TaxLossExpiredDetail {
+    vintage_year: number;
+    expired_amount: number;
+}
+
+export interface TaxLossSettlementResult {
+    year: number;
+    taxableIncomeBeforeDeduction: number;
+    lossDeducted: number;
+    lossExpired: number;
+    taxableIncomeAfterDeduction: number;
+    openingPoolBalance: number;
+    closingPoolBalance: number;
+    settlementMode: string;
+    settlementDetails: TaxLossSettlementDetail[];
+    expiredDetails: TaxLossExpiredDetail[];
+}
+
+export class TaxLossVintage {
+    public static readonly MAX_CARRY_FORWARD_YEARS = 5;
+
+    public readonly originYear: number;
+    public readonly initialAmount: number;
+    public readonly remainingAmount: number;
+    public readonly settledAmount: number;
+    public readonly expiryYear: number;
+    public readonly hasUsedOneOffDeduction: boolean;
+
+    constructor(
+        originYear: number,
+        initialAmount: number,
+        remainingAmount?: number,
+        settledAmount: number = 0,
+        expiryYear?: number,
+        hasUsedOneOffDeduction: boolean = false
+    ) {
+        this.originYear = originYear;
+        this.initialAmount = Math.max(0, initialAmount);
+        this.remainingAmount = remainingAmount !== undefined ? Math.max(0, remainingAmount) : this.initialAmount;
+        this.settledAmount = Math.max(0, settledAmount);
+        this.expiryYear = expiryYear !== undefined ? expiryYear : originYear + TaxLossVintage.MAX_CARRY_FORWARD_YEARS;
+        this.hasUsedOneOffDeduction = hasUsedOneOffDeduction;
+    }
+
+    public static create(originYear: number, amount: number): TaxLossVintage {
+        return new TaxLossVintage(originYear, amount);
+    }
+
+    public isExpired(currentYear: number): boolean {
+        return currentYear > this.expiryYear;
+    }
+
+    public isAvailable(currentYear: number): boolean {
+        return currentYear > this.originYear && currentYear <= this.expiryYear && this.remainingAmount > 0;
+    }
+
+    public maxDeductibleInYear(
+        currentYear: number,
+        mode: string = 'standard_loss_cap',
+        annualCapPercent: number = 50.0,
+        oneOffCap: number = 5000000.0
+    ): number {
+        if (!this.isAvailable(currentYear)) {
+            return 0;
+        }
+
+        const standardMax = this.initialAmount * (annualCapPercent / 100.0);
+
+        if (mode === 'standard_loss_cap') {
+            return Math.min(this.remainingAmount, standardMax);
+        }
+
+        if (mode === 'one_off_5m') {
+            if (!this.hasUsedOneOffDeduction) {
+                return Math.min(this.remainingAmount, oneOffCap);
+            }
+            return Math.min(this.remainingAmount, standardMax);
+        }
+
+        // 'ebt_cap' mode: vintage does not bound itself beyond remaining amount
+        return this.remainingAmount;
+    }
+
+    public settle(amountDeducted: number, usedOneOff: boolean = false): TaxLossVintage {
+        const deduction = Math.min(amountDeducted, this.remainingAmount);
+        return new TaxLossVintage(
+            this.originYear,
+            this.initialAmount,
+            Math.max(0, this.remainingAmount - deduction),
+            this.settledAmount + deduction,
+            this.expiryYear,
+            this.hasUsedOneOffDeduction || usedOneOff
+        );
+    }
+
+    public expire(): TaxLossVintage {
+        return new TaxLossVintage(
+            this.originYear,
+            this.initialAmount,
+            0,
+            this.settledAmount,
+            this.expiryYear,
+            this.hasUsedOneOffDeduction
+        );
+    }
+
+    public clone(): TaxLossVintage {
+        return new TaxLossVintage(
+            this.originYear,
+            this.initialAmount,
+            this.remainingAmount,
+            this.settledAmount,
+            this.expiryYear,
+            this.hasUsedOneOffDeduction
+        );
+    }
+}
+
+export class TaxLossPool {
+    public readonly vintages: Record<number, TaxLossVintage>;
+
+    constructor(vintages: Record<number, TaxLossVintage> | TaxLossVintage[] = {}) {
+        this.vintages = {};
+        if (Array.isArray(vintages)) {
+            for (const v of vintages) {
+                this.vintages[v.originYear] = v.clone();
+            }
+        } else {
+            for (const yearStr of Object.keys(vintages)) {
+                const year = Number(yearStr);
+                this.vintages[year] = vintages[year].clone();
+            }
+        }
+    }
+
+    public static empty(): TaxLossPool {
+        return new TaxLossPool({});
+    }
+
+    public clone(): TaxLossPool {
+        return new TaxLossPool(this.vintages);
+    }
+
+    public addLoss(year: number, amount: number): TaxLossPool {
+        if (amount <= 0) {
+            return this.clone();
+        }
+
+        const newVintages: Record<number, TaxLossVintage> = {};
+        for (const yearStr of Object.keys(this.vintages)) {
+            const y = Number(yearStr);
+            newVintages[y] = this.vintages[y].clone();
+        }
+
+        if (newVintages[year]) {
+            const existing = newVintages[year];
+            newVintages[year] = new TaxLossVintage(
+                year,
+                existing.initialAmount + amount,
+                existing.remainingAmount + amount,
+                existing.settledAmount,
+                existing.expiryYear,
+                existing.hasUsedOneOffDeduction
+            );
+        } else {
+            newVintages[year] = TaxLossVintage.create(year, amount);
+        }
+
+        return new TaxLossPool(newVintages);
+    }
+
+    public closingBalance(currentYear: number): number {
+        let sum = 0;
+        for (const yearStr of Object.keys(this.vintages)) {
+            const v = this.vintages[Number(yearStr)];
+            if (!v.isExpired(currentYear)) {
+                sum += v.remainingAmount;
+            }
+        }
+        return sum;
+    }
+
+    public openingBalance(currentYear: number): number {
+        let sum = 0;
+        for (const yearStr of Object.keys(this.vintages)) {
+            const v = this.vintages[Number(yearStr)];
+            if (v.expiryYear >= currentYear) {
+                sum += v.remainingAmount;
+            }
+        }
+        return sum;
+    }
+
+    public settle(
+        currentYear: number,
+        taxableIncome: number,
+        mode: string = 'standard_loss_cap',
+        annualCapPercent: number = 50.0,
+        oneOffCap: number = 5000000.0
+    ): { pool: TaxLossPool; result: TaxLossSettlementResult } {
+        const updatedVintages: Record<number, TaxLossVintage> = {};
+        let totalExpired = 0;
+        const expiredDetails: TaxLossExpiredDetail[] = [];
+
+        // Sort keys ascending for strict FIFO
+        const sortedYears = Object.keys(this.vintages)
+            .map(Number)
+            .sort((a, b) => a - b);
+
+        for (const y of sortedYears) {
+            const v = this.vintages[y];
+            if (v.isExpired(currentYear)) {
+                if (v.remainingAmount > 0) {
+                    totalExpired += v.remainingAmount;
+                    expiredDetails.push({
+                        vintage_year: v.originYear,
+                        expired_amount: v.remainingAmount
+                    });
+                    updatedVintages[y] = v.expire();
+                } else {
+                    updatedVintages[y] = v.clone();
+                }
+            } else {
+                updatedVintages[y] = v.clone();
+            }
+        }
+
+        // Opening pool after expiries
+        let openingPool = 0;
+        for (const y of sortedYears) {
+            const v = updatedVintages[y];
+            if (!v.isExpired(currentYear)) {
+                openingPool += v.remainingAmount;
+            }
+        }
+
+        let totalDeducted = 0;
+        const settlementDetails: TaxLossSettlementDetail[] = [];
+
+        if (taxableIncome > 0 && openingPool > 0) {
+            let remainingIncomeCapacity = taxableIncome;
+            if (mode === 'ebt_cap') {
+                const maxEbtCap = taxableIncome * (annualCapPercent / 100.0);
+                remainingIncomeCapacity = Math.min(maxEbtCap, taxableIncome);
+            }
+
+            for (const y of sortedYears) {
+                if (remainingIncomeCapacity <= 0) {
+                    break;
+                }
+                const v = updatedVintages[y];
+                if (!v.isAvailable(currentYear)) {
+                    continue;
+                }
+
+                const maxVintageDeductible = v.maxDeductibleInYear(
+                    currentYear,
+                    mode,
+                    annualCapPercent,
+                    oneOffCap
+                );
+                if (maxVintageDeductible <= 0) {
+                    continue;
+                }
+
+                const toDeduct = Math.min(maxVintageDeductible, remainingIncomeCapacity);
+                if (toDeduct > 0) {
+                    const standardCap = v.initialAmount * (annualCapPercent / 100.0);
+                    const usedOneOff = (mode === 'one_off_5m') && !v.hasUsedOneOffDeduction && (toDeduct > standardCap);
+
+                    const vBefore = v.remainingAmount;
+                    const updatedV = v.settle(toDeduct, usedOneOff);
+                    updatedVintages[y] = updatedV;
+
+                    totalDeducted += toDeduct;
+                    remainingIncomeCapacity -= toDeduct;
+
+                    settlementDetails.push({
+                        vintage_year: v.originYear,
+                        deducted: toDeduct,
+                        remaining_before: vBefore,
+                        remaining_after: updatedV.remainingAmount,
+                        used_one_off: usedOneOff
+                    });
+                }
+            }
+        }
+
+        const taxableIncomeAfterDeduction = Math.max(0, taxableIncome - totalDeducted);
+
+        let closingPool = 0;
+        for (const y of sortedYears) {
+            const v = updatedVintages[y];
+            if (!v.isExpired(currentYear)) {
+                closingPool += v.remainingAmount;
+            }
+        }
+
+        const result: TaxLossSettlementResult = {
+            year: currentYear,
+            taxableIncomeBeforeDeduction: taxableIncome,
+            lossDeducted: totalDeducted,
+            lossExpired: totalExpired,
+            taxableIncomeAfterDeduction,
+            openingPoolBalance: openingPool,
+            closingPoolBalance: closingPool,
+            settlementMode: mode,
+            settlementDetails,
+            expiredDetails
+        };
+
+        const newPool = new TaxLossPool(updatedVintages);
+
+        return {
+            result,
+            pool: newPool
+        };
+    }
+}
+
 /**
  * Calculate 15-Year Monthly & Annual 3-Statement Model
  */
@@ -440,7 +770,9 @@ export function calculate15YearStatements(
     // Taxes
     const citRate = Number(assumptions.cit_rate_percent ?? 19.0) / 100.0;
     const taxLossEnabled = assumptions.tax_loss_carry_forward_enabled ?? true;
-    const taxLossOffsetCap = Number(assumptions.tax_loss_offset_cap_percent ?? 50.0) / 100.0;
+    const settlementMode = String(assumptions.tax_loss_settlement_mode || 'standard_loss_cap');
+    const offsetCapPercent = Number(assumptions.tax_loss_offset_cap_percent ?? 50.0);
+    const oneOffCapAmount = Number(assumptions.tax_loss_one_off_cap_amount ?? 5000000.0);
 
     // NWC rotation days
     const dso = Number(assumptions.dso ?? 45.0);
@@ -448,172 +780,262 @@ export function calculate15YearStatements(
     const dio = Number(assumptions.dio ?? 20.0);
 
     const monthlyPeriods: MonthlyStatementPeriod[] = [];
-    let taxLossPool = 0;
+    const annualPeriods: AnnualStatementPeriod[] = [];
+    let taxLossPool = new TaxLossPool();
     let cashBalance = initialEquity;
     let prevNwc = 0;
 
-    for (let m = 1; m <= totalMonths; m++) {
-        const year = Math.ceil(m / 12);
-        const monthInYear = ((m - 1) % 12) + 1;
-        const isCommercial = m >= firstCommercialMonth;
-
-        let monthRev = 0;
-        let monthVarCost = 0;
-        let monthFixedCost = 0;
-        let monthPayroll = 0;
-
-        if (isCommercial) {
-            const operatingMonthIndex = m - firstCommercialMonth + 1;
-            const operatingYear = Math.ceil(operatingMonthIndex / 12);
-
-            // Ramp-up factor
-            let rampFactor = rampY3;
-            if (operatingYear === 1) rampFactor = rampY1;
-            else if (operatingYear === 2) rampFactor = rampY2;
-
-            // Inflated annual revenue
-            const revGrowthFactor = Math.pow(1.0 + revGrowthRate, operatingYear - 1);
-            const inflatedAnnualRev = annualRevenueBase * revMult * revGrowthFactor * rampFactor;
-            monthRev = inflatedAnnualRev / 12.0;
-
-            // Variable costs
-            monthVarCost = monthRev * varCostPercent * varCostMult;
-
-            // Fixed costs
-            const fixedGrowthFactor = Math.pow(1.0 + fixedCostGrowthRate, operatingYear - 1);
-            monthFixedCost = (annualFixedCostsBase * fixedCostMult * fixedGrowthFactor) / 12.0;
-
-            // Payroll costs
-            const payrollGrowthFactor = Math.pow(1.0 + payrollGrowthRate, operatingYear - 1);
-            monthPayroll = (annualPayrollBase * payrollMult * payrollGrowthFactor) / 12.0;
-        }
-
-        const totalOpex = monthVarCost + monthFixedCost + monthPayroll;
-        const ebitda = monthRev - totalOpex;
-
-        const depreciation = depSchedule.monthlyDepreciation[m] || 0;
-        const ebit = ebitda - depreciation;
-
-        // Interest
-        let interestExpense = debtSchedule.monthlyInterest[m] || 0;
-        if (m === 1 && debtSchedule.upfrontFee > 0) {
-            interestExpense += debtSchedule.upfrontFee;
-        }
-
-        const ebt = ebit - interestExpense;
-
-        // CIT & Tax Loss Carry-Forward
-        let cit = 0;
-        let netIncome = ebt;
-
-        if (ebt < 0) {
-            if (taxLossEnabled) {
-                taxLossPool += Math.abs(ebt);
-            }
-            netIncome = ebt;
-        } else {
-            let taxableIncome = ebt;
-            if (taxLossEnabled && taxLossPool > 0) {
-                const maxLossOffset = ebt * taxLossOffsetCap;
-                const lossUsed = Math.min(taxLossPool, maxLossOffset);
-                taxLossPool -= lossUsed;
-                taxableIncome = ebt - lossUsed;
-            }
-            cit = Math.max(0, taxableIncome * citRate);
-            netIncome = ebt - cit;
-        }
-
-        // Working Capital calculation (DSO, DIO, DPO)
-        const receivables = monthRev * (dso / 30.0);
-        const inventory = monthVarCost * (dio / 30.0);
-        const payables = totalOpex * (dpo / 30.0);
-        const currentNwc = receivables + inventory - payables;
-        const changeInNwc = prevNwc - currentNwc; // Positive = cash inflow, negative = cash outflow
-        prevNwc = currentNwc;
-
-        // Cash flow components
-        const debtDrawdown = debtSchedule.monthlyDrawdown[m] || 0;
-        const debtRepaid = debtSchedule.monthlyPrincipalRepaid[m] || 0;
-        const upfrontFee = m === 1 ? debtSchedule.upfrontFee : 0;
-
-        // Upfront fee was expensed in interestExpense (netIncome), so add it back to OCF
-        // to reclassify it as financing cash flow (FCF) and avoid double-deduction.
-        const ocf = netIncome + depreciation + upfrontFee + changeInNwc;
-        const capex = depSchedule.monthlyCapex[m] || 0;
-        const icf = -capex;
-        const fcf = debtDrawdown - debtRepaid - upfrontFee;
-
-        const netCashFlow = ocf + icf + fcf;
-        cashBalance += netCashFlow;
-
-        const periodDate = new Date(startYear, startMonth + m - 1, 1);
-        const dateStr = `${periodDate.getFullYear()}-${String(periodDate.getMonth() + 1).padStart(2, '0')}`;
-
-        monthlyPeriods.push({
-            period: m,
-            year,
-            monthInYear,
-            date: dateStr,
-            isCommercial,
-            revenue: monthRev,
-            variableCosts: monthVarCost,
-            fixedCosts: monthFixedCost,
-            payrollCosts: monthPayroll,
-            totalOpex,
-            ebitda,
-            depreciation,
-            ebit,
-            interestExpense,
-            ebt,
-            cit,
-            netIncome,
-            capex,
-            debtDrawdown,
-            debtPrincipalRepaid: debtRepaid,
-            vatLoanDrawdown: 0,
-            vatLoanRepaid: 0,
-            grantReceived: 0,
-            changeInNwc,
-            receivables,
-            inventory,
-            payables,
-            operatingCashFlow: ocf,
-            investingCashFlow: icf,
-            financingCashFlow: fcf,
-            netCashFlow,
-            closingCash: cashBalance,
-            closingDebt: debtSchedule.monthlyClosingDebt[m] || 0
-        });
-    }
-
-    // 6. Aggregate to 15 Annual Periods
-    const annualPeriods: AnnualStatementPeriod[] = [];
-
     for (let y = 1; y <= horizonYears; y++) {
-        const startIdx = (y - 1) * 12;
-        const endIdx = y * 12;
-        const slice = monthlyPeriods.slice(startIdx, endIdx);
+        const openingPoolForYear = taxLossEnabled ? taxLossPool.openingBalance(y) : 0;
+        const expiryResult = taxLossPool.settle(y, 0, settlementMode, offsetCapPercent, oneOffCapAmount);
+        const expiredThisYear = taxLossEnabled ? expiryResult.result.lossExpired : 0;
+        const poolAtYearStart = taxLossEnabled ? expiryResult.pool : new TaxLossPool();
 
-        const revenue = slice.reduce((sum, p) => sum + p.revenue, 0);
-        const variableCosts = slice.reduce((sum, p) => sum + p.variableCosts, 0);
-        const fixedCosts = slice.reduce((sum, p) => sum + p.fixedCosts, 0);
-        const payrollCosts = slice.reduce((sum, p) => sum + p.payrollCosts, 0);
-        const totalOpex = slice.reduce((sum, p) => sum + p.totalOpex, 0);
-        const ebitda = slice.reduce((sum, p) => sum + p.ebitda, 0);
-        const depreciation = slice.reduce((sum, p) => sum + p.depreciation, 0);
-        const ebit = slice.reduce((sum, p) => sum + p.ebit, 0);
-        const interestExpense = slice.reduce((sum, p) => sum + p.interestExpense, 0);
-        const ebt = slice.reduce((sum, p) => sum + p.ebt, 0);
-        const cit = slice.reduce((sum, p) => sum + p.cit, 0);
-        const netIncome = slice.reduce((sum, p) => sum + p.netIncome, 0);
-        const capex = slice.reduce((sum, p) => sum + p.capex, 0);
-        const changeInNwc = slice.reduce((sum, p) => sum + p.changeInNwc, 0);
-        const operatingCashFlow = slice.reduce((sum, p) => sum + p.operatingCashFlow, 0);
-        const investingCashFlow = slice.reduce((sum, p) => sum + p.investingCashFlow, 0);
-        const financingCashFlow = slice.reduce((sum, p) => sum + p.financingCashFlow, 0);
-        const netCashFlow = slice.reduce((sum, p) => sum + p.netCashFlow, 0);
+        let ytdEbt = 0;
+        let cumulativeIntraYearLoss = 0;
+        let cumulativeCitPaidThisYear = 0;
+        let cumulativePriorLossUsedThisYear = 0;
 
-        const lastMonth = slice[slice.length - 1];
+        const yearMonthlySlice: MonthlyStatementPeriod[] = [];
+
+        for (let monthInYear = 1; monthInYear <= 12; monthInYear++) {
+            const m = ((y - 1) * 12) + monthInYear;
+            if (m > totalMonths) {
+                break;
+            }
+
+            const isCommercial = m >= firstCommercialMonth;
+
+            let monthRev = 0;
+            let monthVarCost = 0;
+            let monthFixedCost = 0;
+            let monthPayroll = 0;
+
+            if (isCommercial) {
+                const operatingMonthIndex = m - firstCommercialMonth + 1;
+                const operatingYear = Math.ceil(operatingMonthIndex / 12);
+
+                // Ramp-up factor
+                let rampFactor = rampY3;
+                if (operatingYear === 1) rampFactor = rampY1;
+                else if (operatingYear === 2) rampFactor = rampY2;
+
+                // Inflated annual revenue
+                const revGrowthFactor = Math.pow(1.0 + revGrowthRate, operatingYear - 1);
+                const inflatedAnnualRev = annualRevenueBase * revMult * revGrowthFactor * rampFactor;
+                monthRev = inflatedAnnualRev / 12.0;
+
+                // Variable costs
+                monthVarCost = monthRev * varCostPercent * varCostMult;
+
+                // Fixed costs
+                const fixedGrowthFactor = Math.pow(1.0 + fixedCostGrowthRate, operatingYear - 1);
+                monthFixedCost = (annualFixedCostsBase * fixedCostMult * fixedGrowthFactor) / 12.0;
+
+                // Payroll costs
+                const payrollGrowthFactor = Math.pow(1.0 + payrollGrowthRate, operatingYear - 1);
+                monthPayroll = (annualPayrollBase * payrollMult * payrollGrowthFactor) / 12.0;
+            }
+
+            const totalOpex = monthVarCost + monthFixedCost + monthPayroll;
+            const ebitda = monthRev - totalOpex;
+
+            const depreciation = depSchedule.monthlyDepreciation[m] || 0;
+            const ebit = ebitda - depreciation;
+
+            // Interest
+            let interestExpense = debtSchedule.monthlyInterest[m] || 0;
+            if (m === 1 && debtSchedule.upfrontFee > 0) {
+                interestExpense += debtSchedule.upfrontFee;
+            }
+
+            const ebt = ebit - interestExpense;
+
+            // CIT Advances & Tax Loss Carry-Forward (Annual YTD Model per art. 25 CIT)
+            let intraYearLossUsedThisMonth = 0;
+            if (ebt < 0) {
+                if (taxLossEnabled) {
+                    cumulativeIntraYearLoss += Math.abs(ebt);
+                }
+                intraYearLossUsedThisMonth = 0;
+            } else {
+                if (taxLossEnabled && cumulativeIntraYearLoss > 0) {
+                    intraYearLossUsedThisMonth = Math.min(cumulativeIntraYearLoss, ebt);
+                    cumulativeIntraYearLoss -= intraYearLossUsedThisMonth;
+                } else {
+                    intraYearLossUsedThisMonth = 0;
+                }
+            }
+
+            ytdEbt += ebt;
+
+            let monthPriorLossUsed = 0;
+            let monthCit = 0;
+            let monthTaxLossUsed = 0;
+            let monthTaxableIncome = 0;
+            let monthLossClosing = 0;
+
+            if (ytdEbt > 0) {
+                let currentYtdPriorLossUsed = 0;
+                let currentYtdTaxableIncome = ytdEbt;
+                let poolClosingAtThisYtd = poolAtYearStart.closingBalance(y);
+
+                if (taxLossEnabled && poolAtYearStart.closingBalance(y) > 0) {
+                    const settleAttempt = poolAtYearStart.settle(
+                        y,
+                        ytdEbt,
+                        settlementMode,
+                        offsetCapPercent,
+                        oneOffCapAmount
+                    );
+                    currentYtdPriorLossUsed = settleAttempt.result.lossDeducted;
+                    currentYtdTaxableIncome = settleAttempt.result.taxableIncomeAfterDeduction;
+                    poolClosingAtThisYtd = settleAttempt.result.closingPoolBalance;
+                }
+
+                monthPriorLossUsed = Math.max(0, currentYtdPriorLossUsed - cumulativePriorLossUsedThisYear);
+                cumulativePriorLossUsedThisYear += monthPriorLossUsed;
+
+                const currentYtdCitDue = citRate > 0 ? Math.max(0, currentYtdTaxableIncome * citRate) : 0;
+                monthCit = Math.max(0, currentYtdCitDue - cumulativeCitPaidThisYear);
+                cumulativeCitPaidThisYear += monthCit;
+
+                monthTaxLossUsed = intraYearLossUsedThisMonth + monthPriorLossUsed;
+                monthTaxableIncome = Math.max(0, ebt - monthTaxLossUsed);
+                monthLossClosing = taxLossEnabled ? poolClosingAtThisYtd : 0;
+            } else {
+                monthPriorLossUsed = 0;
+                monthCit = 0;
+                monthTaxLossUsed = intraYearLossUsedThisMonth;
+                monthTaxableIncome = 0;
+                monthLossClosing = taxLossEnabled
+                    ? (poolAtYearStart.closingBalance(y) + cumulativeIntraYearLoss)
+                    : 0;
+            }
+
+            const netIncome = ebt - monthCit;
+
+            // Working Capital calculation (DSO, DIO, DPO)
+            const receivables = monthRev * (dso / 30.0);
+            const inventory = monthVarCost * (dio / 30.0);
+            const payables = totalOpex * (dpo / 30.0);
+            const currentNwc = receivables + inventory - payables;
+            const changeInNwc = prevNwc - currentNwc;
+            prevNwc = currentNwc;
+
+            // Cash flow components
+            const debtDrawdown = debtSchedule.monthlyDrawdown[m] || 0;
+            const debtRepaid = debtSchedule.monthlyPrincipalRepaid[m] || 0;
+            const upfrontFee = m === 1 ? debtSchedule.upfrontFee : 0;
+
+            const ocf = netIncome + depreciation + upfrontFee + changeInNwc;
+            const capex = depSchedule.monthlyCapex[m] || 0;
+            const icf = -capex;
+            const fcf = debtDrawdown - debtRepaid - upfrontFee;
+
+            const netCashFlow = ocf + icf + fcf;
+            cashBalance += netCashFlow;
+
+            const periodDate = new Date(startYear, startMonth + m - 1, 1);
+            const dateStr = `${periodDate.getFullYear()}-${String(periodDate.getMonth() + 1).padStart(2, '0')}`;
+
+            const periodObj: MonthlyStatementPeriod = {
+                period: m,
+                year: y,
+                monthInYear,
+                date: dateStr,
+                isCommercial,
+                revenue: monthRev,
+                variableCosts: monthVarCost,
+                fixedCosts: monthFixedCost,
+                payrollCosts: monthPayroll,
+                totalOpex,
+                ebitda,
+                depreciation,
+                ebit,
+                interestExpense,
+                ebt,
+                taxLossUsed: monthTaxLossUsed,
+                taxableIncome: monthTaxableIncome,
+                cit: monthCit,
+                netIncome,
+                taxLossCarryForwardOpening: monthInYear === 1 ? openingPoolForYear : poolAtYearStart.closingBalance(y),
+                taxLossExpired: monthInYear === 1 ? expiredThisYear : 0,
+                taxLossCarryForwardClosing: monthLossClosing,
+                capex,
+                debtDrawdown,
+                debtPrincipalRepaid: debtRepaid,
+                vatLoanDrawdown: 0,
+                vatLoanRepaid: 0,
+                grantReceived: 0,
+                changeInNwc,
+                receivables,
+                inventory,
+                payables,
+                operatingCashFlow: ocf,
+                investingCashFlow: icf,
+                financingCashFlow: fcf,
+                netCashFlow,
+                closingCash: cashBalance,
+                closingDebt: debtSchedule.monthlyClosingDebt[m] || 0
+            };
+
+            monthlyPeriods.push(periodObj);
+            yearMonthlySlice.push(periodObj);
+        }
+
+        // Final Annual Settlement & Pool Rollover to Year y + 1
+        let annualPriorLossUsed = 0;
+        let annualTaxableIncome = 0;
+
+        if (taxLossEnabled) {
+            if (ytdEbt < 0) {
+                taxLossPool = poolAtYearStart.addLoss(y, Math.abs(ytdEbt));
+                annualPriorLossUsed = 0;
+                annualTaxableIncome = 0;
+            } else if (ytdEbt > 0) {
+                const finalSettlement = poolAtYearStart.settle(
+                    y,
+                    ytdEbt,
+                    settlementMode,
+                    offsetCapPercent,
+                    oneOffCapAmount
+                );
+                taxLossPool = finalSettlement.pool;
+                annualPriorLossUsed = finalSettlement.result.lossDeducted;
+                annualTaxableIncome = finalSettlement.result.taxableIncomeAfterDeduction;
+            } else {
+                taxLossPool = poolAtYearStart;
+                annualPriorLossUsed = 0;
+                annualTaxableIncome = 0;
+            }
+        } else {
+            taxLossPool = new TaxLossPool();
+            annualPriorLossUsed = 0;
+            annualTaxableIncome = Math.max(0, ytdEbt);
+        }
+
+        const annualCit = cumulativeCitPaidThisYear;
+        const annualNetIncome = ytdEbt - annualCit;
+
+        // Aggregate annual figures from slice
+        const revenue = yearMonthlySlice.reduce((sum, p) => sum + p.revenue, 0);
+        const variableCosts = yearMonthlySlice.reduce((sum, p) => sum + p.variableCosts, 0);
+        const fixedCosts = yearMonthlySlice.reduce((sum, p) => sum + p.fixedCosts, 0);
+        const payrollCosts = yearMonthlySlice.reduce((sum, p) => sum + p.payrollCosts, 0);
+        const totalOpex = yearMonthlySlice.reduce((sum, p) => sum + p.totalOpex, 0);
+        const ebitda = yearMonthlySlice.reduce((sum, p) => sum + p.ebitda, 0);
+        const depreciation = yearMonthlySlice.reduce((sum, p) => sum + p.depreciation, 0);
+        const ebit = yearMonthlySlice.reduce((sum, p) => sum + p.ebit, 0);
+        const interestExpense = yearMonthlySlice.reduce((sum, p) => sum + p.interestExpense, 0);
+        const capex = yearMonthlySlice.reduce((sum, p) => sum + p.capex, 0);
+        const changeInNwc = yearMonthlySlice.reduce((sum, p) => sum + p.changeInNwc, 0);
+        const operatingCashFlow = yearMonthlySlice.reduce((sum, p) => sum + p.operatingCashFlow, 0);
+        const investingCashFlow = yearMonthlySlice.reduce((sum, p) => sum + p.investingCashFlow, 0);
+        const financingCashFlow = yearMonthlySlice.reduce((sum, p) => sum + p.financingCashFlow, 0);
+        const netCashFlow = yearMonthlySlice.reduce((sum, p) => sum + p.netCashFlow, 0);
+
+        const lastMonth = yearMonthlySlice[yearMonthlySlice.length - 1];
         const closingCash = lastMonth ? lastMonth.closingCash : 0;
         const closingDebt = lastMonth ? lastMonth.closingDebt : 0;
         const closingReceivables = lastMonth ? lastMonth.receivables : 0;
@@ -625,14 +1047,14 @@ export function calculate15YearStatements(
         const fcff = nopat + depreciation - capex + changeInNwc;
 
         // FCFE = NetIncome + Depr - Capex + ChangeInNWC + NetBorrowing
-        const debtRepaidAnnual = slice.reduce((sum, p) => sum + p.debtPrincipalRepaid, 0);
-        const debtDrawdownAnnual = slice.reduce((sum, p) => sum + p.debtDrawdown, 0);
+        const debtRepaidAnnual = yearMonthlySlice.reduce((sum, p) => sum + p.debtPrincipalRepaid, 0);
+        const debtDrawdownAnnual = yearMonthlySlice.reduce((sum, p) => sum + p.debtDrawdown, 0);
         const netBorrowing = debtDrawdownAnnual - debtRepaidAnnual;
-        const fcfe = netIncome + depreciation - capex + changeInNwc + netBorrowing;
+        const fcfe = annualNetIncome + depreciation - capex + changeInNwc + netBorrowing;
 
         // Covenants: DSCR = CFADS / (Principal + Interest) during commercial operations
-        const isCommercialYear = slice.some(p => p.isCommercial);
-        const cfads = Math.max(0, ebitda - cit + changeInNwc);
+        const isCommercialYear = yearMonthlySlice.some(p => p.isCommercial);
+        const cfads = Math.max(0, ebitda - annualCit + changeInNwc);
         const totalDebtService = debtRepaidAnnual + interestExpense;
         const dscr = (isCommercialYear && totalDebtService > 0) ? Math.round((cfads / totalDebtService) * 100) / 100 : null;
         const icr = (isCommercialYear && interestExpense > 0) ? Math.round((ebit / interestExpense) * 100) / 100 : null;
@@ -649,10 +1071,15 @@ export function calculate15YearStatements(
             depreciation,
             ebit,
             interestExpense,
-            ebt,
-            cit,
-            netIncome,
-            netMarginPercent: revenue > 0 ? Math.round((netIncome / revenue) * 10000) / 100 : 0,
+            ebt: ytdEbt,
+            taxLossUsed: annualPriorLossUsed,
+            taxableIncome: annualTaxableIncome,
+            cit: annualCit,
+            netIncome: annualNetIncome,
+            netMarginPercent: revenue > 0 ? Math.round((annualNetIncome / revenue) * 10000) / 100 : 0,
+            taxLossCarryForwardOpening: openingPoolForYear,
+            taxLossExpired: expiredThisYear,
+            taxLossCarryForwardClosing: taxLossEnabled ? taxLossPool.closingBalance(y) : 0,
             capex,
             changeInNwc,
             operatingCashFlow,
@@ -828,7 +1255,8 @@ export function calculateAppraisalMetrics(
         const debtRatio = Number(project.wacc_parameters.target_debt_ratio_percent ?? 60.0) / 100.0;
         const equityRatio = 1.0 - debtRatio;
         const kd = 7.50 / 100.0; // cost of debt
-        const cit = 0.19;
+        const citRatePercent = Number(project.operating_assumptions?.cit_rate_percent ?? 19.0);
+        const cit = citRatePercent / 100.0;
         effectiveWacc = Math.round((equityRatio * ke + debtRatio * (kd * (1.0 - cit) * 100)) * 100) / 100;
     }
 

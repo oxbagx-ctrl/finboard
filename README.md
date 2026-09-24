@@ -683,7 +683,13 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Integracja agregatu domenowego `TaxLossPool` z mechanizmem rocznikowania (vintages) i obsługą trybów rozliczeń: standardowy limit 50% (`STANDARD_LOSS_CAP`), jednorazowe odliczenie do 5 mln zł (`ONE_OFF_5M`) wg art. 7 ust. 5 pkt 2 CIT oraz legacy limit EBT (`EBT_CAP`).
     - Obsługa bezpowrotnego wygasania strat podatkowych po 5 kolejno następujących po sobie latach podatkowych ($T+5$) oraz ewidencja salda otwarcia i wygasłych strat w okresach miesięcznych i rocznych.
     - Rozszerzenie zestawu testów jednostkowych w `IncomeStatementServiceTest.php` weryfikujących pełne odliczenie do 5 mln zł vs standardowe 50%, progresję miesięcznych zaliczek YTD oraz 5-letnie wygasanie strat.
-  - [ ] **Commit 242**: Parzystość matematyczna w silniku Web Worker (financialCalculations.ts).
+  - [x] Parzystość matematyczna w silniku Web Worker (financialCalculations.ts).
+    - Implementacja struktur domenowych `TaxLossVintage` oraz `TaxLossPool` w TypeScript odzwierciedlających logikę backendową (kolejka FIFO, 5-letnie wygaszanie $T+5$, limit standardowy 50%, odliczenie jednorazowe do 5 mln zł wg art. 7 ust. 5 CIT).
+    - Refaktoryzacja silnika symulacji 15-letniej `calculate15YearStatements` z wprowadzeniem rocznej pętli zewnętrznej i podziału na miesięczne zaliczki YTD (Year-To-Date) wg art. 25 ust. 1 ustawy o CIT.
+    - Zapewnienie pełnej tożsamości sumy zaliczek miesięcznych z rocznym CIT ($\sum_{m=1}^{12} monthCit \equiv annualCit$) oraz 100% kompensacji bieżących strat śródrocznych w danym roku obrotowym.
+    - Wzbogacenie modeli `MonthlyStatementPeriod` oraz `AnnualStatementPeriod` o atrybuty tarczy podatkowej (`taxLossCarryForwardOpening`, `taxLossExpired`, `taxLossUsed`, `taxLossCarryForwardClosing`, `taxableIncome`).
+    - Dynamiczna synchronizacja stawki podatkowej w formule tarczy długu WACC z parametrami założeń operacyjnych projektu (`cit_rate_percent`).
+    - Rozszerzenie zestawu testów Vitest w `investmentCalculationWorker.test.js` (8 nowych testów weryfikujących logikę klas podatkowych, porównanie trybów rozliczeń, równość sumy zaliczek YTD oraz wygasanie strat).
   - [ ] **Commit 243**: Interfejs UI fiskalnego panelu CIT i podgląd trajektorii tarczy podatkowej (Tax Loss Roll-Forward).
   - [ ] **Commit 244**: Kompleksowe testy integracyjne, regresja 3-Statement & aktualizacja dokumentacji README.md.
 

@@ -6,7 +6,9 @@ import {
     calculateIrr,
     calculatePaybackPeriod,
     calculateAppraisalMetrics,
-    runSimulation
+    runSimulation,
+    TaxLossVintage,
+    TaxLossPool
 } from '../../workers/financialCalculations';
 import { InvestmentWorkerClient, getInvestmentWorkerClient } from '../../workers/InvestmentWorkerClient';
 
@@ -416,4 +418,225 @@ describe('Financial Calculations Engine & Web Worker (Phase 43 Commit 212)', () 
             expect(resDisabled.summary.totalCapex).toBe(45000000);
         });
     });
+
+    describe('6. TaxLossVintage & TaxLossPool Pure Logic (art. 7 ust. 5 CIT Parity)', () => {
+        it('initializes vintage with statutory 5-year expiration window (T+5)', () => {
+            const vintage = TaxLossVintage.create(1, 1000000);
+
+            expect(vintage.originYear).toBe(1);
+            expect(vintage.expiryYear).toBe(6); // 1 + 5
+            expect(vintage.initialAmount).toBe(1000000);
+            expect(vintage.remainingAmount).toBe(1000000);
+            expect(vintage.settledAmount).toBe(0);
+            expect(vintage.hasUsedOneOffDeduction).toBe(false);
+
+            // In Year 1 (origin year), not available
+            expect(vintage.isAvailable(1)).toBe(false);
+            expect(vintage.isExpired(1)).toBe(false);
+
+            // Available in Years 2 through 6
+            for (let y = 2; y <= 6; y++) {
+                expect(vintage.isAvailable(y)).toBe(true);
+                expect(vintage.isExpired(y)).toBe(false);
+            }
+
+            // In Year 7 (7 > 6), expired permanently
+            expect(vintage.isAvailable(7)).toBe(false);
+            expect(vintage.isExpired(7)).toBe(true);
+        });
+
+        it('limits annual deduction to 50% of initial loss under standard_loss_cap', () => {
+            const vintage = TaxLossVintage.create(1, 1000000);
+
+            // Year 2: max 50% of 1,000,000 = 500,000 PLN
+            const maxDeductibleY2 = vintage.maxDeductibleInYear(2, 'standard_loss_cap', 50.0);
+            expect(maxDeductibleY2).toBe(500000);
+
+            // Settle 400,000 PLN
+            const vAfterY2 = vintage.settle(400000);
+            expect(vAfterY2.remainingAmount).toBe(600000);
+            expect(vAfterY2.settledAmount).toBe(400000);
+
+            // Year 3: max is still 50% of initial loss (500,000), even though 600,000 remains
+            const maxDeductibleY3 = vAfterY2.maxDeductibleInYear(3, 'standard_loss_cap', 50.0);
+            expect(maxDeductibleY3).toBe(500000);
+
+            // Settle 500,000 PLN
+            const vAfterY3 = vAfterY2.settle(500000);
+            expect(vAfterY3.remainingAmount).toBe(100000);
+
+            // Year 4: remaining is 100,000, which is below 500,000 cap
+            const maxDeductibleY4 = vAfterY3.maxDeductibleInYear(4, 'standard_loss_cap', 50.0);
+            expect(maxDeductibleY4).toBe(100000);
+        });
+
+        it('allows one-off deduction up to 5M PLN under one_off_5m mode', () => {
+            // Case A: Loss <= 5M (e.g. 3,500,000 PLN) -> 100% deductible in one year
+            const vintageA = TaxLossVintage.create(1, 3500000);
+            const maxDedA = vintageA.maxDeductibleInYear(2, 'one_off_5m');
+            expect(maxDedA).toBe(3500000);
+
+            // Case B: Loss > 5M (e.g. 8,000,000 PLN) -> max 5,000,000 PLN in one-off year
+            const vintageB = TaxLossVintage.create(1, 8000000);
+            const maxDedB = vintageB.maxDeductibleInYear(2, 'one_off_5m');
+            expect(maxDedB).toBe(5000000);
+
+            // Settle 5M using one-off
+            const vAfterOneOff = vintageB.settle(5000000, true);
+            expect(vAfterOneOff.hasUsedOneOffDeduction).toBe(true);
+            expect(vAfterOneOff.remainingAmount).toBe(3000000);
+
+            // Year 3: subsequent deduction reverts to 50% of initial loss (4,000,000 PLN), bounded by remaining (3,000,000 PLN)
+            const maxDedY3 = vAfterOneOff.maxDeductibleInYear(3, 'one_off_5m');
+            expect(maxDedY3).toBe(3000000);
+        });
+
+        it('performs FIFO settlement across multiple vintages in TaxLossPool', () => {
+            const pool = TaxLossPool.empty()
+                .addLoss(1, 400000)  // Vintage Y1: 50% cap = 200k/yr
+                .addLoss(2, 600000); // Vintage Y2: 50% cap = 300k/yr
+
+            expect(pool.openingBalance(3)).toBe(1000000);
+
+            // In Year 3, 500,000 PLN profit generated
+            const outcome = pool.settle(3, 500000, 'standard_loss_cap');
+            const { result, pool: updatedPool } = outcome;
+
+            // FIFO: Y1 contributes 200k (50% cap), Y2 contributes 300k (50% cap) -> total = 500k
+            expect(result.lossDeducted).toBe(500000);
+            expect(result.taxableIncomeAfterDeduction).toBe(0);
+            expect(result.lossExpired).toBe(0);
+            expect(result.settlementDetails.length).toBe(2);
+            expect(result.settlementDetails[0].vintage_year).toBe(1);
+            expect(result.settlementDetails[0].deducted).toBe(200000);
+            expect(result.settlementDetails[1].vintage_year).toBe(2);
+            expect(result.settlementDetails[1].deducted).toBe(300000);
+
+            // Closing pool: 200k remaining in Y1 + 300k remaining in Y2 = 500k
+            expect(updatedPool.closingBalance(3)).toBe(500000);
+        });
+
+        it('purges unutilized tax losses upon 5-year expiration in Year 7 (T+5)', () => {
+            let pool = TaxLossPool.empty().addLoss(1, 1000000);
+
+            // Year 2: deduct 300,000 PLN
+            const y2 = pool.settle(2, 300000);
+            pool = y2.pool;
+            expect(pool.closingBalance(2)).toBe(700000);
+
+            // Years 3, 4, 5, 6: No profit
+            for (let y = 3; y <= 6; y++) {
+                const yOutcome = pool.settle(y, 0);
+                pool = yOutcome.pool;
+                expect(yOutcome.result.lossExpired).toBe(0);
+                expect(pool.closingBalance(y)).toBe(700000);
+            }
+
+            // In Year 7 (currentYear 7 > expiryYear 6):
+            // The remaining 700,000 PLN must expire permanently!
+            const y7 = pool.settle(7, 500000);
+            expect(y7.result.lossExpired).toBe(700000);
+            expect(y7.result.lossDeducted).toBe(0); // Expired loss cannot be deducted
+            expect(y7.result.taxableIncomeAfterDeduction).toBe(500000);
+            expect(y7.pool.closingBalance(7)).toBe(0);
+        });
+    });
+
+    describe('7. Web Worker CIT & Tax Loss Parity (Phase 49 Commit 242)', () => {
+        it('compares standard_loss_cap vs one_off_5m settlement in 15-year 3-statement simulation', () => {
+            const assumptionsStandard = {
+                ...mockProject.operating_assumptions,
+                tax_loss_carry_forward_enabled: true,
+                tax_loss_settlement_mode: 'standard_loss_cap',
+                tax_loss_offset_cap_percent: 50.0
+            };
+
+            const assumptionsOneOff = {
+                ...mockProject.operating_assumptions,
+                tax_loss_carry_forward_enabled: true,
+                tax_loss_settlement_mode: 'one_off_5m',
+                tax_loss_offset_cap_percent: 50.0,
+                tax_loss_one_off_cap_amount: 5000000.0
+            };
+
+            const statementsStd = calculate15YearStatements(mockProject, assumptionsStandard);
+            const statementsOneOff = calculate15YearStatements(mockProject, assumptionsOneOff);
+
+            // In Year 1, project has negative EBT (construction interest/fees)
+            expect(statementsStd.annualPeriods[0].ebt).toBeLessThan(0);
+            expect(statementsStd.annualPeriods[0].cit).toBe(0);
+            expect(statementsOneOff.annualPeriods[0].cit).toBe(0);
+
+            const year1Loss = Math.abs(statementsStd.annualPeriods[0].ebt);
+            expect(year1Loss).toBeGreaterThan(0);
+
+            // Year 2 has substantial operational profit
+            // Under one_off_5m, the project can offset up to 5M PLN (or 100% of loss if <= 5M)
+            // Under standard_loss_cap, it is capped at 50% of Year 1 loss
+            expect(statementsOneOff.annualPeriods[1].taxLossUsed).toBeGreaterThanOrEqual(
+                statementsStd.annualPeriods[1].taxLossUsed
+            );
+
+            // Consequently, CIT paid in Year 2 is less than or equal under one_off_5m
+            expect(statementsOneOff.annualPeriods[1].cit).toBeLessThanOrEqual(
+                statementsStd.annualPeriods[1].cit
+            );
+        });
+
+        it('verifies monthly YTD CIT advances sum exactly to annual CIT (art. 25 ust. 1 CIT)', () => {
+            const statements = calculate15YearStatements(mockProject, {
+                ...mockProject.operating_assumptions,
+                tax_loss_settlement_mode: 'one_off_5m'
+            });
+
+            const { monthlyPeriods, annualPeriods } = statements;
+
+            for (let y = 1; y <= 15; y++) {
+                const yearMonths = monthlyPeriods.filter(m => m.year === y);
+                expect(yearMonths.length).toBe(12);
+
+                const sumMonthlyCit = yearMonths.reduce((sum, m) => sum + m.cit, 0);
+                const sumMonthlyNetIncome = yearMonths.reduce((sum, m) => sum + m.netIncome, 0);
+                const sumMonthlyEbt = yearMonths.reduce((sum, m) => sum + m.ebt, 0);
+
+                const annualP = annualPeriods[y - 1];
+
+                // Check non-negative monthly advances
+                yearMonths.forEach(m => {
+                    expect(m.cit).toBeGreaterThanOrEqual(0);
+                });
+
+                // Perfect sum equality between monthly advances and annual statement
+                expect(sumMonthlyCit).toBeCloseTo(annualP.cit, 2);
+                expect(sumMonthlyEbt).toBeCloseTo(annualP.ebt, 2);
+                expect(sumMonthlyNetIncome).toBeCloseTo(annualP.netIncome, 2);
+            }
+        });
+
+        it('includes taxLossCarryForwardOpening, taxLossExpired, taxLossUsed, and taxLossCarryForwardClosing metadata', () => {
+            const statements = calculate15YearStatements(mockProject, {
+                ...mockProject.operating_assumptions,
+                tax_loss_settlement_mode: 'standard_loss_cap'
+            });
+
+            // Check metadata fields exist on annual periods
+            statements.annualPeriods.forEach(p => {
+                expect(p.taxLossCarryForwardOpening).toBeDefined();
+                expect(p.taxLossExpired).toBeDefined();
+                expect(p.taxLossUsed).toBeDefined();
+                expect(p.taxLossCarryForwardClosing).toBeDefined();
+                expect(p.taxableIncome).toBeDefined();
+            });
+
+            // Check metadata fields exist on monthly periods
+            statements.monthlyPeriods.forEach(m => {
+                expect(m.taxLossCarryForwardOpening).toBeDefined();
+                expect(m.taxLossExpired).toBeDefined();
+                expect(m.taxLossUsed).toBeDefined();
+                expect(m.taxLossCarryForwardClosing).toBeDefined();
+                expect(m.taxableIncome).toBeDefined();
+            });
+        });
+    });
+
 });

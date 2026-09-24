@@ -90,6 +90,8 @@ export interface OperatingAssumptionsInput {
     cit_rate_percent?: number | string;
     tax_loss_carry_forward_enabled?: boolean;
     tax_loss_offset_cap_percent?: number | string;
+    tax_loss_settlement_mode?: 'standard_loss_cap' | 'one_off_5m' | 'ebt_cap' | string;
+    tax_loss_one_off_cap_amount?: number | string;
     dso?: number | string;
     dpo?: number | string;
     dio?: number | string;
@@ -150,8 +152,13 @@ export interface MonthlyStatementPeriod {
     ebit: number;
     interestExpense: number;
     ebt: number;
+    taxLossUsed?: number;
+    taxableIncome?: number;
     cit: number;
     netIncome: number;
+    taxLossCarryForwardOpening?: number;
+    taxLossExpired?: number;
+    taxLossCarryForwardClosing?: number;
     capex: number;
     debtDrawdown: number;
     debtPrincipalRepaid: number;
@@ -183,9 +190,14 @@ export interface AnnualStatementPeriod {
     ebit: number;
     interestExpense: number;
     ebt: number;
+    taxLossUsed?: number;
+    taxableIncome?: number;
     cit: number;
     netIncome: number;
     netMarginPercent: number;
+    taxLossCarryForwardOpening?: number;
+    taxLossExpired?: number;
+    taxLossCarryForwardClosing?: number;
     capex: number;
     changeInNwc: number;
     operatingCashFlow: number;
