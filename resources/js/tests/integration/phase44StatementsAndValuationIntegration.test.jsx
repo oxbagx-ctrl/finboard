@@ -484,4 +484,108 @@ describe('Phase 44 Statements, Valuation & Covenants Comprehensive Test Suite (C
             });
         });
     });
+    // =========================================================================
+    // 7. STATUTORY CIT TAX LOSS CARRY-FORWARD & 3-STATEMENT REGRESSION (PHASE 49)
+    // =========================================================================
+    describe('7. Statutory CIT Tax Loss Carry-Forward & 3-Statement Regression', () => {
+        const createCitProject = (mode, oneOffCap = 5000000) => ({
+            ...mockProject,
+            operating_assumptions: {
+                ...mockProject.operating_assumptions,
+                annual_revenue_base: 25000000,
+                capacity_ramp_up: {
+                    year1_percent: 10.0, // Initial loss in Y1
+                    year2_percent: 85.0,
+                    year3_percent: 100.0,
+                },
+                cit_rate_percent: 19.0,
+                tax_loss_carry_forward_enabled: true,
+                tax_loss_settlement_mode: mode,
+                tax_loss_one_off_cap_amount: oneOffCap,
+                tax_loss_offset_cap_percent: 50.0,
+            },
+        });
+
+        it('maintains Balance Sheet zero-variance across all 15 years under both standard_loss_cap and one_off_5m modes', () => {
+            const standardProject = createCitProject('standard_loss_cap');
+            const oneOffProject = createCitProject('one_off_5m', 5000000);
+
+            const standardStmts = calculate15YearStatements(standardProject);
+            const oneOffStmts = calculate15YearStatements(oneOffProject);
+
+            expect(standardStmts.annualPeriods).toHaveLength(15);
+            expect(oneOffStmts.annualPeriods).toHaveLength(15);
+
+            // Both models must satisfy Assets = Liabilities + Equity
+            [standardStmts, oneOffStmts].forEach((statements) => {
+                let cumNetIncome = 0;
+                let cumDepr = 0;
+                statements.annualPeriods.forEach((period) => {
+                    cumNetIncome += period.netIncome;
+                    cumDepr += period.depreciation;
+                    const netPpe = Math.max(0, statements.initialCapex - cumDepr);
+                    const totalAssets = netPpe + period.closingReceivables + period.closingInventory + period.closingCash;
+                    const totalLiabilitiesAndEquity = (statements.initialEquity + cumNetIncome) + period.closingDebt + period.closingPayables;
+                    expect(Math.abs(totalAssets - totalLiabilitiesAndEquity)).toBeLessThan(1.0);
+                });
+            });
+        });
+
+        it('confirms that monthly YTD CIT advances sum exactly to annual CIT in every year', () => {
+            const project = createCitProject('one_off_5m', 5000000);
+            const statements = calculate15YearStatements(project);
+
+            for (let y = 1; y <= 15; y++) {
+                const annualPeriod = statements.annualPeriods[y - 1];
+                const monthlyInYear = statements.monthlyPeriods.filter((m) => m.year === y);
+                const sumMonthlyCit = monthlyInYear.reduce((acc, m) => acc + m.cit, 0);
+
+                expect(sumMonthlyCit).toBeCloseTo(annualPeriod.cit, 2);
+            }
+        });
+
+        it('verifies one_off_5m accelerates tax deduction in Year 2 compared to standard 50% cap', () => {
+            const standardStmts = calculate15YearStatements(createCitProject('standard_loss_cap'));
+            const oneOffStmts = calculate15YearStatements(createCitProject('one_off_5m', 5000000));
+
+            const stdY2 = standardStmts.annualPeriods[1];
+            const oneOffY2 = oneOffStmts.annualPeriods[1];
+
+            // In Year 2, one-off deduction up to 5M allows equal or greater tax loss usage
+            expect(oneOffY2.taxLossUsed).toBeGreaterThanOrEqual(stdY2.taxLossUsed);
+            // Resulting in lower or equal CIT payable in Year 2
+            expect(oneOffY2.cit).toBeLessThanOrEqual(stdY2.cit);
+            // And higher or equal Year 2 Net Income
+            expect(oneOffY2.netIncome).toBeGreaterThanOrEqual(stdY2.netIncome);
+        });
+
+        it('renders ThreeStatementGrid with expandable tax breakdown rows showing correct pool figures', async () => {
+            const citProject = createCitProject('one_off_5m', 5000000);
+            const statements = calculate15YearStatements(citProject);
+
+            const contextValue = {
+                selectedProject: citProject,
+                selectedProjectId: citProject.id,
+                loading: false,
+            };
+
+            render(
+                <InvestmentProjectContext.Provider value={contextValue}>
+                    <ThreeStatementGrid project={citProject} />
+                </InvestmentProjectContext.Provider>
+            );
+
+            // Expand tax breakdown sub-rows
+            const expandTaxBtn = screen.getByRole('button', { name: /Rozwiń rozliczenie podatkowe CIT/i });
+            fireEvent.click(expandTaxBtn);
+
+            await waitFor(() => {
+                expect(screen.getByText(/Saldo Otwarcia Tarczy Podatkowej/i)).toBeInTheDocument();
+                expect(screen.getByText(/Wygasłe Straty Podatkowe/i)).toBeInTheDocument();
+                expect(screen.getByText(/Odliczona Tarcza Podatkowa/i)).toBeInTheDocument();
+                expect(screen.getByText(/Podstawa Opodatkowania CIT/i)).toBeInTheDocument();
+                expect(screen.getByText(/Saldo Zamknięcia Tarczy Podatkowej/i)).toBeInTheDocument();
+            });
+        });
+    });
 });

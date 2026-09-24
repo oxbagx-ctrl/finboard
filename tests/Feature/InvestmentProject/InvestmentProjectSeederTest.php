@@ -14,7 +14,7 @@ use App\Models\InvestmentProject;
 use Database\Seeders\DatabaseSeeder;
 use Database\Seeders\IdentitySeeder;
 use Database\Seeders\InvestmentProjectSeeder;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
 /**
@@ -22,12 +22,15 @@ use Tests\TestCase;
  */
 final class InvestmentProjectSeederTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function test_investment_project_seeder_populates_acme_manufacturing_demo_project(): void
     {
         // 1. Run prerequisite IdentitySeeder
         $this->seed(IdentitySeeder::class);
+
+        // Ensure clean state before running seeder
+        InvestmentProject::where('id', InvestmentProjectSeeder::DEMO_PROJECT_ID)->delete();
 
         // 2. Run InvestmentProjectSeeder
         $this->seed(InvestmentProjectSeeder::class);

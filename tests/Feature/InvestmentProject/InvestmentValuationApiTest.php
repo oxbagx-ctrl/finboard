@@ -606,4 +606,57 @@ final class InvestmentValuationApiTest extends TestCase
 
         return $response->json('data.id');
     }
+    public function test_tax_loss_settlement_mode_and_statements_tax_breakdown_integration(): void
+    {
+        Sanctum::actingAs($this->clientA);
+        $projectId = $this->createStandardProject('Projekt z Fiskalnym Rozliczeniem CIT');
+
+        // 1. Update operating assumptions with statutory one-off 5M tax loss mode
+        $updateResponse = $this->putJson("/api/v1/investment-projects/{$projectId}", [
+            'operating_assumptions' => [
+                'annual_revenue_base' => 15000000.0,
+                'revenue_growth_rate_percent' => 3.0,
+                'variable_cost_percent' => 35.0,
+                'annual_fixed_costs_base' => 800000.0,
+                'fixed_cost_growth_rate_percent' => 2.5,
+                'annual_payroll_base' => 1500000.0,
+                'payroll_growth_rate_percent' => 3.0,
+                'dso' => 30,
+                'dpo' => 30,
+                'dio' => 15,
+                'cit_rate_percent' => 19.0,
+                'tax_loss_carry_forward_enabled' => true,
+                'tax_loss_settlement_mode' => 'one_off_5m',
+                'tax_loss_one_off_cap_amount' => 5000000.0,
+                'tax_loss_offset_cap_percent' => 50.0,
+            ],
+        ]);
+
+        $updateResponse->assertStatus(200);
+        $updateResponse->assertJsonPath('data.operating_assumptions.tax_loss_settlement_mode', 'one_off_5m');
+        $updateResponse->assertJsonPath('data.operating_assumptions.tax_loss_one_off_cap_amount', 5000000);
+        $updateResponse->assertJsonPath('data.operating_assumptions.tax_loss_carry_forward_enabled', true);
+
+        // 2. Fetch Three-Statement endpoint and verify tax loss breakdown in Income Statement
+        $statementResponse = $this->getJson("/api/v1/investment-projects/{$projectId}/statements/three-statement");
+        $statementResponse->assertStatus(200);
+
+        // Annual statements must contain all statutory CIT breakdown fields (keyed by year 1..15)
+        $annualStmt1 = $statementResponse->json('data.income_statement.annual_statements.1');
+        $this->assertNotNull($annualStmt1);
+        $this->assertArrayHasKey('tax_loss_carry_forward_opening', $annualStmt1);
+        $this->assertArrayHasKey('tax_loss_expired', $annualStmt1);
+        $this->assertArrayHasKey('tax_loss_used', $annualStmt1);
+        $this->assertArrayHasKey('taxable_income', $annualStmt1);
+        $this->assertArrayHasKey('income_tax', $annualStmt1);
+        $this->assertArrayHasKey('tax_loss_carry_forward_closing', $annualStmt1);
+
+        $annualStmt2 = $statementResponse->json('data.income_statement.annual_statements.2');
+        $this->assertNotNull($annualStmt2);
+        $this->assertArrayHasKey('tax_loss_carry_forward_opening', $annualStmt2);
+        $this->assertArrayHasKey('tax_loss_used', $annualStmt2);
+
+        // Verify monthly periods count is 180 (15 years * 12 months)
+        $this->assertEquals(180, $statementResponse->json('data.income_statement.monthly_periods_count'));
+    }
 }

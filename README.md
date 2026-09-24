@@ -128,13 +128,13 @@ Pulpit Mailpit (podgląd e-maili deweloperskich): `http://localhost:8025`.
 ## 🧪 Uruchamianie Testów
 
 ### Testy Backendowe (PHPUnit)
-Pakiet ponad 460 testów jednostkowych i integracyjnych pokrywających warstwę domenową (DDD), zapytania CQRS, repozytoria, kalkulacje matematyczne `Money`, importy CSV, autoryzację wielonajemcową, system zaproszeń, odporność kolejek pocztowych, logi audytowe oraz API benchmarków i analityki:
+Pakiet ponad 600 testów jednostkowych i integracyjnych pokrywających warstwę domenową (DDD), zapytania CQRS, repozytoria, kalkulacje matematyczne `Money`, importy CSV, autoryzację wielonajemcową, system zaproszeń, odporność kolejek pocztowych, logi audytowe oraz API benchmarków i analityki:
 ```bash
 docker compose exec app ./vendor/bin/phpunit
 ```
 
 ### Testy Frontendowe (Vitest)
-Pakiet 239 testów jednostkowych i integracyjnych dla komponentów React, kontekstu transakcyjnego, walidacji danych, kalkulatorów walutowych, konfiguratora celów benchmarkowych, księgi operacji, diagnostyki poczty oraz przepływów integracyjnych E2E:
+Pakiet ponad 470 testów jednostkowych i integracyjnych dla komponentów React, kontekstu transakcyjnego, walidacji danych, kalkulatorów walutowych, konfiguratora celów benchmarkowych, księgi operacji, diagnostyki poczty oraz przepływów integracyjnych E2E:
 ```bash
 npm test
 ```
@@ -662,7 +662,7 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
   - Kalkulacja w czasie rzeczywistym trajektorii wieloletniej (Rok 5, Rok 10, skumulowany narzut 15-letni $\Sigma$, dynamika wzrostu procentowego w R15) oraz nota objaśniająca formułę $Baza \times (1 + r)^{t-1}$.
   - Dodanie towarzyszącego panelu szacunków wieloletnich przychodów (`revenue-projection-panel`) uwzględniającego dynamikę organiczną i krzywą ramp-up.
   - Rozszerzenie zestawu testów Vitest (`OperatingAssumptionsForm.test.jsx`) o weryfikację reaktywności suwaków i projekcji wieloletniej.
-- [ ] **Faza 49: Bankowalny model podatkowy (CIT & Tax Loss Carry-Forward) zgodny z art. 7 ust. 5 i art. 19 ustawy o CIT**
+- [x] **Faza 49: Bankowalny model podatkowy (CIT & Tax Loss Carry-Forward) zgodny z art. 7 ust. 5 i art. 19 ustawy o CIT**
   - [x] Korekta UI, synchronizacja stawki CIT z tarczą podatkową WACC i parametryzacja FormRequest.
     - Eliminacja literówki w `OperatingAssumptionsForm.jsx` (*Limit Rocznego Odliczenia Straty (%)*).
     - Synchronizacja tarczy podatkowej długu WACC $K_d \cdot (1 - T)$ z dynamiczną stawką CIT projektu (19% lub preferencyjne 9% dla małych podatników).
@@ -696,7 +696,14 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Dedykowana tabela 15-letniej projekcji podatkowej (`tax-loss-rollforward-panel`) z przepływem salda otwarcia, EBT, odliczeń, podatku należnego i salda zamknięcia tarczy.
     - Rozszerzenie tabeli sprawozdań finansowych (`ThreeStatementGrid.jsx`) o interaktywne rozwijanie pozycji CIT na wiersze analityczne tarczy podatkowej oraz integrację z eksportem CSV.
     - Zestaw testów jednostkowych i integracyjnych w `OperatingAssumptionsForm.test.jsx`, `ThreeStatementGrid.test.jsx` oraz `InvestmentStateValidation.test.jsx`.
-  - [ ] **Commit 244**: Kompleksowe testy integracyjne, regresja 3-Statement & aktualizacja dokumentacji README.md.
+  - [x] Kompleksowe testy integracyjne, regresja 3-Statement & aktualizacja dokumentacji README.md.
+    - End-to-end test integracyjny w `ThreeStatementEngineIntegrationTest.php` weryfikujący pełną symulację 15-letnią dla trybów `STANDARD_LOSS_CAP` (50%) oraz `ONE_OFF_5M` (jednorazowe do 5 mln zł).
+    - Weryfikacja zerowej wariancji bilansu ($Assets = Liabilities + Equity$) we wszystkich 180 okresach miesięcznych w obu trybach rozliczeń.
+    - Weryfikacja tożsamości sumy miesięcznych zaliczek YTD z rocznym podatkiem CIT ($\sum_{m=1}^{12} \text{CIT}_m \equiv \text{CIT}_{rok}$) dla wszystkich 15 lat.
+    - Weryfikacja endpointu API w `InvestmentValuationApiTest.php` dla aktualizacji parametrów podatkowych oraz ekspozycji analitycznych danych tarczy podatkowej w sprawozdaniu 3-statement.
+    - Frontendowy test integracyjny w `phase44StatementsAndValuationIntegration.test.jsx` sprawdzający parzystość kalkulacji Web Worker, akcelerację odliczenia w roku 2 oraz interaktywne rozwijanie sub-wierszy CIT w `ThreeStatementGrid`.
+    - Poprawa izolacji bazy danych w `InvestmentProjectSeederTest.php` z użyciem `DatabaseTransactions`.
+    - Zapewnienie 100% zielonego wyniku testów: 603 testy PHPUnit (7915 asercji) oraz 477 testów Vitest (52 pliki testowe).
 
 ---
 

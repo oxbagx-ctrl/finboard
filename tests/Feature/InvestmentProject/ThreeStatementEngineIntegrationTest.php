@@ -28,6 +28,7 @@ use App\Contexts\InvestmentProject\Domain\ValueObjects\KstClassification;
 use App\Contexts\InvestmentProject\Domain\ValueObjects\LiquidityAlert;
 use App\Contexts\InvestmentProject\Domain\ValueObjects\LoanTenor;
 use App\Contexts\InvestmentProject\Domain\ValueObjects\OperatingAssumptions;
+use App\Contexts\InvestmentProject\Domain\ValueObjects\TaxLossSettlementMode;
 use App\Contexts\InvestmentProject\Domain\ValueObjects\WorkingCapitalDays;
 use App\Models\Company;
 use DateTimeImmutable;
@@ -409,5 +410,146 @@ final class ThreeStatementEngineIntegrationTest extends TestCase
 
         $this->assertNull($this->repository->findById($project->projectId(), $otherCompany->id));
         $this->assertNotNull($this->repository->findById($project->projectId(), $this->company->id));
+    }
+    public function test_end_to_end_statutory_cit_tax_loss_carry_forward_and_one_off_mode_parity(): void
+    {
+        $startDate = new DateTimeImmutable('2026-01-01');
+
+        $stage = CapexStage::create(
+            CapexStageId::generate(),
+            'Infrastruktura Przemysłowa',
+            Money::fromDecimal('8000000.0000', Currency::PLN),
+            $startDate,
+            6,
+            KstClassification::fromCode('KST_4')
+        );
+
+        $project = InvestmentProject::create(
+            InvestmentProjectId::generate(),
+            $this->company->id,
+            'Projekt Fotowoltaiczny & BESS',
+            'Opis',
+            $startDate,
+            FinancingStructure::create(Money::fromDecimal('4000000.0000', Currency::PLN)),
+            DebtFacility::create(
+                DebtFacilityId::generate(),
+                'Kredyt Inwestycyjny',
+                Money::fromDecimal('4000000.0000', Currency::PLN),
+                InterestMargin::fromPercentage(2.0),
+                6.0,
+                LoanTenor::fromMonths(60, 6),
+                AmortizationType::LINEAR,
+                1.0
+            )
+        );
+        $project->addCapexStage($stage);
+        $this->repository->save($project);
+
+        // Standard 50% cap assumptions (art. 7 ust. 5 pkt 1 CIT)
+        $standardAssumptions = new OperatingAssumptions(
+            annualRevenueBase: Money::fromDecimal('10000000.0000', Currency::PLN),
+            revenueGrowthRatePercent: 3.0,
+            variableCostPercent: 30.0,
+            annualFixedCostsBase: Money::fromDecimal('800000.0000', Currency::PLN),
+            fixedCostGrowthRatePercent: 2.0,
+            annualPayrollBase: Money::fromDecimal('1000000.0000', Currency::PLN),
+            payrollGrowthRatePercent: 3.0,
+            capacityRampUp: [1 => 10.0, 2 => 90.0, 3 => 100.0],
+            citRatePercent: 19.0,
+            taxLossCarryForwardEnabled: true,
+            taxLossSettlementMode: TaxLossSettlementMode::STANDARD_LOSS_CAP,
+            taxLossOffsetCapPercent: 50.0
+        );
+
+        // One-off 5M cap assumptions (art. 7 ust. 5 pkt 2 CIT)
+        $oneOffAssumptions = new OperatingAssumptions(
+            annualRevenueBase: Money::fromDecimal('10000000.0000', Currency::PLN),
+            revenueGrowthRatePercent: 3.0,
+            variableCostPercent: 30.0,
+            annualFixedCostsBase: Money::fromDecimal('800000.0000', Currency::PLN),
+            fixedCostGrowthRatePercent: 2.0,
+            annualPayrollBase: Money::fromDecimal('1000000.0000', Currency::PLN),
+            payrollGrowthRatePercent: 3.0,
+            capacityRampUp: [1 => 10.0, 2 => 90.0, 3 => 100.0],
+            citRatePercent: 19.0,
+            taxLossCarryForwardEnabled: true,
+            taxLossSettlementMode: TaxLossSettlementMode::ONE_OFF_5M,
+            taxLossOneOffCapAmount: Money::fromDecimal('5000000.0000', Currency::PLN)
+        );
+
+        // Generate statements for both modes
+        $pnlStandard = $this->incomeStatementService->generateStatement($project, $standardAssumptions, horizonYears: 15);
+        $cfStandard = $this->cashFlowService->generateStatement($project, $standardAssumptions, horizonYears: 15);
+        $bsStandard = $this->balanceSheetService->generateStatement($project, $standardAssumptions, 15, $cfStandard, $pnlStandard);
+
+        $pnlOneOff = $this->incomeStatementService->generateStatement($project, $oneOffAssumptions, horizonYears: 15);
+        $cfOneOff = $this->cashFlowService->generateStatement($project, $oneOffAssumptions, horizonYears: 15);
+        $bsOneOff = $this->balanceSheetService->generateStatement($project, $oneOffAssumptions, 15, $cfOneOff, $pnlOneOff);
+
+        // 1. Both Balance Sheets must balance with ZERO variance across all 180 months
+        $this->assertTrue($bsStandard->isBalancedOverHorizon(), 'Standard mode balance sheet must be balanced over 180 months.');
+        $this->assertTrue($bsOneOff->isBalancedOverHorizon(), 'One-off mode balance sheet must be balanced over 180 months.');
+
+        // 2. Both modes must have monthly YTD advance sum strictly equal to annual CIT
+        for ($y = 1; $y <= 15; $y++) {
+            $annualStd = $pnlStandard->annualStatement($y);
+            $annualOne = $pnlOneOff->annualStatement($y);
+
+            $monthlyStdCitSum = 0.0;
+            $monthlyOneCitSum = 0.0;
+            for ($m = 1; $m <= 12; $m++) {
+                $monthIdx = ($y - 1) * 12 + $m;
+                $monthlyStdCitSum += (float) $pnlStandard->monthlyPeriod($monthIdx)->incomeTax()->amount();
+                $monthlyOneCitSum += (float) $pnlOneOff->monthlyPeriod($monthIdx)->incomeTax()->amount();
+            }
+
+            $this->assertEqualsWithDelta((float) $annualStd->incomeTax()->amount(), $monthlyStdCitSum, 0.01, "Year {$y} standard CIT mismatch");
+            $this->assertEqualsWithDelta((float) $annualOne->incomeTax()->amount(), $monthlyOneCitSum, 0.01, "Year {$y} one-off CIT mismatch");
+        }
+
+        // 3. In Year 1 (low ramp up 10%), project incurs a loss, creating a tax loss pool
+        $pnlStdY1 = $pnlStandard->annualStatement(1);
+        $this->assertTrue($pnlStdY1->ebt()->isNegative(), 'Year 1 EBT must be negative due to low capacity ramp up.');
+        $this->assertEquals('0.0000', $pnlStdY1->incomeTax()->amount(), 'Year 1 CIT must be 0 PLN due to loss.');
+
+        // 4. In Year 2 (ramp up 90%), Year 1 loss is carried forward
+        $pnlStdY2 = $pnlStandard->annualStatement(2);
+        $pnlOneY2 = $pnlOneOff->annualStatement(2);
+
+        $this->assertTrue($pnlStdY2->taxLossUsed()->isPositive(), 'Standard mode must use tax loss in Year 2.');
+        $this->assertTrue($pnlOneY2->taxLossUsed()->isPositive(), 'One-off mode must use tax loss in Year 2.');
+
+        // In One-Off 5M mode, up to 100% of loss (within 5M) can be deducted in Year 2,
+        // so taxLossUsed in Year 2 is higher than or equal to standard mode (50% cap)
+        $this->assertGreaterThanOrEqual(
+            (float) $pnlStdY2->taxLossUsed()->amount(),
+            (float) $pnlOneY2->taxLossUsed()->amount()
+        );
+
+        // Consequently, One-Off mode has equal or lower CIT in Year 2
+        $this->assertLessThanOrEqual(
+            (float) $pnlStdY2->incomeTax()->amount(),
+            (float) $pnlOneY2->incomeTax()->amount()
+        );
+
+        // And higher or equal Year 2 Net Income
+        $this->assertGreaterThanOrEqual(
+            (float) $pnlStdY2->netIncome()->amount(),
+            (float) $pnlOneY2->netIncome()->amount()
+        );
+
+        // 5. Cross-statement reconciliation for both modes
+        for ($m = 1; $m <= 180; $m++) {
+            $this->assertEquals(
+                $cfStandard->monthlyPeriod($m)->closingCashBalance()->amount(),
+                $bsStandard->monthlyPeriod($m)->cashAndEquivalents()->amount(),
+                "Standard Month {$m} Cash mismatch"
+            );
+            $this->assertEquals(
+                $cfOneOff->monthlyPeriod($m)->closingCashBalance()->amount(),
+                $bsOneOff->monthlyPeriod($m)->cashAndEquivalents()->amount(),
+                "OneOff Month {$m} Cash mismatch"
+            );
+        }
     }
 }
