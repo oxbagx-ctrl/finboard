@@ -33,12 +33,27 @@ export interface DebtFacilityInput {
     repayment_type?: 'annuity' | 'linear' | 'bullet';
 }
 
+export interface GrantTrancheInput {
+    tranche_number?: number;
+    milestone?: string;
+    amount: number | string;
+    disbursement_date?: string;
+    date?: string;
+    month?: number;
+    period?: number;
+    status?: string;
+}
+
 export interface FinancingStructureInput {
     investor1_equity?: number | string;
     investor2_equity?: number | string;
+    equity_contribution?: number | string;
+    bank_loan_amount?: number | string;
     debt_facility_amount?: number | string;
     vat_bridge_loan_amount?: number | string;
+    vat_bridge_loan?: number | string;
     grant_amount?: number | string;
+    grant_disbursement_schedule?: GrantTrancheInput[];
     currency?: string;
 }
 
@@ -200,6 +215,7 @@ export interface AnnualStatementPeriod {
     taxLossCarryForwardClosing?: number;
     capex: number;
     changeInNwc: number;
+    grantReceived?: number;
     operatingCashFlow: number;
     investingCashFlow: number;
     financingCashFlow: number;

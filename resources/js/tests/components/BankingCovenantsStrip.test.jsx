@@ -288,4 +288,55 @@ describe('BankingCovenantsStrip Component (Phase 44 Commit 220)', () => {
             expect(screen.getAllByText(/tys\. PLN/i).length).toBeGreaterThan(0);
         });
     });
+    it("renders dynamic CR and DSRF status badges and styling based on covenant thresholds", async () => {
+        // High-performing project where CR >= 1.10 and DSRF >= 6
+        const safeProject = {
+            ...mockProject,
+            debt_facility: {
+                ...mockProject.debt_facility,
+                principal_amount: 2000000,
+            },
+            financing_structure: {
+                investor1_equity: 40000000,
+                debt_facility_amount: 2000000,
+            },
+            operating_assumptions: {
+                ...mockProject.operating_assumptions,
+                annual_revenue_base: 40000000,
+            }
+        };
+
+        renderWithContext(safeProject);
+
+        await waitFor(() => {
+            expect(screen.getAllByText("ZGODNY").length).toBeGreaterThanOrEqual(1);
+            expect(screen.getByText("ZABEZPIECZONE")).toBeInTheDocument();
+        });
+    });
+
+    it("protects against negative ratios by displaying guardrail labels (0.00x Deficyt NWC / 0.0 m. Luka gotowkowa)", async () => {
+        // Project with heavy debt and severe deficit
+        const deficitProject = {
+            ...mockProject,
+            debt_facility: {
+                ...mockProject.debt_facility,
+                principal_amount: 80000000,
+            },
+            financing_structure: {
+                investor1_equity: 1000,
+                debt_facility_amount: 80000000,
+            },
+            operating_assumptions: {
+                ...mockProject.operating_assumptions,
+                annual_revenue_base: 1000000,
+            }
+        };
+
+        renderWithContext(deficitProject);
+
+        await waitFor(() => {
+            expect(screen.getByText(/DEFICYT PŁYNNOŚCI/i)).toBeInTheDocument();
+            expect(screen.getByText(/BRAK REZERWY/i)).toBeInTheDocument();
+        });
+    });
 });

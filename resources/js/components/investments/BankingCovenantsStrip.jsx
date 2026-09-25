@@ -415,7 +415,11 @@ export function BankingCovenantsStrip({
                 </div>
 
                 {/* 3. Current Ratio Tile */}
-                <div className="p-3 rounded-lg border bg-zinc-950/70 border-zinc-800 flex flex-col justify-between">
+                <div className={`p-3 rounded-lg border flex flex-col justify-between ${
+                    summary?.minCurrentRatio != null && summary.minCurrentRatio >= thresholds.minCurrentRatio
+                        ? 'bg-zinc-950/70 border-zinc-800'
+                        : 'bg-rose-950/20 border-rose-800/40'
+                }`}>
                     <div className="flex items-center justify-between">
                         <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
                             PŁYNNOŚĆ BIEŻĄCA (CR)
@@ -426,17 +430,41 @@ export function BankingCovenantsStrip({
                     </div>
                     <div className="my-1.5">
                         <div className="flex items-baseline gap-1.5">
-                            <span className="text-xl font-bold font-mono tabular-nums text-zinc-100">
-                                {summary?.minCurrentRatio != null ? `${summary.minCurrentRatio.toFixed(2)}x` : '—'}
+                            <span className={`text-xl font-bold font-mono tabular-nums ${
+                                summary?.minCurrentRatio != null
+                                    ? summary.minCurrentRatio >= thresholds.minCurrentRatio
+                                        ? 'text-zinc-100'
+                                        : 'text-rose-400'
+                                    : 'text-zinc-100'
+                            }`}>
+                                {summary?.minCurrentRatio != null
+                                    ? summary.minCurrentRatio < 0
+                                        ? '0.00x'
+                                        : `${summary.minCurrentRatio.toFixed(2)}x`
+                                    : '—'}
                             </span>
                             <span className="text-[11px] text-zinc-400 font-mono">
-                                (śr. {summary?.avgCurrentRatio != null ? `${summary.avgCurrentRatio.toFixed(2)}x` : '—'})
+                                {summary?.minCurrentRatio != null && summary.minCurrentRatio < 0 ? (
+                                    <span className="text-rose-400 font-semibold">(Deficyt NWC)</span>
+                                ) : (
+                                    `(śr. ${summary?.avgCurrentRatio != null ? (summary.avgCurrentRatio < 0 ? '0.00x' : `${summary.avgCurrentRatio.toFixed(2)}x`) : '—'})`
+                                )}
                             </span>
                         </div>
                     </div>
                     <div className="flex items-center justify-between text-[11px] text-zinc-400 pt-1 border-t border-zinc-800/50">
                         <span>Wymóg: <strong className="text-zinc-200">≥ {thresholds.minCurrentRatio.toFixed(2)}x</strong></span>
-                        <span className="text-[10px] text-emerald-400">Płynny</span>
+                        {summary?.minCurrentRatio != null ? (
+                            summary.minCurrentRatio < thresholds.minCurrentRatio ? (
+                                <span className="text-[10px] text-rose-400 font-semibold">DEFICYT PŁYNNOŚCI</span>
+                            ) : summary.minCurrentRatio < thresholds.minCurrentRatio * 1.10 ? (
+                                <span className="text-[10px] text-amber-400 font-semibold">OSTRZEŻENIE</span>
+                            ) : (
+                                <span className="text-[10px] text-emerald-400 font-semibold">ZGODNY</span>
+                            )
+                        ) : (
+                            <span className="text-[10px] text-zinc-500">—</span>
+                        )}
                     </div>
                 </div>
 
@@ -475,7 +503,11 @@ export function BankingCovenantsStrip({
                 </div>
 
                 {/* 5. DSRF Coverage Tile */}
-                <div className="p-3 rounded-lg border bg-zinc-950/70 border-zinc-800 flex flex-col justify-between">
+                <div className={`p-3 rounded-lg border flex flex-col justify-between ${
+                    summary?.minDsrfMonths != null && summary.minDsrfMonths >= thresholds.minDsrfMonths
+                        ? 'bg-zinc-950/70 border-zinc-800'
+                        : 'bg-rose-950/20 border-rose-800/40'
+                }`}>
                     <div className="flex items-center justify-between">
                         <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
                             REZERWA DSRF
@@ -486,17 +518,41 @@ export function BankingCovenantsStrip({
                     </div>
                     <div className="my-1.5">
                         <div className="flex items-baseline gap-1.5">
-                            <span className="text-xl font-bold font-mono tabular-nums text-emerald-400">
-                                {summary?.minDsrfMonths != null ? `${summary.minDsrfMonths.toFixed(1)} m.` : '—'}
+                            <span className={`text-xl font-bold font-mono tabular-nums ${
+                                summary?.minDsrfMonths != null
+                                    ? summary.minDsrfMonths >= thresholds.minDsrfMonths
+                                        ? 'text-emerald-400'
+                                        : 'text-rose-400'
+                                    : 'text-zinc-100'
+                            }`}>
+                                {summary?.minDsrfMonths != null
+                                    ? summary.minDsrfMonths < 0
+                                        ? '0.0 m.'
+                                        : `${summary.minDsrfMonths.toFixed(1)} m.`
+                                    : '—'}
                             </span>
                             <span className="text-[11px] text-zinc-400 font-mono">
-                                (min. bufor)
+                                {summary?.minDsrfMonths != null && summary.minDsrfMonths < 0 ? (
+                                    <span className="text-rose-400 font-semibold">(Luka gotówkowa)</span>
+                                ) : (
+                                    '(min. bufor)'
+                                )}
                             </span>
                         </div>
                     </div>
                     <div className="flex items-center justify-between text-[11px] text-zinc-400 pt-1 border-t border-zinc-800/50">
                         <span>Wymóg: <strong className="text-zinc-200">≥ {thresholds.minDsrfMonths} mies.</strong></span>
-                        <span className="text-[10px] text-emerald-400 font-semibold">Zabezpieczone</span>
+                        {summary?.minDsrfMonths != null ? (
+                            summary.minDsrfMonths < thresholds.minDsrfMonths ? (
+                                <span className="text-[10px] text-rose-400 font-semibold">BRAK REZERWY</span>
+                            ) : summary.minDsrfMonths < thresholds.minDsrfMonths * 1.25 ? (
+                                <span className="text-[10px] text-amber-400 font-semibold">NISKI BUFOR</span>
+                            ) : (
+                                <span className="text-[10px] text-emerald-400 font-semibold">ZABEZPIECZONE</span>
+                            )
+                        ) : (
+                            <span className="text-[10px] text-zinc-500">—</span>
+                        )}
                     </div>
                 </div>
             </div>
@@ -657,7 +713,13 @@ export function BankingCovenantsStrip({
 
                                                     {/* Current Ratio */}
                                                     <td className="py-2 px-3 text-center text-zinc-300 tabular-nums">
-                                                        {m.currentRatio !== null ? `${m.currentRatio.toFixed(2)}x` : '—'}
+                                                        {m.currentRatio !== null ? (
+                                                            m.currentRatio < 0 ? (
+                                                                <span className="text-rose-400 font-semibold">0.00x</span>
+                                                            ) : (
+                                                                `${m.currentRatio.toFixed(2)}x`
+                                                            )
+                                                        ) : '—'}
                                                     </td>
 
                                                     {/* Net Debt / EBITDA */}
@@ -683,7 +745,7 @@ export function BankingCovenantsStrip({
                                                                     ? 'text-rose-400 font-bold'
                                                                     : 'text-emerald-400'
                                                             }`}>
-                                                                {m.dsrfMonths.toFixed(1)} m.
+                                                                {m.dsrfMonths < 0 ? '0.0 m.' : `${m.dsrfMonths.toFixed(1)} m.`}
                                                             </span>
                                                         ) : (
                                                             <span className="text-zinc-600">—</span>

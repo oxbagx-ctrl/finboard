@@ -715,9 +715,10 @@ export function calculate15YearStatements(
     // 3. Equity initial contribution
     const initialEquity1 = Number(project.financing_structure?.investor1_equity || 0);
     const initialEquity2 = Number(project.financing_structure?.investor2_equity || 0);
+    const equityContribution = Number(project.financing_structure?.equity_contribution || 0);
     const initialEquity = initialEquity1 + initialEquity2 > 0
         ? initialEquity1 + initialEquity2
-        : Math.max(0, depSchedule.initialCapex - debtSchedule.initialPrincipal);
+        : (equityContribution > 0 ? equityContribution : Math.max(0, depSchedule.initialCapex - debtSchedule.initialPrincipal));
 
     // 4. Commercial operation offset
     const projectStartDate = new Date(project.start_date || '2026-01-01');
@@ -732,6 +733,65 @@ export function calculate15YearStatements(
 
     const codMonthOffset = Math.max(0, (codYear - startYear) * 12 + (codMonth - startMonth));
     const firstCommercialMonth = codMonthOffset + 1;
+
+    // 4b. Grant disbursement schedule (EU grants / Dotacje unijne)
+    const monthlyGrants = new Array(totalMonths + 1).fill(0);
+    const fsStructure = project.financing_structure;
+    const grantSchedule = fsStructure?.grant_disbursement_schedule;
+    const totalGrantAmount = Number(fsStructure?.grant_amount || 0);
+
+    if (Array.isArray(grantSchedule) && grantSchedule.length > 0) {
+        for (const tranche of grantSchedule) {
+            const trancheAmount = Number(tranche.amount || 0);
+            if (trancheAmount <= 0) continue;
+
+            let m = null;
+            if (tranche.month !== undefined || tranche.period !== undefined) {
+                m = Number(tranche.month ?? tranche.period);
+            } else if (tranche.disbursement_date || tranche.date) {
+                const dateStr = tranche.disbursement_date || tranche.date;
+                const d = new Date(dateStr);
+                if (!isNaN(d.getTime())) {
+                    m = (d.getFullYear() - startYear) * 12 + (d.getMonth() - startMonth) + 1;
+                }
+            }
+
+            const monthIndex = m !== null ? Math.max(1, Math.min(totalMonths, m)) : 1;
+            monthlyGrants[monthIndex] += trancheAmount;
+        }
+    } else if (totalGrantAmount > 0) {
+        // Fallback: Compute tranches linked to completion of grant-eligible CAPEX stages
+        const stages = project.capex_stages || [];
+        const eligibleStages = stages.filter(s => s.is_grant_eligible || s.eligible_for_grant);
+
+        if (eligibleStages.length > 0) {
+            const eligibleSums = eligibleStages.map(s => {
+                const amount = s.grant_eligible_amount !== null && s.grant_eligible_amount !== undefined
+                    ? Number(s.grant_eligible_amount)
+                    : (Number(s.net_amount) || 0);
+                return Math.max(0, amount);
+            });
+            const totalEligibleSum = eligibleSums.reduce((sum, v) => sum + v, 0);
+
+            eligibleStages.forEach((stage, idx) => {
+                const duration = Math.max(1, Math.min(120, parseInt(String(stage.duration_months || 6), 10)));
+                const stageStart = stage.start_date ? new Date(stage.start_date) : projectStartDate;
+                const stageStartYear = stageStart.getFullYear() || startYear;
+                const stageStartMonth = stageStart.getMonth() || 0;
+                const monthOffset = (stageStartYear - startYear) * 12 + (stageStartMonth - startMonth);
+                const stageFirstMonth = Math.max(1, monthOffset + 1);
+                const completionMonth = Math.min(totalMonths, Math.max(1, stageFirstMonth + duration - 1));
+
+                const weight = totalEligibleSum > 0 ? (eligibleSums[idx] / totalEligibleSum) : (1 / eligibleStages.length);
+                const trancheAmount = totalGrantAmount * weight;
+                monthlyGrants[completionMonth] += trancheAmount;
+            });
+        } else {
+            // Disburse in month prior to COD or month 1
+            const disburseMonth = codMonthOffset > 0 ? Math.min(totalMonths, codMonthOffset) : 1;
+            monthlyGrants[disburseMonth] += totalGrantAmount;
+        }
+    }
 
     // 5. Operating baseline parameters
     let annualRevenueBase = Number(assumptions.annual_revenue_base || 0);
@@ -927,11 +987,12 @@ export function calculate15YearStatements(
             const debtDrawdown = debtSchedule.monthlyDrawdown[m] || 0;
             const debtRepaid = debtSchedule.monthlyPrincipalRepaid[m] || 0;
             const upfrontFee = m === 1 ? debtSchedule.upfrontFee : 0;
+            const grantReceived = monthlyGrants[m] || 0;
 
             const ocf = netIncome + depreciation + upfrontFee + changeInNwc;
             const capex = depSchedule.monthlyCapex[m] || 0;
             const icf = -capex;
-            const fcf = debtDrawdown - debtRepaid - upfrontFee;
+            const fcf = debtDrawdown + grantReceived - debtRepaid - upfrontFee;
 
             const netCashFlow = ocf + icf + fcf;
             cashBalance += netCashFlow;
@@ -967,7 +1028,7 @@ export function calculate15YearStatements(
                 debtPrincipalRepaid: debtRepaid,
                 vatLoanDrawdown: 0,
                 vatLoanRepaid: 0,
-                grantReceived: 0,
+                grantReceived,
                 changeInNwc,
                 receivables,
                 inventory,
@@ -1049,6 +1110,7 @@ export function calculate15YearStatements(
         // FCFE = NetIncome + Depr - Capex + ChangeInNWC + NetBorrowing
         const debtRepaidAnnual = yearMonthlySlice.reduce((sum, p) => sum + p.debtPrincipalRepaid, 0);
         const debtDrawdownAnnual = yearMonthlySlice.reduce((sum, p) => sum + p.debtDrawdown, 0);
+        const grantReceivedAnnual = yearMonthlySlice.reduce((sum, p) => sum + p.grantReceived, 0);
         const netBorrowing = debtDrawdownAnnual - debtRepaidAnnual;
         const fcfe = annualNetIncome + depreciation - capex + changeInNwc + netBorrowing;
 
@@ -1082,6 +1144,7 @@ export function calculate15YearStatements(
             taxLossCarryForwardClosing: taxLossEnabled ? taxLossPool.closingBalance(y) : 0,
             capex,
             changeInNwc,
+            grantReceived: grantReceivedAnnual,
             operatingCashFlow,
             investingCashFlow,
             financingCashFlow,
@@ -1887,7 +1950,8 @@ export function calculateBankingCovenants(
             validCurrentRatios.push(currentRatio);
             if (currentRatio < thresholds.minCurrentRatio) {
                 currentRatioStatus = 'breach';
-                breaches.push(`Płynność bieżąca (${currentRatio.toFixed(2)}x < ${thresholds.minCurrentRatio.toFixed(2)}x)`);
+                const crDisplay = currentRatio < 0 ? '0.00x (Deficyt NWC)' : `${currentRatio.toFixed(2)}x`;
+                breaches.push(`Płynność bieżąca (${crDisplay} < ${thresholds.minCurrentRatio.toFixed(2)}x)`);
             } else if (currentRatio < thresholds.minCurrentRatio * 1.10) {
                 currentRatioStatus = 'warning';
             } else {
@@ -1928,7 +1992,8 @@ export function calculateBankingCovenants(
 
             if (dsrfMonths < thresholds.minDsrfMonths) {
                 dsrfStatus = 'breach';
-                breaches.push(`Rezerwa DSRF (${dsrfMonths.toFixed(1)} m. < ${thresholds.minDsrfMonths} m.)`);
+                const dsrfDisplay = dsrfMonths < 0 ? '0.0 m. (Luka gotówkowa)' : `${dsrfMonths.toFixed(1)} m.`;
+                breaches.push(`Rezerwa DSRF (${dsrfDisplay} < ${thresholds.minDsrfMonths} m.)`);
             } else if (dsrfMonths < thresholds.minDsrfMonths * 1.25) {
                 dsrfStatus = 'warning';
             } else {

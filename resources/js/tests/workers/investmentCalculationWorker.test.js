@@ -639,4 +639,121 @@ describe('Financial Calculations Engine & Web Worker (Phase 43 Commit 212)', () 
         });
     });
 
+    describe("8. EU Grants Disbursement Schedule & Cash Flow Parity (Phase 51 Commit 246)", () => {
+        it("incorporates grant disbursement schedule into monthly and annual financing cash flow", () => {
+            const projectWithGrants = {
+                ...mockProject,
+                capex_stages: [
+                    {
+                        id: "stage-1",
+                        stage_name: "Hala produkcyjna",
+                        net_amount: 12000000,
+                        start_date: "2026-01-01",
+                        duration_months: 6,
+                        kst_code: "KST_1",
+                        kst_annual_rate: 2.5
+                    },
+                    {
+                        id: "stage-2",
+                        stage_name: "Park maszynowy",
+                        net_amount: 12000000,
+                        start_date: "2026-03-01",
+                        duration_months: 6,
+                        kst_code: "KST_4",
+                        kst_annual_rate: 10.0
+                    },
+                    {
+                        id: "stage-3",
+                        stage_name: "Infrastruktura OZE",
+                        net_amount: 8000000,
+                        start_date: "2026-06-01",
+                        duration_months: 4,
+                        kst_code: "KST_3",
+                        kst_annual_rate: 7.0
+                    }
+                ],
+                debt_facility: {
+                    ...mockProject.debt_facility,
+                    principal_amount: 14000000,
+                    upfront_fee_percent: 0,
+                },
+                financing_structure: {
+                    investor1_equity: 8000000,
+                    investor2_equity: 0,
+                    bank_loan_amount: 14000000,
+                    debt_facility_amount: 14000000,
+                    grant_amount: 10000000,
+                    grant_disbursement_schedule: [
+                        { tranche_number: 1, amount: 4000000, month: 3, milestone: "Fundamenty" },
+                        { tranche_number: 2, amount: 6000000, month: 8, milestone: "Konstrukcja" },
+                    ]
+                }
+            };
+
+            const statements = calculate15YearStatements(projectWithGrants);
+
+            // Month 3 should have 4M grant
+            const month3 = statements.monthlyPeriods.find(p => p.period === 3);
+            expect(month3).toBeDefined();
+            expect(month3.grantReceived).toBe(4000000);
+            expect(month3.financingCashFlow).toBeGreaterThanOrEqual(4000000);
+
+            // Month 8 should have 6M grant
+            const month8 = statements.monthlyPeriods.find(p => p.period === 8);
+            expect(month8).toBeDefined();
+            expect(month8.grantReceived).toBe(6000000);
+
+            // Year 1 annual statement should have 10M total grant received
+            const year1 = statements.annualPeriods[0];
+            expect(year1.grantReceived).toBe(10000000);
+
+            // Without grant funding, cash would have a 10M PLN deficit
+            const projectWithoutGrants = {
+                ...projectWithGrants,
+                financing_structure: {
+                    ...projectWithGrants.financing_structure,
+                    grant_amount: 0,
+                    grant_disbursement_schedule: []
+                }
+            };
+            const statementsNoGrants = calculate15YearStatements(projectWithoutGrants);
+            const cashDifference = year1.closingCash - statementsNoGrants.annualPeriods[0].closingCash;
+            expect(cashDifference).toBeCloseTo(10000000, 2);
+        });
+
+        it("falls back to eligible capex stages when grant_disbursement_schedule is omitted but grant_amount > 0", () => {
+            const projectWithFallbackGrants = {
+                ...mockProject,
+                financing_structure: {
+                    investor1_equity: 8000000,
+                    bank_loan_amount: 14000000,
+                    grant_amount: 10000000,
+                },
+                capex_stages: [
+                    {
+                        id: "stage-1",
+                        stage_name: "Budynek A",
+                        net_amount: 20000000,
+                        start_date: "2026-01-01",
+                        duration_months: 6,
+                        is_grant_eligible: true,
+                        grant_eligible_amount: 15000000,
+                    },
+                    {
+                        id: "stage-2",
+                        stage_name: "Instalacja B",
+                        net_amount: 12000000,
+                        start_date: "2026-04-01",
+                        duration_months: 6,
+                        is_grant_eligible: true,
+                        grant_eligible_amount: 15000000,
+                    }
+                ]
+            };
+
+            const statements = calculate15YearStatements(projectWithFallbackGrants);
+            const totalGrantsReceived = statements.annualPeriods.reduce((sum, p) => sum + (p.grantReceived || 0), 0);
+            expect(totalGrantsReceived).toBe(10000000);
+        });
+    });
 });

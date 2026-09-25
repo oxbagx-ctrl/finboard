@@ -134,7 +134,7 @@ docker compose exec app ./vendor/bin/phpunit
 ```
 
 ### Testy Frontendowe (Vitest)
-Pakiet ponad 470 testów jednostkowych i integracyjnych dla komponentów React, kontekstu transakcyjnego, walidacji danych, kalkulatorów walutowych, konfiguratora celów benchmarkowych, księgi operacji, diagnostyki poczty oraz przepływów integracyjnych E2E:
+Pakiet ponad 485 testów jednostkowych i integracyjnych dla komponentów React, kontekstu transakcyjnego, walidacji danych, kalkulatorów walutowych, konfiguratora celów benchmarkowych, księgi operacji, diagnostyki poczty oraz przepływów integracyjnych E2E:
 ```bash
 npm test
 ```
@@ -712,6 +712,16 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
   - Dynamiczne obliczanie i prezentacja 15-letniej zagregowanej sumy nakładów odtworzeniowych pod suwakiem Reinvestmentu oraz obsługa stanu pustego (0 PLN) z bezpośrednim linkiem do konfiguratora `ReinvestmentManager`.
   - Utrzymanie pełnej zgodności i spójności 10-wierszowej macierzy wariancji Base Case vs What-If.
   - Rozszerzenie zestawu testów jednostkowych Vitest w `SensitivityCockpitView.test.jsx` (14 testów) oraz pełna weryfikacja regresji (482 testy Vitest, 603 testy PHPUnit).
+
+- [ ] **Faza 51: Wyeliminowanie krytycznych rozbieżności między silnikiem przepływów pieniężnych a modułem audytu kowenantów LMA (Commity 246–248)**
+  - [x] Wyeliminowanie rozbieżności Cash Flow dotacji unijnych (EU Grants) i guardraile wskaźników płynności w audycie kowenantów LMA (`BankingCovenantsStrip` & `financialCalculations.ts`).
+    - Likwidacja sztucznej 10-milionowej dziury płynnościowej w fazie CAPEX poprzez włączenie transz dotacji unijnych (`grant_disbursement_schedule` oraz fallback na zakończenie kwalifikowanych etapów CAPEX) do miesięcznych przepływów finansowych Web Workera (`fcf = debtDrawdown + grantReceived - debtRepaid - upfrontFee`) oraz rocznych agregacji `grantReceived` w Cash Flow Statement.
+    - Wprowadzenie dynamicznych kontenerów (tło/obramowanie `bg-zinc-950/70 border-zinc-800` vs `bg-rose-950/20 border-rose-800/40`) oraz kolorystyki kafelków Płynności Bieżącej (CR) i Rezerwy DSRF w `BankingCovenantsStrip.jsx`.
+    - Trójstopniowa logiczna ewaluacja statusów bankowych: dla CR (`ZGODNY`, `OSTRZEŻENIE`, `DEFICYT PŁYNNOŚCI`) i DSRF (`ZABEZPIECZONE`, `NISKI BUFOR`, `BRAK REZERWY`), eliminująca mylące, statyczne etykiety.
+    - Rygorystyczne guardraile prezentacyjne zapobiegające wyświetlaniu ujemnych wartości wskaźników płynności i buforów czasowych: automatyczna konwersja wartości ujemnych do `0.00x (Deficyt NWC)` dla CR oraz `0.0 m. (Luka gotówkowa)` dla DSRF na kafelkach, w opisach naruszeń kowenantów oraz w 15-letniej tabeli analitycznej.
+    - Zestaw dedykowanych testów w `BankingCovenantsStrip.test.jsx` oraz `investmentCalculationWorker.test.js`, osiągający 100% PASS w pełnym pakiecie Vitest (52 pliki testowe, 486 testów).
+  - [ ] Wdrożenie wskaźnika LLCR (Loan Life Coverage Ratio), dedykowanego bufora DSRA oraz asystenta dokapitalizowania naprawczego (Equity Cure Simulator).
+  - [ ] Kompleksowe testy regresyjne, jednostkowe i integracyjne Vitest oraz PHPUnit dla modułu audytu kowenantów.
 
 ---
 
