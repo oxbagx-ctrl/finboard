@@ -720,7 +720,13 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Trójstopniowa logiczna ewaluacja statusów bankowych: dla CR (`ZGODNY`, `OSTRZEŻENIE`, `DEFICYT PŁYNNOŚCI`) i DSRF (`ZABEZPIECZONE`, `NISKI BUFOR`, `BRAK REZERWY`), eliminująca mylące, statyczne etykiety.
     - Rygorystyczne guardraile prezentacyjne zapobiegające wyświetlaniu ujemnych wartości wskaźników płynności i buforów czasowych: automatyczna konwersja wartości ujemnych do `0.00x (Deficyt NWC)` dla CR oraz `0.0 m. (Luka gotówkowa)` dla DSRF na kafelkach, w opisach naruszeń kowenantów oraz w 15-letniej tabeli analitycznej.
     - Zestaw dedykowanych testów w `BankingCovenantsStrip.test.jsx` oraz `investmentCalculationWorker.test.js`, osiągający 100% PASS w pełnym pakiecie Vitest (52 pliki testowe, 486 testów).
-  - [ ] Wdrożenie wskaźnika LLCR (Loan Life Coverage Ratio), dedykowanego bufora DSRA oraz asystenta dokapitalizowania naprawczego (Equity Cure Simulator).
+  - [x] Wdrożenie wskaźnika LLCR (Loan Life Coverage Ratio), dedykowanego bufora DSRA oraz asystenta dokapitalizowania naprawczego (Equity Cure Simulator).
+    - Implementacja formuły LLCR (Loan Life Coverage Ratio) według standardu Loan Market Association (LMA) dla Project Finance: $\text{LLCR}_t = \frac{\sum_{i=t}^{\text{tenor}} \frac{\text{CFADS}_i}{(1 + K_d)^{i-t}} + \text{Rezerwa DSRA}_t}{\text{Saldo Zadłużenia}_t}$ z dyskontowaniem stopą $K_d$ i wyznaczaniem `minLlcr`, `avgLlcr` oraz `llcrHeadroom`.
+    - Bilansowe wyodrębnienie rezerwy DSRA (`dsraReserve`: środki zablokowane na rachunku escrow w wysokości 6 miesięcy obsługi zadłużenia) od wolnych środków pieniężnych (`freeCash = closingCash - dsraReserve`), z automatycznym zwolnieniem rezerwy do wolnej gotówki po całkowitej spłacie długu.
+    - Autonomiczny silnik Deal Advisory kalkulacji zastrzyku naprawczego (`calculateEquityCureRequirement`), wyliczający skumulowaną kwotę wsparcia kapitałowego w PLN, szczytowy transfer roczny, harmonogram transz z przyczynami deficytu oraz rekomendacjami instrumentów strukturyzacyjnych (pożyczka podporządkowana, kredyt obrotowy, akredytywa Standby LC).
+    - Oficjalny Certyfikat Bankowalności LMA (Project Bankability Certificate) generowany w pod-zakładce wąskiego gardła dla projektów spełniających wszystkie wymogi ostrożnościowe komitetu kredytowego.
+    - Rozszerzenie paska `BankingCovenantsStrip.jsx` o 6. kafelek KPI (LLCR), kolumnę LLCR w 15-letniej rocznej matrycy kowenantów, interaktywny suwak progu LLCR w konfiguratorze oraz dynamiczny panel Equity Cure vs Certyfikat LMA.
+    - Zestaw dedykowanych testów jednostkowych Vitest w `investmentCalculationWorker.test.js` (32 testy) i `BankingCovenantsStrip.test.jsx` (17 testów) oraz pełna spójność bilansowa $Aktywa = Pasywa$.
   - [ ] Kompleksowe testy regresyjne, jednostkowe i integracyjne Vitest oraz PHPUnit dla modułu audytu kowenantów.
 
 ---

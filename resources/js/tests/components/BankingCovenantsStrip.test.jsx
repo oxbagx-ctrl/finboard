@@ -339,4 +339,98 @@ describe('BankingCovenantsStrip Component (Phase 44 Commit 220)', () => {
             expect(screen.getByText(/BRAK REZERWY/i)).toBeInTheDocument();
         });
     });
+    it("renders LLCR tile in KPI strip and LLCR column in annual covenant matrix (Commit 247)", async () => {
+        renderWithContext(mockProject, { defaultExpanded: true });
+
+        await waitFor(() => {
+            // Check KPI strip tile
+            expect(screen.getByText("POKRYCIE CAŁEGO DŁUGU (LLCR)")).toBeInTheDocument();
+            expect(screen.getByText("NPV CFADS / Dług")).toBeInTheDocument();
+
+            // Check matrix column header
+            expect(screen.getByText(/LLCR \(≥ 1\.35x\)/i)).toBeInTheDocument();
+        });
+    });
+
+    it("adjusts min LLCR threshold using slider in Bank Requirements Configurator (Commit 247)", async () => {
+        renderWithContext(mockProject, { defaultExpanded: true });
+
+        // Switch to Config tab
+        const configTabBtn = screen.getByRole("button", { name: /2\. Konfigurator Wymogów Banku/i });
+        fireEvent.click(configTabBtn);
+
+        await waitFor(() => {
+            expect(screen.getByText(/Minimalne Pokrycie Całego Długu \(LLCR = NPV CFADS \/ Dług\)/i)).toBeInTheDocument();
+            expect(screen.getByText("1.35x (Standard LMA)")).toBeInTheDocument();
+        });
+    });
+
+    it("renders Deal Advisory Equity Cure Simulator in Headroom tab when covenant breaches occur (Commit 247)", async () => {
+        const stressedProject = {
+            ...mockProject,
+            operating_assumptions: {
+                ...mockProject.operating_assumptions,
+                annual_revenue_base: 5000000, // Very low revenue triggering breaches
+            },
+        };
+
+        renderWithContext(stressedProject, { defaultExpanded: true });
+
+        // Switch to Headroom tab
+        const headroomTabBtn = screen.getByRole("button", { name: /3\. Wąskie Gardło & Analiza Buforu/i });
+        fireEvent.click(headroomTabBtn);
+
+        await waitFor(() => {
+            expect(screen.getByText(/Deal Advisory: Pakiet Naprawczy \(Equity Cure Simulator\)/i)).toBeInTheDocument();
+            expect(screen.getByText("EQUITY CURE WYMAGANE")).toBeInTheDocument();
+            expect(screen.getByText(/Łączny Wymóg Dokapitalizowania/i)).toBeInTheDocument();
+            expect(screen.getByText(/Zalecenia Deal Advisory dla Zespołu Transakcyjnego:/i)).toBeInTheDocument();
+        });
+    });
+
+    it("renders LMA Bankability Certificate in Headroom tab when project is fully compliant (Commit 247)", async () => {
+        const robustProject = {
+            ...mockProject,
+            capex_stages: [
+                { id: "stage-1", stage_name: "Hala", net_amount: 10000000, start_date: "2026-01-01", duration_months: 6, kst_code: "KST_1", kst_annual_rate: 2.5 }
+            ],
+            debt_facility: {
+                principal_amount: 2000000,
+                base_interest_rate_percent: 4.0,
+                margin_percent: 1.5,
+                upfront_fee_percent: 0.5,
+                tenor_months: 60,
+                grace_period_months: 12,
+                repayment_type: "annuity",
+            },
+            financing_structure: {
+                investor1_equity: 10000000,
+                debt_facility_amount: 2000000,
+            },
+            operating_assumptions: {
+                annual_revenue_base: 45000000,
+                revenue_growth_rate_percent: 3.0,
+                variable_cost_percent: 15.0,
+                annual_fixed_costs_base: 2000000,
+                fixed_cost_growth_rate_percent: 2.0,
+                annual_payroll_base: 2000000,
+                payroll_growth_rate_percent: 2.0,
+                capacity_ramp_up: { year1_percent: 100.0, year2_percent: 100.0, year3_percent: 100.0 },
+                cit_rate_percent: 19.0,
+                working_capital: { receivables_days: 15, inventory_days: 15, payables_days: 15 }
+            }
+        };
+
+        renderWithContext(robustProject, { defaultExpanded: true });
+
+        // Switch to Headroom tab
+        const headroomTabBtn = screen.getByRole("button", { name: /3\. Wąskie Gardło & Analiza Buforu/i });
+        fireEvent.click(headroomTabBtn);
+
+        await waitFor(() => {
+            expect(screen.getByText(/Certyfikat Bankowalności LMA \(Project Bankability Certificate\)/i)).toBeInTheDocument();
+            expect(screen.getByText("LMA COMPLIANT")).toBeInTheDocument();
+            expect(screen.getByText(/Opinia Komitetu Kredytowego:/i)).toBeInTheDocument();
+        });
+    });
 });

@@ -22,6 +22,8 @@ import {
     CovenantThresholds,
     YearlyCovenantMetric,
     BankingCovenantsResult,
+    EquityCureYearResult,
+    EquityCureSummary,
     ReadinessCriterionStatus,
     ReadinessPillarKey,
     ReadinessBankabilityStatus,
@@ -997,6 +999,12 @@ export function calculate15YearStatements(
             const netCashFlow = ocf + icf + fcf;
             cashBalance += netCashFlow;
 
+            const monthlyDebtService = debtRepaid + interestExpense;
+            const targetDsraMonthly = monthlyDebtService * 6;
+            const monthlyClosingDebt = debtSchedule.monthlyClosingDebt[m] || 0;
+            const dsraReserveMonthly = monthlyClosingDebt > 0 ? Math.max(0, Math.min(cashBalance, targetDsraMonthly)) : 0;
+            const freeCashMonthly = Math.max(0, cashBalance - dsraReserveMonthly);
+
             const periodDate = new Date(startYear, startMonth + m - 1, 1);
             const dateStr = `${periodDate.getFullYear()}-${String(periodDate.getMonth() + 1).padStart(2, '0')}`;
 
@@ -1038,7 +1046,9 @@ export function calculate15YearStatements(
                 financingCashFlow: fcf,
                 netCashFlow,
                 closingCash: cashBalance,
-                closingDebt: debtSchedule.monthlyClosingDebt[m] || 0
+                closingDebt: debtSchedule.monthlyClosingDebt[m] || 0,
+                dsraReserve: Math.round(dsraReserveMonthly * 100) / 100,
+                freeCash: Math.round(freeCashMonthly * 100) / 100
             };
 
             monthlyPeriods.push(periodObj);
@@ -1118,6 +1128,9 @@ export function calculate15YearStatements(
         const isCommercialYear = yearMonthlySlice.some(p => p.isCommercial);
         const cfads = Math.max(0, ebitda - annualCit + changeInNwc);
         const totalDebtService = debtRepaidAnnual + interestExpense;
+        const targetDsraAnnual = (totalDebtService / 12) * 6;
+        const dsraReserveAnnual = closingDebt > 0 ? Math.max(0, Math.min(closingCash, targetDsraAnnual)) : 0;
+        const freeCashAnnual = Math.max(0, closingCash - dsraReserveAnnual);
         const dscr = (isCommercialYear && totalDebtService > 0) ? Math.round((cfads / totalDebtService) * 100) / 100 : null;
         const icr = (isCommercialYear && interestExpense > 0) ? Math.round((ebit / interestExpense) * 100) / 100 : null;
 
@@ -1151,6 +1164,8 @@ export function calculate15YearStatements(
             netCashFlow,
             closingCash,
             closingDebt,
+            dsraReserve: Math.round(dsraReserveAnnual * 100) / 100,
+            freeCash: Math.round(freeCashAnnual * 100) / 100,
             closingReceivables,
             closingInventory,
             closingPayables,
@@ -1836,15 +1851,139 @@ export function calculateExitWaterfall(
 }
 
 /**
- * Calculate Institutional Banking Covenants (DSCR, ICR, Liquidity, Leverage, DSRF)
+ * Phase 51 Commit 247: Calculate Equity Cure Requirement according to LMA standards
+ * Computes required sponsor equity injection / subordinated debt in PLN to cure covenant breaches.
+ */
+export function calculateEquityCureRequirement(
+    yearlyMetrics: YearlyCovenantMetric[],
+    thresholds: CovenantThresholds,
+    currency: string = "PLN"
+): EquityCureSummary {
+    const curesByYear: EquityCureYearResult[] = [];
+    let totalEquityCureRequired = 0;
+    let peakAnnualCure = 0;
+
+    for (const m of yearlyMetrics) {
+        if (!m.isCommercial) continue;
+
+        let dscrCure = 0;
+        let crCure = 0;
+        let dsrfCure = 0;
+        let llcrCure = 0;
+        let leverageCure = 0;
+
+        // 1. DSCR Cure: (minDscr * TotalDebtService) - CFADS
+        if (m.hasDebtService && m.totalDebtService > 0 && m.dscr !== null && m.dscr < thresholds.minDscr) {
+            const requiredCfads = m.totalDebtService * thresholds.minDscr;
+            dscrCure = Math.max(0, Math.round((requiredCfads - m.cfads) * 100) / 100);
+        }
+
+        // 2. Current Ratio (CR) Cure: (minCurrentRatio * CurrentLiabilities) - CurrentAssets
+        if (m.currentRatio !== null && m.currentRatio < thresholds.minCurrentRatio && m.currentLiabilities > 0) {
+            const requiredCA = m.currentLiabilities * thresholds.minCurrentRatio;
+            crCure = Math.max(0, Math.round((requiredCA - m.currentAssets) * 100) / 100);
+        }
+
+        // 3. DSRF Cure: (TotalDebtService / 12 * minDsrfMonths) - ClosingCash
+        if (m.hasDebtService && m.totalDebtService > 0 && (m.dsrfMonths === null || m.dsrfMonths < thresholds.minDsrfMonths)) {
+            const requiredCash = (m.totalDebtService / 12) * thresholds.minDsrfMonths;
+            dsrfCure = Math.max(0, Math.round((requiredCash - m.closingCash) * 100) / 100);
+        }
+
+        // 4. LLCR Cure: (minLlcr * Debt) - (PV_CFADS + DSRA)
+        if (m.llcr !== null && thresholds.minLlcr != null && m.llcr < thresholds.minLlcr && m.closingDebt > 0) {
+            const requiredNumerator = m.closingDebt * thresholds.minLlcr;
+            const currentNumerator = m.llcr * m.closingDebt;
+            llcrCure = Math.max(0, Math.round((requiredNumerator - currentNumerator) * 100) / 100);
+        }
+
+        // 5. Leverage Cure: NetDebt - (EBITDA * maxLeverage)
+        if (m.leverageRatio !== null && m.leverageRatio > thresholds.maxLeverage && m.ebitda > 0) {
+            const maxAllowedNetDebt = m.ebitda * thresholds.maxLeverage;
+            leverageCure = Math.max(0, Math.round((m.netDebt - maxAllowedNetDebt) * 100) / 100);
+        }
+
+        const cureAmount = Math.max(dscrCure, crCure, dsrfCure, llcrCure, leverageCure);
+
+        if (cureAmount > 0 || m.breaches.length > 0) {
+            const drivers = [
+                { name: "Obsługa długu (DSCR)", val: dscrCure },
+                { name: "Płynność bieżąca (CR)", val: crCure },
+                { name: "Rezerwa DSRF / Gotówka", val: dsrfCure },
+                { name: "Pokrycie całego długu (LLCR)", val: llcrCure },
+                { name: "Dźwignia finansowa (Leverage)", val: leverageCure },
+            ].sort((a, b) => b.val - a.val);
+
+            const primaryDriver = drivers[0].val > 0 ? drivers[0].name : (m.breaches[0] || "Naruszenie kowenantu");
+
+            curesByYear.push({
+                year: m.year,
+                cureAmount,
+                dscrCure,
+                crCure,
+                dsrfCure,
+                llcrCure,
+                leverageCure,
+                primaryDriver,
+                covenantBreaches: m.breaches,
+            });
+
+            totalEquityCureRequired += cureAmount;
+            if (cureAmount > peakAnnualCure) {
+                peakAnnualCure = cureAmount;
+            }
+        }
+    }
+
+    const isCureNeeded = totalEquityCureRequired > 0;
+    const recommendations: string[] = [];
+
+    if (isCureNeeded) {
+        recommendations.push(
+            `Wykryto konieczność dokapitalizowania naprawczego (Equity Cure) o łącznej wartości ${Math.round(totalEquityCureRequired).toLocaleString("pl-PL")} ${currency} (maksymalny zastrzyk roczny: ${Math.round(peakAnnualCure).toLocaleString("pl-PL")} ${currency}).`
+        );
+        recommendations.push(
+            "Rekomendacja 1 (Sponsor Equity): Zastrzyk kapitału własnego lub podporządkowanej pożyczki wspólnika (Shareholder Loan) w celu bezpośredniego uzupełnienia luki CFADS / DSRF."
+        );
+        recommendations.push(
+            "Rekomendacja 2 (Facility Restructuring): Negocjacje z konsorcjum bankowym w celu wydłużenia karencji (grace period) o 6–12 miesięcy lub przejścia na raty dopasowane do profilu CFADS."
+        );
+        recommendations.push(
+            "Rekomendacja 3 (Rezerwa DSRA): Zastąpienie blokady gotówki na rachunku DSRA akredytywą bankową (Letter of Credit) lub gwarancją korporacyjną w celu uwolnienia płynności."
+        );
+    } else {
+        recommendations.push(
+            "Certyfikat Bankowalności LMA: Projekt spełnia wszystkie wymagane wskaźniki ostrożnościowe (DSCR, LLCR, ICR, CR, DSRF, Dźwignia) bez wymogu dokapitalizowania naprawczego."
+        );
+        recommendations.push(
+            "Wszystkie kowenanty posiadają bezpieczny margines (headroom), a bufor DSRA w pełni chroni obsługę zadłużenia konsorcjalnego."
+        );
+    }
+
+    return {
+        isCureNeeded,
+        totalEquityCureRequired: Math.round(totalEquityCureRequired * 100) / 100,
+        peakAnnualCure: Math.round(peakAnnualCure * 100) / 100,
+        curesByYear,
+        recommendations,
+    };
+}
+
+/**
+ * Calculate Institutional Banking Covenants (DSCR, ICR, Liquidity, Leverage, DSRF, LLCR)
  */
 export function calculateBankingCovenants(
     annualPeriods: AnnualStatementPeriod[] = [],
     thresholdsInput?: Partial<CovenantThresholds>,
-    currency: string = 'PLN'
+    currency: string = 'PLN',
+    options?: {
+        costOfDebtPercent?: number;
+        dsraMonths?: number;
+    }
 ): BankingCovenantsResult {
     const thresholds: CovenantThresholds = {
         minDscr: thresholdsInput?.minDscr ?? 1.20,
+        minLlcr: thresholdsInput?.minLlcr ?? 1.35,
         minIcr: thresholdsInput?.minIcr ?? 2.50,
         maxLeverage: thresholdsInput?.maxLeverage ?? 3.50,
         minCurrentRatio: thresholdsInput?.minCurrentRatio ?? 1.10,
@@ -1859,10 +1998,35 @@ export function calculateBankingCovenants(
     let pinchHeadroomPercent: number | null = null;
 
     const validDscrList: number[] = [];
+    const validLlcrList: number[] = [];
     const validIcrList: number[] = [];
     const validCurrentRatios: number[] = [];
     const validLeverages: number[] = [];
     const validDsrfList: number[] = [];
+
+    const lastDebtPeriodIndex = annualPeriods.reduce((lastIdx, p, idx) => {
+        if ((p.closingDebt ?? 0) > 0 || (p.debtPrincipalRepaid ?? 0) > 0) {
+            return idx;
+        }
+        return lastIdx;
+    }, -1);
+
+    let costOfDebt = (options?.costOfDebtPercent ?? 0) > 0
+        ? (options!.costOfDebtPercent! / 100)
+        : 0;
+
+    if (costOfDebt === 0) {
+        let totalDebt = 0;
+        let totalInt = 0;
+        for (const p of annualPeriods) {
+            if ((p.interestExpense ?? 0) > 0 && ((p.closingDebt ?? 0) > 0 || (p.debtPrincipalRepaid ?? 0) > 0)) {
+                const debtBase = (p.closingDebt ?? 0) + (p.debtPrincipalRepaid ?? 0);
+                totalDebt += debtBase;
+                totalInt += p.interestExpense;
+            }
+        }
+        costOfDebt = totalDebt > 0 ? (totalInt / totalDebt) : 0.08;
+    }
 
     let commercialYearsCount = 0;
     let debtServiceYearsCount = 0;
@@ -1888,6 +2052,45 @@ export function calculateBankingCovenants(
         const dscr = period.dscr;
 
         const breaches: string[] = [];
+
+        // DSRA Reserve & Free Cash Analysis
+        const dsraRequired = Math.round((totalDebtService / 12) * thresholds.minDsrfMonths * 100) / 100;
+        const dsraReserve = period.dsraReserve ?? (period.closingDebt > 0 ? Math.max(0, Math.min(period.closingCash, dsraRequired)) : 0);
+        const freeCash = period.freeCash ?? Math.max(0, period.closingCash - dsraReserve);
+
+        // LLCR (Loan Life Coverage Ratio) according to LMA Project Finance standard:
+        // LLCR_t = (sum_{j=t}^{tenor} CFADS_j / (1 + Kd)^(j-t) + DSRA_t) / DebtBalance_t
+        let llcr: number | null = null;
+        let llcrStatus: 'compliant' | 'warning' | 'breach' | 'na' = 'na';
+        let llcrHeadroom: number | null = null;
+
+        if (isCommercial && lastDebtPeriodIndex >= 0 && i <= lastDebtPeriodIndex) {
+            const debtBalance = period.closingDebt > 0 ? period.closingDebt : principalRepaid;
+            if (debtBalance > 0) {
+                let pvCfads = 0;
+                for (let j = i; j <= lastDebtPeriodIndex; j++) {
+                    const fut = annualPeriods[j];
+                    const futCfads = Math.max(0, fut.ebitda - fut.cit + (fut.changeInNwc || 0));
+                    const discountYears = j - i;
+                    const discountFactor = Math.pow(1 + costOfDebt, discountYears);
+                    pvCfads += futCfads / discountFactor;
+                }
+                const llcrNumerator = pvCfads + dsraReserve;
+                llcr = Math.round((llcrNumerator / debtBalance) * 100) / 100;
+
+                validLlcrList.push(llcr);
+                llcrHeadroom = Math.round((llcr - thresholds.minLlcr) * 100) / 100;
+
+                if (llcr < thresholds.minLlcr) {
+                    llcrStatus = 'breach';
+                    breaches.push(`LLCR (${llcr.toFixed(2)}x < ${thresholds.minLlcr.toFixed(2)}x)`);
+                } else if (llcr < thresholds.minLlcr * 1.10) {
+                    llcrStatus = 'warning';
+                } else {
+                    llcrStatus = 'compliant';
+                }
+            }
+        }
 
         // DSCR Status & Headroom
         let dscrStatus: 'compliant' | 'warning' | 'breach' | 'na' = 'na';
@@ -2027,6 +2230,12 @@ export function calculateBankingCovenants(
             dscrStatus,
             dscrHeadroom,
             dscrHeadroomPercent,
+            llcr,
+            llcrStatus,
+            llcrHeadroom,
+            dsraRequired,
+            dsraReserve,
+            freeCash,
             icr,
             icrStatus,
             icrHeadroom,
@@ -2047,6 +2256,11 @@ export function calculateBankingCovenants(
         ? Math.round((validDscrList.reduce((a, b) => a + b, 0) / validDscrList.length) * 100) / 100
         : null;
 
+    const minLlcr = validLlcrList.length > 0 ? Math.min(...validLlcrList) : null;
+    const avgLlcr = validLlcrList.length > 0
+        ? Math.round((validLlcrList.reduce((a, b) => a + b, 0) / validLlcrList.length) * 100) / 100
+        : null;
+
     const minIcr = validIcrList.length > 0 ? Math.min(...validIcrList) : null;
     const avgIcr = validIcrList.length > 0
         ? Math.round((validIcrList.reduce((a, b) => a + b, 0) / validIcrList.length) * 100) / 100
@@ -2061,13 +2275,22 @@ export function calculateBankingCovenants(
 
     const minDsrfMonths = validDsrfList.length > 0 ? Math.min(...validDsrfList) : null;
 
-    const isBankable = totalBreachesCount === 0 && (minDscr === null || minDscr >= thresholds.minDscr);
+    const equityCure = calculateEquityCureRequirement(yearlyMetrics, thresholds, currency);
+    const cureMap = new Map(equityCure.curesByYear.map(c => [c.year, c.cureAmount]));
+    for (const m of yearlyMetrics) {
+        m.equityCureRequired = cureMap.get(m.year) ?? 0;
+    }
+
+    const isBankable = totalBreachesCount === 0 &&
+        (minDscr === null || minDscr >= thresholds.minDscr) &&
+        (minLlcr === null || minLlcr >= thresholds.minLlcr);
 
     let bankabilityStatus: 'compliant' | 'warning' | 'breach' = 'compliant';
     if (totalBreachesCount > 0) {
         bankabilityStatus = 'breach';
     } else if (
         (minDscr !== null && minDscr < thresholds.minDscr * 1.10) ||
+        (minLlcr !== null && minLlcr < thresholds.minLlcr * 1.10) ||
         (minIcr !== null && minIcr < thresholds.minIcr * 1.15)
     ) {
         bankabilityStatus = 'warning';
@@ -2079,6 +2302,8 @@ export function calculateBankingCovenants(
         summary: {
             minDscr,
             avgDscr,
+            minLlcr,
+            avgLlcr,
             minIcr,
             avgIcr,
             peakLeverage,
@@ -2094,8 +2319,10 @@ export function calculateBankingCovenants(
             pinchYear,
             pinchDscr,
             pinchHeadroomPercent,
+            equityCure,
         },
         yearlyMetrics,
+        equityCure,
     };
 }
 
@@ -2135,7 +2362,10 @@ export function runSimulation(
     const covenants = calculateBankingCovenants(
         statements.annualPeriods,
         undefined,
-        project.currency || 'PLN'
+        project.currency || 'PLN',
+        {
+            costOfDebtPercent: (project.debt_facility?.base_interest_rate_percent ?? 5.25) + (project.debt_facility?.margin_percent ?? 2.00)
+        }
     );
 
     const totalRevenue15Y = statements.annualPeriods.reduce((sum, p) => sum + p.revenue, 0);

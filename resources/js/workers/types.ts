@@ -187,6 +187,8 @@ export interface MonthlyStatementPeriod {
     netCashFlow: number;
     closingCash: number;
     closingDebt: number;
+    dsraReserve?: number;
+    freeCash?: number;
     receivables: number;
     inventory: number;
     payables: number;
@@ -222,6 +224,8 @@ export interface AnnualStatementPeriod {
     netCashFlow: number;
     closingCash: number;
     closingDebt: number;
+    dsraReserve?: number;
+    freeCash?: number;
     closingReceivables: number;
     closingInventory: number;
     closingPayables: number;
@@ -404,10 +408,31 @@ export interface ExitWaterfallResult {
 
 export interface CovenantThresholds {
     minDscr: number;           // Standard: 1.20x
+    minLlcr?: number;          // Standard: 1.35x (LMA benchmark)
     minIcr: number;            // Standard: 2.50x
     maxLeverage: number;       // Standard: 3.50x (Net Debt / EBITDA)
     minCurrentRatio: number;   // Standard: 1.10x
     minDsrfMonths: number;     // Standard: 6 months
+}
+
+export interface EquityCureYearResult {
+    year: number;
+    cureAmount: number;
+    dscrCure: number;
+    crCure: number;
+    dsrfCure: number;
+    llcrCure: number;
+    leverageCure: number;
+    primaryDriver: string;
+    covenantBreaches: string[];
+}
+
+export interface EquityCureSummary {
+    isCureNeeded: boolean;
+    totalEquityCureRequired: number;
+    peakAnnualCure: number;
+    curesByYear: EquityCureYearResult[];
+    recommendations: string[];
 }
 
 export interface YearlyCovenantMetric {
@@ -430,6 +455,13 @@ export interface YearlyCovenantMetric {
     dscrStatus: 'compliant' | 'warning' | 'breach' | 'na';
     dscrHeadroom: number | null; // e.g. +0.25 (DSCR - minDscr)
     dscrHeadroomPercent: number | null; // e.g. +20.8%
+    llcr: number | null;
+    llcrStatus?: 'compliant' | 'warning' | 'breach' | 'na';
+    llcrHeadroom?: number | null;
+    dsraRequired?: number;
+    dsraReserve?: number;
+    freeCash?: number;
+    equityCureRequired?: number;
     icr: number | null;
     icrStatus: 'compliant' | 'warning' | 'breach' | 'na';
     icrHeadroom: number | null;
@@ -450,6 +482,8 @@ export interface BankingCovenantsResult {
     summary: {
         minDscr: number | null;
         avgDscr: number | null;
+        minLlcr: number | null;
+        avgLlcr: number | null;
         minIcr: number | null;
         avgIcr: number | null;
         peakLeverage: number | null;
@@ -465,8 +499,10 @@ export interface BankingCovenantsResult {
         pinchYear: number | null;
         pinchDscr: number | null;
         pinchHeadroomPercent: number | null;
+        equityCure?: EquityCureSummary;
     };
     yearlyMetrics: YearlyCovenantMetric[];
+    equityCure?: EquityCureSummary;
 }
 
 /**

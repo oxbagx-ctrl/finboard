@@ -8,7 +8,9 @@ import {
     calculateAppraisalMetrics,
     runSimulation,
     TaxLossVintage,
-    TaxLossPool
+    TaxLossPool,
+    calculateBankingCovenants,
+    calculateEquityCureRequirement
 } from '../../workers/financialCalculations';
 import { InvestmentWorkerClient, getInvestmentWorkerClient } from '../../workers/InvestmentWorkerClient';
 
@@ -754,6 +756,141 @@ describe('Financial Calculations Engine & Web Worker (Phase 43 Commit 212)', () 
             const statements = calculate15YearStatements(projectWithFallbackGrants);
             const totalGrantsReceived = statements.annualPeriods.reduce((sum, p) => sum + (p.grantReceived || 0), 0);
             expect(totalGrantsReceived).toBe(10000000);
+        });
+    });
+    describe('8. LMA Banking Covenants, LLCR, DSRA & Equity Cure Simulator (Phase 51 Commit 247)', () => {
+        it('segregates DSRA reserve from unrestricted free cash on balance sheet', () => {
+            const statements = calculate15YearStatements(mockProject, mockProject.operating_assumptions);
+            
+            // Check monthly periods
+            statements.monthlyPeriods.forEach(m => {
+                expect(m.dsraReserve).toBeDefined();
+                expect(m.freeCash).toBeDefined();
+                expect(m.dsraReserve).toBeGreaterThanOrEqual(0);
+                expect(m.freeCash).toBeGreaterThanOrEqual(0);
+                if (m.closingCash >= 0) {
+                    expect(Math.round((m.dsraReserve + m.freeCash) * 100) / 100).toBeCloseTo(m.closingCash, 1);
+                } else {
+                    expect(m.dsraReserve).toBe(0);
+                    expect(m.freeCash).toBe(0);
+                }
+            });
+
+            // Check annual periods
+            statements.annualPeriods.forEach(p => {
+                expect(p.dsraReserve).toBeDefined();
+                expect(p.freeCash).toBeDefined();
+                expect(p.dsraReserve).toBeGreaterThanOrEqual(0);
+                expect(p.freeCash).toBeGreaterThanOrEqual(0);
+                if (p.closingCash >= 0) {
+                    expect(Math.round((p.dsraReserve + p.freeCash) * 100) / 100).toBeCloseTo(p.closingCash, 1);
+                }
+                
+                // When debt is zero, DSRA reserve is released to 0
+                if (p.closingDebt === 0) {
+                    expect(p.dsraReserve).toBe(0);
+                    expect(p.freeCash).toBeCloseTo(p.closingCash, 2);
+                }
+            });
+        });
+
+        it('calculates LLCR (Loan Life Coverage Ratio) according to LMA Project Finance standard', () => {
+            const statements = calculate15YearStatements(mockProject, mockProject.operating_assumptions);
+            const covenants = calculateBankingCovenants(statements.annualPeriods, { minLlcr: 1.35 }, 'PLN', {
+                costOfDebtPercent: 8.0
+            });
+
+            expect(covenants.summary.minLlcr).toBeDefined();
+            expect(covenants.summary.avgLlcr).toBeDefined();
+            expect(covenants.summary.minLlcr).toBeGreaterThan(0);
+            expect(covenants.summary.avgLlcr).toBeGreaterThanOrEqual(covenants.summary.minLlcr);
+
+            // Commercial periods with active debt should have valid LLCR and DSRA metrics
+            const debtPeriods = covenants.yearlyMetrics.filter(m => m.isCommercial && m.hasDebtService && m.closingDebt > 0);
+            expect(debtPeriods.length).toBeGreaterThan(0);
+            debtPeriods.forEach(m => {
+                expect(m.llcr).not.toBeNull();
+                expect(m.llcrStatus).toBeDefined();
+                expect(m.dsraRequired).toBeGreaterThan(0);
+                expect(m.dsraReserve).toBeGreaterThanOrEqual(0);
+                expect(m.freeCash).toBeGreaterThanOrEqual(0);
+            });
+        });
+
+        it('simulates Equity Cure requirement and Deal Advisory recommendations upon covenant breach', () => {
+            const statements = calculate15YearStatements(mockProject, mockProject.operating_assumptions);
+            
+            // Apply strict stress thresholds forcing breaches
+            const stressThresholds = {
+                minDscr: 2.50,
+                minLlcr: 2.50,
+                minIcr: 5.00,
+                maxLeverage: 1.50,
+                minCurrentRatio: 2.00,
+                minDsrfMonths: 12
+            };
+
+            const covenants = calculateBankingCovenants(statements.annualPeriods, stressThresholds, 'PLN');
+            
+            expect(covenants.summary.isBankable).toBe(false);
+            expect(covenants.summary.bankabilityStatus).toBe('breach');
+            expect(covenants.summary.equityCure).toBeDefined();
+            expect(covenants.summary.equityCure.isCureNeeded).toBe(true);
+            expect(covenants.summary.equityCure.totalEquityCureRequired).toBeGreaterThan(0);
+            expect(covenants.summary.equityCure.peakAnnualCure).toBeGreaterThan(0);
+            expect(covenants.summary.equityCure.curesByYear.length).toBeGreaterThan(0);
+            expect(covenants.summary.equityCure.recommendations.length).toBeGreaterThanOrEqual(3);
+            expect(covenants.summary.equityCure.recommendations[0]).toContain('Equity Cure');
+        });
+
+        it('issues LMA Bankability Certificate when project covenants are fully compliant', () => {
+            const safeProject = {
+                ...mockProject,
+                capex_stages: [
+                    { id: 'stage-civil', stage_name: 'Hala', net_amount: 10000000, start_date: '2026-01-01', duration_months: 6, kst_code: 'KST_1', kst_annual_rate: 2.5 }
+                ],
+                debt_facility: {
+                    principal_amount: 2000000,
+                    base_interest_rate_percent: 4.0,
+                    margin_percent: 1.5,
+                    upfront_fee_percent: 0.5,
+                    tenor_months: 60,
+                    grace_period_months: 12,
+                    repayment_type: 'annuity'
+                },
+                financing_structure: {
+                    investor1_equity: 10000000,
+                    debt_facility_amount: 2000000,
+                },
+                operating_assumptions: {
+                    annual_revenue_base: 40000000,
+                    revenue_growth_rate_percent: 3.0,
+                    variable_cost_percent: 20.0,
+                    annual_fixed_costs_base: 2000000,
+                    fixed_cost_growth_rate_percent: 2.0,
+                    annual_payroll_base: 2000000,
+                    payroll_growth_rate_percent: 2.0,
+                    capacity_ramp_up: { year1_percent: 100.0, year2_percent: 100.0, year3_percent: 100.0 },
+                    cit_rate_percent: 19.0,
+                    working_capital: { receivables_days: 15, inventory_days: 15, payables_days: 15 }
+                }
+            };
+
+            const statements = calculate15YearStatements(safeProject, safeProject.operating_assumptions);
+            const covenants = calculateBankingCovenants(statements.annualPeriods, {
+                minDscr: 1.10,
+                minLlcr: 1.15,
+                minIcr: 2.00,
+                maxLeverage: 4.00,
+                minCurrentRatio: 1.00,
+                minDsrfMonths: 3
+            }, 'PLN');
+
+            expect(covenants.summary.isBankable).toBe(true);
+            expect(covenants.summary.bankabilityStatus).toBe('compliant');
+            expect(covenants.summary.equityCure.isCureNeeded).toBe(false);
+            expect(covenants.summary.equityCure.totalEquityCureRequired).toBe(0);
+            expect(covenants.summary.equityCure.recommendations[0]).toContain('Certyfikat Bankowalności LMA');
         });
     });
 });

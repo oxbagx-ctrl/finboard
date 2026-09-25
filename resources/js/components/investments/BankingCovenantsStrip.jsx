@@ -34,6 +34,7 @@ export const COVENANT_PRESETS = {
         description: 'Standardowe wytyczne rynkowe dla długu Senior Debt (DSCR 1.20x, ICR 2.50x, Leverage 3.50x)',
         thresholds: {
             minDscr: 1.20,
+            minLlcr: 1.35,
             minIcr: 2.50,
             maxLeverage: 3.50,
             minCurrentRatio: 1.10,
@@ -46,6 +47,7 @@ export const COVENANT_PRESETS = {
         description: 'Zaostrzone wymogi komitetu ryzyka dla projektów infrastrukturalnych o podwyższonej zmienności',
         thresholds: {
             minDscr: 1.30,
+            minLlcr: 1.45,
             minIcr: 3.00,
             maxLeverage: 3.00,
             minCurrentRatio: 1.20,
@@ -58,6 +60,7 @@ export const COVENANT_PRESETS = {
         description: 'Maksymalizacja dźwigni finansowej przy minimalnym buforze gotówkowym',
         thresholds: {
             minDscr: 1.15,
+            minLlcr: 1.25,
             minIcr: 2.00,
             maxLeverage: 4.50,
             minCurrentRatio: 1.05,
@@ -339,7 +342,7 @@ export function BankingCovenantsStrip({
             </div>
 
             {/* Key Metric Tiles Strip */}
-            <div className="p-4 grid grid-cols-2 md:grid-cols-5 gap-3 bg-zinc-900/40">
+            <div className="p-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 bg-zinc-900/40">
                 {/* 1. DSCR Tile */}
                 <div className={`p-3 rounded-lg border flex flex-col justify-between ${
                     summary?.minDscr != null && summary.minDscr >= thresholds.minDscr
@@ -555,6 +558,46 @@ export function BankingCovenantsStrip({
                         )}
                     </div>
                 </div>
+
+                {/* 6. LLCR Tile */}
+                <div className={`p-3 rounded-lg border flex flex-col justify-between ${
+                    summary?.minLlcr != null && summary.minLlcr >= thresholds.minLlcr
+                        ? "bg-zinc-950/70 border-zinc-800"
+                        : "bg-rose-950/20 border-rose-800/40"
+                }`}>
+                    <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                            POKRYCIE CAŁEGO DŁUGU (LLCR)
+                        </span>
+                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                            summary?.minLlcr != null && summary.minLlcr >= thresholds.minLlcr
+                                ? "bg-emerald-500/20 text-emerald-400"
+                                : summary?.minLlcr != null && summary.minLlcr >= thresholds.minLlcr * 0.90
+                                ? "bg-amber-500/20 text-amber-400"
+                                : "bg-rose-500/20 text-rose-400"
+                        }`}>
+                            {summary?.minLlcr != null && summary.minLlcr >= thresholds.minLlcr
+                                ? "ZGODNY"
+                                : summary?.minLlcr != null && summary.minLlcr >= thresholds.minLlcr * 0.90
+                                ? "OSTRZEŻENIE"
+                                : "NARUSZENIE"}
+                        </span>
+                    </div>
+                    <div className="my-1.5">
+                        <div className="flex items-baseline gap-1.5">
+                            <span className="text-xl font-bold font-mono tabular-nums text-zinc-100">
+                                {summary?.minLlcr != null ? (summary.minLlcr < 0 ? "0.00x" : `${summary.minLlcr.toFixed(2)}x`) : "—"}
+                            </span>
+                            <span className="text-[11px] text-zinc-400 font-mono">
+                                (śr. {summary?.avgLlcr != null ? (summary.avgLlcr < 0 ? "0.00x" : `${summary.avgLlcr.toFixed(2)}x`) : "—"})
+                            </span>
+                        </div>
+                    </div>
+                    <div className="flex items-center justify-between text-[11px] text-zinc-400 pt-1 border-t border-zinc-800/50">
+                        <span>Wymóg: <strong className="text-zinc-200">≥ {(thresholds.minLlcr ?? 1.35).toFixed(2)}x</strong></span>
+                        <span className="text-[10px] text-zinc-500">NPV CFADS / Dług</span>
+                    </div>
+                </div>
             </div>
 
             {/* Expanded Detailed Audit Section */}
@@ -640,6 +683,7 @@ export function BankingCovenantsStrip({
                                             <th className="py-2.5 px-3 text-right">CFADS</th>
                                             <th className="py-2.5 px-3 text-right">Obsługa Długu</th>
                                             <th className="py-2.5 px-3 text-center">DSCR (≥ {thresholds.minDscr.toFixed(2)}x)</th>
+                                            <th className="py-2.5 px-3 text-center">LLCR (≥ {(thresholds.minLlcr ?? 1.35).toFixed(2)}x)</th>
                                             <th className="py-2.5 px-3 text-center">ICR (≥ {thresholds.minIcr.toFixed(2)}x)</th>
                                             <th className="py-2.5 px-3 text-center">CR (Płynność)</th>
                                             <th className="py-2.5 px-3 text-center">Dźwignia Net Debt</th>
@@ -688,6 +732,23 @@ export function BankingCovenantsStrip({
                                                                     : 'bg-rose-500/10 text-rose-400 border border-rose-500/30'
                                                             }`}>
                                                                 {m.dscr.toFixed(2)}x
+                                                            </span>
+                                                        ) : (
+                                                            <span className="text-zinc-600">—</span>
+                                                        )}
+                                                    </td>
+
+                                                    {/* LLCR */}
+                                                    <td className="py-2 px-3 text-center">
+                                                        {m.llcr !== null ? (
+                                                            <span className={`inline-block px-2 py-0.5 rounded text-[11px] font-bold ${
+                                                                m.llcrStatus === 'compliant'
+                                                                    ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                                                                    : m.llcrStatus === 'warning'
+                                                                    ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
+                                                                    : 'bg-rose-500/10 text-rose-400 border border-rose-500/30'
+                                                            }`}>
+                                                                {m.llcr < 0 ? '0.00x' : `${m.llcr.toFixed(2)}x`}
                                                             </span>
                                                         ) : (
                                                             <span className="text-zinc-600">—</span>
@@ -814,6 +875,28 @@ export function BankingCovenantsStrip({
                                         <span>1.00x (Granica defaultu)</span>
                                         <span>1.20x (Standard)</span>
                                         <span>1.60x (Super-konserwatywny)</span>
+                                    </div>
+                                </div>
+
+                                {/* Slider: Min LLCR */}
+                                <div className="space-y-1.5">
+                                    <div className="flex items-center justify-between text-xs">
+                                        <span className="text-zinc-400">Minimalne Pokrycie Całego Długu (LLCR = NPV CFADS / Dług)</span>
+                                        <span className="font-mono font-bold text-emerald-400">{(thresholds.minLlcr ?? 1.35).toFixed(2)}x</span>
+                                    </div>
+                                    <input
+                                        type="range"
+                                        min="1.00"
+                                        max="2.00"
+                                        step="0.05"
+                                        value={thresholds.minLlcr ?? 1.35}
+                                        onChange={(e) => updateThreshold('minLlcr', e.target.value)}
+                                        className="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                                    />
+                                    <div className="flex justify-between text-[10px] text-zinc-500 font-mono">
+                                        <span>1.10x (Ryzykowny)</span>
+                                        <span>1.35x (Standard LMA)</span>
+                                        <span>1.60x (Konserwatywny)</span>
                                     </div>
                                 </div>
 
@@ -979,6 +1062,167 @@ export function BankingCovenantsStrip({
                                         </>
                                     )}
                                 </ul>
+                            </div>
+                            {/* Deal Advisory: Equity Cure Simulator OR LMA Bankability Certificate */}
+                            <div className="md:col-span-3">
+                                {covenantsResult?.equityCure?.isCureNeeded ? (
+                                    <div className="p-4 bg-rose-950/20 border border-rose-800/40 rounded-lg space-y-4">
+                                        <div className="flex items-center justify-between border-b border-rose-800/30 pb-3">
+                                            <div className="flex items-center gap-2">
+                                                <AlertTriangle className="w-5 h-5 text-rose-400" />
+                                                <div>
+                                                    <h4 className="text-sm font-bold text-zinc-100 uppercase tracking-wide">
+                                                        Deal Advisory: Pakiet Naprawczy (Equity Cure Simulator)
+                                                    </h4>
+                                                    <p className="text-xs text-zinc-400">
+                                                        Symulacja minimalnego zastrzyku kapitałowego wymaganego do przywrócenia pełnej bankowalności projektu (LMA Standard)
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <span className="px-2.5 py-1 rounded text-xs font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                                                EQUITY CURE WYMAGANE
+                                            </span>
+                                        </div>
+
+                                        {/* 3 Metric Cards for Equity Cure */}
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                            <div className="p-3 bg-zinc-950/80 rounded border border-rose-900/40">
+                                                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">
+                                                    Łączny Wymóg Dokapitalizowania
+                                                </span>
+                                                <span className="text-xl font-bold font-mono text-rose-400 mt-1 block">
+                                                    {formatAmount(covenantsResult.equityCure.totalEquityCureRequired)}
+                                                </span>
+                                                <span className="text-[10px] text-zinc-500">Skumulowana kwota wsparcia w horyzoncie 15L</span>
+                                            </div>
+
+                                            <div className="p-3 bg-zinc-950/80 rounded border border-rose-900/40">
+                                                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">
+                                                    Szczytowy Roczny Zastrzyk
+                                                </span>
+                                                <span className="text-xl font-bold font-mono text-amber-400 mt-1 block">
+                                                    {formatAmount(covenantsResult.equityCure.peakAnnualCure)}
+                                                </span>
+                                                <span className="text-[10px] text-zinc-500">Maksymalny pojedynczy transfer kapitału</span>
+                                            </div>
+
+                                            <div className="p-3 bg-zinc-950/80 rounded border border-rose-900/40">
+                                                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">
+                                                    Lata z Deficytem Kowenantowym
+                                                </span>
+                                                <span className="text-xl font-bold font-mono text-zinc-100 mt-1 block">
+                                                    {covenantsResult.equityCure.curesByYear.length} {covenantsResult.equityCure.curesByYear.length === 1 ? 'rok' : 'lata'}
+                                                </span>
+                                                <span className="text-[10px] text-zinc-500">
+                                                    {covenantsResult.equityCure.curesByYear.map(c => `Rok ${c.year}`).join(', ') || 'Brak'}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        {/* Schedule of Required Cures Table */}
+                                        <div className="overflow-x-auto border border-zinc-800 rounded-lg">
+                                            <table className="w-full text-xs font-mono text-left">
+                                                <thead className="bg-zinc-900/90 text-zinc-400 border-b border-zinc-800 text-[11px] uppercase tracking-wider">
+                                                    <tr>
+                                                        <th className="py-2 px-3">Rok</th>
+                                                        <th className="py-2 px-3 text-right">Wymagane Dokapitalizowanie</th>
+                                                        <th className="py-2 px-3">Główny Powód Deficytu</th>
+                                                        <th className="py-2 px-3">Naruszone Wymogi</th>
+                                                        <th className="py-2 px-3">Sugerowany Instrument Naprawczy</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="divide-y divide-zinc-800/60 bg-zinc-950/40">
+                                                    {covenantsResult.equityCure.curesByYear.map((c) => (
+                                                        <tr key={c.year} className="hover:bg-zinc-900/50">
+                                                            <td className="py-2 px-3 font-bold text-zinc-200">Rok {c.year}</td>
+                                                            <td className="py-2 px-3 text-right font-bold text-rose-400 tabular-nums">
+                                                                {formatAmount(c.cureAmount)}
+                                                            </td>
+                                                            <td className="py-2 px-3 text-zinc-300 font-sans">{c.primaryDriver}</td>
+                                                            <td className="py-2 px-3 font-sans">
+                                                                <div className="flex flex-wrap gap-1">
+                                                                    {c.covenantBreaches.map((b, i) => (
+                                                                        <span key={i} className="px-1.5 py-0.5 rounded text-[10px] bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                                                                            {b}
+                                                                        </span>
+                                                                    ))}
+                                                                </div>
+                                                            </td>
+                                                            <td className="py-2 px-3 text-zinc-400 font-sans">
+                                                                {c.primaryDriver.includes('DSCR') || c.primaryDriver.includes('LLCR')
+                                                                    ? 'Pożyczka podporządkowana sponsora (Shareholder Loan)'
+                                                                    : c.primaryDriver.includes('CR')
+                                                                    ? 'Kredyt obrotowy / Faktoring pomostowy'
+                                                                    : 'Akredytywa bankowa (Letter of Credit) na rezerwę DSRA'}
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                        {/* Actionable Deal Advisory Advice */}
+                                        <div className="p-3 bg-zinc-950/60 rounded border border-rose-900/30 text-xs text-zinc-300 space-y-2">
+                                            <span className="font-bold text-zinc-100 uppercase tracking-wide block">
+                                                Zalecenia Deal Advisory dla Zespołu Transakcyjnego:
+                                            </span>
+                                            <ul className="space-y-1 list-disc list-inside text-zinc-400 text-[11px]">
+                                                {covenantsResult.equityCure.recommendations.map((rec, i) => (
+                                                    <li key={i}>{rec}</li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="p-4 bg-emerald-950/20 border border-emerald-800/40 rounded-lg space-y-4">
+                                        <div className="flex items-center justify-between border-b border-emerald-800/30 pb-3">
+                                            <div className="flex items-center gap-2">
+                                                <ShieldCheck className="w-5 h-5 text-emerald-400" />
+                                                <div>
+                                                    <h4 className="text-sm font-bold text-zinc-100 uppercase tracking-wide">
+                                                        Certyfikat Bankowalności LMA (Project Bankability Certificate)
+                                                    </h4>
+                                                    <p className="text-xs text-zinc-400">
+                                                        Projekt spełnia wszystkie instytucjonalne wymogi ostrożnościowe Loan Market Association w całym 15-letnim okresie
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <span className="px-2.5 py-1 rounded text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                                                <CheckCircle2 className="w-3.5 h-3.5" />
+                                                LMA COMPLIANT
+                                            </span>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-xs">
+                                            <div className="p-3 bg-zinc-950/70 rounded border border-emerald-900/30 space-y-1">
+                                                <span className="text-[10px] text-zinc-400 uppercase font-bold block">Pokrycie Roczne (DSCR)</span>
+                                                <span className="text-emerald-400 font-mono font-bold text-base">
+                                                    {summary?.minDscr != null ? `${summary.minDscr.toFixed(2)}x` : '—'}
+                                                </span>
+                                                <span className="text-[10px] text-zinc-500 block">Wymóg: ≥ {thresholds.minDscr.toFixed(2)}x (Bezpieczny bufor)</span>
+                                            </div>
+                                            <div className="p-3 bg-zinc-950/70 rounded border border-emerald-900/30 space-y-1">
+                                                <span className="text-[10px] text-zinc-400 uppercase font-bold block">Pokrycie Całego Długu (LLCR)</span>
+                                                <span className="text-emerald-400 font-mono font-bold text-base">
+                                                    {summary?.minLlcr != null ? `${summary.minLlcr.toFixed(2)}x` : '—'}
+                                                </span>
+                                                <span className="text-[10px] text-zinc-500 block">Wymóg: ≥ {(thresholds.minLlcr ?? 1.35).toFixed(2)}x (Standard LMA)</span>
+                                            </div>
+                                            <div className="p-3 bg-zinc-950/70 rounded border border-emerald-900/30 space-y-1">
+                                                <span className="text-[10px] text-zinc-400 uppercase font-bold block">Rezerwa DSRA / DSRF</span>
+                                                <span className="text-emerald-400 font-mono font-bold text-base">
+                                                    {summary?.minDsrfMonths != null ? `${summary.minDsrfMonths.toFixed(1)} mies.` : '—'}
+                                                </span>
+                                                <span className="text-[10px] text-zinc-500 block">Wymóg: ≥ {thresholds.minDsrfMonths} mies. na rachunku escrow</span>
+                                            </div>
+                                        </div>
+
+                                        <div className="p-3 bg-zinc-950/60 rounded border border-emerald-900/30 text-[11px] text-zinc-300">
+                                            <span className="font-semibold text-emerald-400 block mb-1">Opinia Komitetu Kredytowego:</span>
+                                            Struktura montażu finansowego i prognozy przepływów pieniężnych (CFADS) wykazują pełną odporność na wahania rynkowe. Nie zidentyfikowano zapotrzebowania na dokapitalizowanie naprawcze (Equity Cure) ani kredyty pomostowe.
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     )}
