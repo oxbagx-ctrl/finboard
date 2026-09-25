@@ -704,6 +704,14 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Frontendowy test integracyjny w `phase44StatementsAndValuationIntegration.test.jsx` sprawdzający parzystość kalkulacji Web Worker, akcelerację odliczenia w roku 2 oraz interaktywne rozwijanie sub-wierszy CIT w `ThreeStatementGrid`.
     - Poprawa izolacji bazy danych w `InvestmentProjectSeederTest.php` z użyciem `DatabaseTransactions`.
     - Zapewnienie 100% zielonego wyniku testów: 603 testy PHPUnit (7915 asercji) oraz 477 testów Vitest (52 pliki testowe).
+- [x] **Faza 50: Ulepszenie interaktywności, transparentności symulatora What-If oraz wizualizacja DCF i CAPEX w Kokpicie Wrażliwości (Commit 245)**
+  - Przełącznik trybów prezentacji wykresu 15-letniego w `SensitivityCockpitView.jsx` (Segmented Control: tryb *Nominalne (P&L i CF)* vs *Zdyskontowane (DCF & NPV)*).
+  - Wzbogacenie wykresu nominalnego o dedykowaną serię słupkową nakładów majątkowych *CAPEX & Reinwestycje* (#818cf8) i etykietowanie lat z odtworzeniami na osi X (`Rok X (CAPEX)`).
+  - Pełna wizualizacja trajektorii zdyskontowanych przepływów pieniężnych (słupki *Zdyskontowany FCFF*) oraz narastającej krzywej wartości bieżącej netto (*Skumulowane NPV*) reagującej na żywo na suwak WACC.
+  - Efekt wizualnego kotwiczenia (Visual Anchoring glow) kart KPI (*PROJECT NPV*, *PROJECT IRR*, *EQUITY MoIC*) po modyfikacji stopy dyskontowej WACC wraz z notą objaśniającą mechanikę DCF.
+  - Dynamiczne obliczanie i prezentacja 15-letniej zagregowanej sumy nakładów odtworzeniowych pod suwakiem Reinvestmentu oraz obsługa stanu pustego (0 PLN) z bezpośrednim linkiem do konfiguratora `ReinvestmentManager`.
+  - Utrzymanie pełnej zgodności i spójności 10-wierszowej macierzy wariancji Base Case vs What-If.
+  - Rozszerzenie zestawu testów jednostkowych Vitest w `SensitivityCockpitView.test.jsx` (14 testów) oraz pełna weryfikacja regresji (482 testy Vitest, 603 testy PHPUnit).
 
 ---
 

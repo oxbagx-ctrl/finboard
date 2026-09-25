@@ -299,4 +299,105 @@ describe('SensitivityCockpitView Component (Phase 43 Commit 213)', () => {
             expect(screen.getAllByText('LINEAR').length).toBeGreaterThanOrEqual(1);
         });
     });
+
+    describe('DCF Toggle & CAPEX Evolution (Phase 50 Commit 245)', () => {
+        const mockProjectWithReinvestments = {
+            ...mockProject,
+            id: 'proj-battery-storage-reinvest',
+            operating_assumptions: {
+                ...mockProject.operating_assumptions,
+                reinvestment_programs: [
+                    {
+                        id: 'prog-a',
+                        program_type: 'program_a',
+                        name: 'Program A: Wymiana Falowników',
+                        enabled: true,
+                        net_amount: 2500000,
+                        specific_years: [5, 10],
+                    },
+                ],
+            },
+        };
+
+        it('renders chart mode switcher with Nominalne and Zdyskontowane buttons and defaults to nominal', async () => {
+            renderWithContext();
+
+            await waitFor(() => {
+                expect(screen.getByText('Nominalne (P&L i CF)')).toBeInTheDocument();
+                expect(screen.getByText('Zdyskontowane (DCF & NPV)')).toBeInTheDocument();
+            });
+
+            // Nominal legend items should be visible
+            expect(screen.getByText('CAPEX & Reinwestycje')).toBeInTheDocument();
+            expect(screen.getByText('Koszty OPEX')).toBeInTheDocument();
+            expect(screen.getByText('EBITDA')).toBeInTheDocument();
+        });
+
+        it('switches chart mode to Zdyskontowane (DCF & NPV) and displays discounted series', async () => {
+            renderWithContext();
+
+            await waitFor(() => {
+                expect(screen.getByText('Zdyskontowane (DCF & NPV)')).toBeInTheDocument();
+            });
+
+            fireEvent.click(screen.getByText('Zdyskontowane (DCF & NPV)'));
+
+            await waitFor(() => {
+                expect(screen.getByText('Zdyskontowany FCFF')).toBeInTheDocument();
+                expect(screen.getByText('Skumulowane NPV')).toBeInTheDocument();
+            });
+        });
+
+        it('displays WACC driver subtitle and triggers visual anchoring glow on KPI cards when adjusting WACC slider', async () => {
+            renderWithContext();
+
+            await waitFor(() => {
+                expect(screen.getByText('Stopa Dyskontowa WACC')).toBeInTheDocument();
+            });
+
+            expect(
+                screen.getByText(/Wpływa na wycenę DCF \(karty KPI u góry\) oraz na tryb zdyskontowany wykresu/i)
+            ).toBeInTheDocument();
+
+            const sliders = screen.getAllByRole('slider');
+            const waccSlider = sliders[5]; // index 5 is WACC
+
+            fireEvent.change(waccSlider, { target: { value: '10.5' } });
+
+            await waitFor(() => {
+                const npvCard = screen.getByTestId('kpi-project-npv');
+                expect(npvCard.className).toContain('ring-2');
+                expect(npvCard.className).toContain('ring-blue-500/70');
+                expect(screen.getByText(/Przywróć model WACC/i)).toBeInTheDocument();
+            });
+        });
+
+        it('handles empty reinvestment programs state with informative message and configuration button', async () => {
+            renderWithContext(mockProject); // mockProject has no reinvestments
+
+            await waitFor(() => {
+                expect(screen.getByText(/brak aktywnych programów/i)).toBeInTheDocument();
+            });
+
+            const configButtons = screen.getAllByRole('button', { name: /Skonfiguruj A, B, C/i });
+            expect(configButtons.length).toBeGreaterThanOrEqual(1);
+
+            // Clicking open shows reinvestment configuration manager
+            fireEvent.click(configButtons[0]);
+
+            await waitFor(() => {
+                expect(screen.getByText(/Harmonogram Nakładów Odtworzeniowych/i)).toBeInTheDocument();
+            });
+        });
+
+        it('displays 15-year aggregate sum when project contains active reinvestments', async () => {
+            renderWithContext(mockProjectWithReinvestments);
+
+            await waitFor(() => {
+                expect(screen.getByText(/Suma 15-letnia:/i)).toBeInTheDocument();
+                expect(screen.getByText(/5,00 mln PLN/i)).toBeInTheDocument();
+            });
+        });
+    });
+
 });

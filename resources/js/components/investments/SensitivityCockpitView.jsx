@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import {
     Sliders,
     TrendingUp,
@@ -56,6 +56,13 @@ export const SensitivityCockpitView = () => {
     const [repaymentTypeOverride, setRepaymentTypeOverride] = useState(null); // 'annuity' | 'linear' | 'bullet' | null
     const [activeScenario, setActiveScenario] = useState('base');
 
+    // Chart Mode: 'nominal' (P&L and CF) vs 'discounted' (DCF & NPV)
+    const [chartMode, setChartMode] = useState('nominal');
+
+    // Visual Anchoring: Glow highlight on top KPI cards when WACC slider is adjusted
+    const [isWaccHighlightActive, setIsWaccHighlightActive] = useState(false);
+    const waccHighlightTimeoutRef = useRef(null);
+
     // Simulation calculation results
     const [baseResult, setBaseResult] = useState(null);
     const [whatIfResult, setWhatIfResult] = useState(null);
@@ -78,6 +85,38 @@ export const SensitivityCockpitView = () => {
         if (val === null || val === undefined || isNaN(val)) return '—';
         return `${Number(val).toFixed(2)}%`;
     };
+
+    // Format reinvestment summary helper (compact institutional notation)
+    const formatReinvestmentSummary = useCallback((val, curr = selectedProject?.currency || 'PLN') => {
+        if (!val || val <= 0) return '0,00 ' + curr;
+        if (Math.abs(val) >= 1_000_000) {
+            return `${(val / 1_000_000).toFixed(2).replace('.', ',')} mln ${curr}`;
+        }
+        if (Math.abs(val) >= 1_000) {
+            return `${(val / 1_000).toFixed(1).replace('.', ',')} tys. ${curr}`;
+        }
+        return formatMoney(val, curr);
+    }, [selectedProject, formatMoney]);
+
+    // Cleanup timeout on unmount
+    useEffect(() => {
+        return () => {
+            if (waccHighlightTimeoutRef.current) {
+                clearTimeout(waccHighlightTimeoutRef.current);
+            }
+        };
+    }, []);
+
+    // Trigger Visual Anchoring glow on WACC changes
+    const triggerWaccHighlight = useCallback(() => {
+        setIsWaccHighlightActive(true);
+        if (waccHighlightTimeoutRef.current) {
+            clearTimeout(waccHighlightTimeoutRef.current);
+        }
+        waccHighlightTimeoutRef.current = setTimeout(() => {
+            setIsWaccHighlightActive(false);
+        }, 1200);
+    }, []);
 
     // Calculate baseline scenario
     useEffect(() => {
@@ -232,19 +271,41 @@ export const SensitivityCockpitView = () => {
         };
     }, [baseResult, whatIfResult]);
 
-    // Chart data for 15-year financial evolution
+    // Chart data for 15-year financial evolution (Nominal P&L/CF and Discounted DCF/NPV)
     const chartData = useMemo(() => {
         if (!whatIfResult?.annualPeriods) return [];
 
-        return whatIfResult.annualPeriods.map((p) => ({
-            label: `Rok ${p.year}`,
-            'Przychody': Math.round(p.revenue),
-            'Koszty OPEX': Math.round(p.totalOpex),
-            'EBITDA': Math.round(p.ebitda),
-            'Free Cash Flow (FCFF)': Math.round(p.fcff),
-            'Dług Końcowy': Math.round(p.closingDebt),
-        }));
-    }, [whatIfResult]);
+        const effectiveWaccDecimal = (waccOverride !== null
+            ? waccOverride
+            : (whatIfResult?.appraisal?.waccPercent ?? baseResult?.appraisal?.waccPercent ?? 8.50)) / 100.0;
+
+        let cumulativeNpv = 0;
+
+        return whatIfResult.annualPeriods.map((p) => {
+            // Detect if this year contains cyclical reinvestment CAPEX
+            const isReinvestmentYear = reinvestmentsEnabled && p.year > 1 && (p.capex > 0);
+            const label = isReinvestmentYear ? `Rok ${p.year} (CAPEX)` : `Rok ${p.year}`;
+
+            // Discount factor: df = 1 / (1 + WACC)^t
+            const df = Math.pow(1.0 + effectiveWaccDecimal, -p.year);
+            const discFcff = Math.round(p.fcff * df);
+            cumulativeNpv += discFcff;
+
+            return {
+                label,
+                year: p.year,
+                isReinvestmentYear,
+                'Przychody': Math.round(p.revenue),
+                'Koszty OPEX': Math.round(p.totalOpex),
+                'CAPEX & Reinwestycje': Math.round(p.capex || 0),
+                'EBITDA': Math.round(p.ebitda),
+                'Free Cash Flow (FCFF)': Math.round(p.fcff),
+                'Zdyskontowany FCFF': discFcff,
+                'Skumulowane NPV': cumulativeNpv,
+                'Dług Końcowy': Math.round(p.closingDebt),
+            };
+        });
+    }, [whatIfResult, baseResult, waccOverride, reinvestmentsEnabled]);
 
     const formatYAxis = (val) => {
         if (Math.abs(val) >= 1000000) return `${(val / 1000000).toFixed(1)}M`;
@@ -270,11 +331,21 @@ export const SensitivityCockpitView = () => {
 
     const currentNpv = whatIfResult?.summary?.projectNpv ?? 0;
     const currentIrr = whatIfResult?.summary?.projectIrrPercent;
-    const currentWacc = whatIfResult?.appraisal?.waccPercent ?? 8.5;
+    const currentWacc = waccOverride !== null ? waccOverride : (whatIfResult?.appraisal?.waccPercent ?? 8.5);
     const currentMoic = whatIfResult?.summary?.equityMoic ?? 0;
     const currentMinDscr = whatIfResult?.summary?.minDscr;
     const currentAvgDscr = whatIfResult?.summary?.avgDscr;
     const isBankable = whatIfResult?.appraisal?.isBankable ?? false;
+
+    // Current total 15-year reinvestment capex
+    const currentReinvestmentCapex = reinvestmentsEnabled
+        ? (whatIfResult?.summary?.totalReinvestmentCapex ?? baseResult?.summary?.totalReinvestmentCapex ?? 0)
+        : 0;
+
+    // Visual anchoring glow class for WACC-sensitive KPI metrics
+    const waccGlowClass = isWaccHighlightActive
+        ? 'ring-2 ring-blue-500/70 border-blue-500/80 shadow-[0_0_15px_rgba(59,130,246,0.35)]'
+        : 'border-zinc-800';
 
     return (
         <div className="space-y-6 font-mono">
@@ -315,10 +386,13 @@ export const SensitivityCockpitView = () => {
                 onReset={handleResetAll}
             />
 
-            {/* Live KPI Metric Cards Strip */}
+            {/* Live KPI Metric Cards Strip with Visual Anchoring for WACC */}
             <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
                 {/* 1. Project NPV */}
-                <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 relative overflow-hidden">
+                <div
+                    data-testid="kpi-project-npv"
+                    className={`bg-zinc-900 border rounded-lg p-4 relative overflow-hidden transition-all duration-300 ${waccGlowClass}`}
+                >
                     <div className="flex items-center justify-between text-[10px] text-zinc-400 uppercase font-semibold mb-1">
                         <span>PROJECT NPV</span>
                         <DollarSign className="w-3.5 h-3.5 text-emerald-400" />
@@ -338,7 +412,10 @@ export const SensitivityCockpitView = () => {
                 </div>
 
                 {/* 2. Project IRR vs WACC */}
-                <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
+                <div
+                    data-testid="kpi-project-irr"
+                    className={`bg-zinc-900 border rounded-lg p-4 transition-all duration-300 ${waccGlowClass}`}
+                >
                     <div className="flex items-center justify-between text-[10px] text-zinc-400 uppercase font-semibold mb-1">
                         <span>PROJECT IRR</span>
                         <TrendingUp className="w-3.5 h-3.5 text-blue-400" />
@@ -357,7 +434,10 @@ export const SensitivityCockpitView = () => {
                 </div>
 
                 {/* 3. Equity MoIC */}
-                <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
+                <div
+                    data-testid="kpi-equity-moic"
+                    className={`bg-zinc-900 border rounded-lg p-4 transition-all duration-300 ${waccGlowClass}`}
+                >
                     <div className="flex items-center justify-between text-[10px] text-zinc-400 uppercase font-semibold mb-1">
                         <span>EQUITY MoIC</span>
                         <Coins className="w-3.5 h-3.5 text-amber-400" />
@@ -576,6 +656,9 @@ export const SensitivityCockpitView = () => {
                                 {waccOverride !== null ? `${waccOverride.toFixed(2)}% (Manual)` : `${formatPercent(baseResult?.appraisal?.waccPercent ?? 8.50)} (Model)`}
                             </span>
                         </div>
+                        <p className="text-[10px] text-zinc-400 leading-tight">
+                            Wpływa na wycenę DCF (karty KPI u góry) oraz na tryb zdyskontowany wykresu
+                        </p>
                         <input
                             type="range"
                             min="4.0"
@@ -585,6 +668,7 @@ export const SensitivityCockpitView = () => {
                             onChange={(e) => {
                                 setWaccOverride(parseFloat(e.target.value));
                                 setActiveScenario('custom');
+                                triggerWaccHighlight();
                             }}
                             className="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-blue-500"
                         />
@@ -593,8 +677,11 @@ export const SensitivityCockpitView = () => {
                             {waccOverride !== null && (
                                 <button
                                     type="button"
-                                    onClick={() => setWaccOverride(null)}
-                                    className="text-[10px] text-zinc-400 hover:text-zinc-200 underline"
+                                    onClick={() => {
+                                        setWaccOverride(null);
+                                        triggerWaccHighlight();
+                                    }}
+                                    className="text-[10px] text-zinc-400 hover:text-zinc-200 underline cursor-pointer"
                                 >
                                     Przywróć model WACC
                                 </button>
@@ -642,12 +729,34 @@ export const SensitivityCockpitView = () => {
                                 <button
                                     type="button"
                                     onClick={() => setShowReinvestmentDetails(prev => !prev)}
-                                    className="text-[10px] text-cyan-400 hover:text-cyan-300 underline font-bold"
+                                    className="text-[10px] text-cyan-400 hover:text-cyan-300 underline font-bold cursor-pointer"
                                 >
                                     {showReinvestmentDetails ? 'Ukryj A, B, C' : 'Konfiguruj A, B, C'}
                                 </button>
                             </div>
                             <span>+50%</span>
+                        </div>
+
+                        {/* Aggregated 15Y Reinvestment Info & Empty State Handling */}
+                        <div className="pt-2 border-t border-zinc-850/60 flex items-center justify-between text-[10px] font-mono">
+                            {currentReinvestmentCapex > 0 ? (
+                                <span className="text-zinc-400">
+                                    Suma 15-letnia: <span className="font-bold text-zinc-200">{formatReinvestmentSummary(currentReinvestmentCapex, selectedProject?.currency || 'PLN')}</span>
+                                </span>
+                            ) : (
+                                <div className="flex items-center justify-between w-full">
+                                    <span className="text-amber-400/90 font-medium">
+                                        Suma: 0,00 {selectedProject?.currency || 'PLN'} (brak aktywnych programów)
+                                    </span>
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowReinvestmentDetails(true)}
+                                        className="text-[10px] text-cyan-400 hover:text-cyan-300 underline font-bold cursor-pointer"
+                                    >
+                                        Skonfiguruj A, B, C
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -682,29 +791,76 @@ export const SensitivityCockpitView = () => {
                 currency={selectedProject?.currency || 'PLN'}
             />
 
-            {/* 15-Year Financial Evolution Chart */}
+            {/* 15-Year Financial Evolution Chart (Nominal vs Discounted DCF & NPV Modes) */}
             <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-5">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 border-b border-zinc-800 pb-3">
-                    <div className="flex items-center gap-2">
-                        <BarChart3 className="w-4 h-4 text-emerald-400" />
-                        <h3 className="text-xs font-bold text-zinc-100 uppercase tracking-wide">
-                            15-letnia Ewolucja Wyników Finansowych (Scenariusz What-If)
-                        </h3>
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 mb-4 border-b border-zinc-800 pb-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                        <div className="flex items-center gap-2">
+                            <BarChart3 className="w-4 h-4 text-emerald-400" />
+                            <h3 className="text-xs font-bold text-zinc-100 uppercase tracking-wide">
+                                15-letnia Ewolucja Wyników Finansowych (Scenariusz What-If)
+                            </h3>
+                        </div>
+
+                        {/* Chart Mode Switcher (Segmented Control) */}
+                        <div className="inline-flex rounded-md p-0.5 bg-zinc-950 border border-zinc-800 text-[11px] self-start sm:self-auto">
+                            <button
+                                type="button"
+                                onClick={() => setChartMode('nominal')}
+                                className={`px-2.5 py-1 rounded transition-colors cursor-pointer ${
+                                    chartMode === 'nominal'
+                                        ? 'bg-emerald-600 text-white font-bold shadow-xs'
+                                        : 'text-zinc-400 hover:text-zinc-200'
+                                }`}
+                            >
+                                Nominalne (P&L i CF)
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setChartMode('discounted')}
+                                className={`px-2.5 py-1 rounded transition-colors cursor-pointer ${
+                                    chartMode === 'discounted'
+                                        ? 'bg-blue-600 text-white font-bold shadow-xs'
+                                        : 'text-zinc-400 hover:text-zinc-200'
+                                }`}
+                            >
+                                Zdyskontowane (DCF & NPV)
+                            </button>
+                        </div>
                     </div>
-                    <div className="text-[11px] text-zinc-400 flex items-center gap-4">
-                        <span className="flex items-center gap-1.5">
-                            <span className="w-2.5 h-2.5 bg-emerald-500 rounded-xs" /> Przychody
-                        </span>
-                        <span className="flex items-center gap-1.5">
-                            <span className="w-2.5 h-2.5 bg-rose-500 rounded-xs" /> Koszty OPEX
-                        </span>
-                        <span className="flex items-center gap-1.5">
-                            <span className="w-2.5 h-2.5 bg-amber-400 rounded-full" /> EBITDA
-                        </span>
-                        <span className="flex items-center gap-1.5">
-                            <span className="w-2.5 h-2.5 bg-blue-400 rounded-full" /> FCFF
-                        </span>
-                    </div>
+
+                    {/* Chart Legend */}
+                    {chartMode === 'nominal' ? (
+                        <div className="text-[11px] text-zinc-400 flex flex-wrap items-center gap-3">
+                            <span className="flex items-center gap-1.5">
+                                <span className="w-2.5 h-2.5 bg-[#10b981] rounded-xs" /> Przychody
+                            </span>
+                            <span className="flex items-center gap-1.5">
+                                <span className="w-2.5 h-2.5 bg-[#f43f5e] rounded-xs" /> Koszty OPEX
+                            </span>
+                            <span className="flex items-center gap-1.5">
+                                <span className="w-2.5 h-2.5 bg-[#818cf8] rounded-xs" /> CAPEX & Reinwestycje
+                            </span>
+                            <span className="flex items-center gap-1.5">
+                                <span className="w-2.5 h-2.5 bg-[#f59e0b] rounded-full" /> EBITDA
+                            </span>
+                            <span className="flex items-center gap-1.5">
+                                <span className="w-2.5 h-2.5 bg-[#3b82f6] rounded-full" /> FCFF
+                            </span>
+                        </div>
+                    ) : (
+                        <div className="text-[11px] text-zinc-400 flex flex-wrap items-center gap-3">
+                            <span className="flex items-center gap-1.5">
+                                <span className="w-2.5 h-2.5 bg-[#3b82f6] rounded-xs" /> Zdyskontowany FCFF
+                            </span>
+                            <span className="flex items-center gap-1.5">
+                                <span className="w-2.5 h-2.5 bg-[#10b981] rounded-full" /> Skumulowane NPV
+                            </span>
+                            <span className="text-[10px] text-zinc-500 bg-zinc-950 px-2 py-0.5 rounded border border-zinc-800">
+                                WACC: {currentWacc.toFixed(2)}%
+                            </span>
+                        </div>
+                    )}
                 </div>
 
                 <div className="w-full h-80">
@@ -734,24 +890,41 @@ export const SensitivityCockpitView = () => {
                                 content={<CustomChartTooltip currency={selectedProject.currency || 'PLN'} />}
                                 cursor={{ fill: 'rgba(255, 255, 255, 0.04)' }}
                             />
-                            <Bar dataKey="Przychody" fill="#10b981" radius={[2, 2, 0, 0]} maxBarSize={28} />
-                            <Bar dataKey="Koszty OPEX" fill="#f43f5e" radius={[2, 2, 0, 0]} maxBarSize={28} />
-                            <Line
-                                type="monotone"
-                                dataKey="EBITDA"
-                                stroke="#f59e0b"
-                                strokeWidth={2.5}
-                                dot={{ fill: '#f59e0b', r: 3 }}
-                                activeDot={{ r: 5 }}
-                            />
-                            <Line
-                                type="monotone"
-                                dataKey="Free Cash Flow (FCFF)"
-                                stroke="#3b82f6"
-                                strokeWidth={2.5}
-                                dot={{ fill: '#3b82f6', r: 3 }}
-                                activeDot={{ r: 5 }}
-                            />
+                            {chartMode === 'nominal' ? (
+                                <>
+                                    <Bar dataKey="Przychody" fill="#10b981" radius={[2, 2, 0, 0]} maxBarSize={24} />
+                                    <Bar dataKey="Koszty OPEX" fill="#f43f5e" radius={[2, 2, 0, 0]} maxBarSize={24} />
+                                    <Bar dataKey="CAPEX & Reinwestycje" fill="#818cf8" radius={[2, 2, 0, 0]} maxBarSize={24} />
+                                    <Line
+                                        type="monotone"
+                                        dataKey="EBITDA"
+                                        stroke="#f59e0b"
+                                        strokeWidth={2.5}
+                                        dot={{ fill: '#f59e0b', r: 3 }}
+                                        activeDot={{ r: 5 }}
+                                    />
+                                    <Line
+                                        type="monotone"
+                                        dataKey="Free Cash Flow (FCFF)"
+                                        stroke="#3b82f6"
+                                        strokeWidth={2.5}
+                                        dot={{ fill: '#3b82f6', r: 3 }}
+                                        activeDot={{ r: 5 }}
+                                    />
+                                </>
+                            ) : (
+                                <>
+                                    <Bar dataKey="Zdyskontowany FCFF" fill="#3b82f6" radius={[2, 2, 0, 0]} maxBarSize={28} />
+                                    <Line
+                                        type="monotone"
+                                        dataKey="Skumulowane NPV"
+                                        stroke="#10b981"
+                                        strokeWidth={3}
+                                        dot={{ fill: '#10b981', r: 3 }}
+                                        activeDot={{ r: 5 }}
+                                    />
+                                </>
+                            )}
                         </ComposedChart>
                     </ResponsiveContainer>
                 </div>
@@ -796,8 +969,7 @@ export const SensitivityCockpitView = () => {
                                 </td>
                                 <td className="py-3 px-4 text-right">
                                     <span className={capexDelta > 0 ? 'text-rose-400' : capexDelta < 0 ? 'text-emerald-400' : 'text-zinc-400'}>
-                                        {capexDelta > 0 ? '+' : ''}{formatMoney(deltas?.capexDiff ?? 0)} ({capexDelta}%)
-                                    </span>
+                                        {capexDelta > 0 ? '+' : ''}{formatMoney(deltas?.capexDiff ?? 0)} ({capexDelta}%)                                    </span>
                                 </td>
                                 <td className="py-3 px-4 text-center">
                                     <Badge variant={capexDelta <= 0 ? 'success' : 'danger'}>
@@ -868,13 +1040,15 @@ export const SensitivityCockpitView = () => {
                                 </td>
                                 <td className="py-3 px-4 text-right">
                                     {baseResult && whatIfResult && (
-                                        <span className={whatIfResult.summary.totalEbitda15Y >= baseResult.summary.totalEbitda15Y ? 'text-emerald-400' : 'text-rose-400'}>
-                                            {formatMoney(whatIfResult.summary.totalEbitda15Y - baseResult.summary.totalEbitda15Y)}
+                                        <span className={(whatIfResult.summary?.totalEbitda15Y ?? 0) >= (baseResult.summary?.totalEbitda15Y ?? 0) ? 'text-emerald-400' : 'text-rose-400'}>
+                                            {formatMoney((whatIfResult.summary?.totalEbitda15Y ?? 0) - (baseResult.summary?.totalEbitda15Y ?? 0))}
                                         </span>
                                     )}
                                 </td>
                                 <td className="py-3 px-4 text-center">
-                                    <Badge variant="default">OPERACYJNY</Badge>
+                                    <Badge variant={(whatIfResult?.summary?.totalEbitda15Y ?? 0) >= (baseResult?.summary?.totalEbitda15Y ?? 0) ? 'success' : 'warning'}>
+                                        {(whatIfResult?.summary?.totalEbitda15Y ?? 0) >= (baseResult?.summary?.totalEbitda15Y ?? 0) ? 'W NORMIE' : 'REDUKCJA'}
+                                    </Badge>
                                 </td>
                             </tr>
 
