@@ -713,7 +713,7 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
   - Utrzymanie pełnej zgodności i spójności 10-wierszowej macierzy wariancji Base Case vs What-If.
   - Rozszerzenie zestawu testów jednostkowych Vitest w `SensitivityCockpitView.test.jsx` (14 testów) oraz pełna weryfikacja regresji (482 testy Vitest, 603 testy PHPUnit).
 
-- [ ] **Faza 51: Wyeliminowanie krytycznych rozbieżności między silnikiem przepływów pieniężnych a modułem audytu kowenantów LMA (Commity 246–248)**
+- [x] **Faza 51: Wyeliminowanie krytycznych rozbieżności między silnikiem przepływów pieniężnych a modułem audytu kowenantów LMA (Commity 246–248)**
   - [x] Wyeliminowanie rozbieżności Cash Flow dotacji unijnych (EU Grants) i guardraile wskaźników płynności w audycie kowenantów LMA (`BankingCovenantsStrip` & `financialCalculations.ts`).
     - Likwidacja sztucznej 10-milionowej dziury płynnościowej w fazie CAPEX poprzez włączenie transz dotacji unijnych (`grant_disbursement_schedule` oraz fallback na zakończenie kwalifikowanych etapów CAPEX) do miesięcznych przepływów finansowych Web Workera (`fcf = debtDrawdown + grantReceived - debtRepaid - upfrontFee`) oraz rocznych agregacji `grantReceived` w Cash Flow Statement.
     - Wprowadzenie dynamicznych kontenerów (tło/obramowanie `bg-zinc-950/70 border-zinc-800` vs `bg-rose-950/20 border-rose-800/40`) oraz kolorystyki kafelków Płynności Bieżącej (CR) i Rezerwy DSRF w `BankingCovenantsStrip.jsx`.
@@ -727,7 +727,10 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Oficjalny Certyfikat Bankowalności LMA (Project Bankability Certificate) generowany w pod-zakładce wąskiego gardła dla projektów spełniających wszystkie wymogi ostrożnościowe komitetu kredytowego.
     - Rozszerzenie paska `BankingCovenantsStrip.jsx` o 6. kafelek KPI (LLCR), kolumnę LLCR w 15-letniej rocznej matrycy kowenantów, interaktywny suwak progu LLCR w konfiguratorze oraz dynamiczny panel Equity Cure vs Certyfikat LMA.
     - Zestaw dedykowanych testów jednostkowych Vitest w `investmentCalculationWorker.test.js` (32 testy) i `BankingCovenantsStrip.test.jsx` (17 testów) oraz pełna spójność bilansowa $Aktywa = Pasywa$.
-  - [ ] Kompleksowe testy regresyjne, jednostkowe i integracyjne Vitest oraz PHPUnit dla modułu audytu kowenantów.
+  - [x] Kompleksowe testy integracyjne i regresyjne w PHPUnit oraz Vitest dla modułu kowenantów LMA, rezerwy DSRA i certyfikacji bankowalności.
+    - Opracowanie backendowego pakietu testów integracyjnych w `tests/Feature/InvestmentProject/ProjectFinanceLmaCovenantsIntegrationTest.php` (4 testy, 148 asercji): weryfikacja zapisu i izolacji multi-tenant harmonogramu dotacji w strukturze finansowania, zerowej wariancji 15-letniego bilansu (Assets = Liabilities + Equity) przy spłacie długu senioralnego i dotacjach unijnych, profilu spłaty długu LMA (CFADS i obsługa długu w 120-miesięcznym tenorze z karencją) oraz ekspozycji API.
+    - Opracowanie frontendowego pakietu testów integracyjnych w `resources/js/tests/integration/phase51CovenantsAndProjectFinanceIntegration.test.jsx` (6 testów): weryfikacja 15-letniej symulacji z separacją rezerwy DSRA i zerową wariancją gotówkową, formuły dyskontowania LLCR stopą Kd z uwzględnieniem bufora DSRA, reguł prezentacyjnych LMA (brak ujemnych wartości dla CR i DSRF), algorytmu Deal Advisory Equity Cure dla projektów zagrożonych, certyfikatu bankowalności LMA dla projektów w 100% bankowalnych oraz interaktywnego suwaka progów i presetów bankowych.
+    - Zapewnienie 100% zielonego wyniku testów: 607 testów PHPUnit (8063 asercje) oraz 500 testów Vitest (53 pliki testowe).
 
 ---
 
