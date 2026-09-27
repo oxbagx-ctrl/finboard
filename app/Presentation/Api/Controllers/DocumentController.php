@@ -18,8 +18,11 @@ use App\Contexts\DocumentManagement\Application\Queries\GetDocumentById\GetDocum
 use App\Contexts\DocumentManagement\Application\Queries\GetDocumentById\GetDocumentByIdQuery;
 use App\Contexts\DocumentManagement\Application\Queries\GetDocuments\GetDocumentsHandler;
 use App\Contexts\DocumentManagement\Application\Queries\GetDocuments\GetDocumentsQuery;
+use App\Contexts\DocumentManagement\Application\Queries\GetEffectiveVdrPermission\GetEffectiveVdrPermissionHandler;
+use App\Contexts\DocumentManagement\Application\Queries\GetEffectiveVdrPermission\GetEffectiveVdrPermissionQuery;
 use App\Contexts\DocumentManagement\Application\Queries\GetVdrAuditLogs\GetVdrAuditLogsHandler;
 use App\Contexts\DocumentManagement\Application\Queries\GetVdrAuditLogs\GetVdrAuditLogsQuery;
+use App\Contexts\DocumentManagement\Domain\ValueObjects\WatermarkOptions;
 use App\Models\Document as EloquentDocument;
 use App\Models\User;
 use App\Presentation\Api\Requests\UpdateDocumentRequest;
@@ -48,7 +51,8 @@ final class DocumentController
         private readonly ArchiveDocumentHandler $archiveDocumentHandler,
         private readonly DeleteDocumentHandler $deleteDocumentHandler,
         private readonly DownloadDocumentHandler $downloadDocumentHandler,
-        private readonly GetVdrAuditLogsHandler $getVdrAuditLogsHandler
+        private readonly GetVdrAuditLogsHandler $getVdrAuditLogsHandler,
+        private readonly GetEffectiveVdrPermissionHandler $getEffectiveVdrPermissionHandler
     ) {
     }
 
@@ -127,18 +131,103 @@ final class DocumentController
 
         $this->ensureCanAccessDocument($request->user(), $document);
 
+        $effective = $this->getEffectiveVdrPermissionHandler->handle(new GetEffectiveVdrPermissionQuery(
+            companyId: (string) $document->company_id,
+            role: (string) $request->user()->role,
+            userId: (string) $request->user()->id,
+            folderId: $document->folder_id ? (string) $document->folder_id : null,
+            documentId: $document->id
+        ));
+
+        $isUploader = (string) $document->uploaded_by_user_id === (string) $request->user()->id;
+        if (!$effective->canDownload() && !$isUploader) {
+            throw new AccessDeniedHttpException('Brak uprawnień do pobierania tego dokumentu (wymagany poziom: download).');
+        }
+
+        $watermarkOptions = null;
+        if ($effective->watermarkRequired() || $request->boolean('watermark', false)) {
+            $watermarkOptions = WatermarkOptions::create(
+                userName: (string) $request->user()->name,
+                userEmail: (string) $request->user()->email,
+                ipAddress: $request->ip(),
+                timestamp: now(),
+                companyName: $document->company?->name
+            );
+        }
+
         $result = $this->downloadDocumentHandler->handle(new DownloadDocumentCommand(
             id: $id,
             userId: (string) $request->user()->id,
             ipAddress: $request->ip(),
-            userAgent: $request->userAgent()
+            userAgent: $request->userAgent(),
+            watermarkOptions: $watermarkOptions
+        ));
+
+        $inline = $request->boolean('inline', false);
+        $dispositionType = $inline ? HeaderUtils::DISPOSITION_INLINE : HeaderUtils::DISPOSITION_ATTACHMENT;
+
+        $originalName = $result->originalName;
+        $fallbackName = Str::ascii($originalName);
+        $fallbackName = preg_replace('/[^\x20-\x7e]/', '', $fallbackName) ?: 'document';
+        $disposition = HeaderUtils::makeDisposition(
+            $dispositionType,
+            $originalName,
+            $fallbackName
+        );
+
+        return response($result->fileContent, Response::HTTP_OK, [
+            'Content-Type' => $result->mimeType,
+            'Content-Length' => (string) $result->sizeBytes,
+            'Content-Disposition' => $disposition,
+        ]);
+    }
+
+    /**
+     * Preview document inline in browser (requires view permission, enforces watermark).
+     */
+    public function preview(string $id, Request $request): HttpResponse
+    {
+        $document = $this->getDocumentByIdHandler->handle(new GetDocumentByIdQuery(id: $id));
+
+        $this->ensureCanAccessDocument($request->user(), $document);
+
+        $effective = $this->getEffectiveVdrPermissionHandler->handle(new GetEffectiveVdrPermissionQuery(
+            companyId: (string) $document->company_id,
+            role: (string) $request->user()->role,
+            userId: (string) $request->user()->id,
+            folderId: $document->folder_id ? (string) $document->folder_id : null,
+            documentId: $document->id
+        ));
+
+        $isUploader = (string) $document->uploaded_by_user_id === (string) $request->user()->id;
+        if (!$effective->canView() && !$isUploader) {
+            throw new AccessDeniedHttpException('Brak uprawnień do podglądu tego dokumentu.');
+        }
+
+        $watermarkOptions = null;
+        if ($effective->watermarkRequired() || $request->boolean('watermark', false)) {
+            $watermarkOptions = WatermarkOptions::create(
+                userName: (string) $request->user()->name,
+                userEmail: (string) $request->user()->email,
+                ipAddress: $request->ip(),
+                timestamp: now(),
+                companyName: $document->company?->name
+            );
+        }
+
+        $result = $this->downloadDocumentHandler->handle(new DownloadDocumentCommand(
+            id: $id,
+            userId: (string) $request->user()->id,
+            ipAddress: $request->ip(),
+            userAgent: $request->userAgent(),
+            watermarkOptions: $watermarkOptions
         ));
 
         $originalName = $result->originalName;
         $fallbackName = Str::ascii($originalName);
         $fallbackName = preg_replace('/[^\x20-\x7e]/', '', $fallbackName) ?: 'document';
         $disposition = HeaderUtils::makeDisposition(
-            HeaderUtils::DISPOSITION_ATTACHMENT,
+            HeaderUtils::DISPOSITION_INLINE,
             $originalName,
             $fallbackName
         );

@@ -8,13 +8,15 @@ use App\Contexts\DocumentManagement\Application\Exceptions\DocumentNotFoundExcep
 use App\Contexts\DocumentManagement\Application\Exceptions\FileNotFoundInStorageException;
 use App\Contexts\DocumentManagement\Domain\Repositories\DocumentRepositoryInterface;
 use App\Contexts\DocumentManagement\Domain\Services\DocumentStorageInterface;
+use App\Contexts\DocumentManagement\Domain\Services\PdfWatermarkServiceInterface;
 use App\Contexts\DocumentManagement\Domain\ValueObjects\DocumentId;
 
 final class DownloadDocumentHandler
 {
     public function __construct(
         private readonly DocumentRepositoryInterface $repository,
-        private readonly DocumentStorageInterface $storage
+        private readonly DocumentStorageInterface $storage,
+        private readonly PdfWatermarkServiceInterface $watermarkService
     ) {
     }
 
@@ -44,6 +46,16 @@ final class DownloadDocumentHandler
             documentTitle: $domainDoc->title(),
             companyId: $domainDoc->companyId()
         );
+
+        if (
+            $command->watermarkOptions !== null &&
+            $this->watermarkService->supportsWatermarking(
+                $domainDoc->fileMetadata()->mimeType(),
+                $domainDoc->fileMetadata()->originalName()
+            )
+        ) {
+            $fileContent = $this->watermarkService->applyWatermark($fileContent, $command->watermarkOptions);
+        }
 
         return new DownloadDocumentResult(
             fileContent: $fileContent,

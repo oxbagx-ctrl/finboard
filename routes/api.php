@@ -192,6 +192,8 @@ Route::prefix('v1')->group(function () {
                 )->name('api.documents.destroy');
             Route::get('/{id}/download', [DocumentController::class, 'download']
                 )->name('api.documents.download');
+            Route::get('/{id}/preview', [DocumentController::class, 'preview']
+                )->name('api.documents.preview');
             Route::patch('/{id}/archive', [DocumentController::class, 'archive']
                 )->name('api.documents.archive');
             Route::get('/{id}/audit-logs', [DocumentController::class, 'auditLogs']

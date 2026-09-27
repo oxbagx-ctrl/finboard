@@ -196,7 +196,8 @@ npm test
 - `POST /api/v1/documents` – Upload nowego dokumentu z wyliczeniem SHA-256, opcjonalnym folderem i indeksem Dewey oraz wpisem audytowym
 - `GET /api/v1/documents/{id}` – Metadane pojedynczego dokumentu z informacją o przypisanym folderze transakcyjnym
 - `PUT /api/v1/documents/{id}` – Aktualizacja tytułu, kategorii oraz przypisania folderu i indeksu dokumentu
-- `GET /api/v1/documents/{id}/download` – Bezpieczne pobranie pliku z inkrementacją licznika i wpisem w dzienniku pobrań
+- `GET /api/v1/documents/{id}/download` – Bezpieczne pobranie pliku z inkrementacją licznika, wpisem w dzienniku pobrań oraz dynamicznym znakiem wodnym (jeśli wymagany)
+- `GET /api/v1/documents/{id}/preview` – Bezpieczny podgląd pliku PDF bezpośrednio w przeglądarce (`inline`) z automatycznym znakiem wodnym
 - `PATCH /api/v1/documents/{id}/archive` – Przełączenie statusu archiwalnego dokumentu
 - `DELETE /api/v1/documents/{id}` – Usunięcie pliku z magazynu i bazy danych
 - `GET /api/v1/documents/{id}/audit-logs` – Rejestr zdarzeń i pobrań dla wskazanego dokumentu
@@ -845,6 +846,12 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Warstwa REST API: `VdrPermissionController`, `SetVdrPermissionRequest`, trasy `api.documents.permissions.*` (`GET matrix`, `GET effective`, `POST folders/{folderId}`, `POST documents/{documentId}`, `DELETE {type}/{id}`).
     - Bezpieczeństwo i autoryzacja: restrykcja modyfikacji wyłącznie dla doradców (`advisor`) i administratorów (`super_admin`), ścisła izolacja multi-tenant.
     - Pakiety testów: jednostkowe CQRS `VdrPermissionCqrsHandlersTest` (8 testów, 42 asercje), funkcjonalne REST API `VdrPermissionApiTest` (10 testów, 58 asercji), 100% PASS w pełnym zestawie 698 testów PHPUnit (8684 asercje) oraz 515 testów Vitest.
+  - [x] Usługa dynamicznego nakładania znaków wodnych PDF (Dynamic PDF Watermarking Service) (Commit 266).
+    - Obiekt wartości: `WatermarkOptions` (identyfikacja użytkownika, email, IP, znacznik czasu UTC, nazwa spółki, klauzula poufności, przezroczystość alfa, kąt obrotu, rozmiar fontu, formatowanie ukośnych linii, nagłówka i stopki).
+    - Silnik FPDI: instalacja `setasign/fpdf` i `setasign/fpdi`, rozszerzenie `WatermarkFpdi` z obsługą przezroczystości PDF 1.4+ (`/ExtGState`) oraz rotacji współrzędnych `rotate()`.
+    - Serwis domenowy: `FpdiPdfWatermarkService` implementujący `PdfWatermarkServiceInterface` ze skalowaniem do oryginalnej geometrii stron (A4/Letter, pion/poziom) oraz odpornym fallbackiem przy plikach nie-PDF.
+    - Integracja pobierania i podglądu: rozszerzenie `DownloadDocumentCommand` i `DownloadDocumentHandler`, aktualizacja `DocumentController::download` z wymuszeniem znaku wodnego wg uprawnienia efektywnego (`watermarkRequired()`) oraz nowy endpoint podglądu w przeglądarce `GET /api/v1/documents/{id}/preview` (`inline`).
+    - Pakiety testów: `WatermarkOptionsTest` (5 testów, 23 asercje), `PdfWatermarkServiceTest` (4 testy, 22 asercje), `PdfWatermarkIntegrationTest` (6 testów, 22 asercje), 100% PASS w pełnym zestawie 713 testów PHPUnit (8751 asercji) oraz 515 testów Vitest.
 
 ---
 

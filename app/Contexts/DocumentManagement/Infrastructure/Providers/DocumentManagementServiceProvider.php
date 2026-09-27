@@ -40,6 +40,11 @@ final class DocumentManagementServiceProvider extends ServiceProvider
             \App\Contexts\DocumentManagement\Domain\Repositories\VdrPermissionRepositoryInterface::class,
             \App\Contexts\DocumentManagement\Infrastructure\Repositories\EloquentVdrPermissionRepository::class
         );
+
+        $this->app->bind(
+            \App\Contexts\DocumentManagement\Domain\Services\PdfWatermarkServiceInterface::class,
+            \App\Contexts\DocumentManagement\Infrastructure\Services\FpdiPdfWatermarkService::class
+        );
     }
 
     public function boot(): void

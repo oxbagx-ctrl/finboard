@@ -266,13 +266,13 @@ describe('AdvisorsManagementView (SuperAdmin Dashboard)', () => {
         expect(screen.getAllByText('SUPER ADMIN').length).toBeGreaterThan(0);
 
         // Check advisors rendered
-        expect(screen.getByText('Super Partner Helvest')).toBeInTheDocument();
-        expect(screen.getByText('Krzysztof Kowalczyk')).toBeInTheDocument();
-        expect(screen.getByText('Marek Nowak')).toBeInTheDocument();
-
-        // Roles and statuses
-        expect(screen.getAllByText('DORADCA M&A').length).toBeGreaterThan(0);
-        expect(screen.getByText('NIEAKTYWNY')).toBeInTheDocument();
+        await waitFor(() => {
+            expect(screen.getByText('Super Partner Helvest')).toBeInTheDocument();
+            expect(screen.getByText('Krzysztof Kowalczyk')).toBeInTheDocument();
+            expect(screen.getByText('Marek Nowak')).toBeInTheDocument();
+            expect(screen.getAllByText('DORADCA M&A').length).toBeGreaterThan(0);
+            expect(screen.getByText('NIEAKTYWNY')).toBeInTheDocument();
+        });
     });
 
     it('switches between Advisors, Companies matrix, and Invitations tabs', async () => {
