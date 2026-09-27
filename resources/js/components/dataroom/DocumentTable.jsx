@@ -65,9 +65,11 @@ export const DocumentTable = ({
         const config = typeLabels[doc.type] || { label: doc.type_label || doc.type, cls: 'bg-zinc-850 border-zinc-750 text-zinc-300' };
 
         return (
-            <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold border ${config.cls}`}>
-                {config.label}
-            </span>
+            <Tooltip content={`Kategoria dokumentu: ${config.label}`}>
+                <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold border cursor-help ${config.cls}`}>
+                    {config.label}
+                </span>
+            </Tooltip>
         );
     };
 
@@ -98,16 +100,44 @@ export const DocumentTable = ({
                 <table className="w-full text-left border-collapse">
                     <thead>
                         <tr className="bg-zinc-950 border-b border-zinc-800 text-[10px] text-zinc-400 uppercase tracking-wider">
-                            <th className="py-2.5 px-4 font-semibold">Tytuł i Plik Źródłowy</th>
-                            <th className="py-2.5 px-3 font-semibold w-40">Kategoria VDR</th>
-                            <th className="py-2.5 px-3 font-semibold w-36">Suma SHA-256</th>
-                            <th className="py-2.5 px-3 font-semibold w-24 text-right">Rozmiar</th>
-                            <th className="py-2.5 px-3 font-semibold w-36">Wgrał / Data</th>
-                            <th className="py-2.5 px-3 font-semibold w-20 text-center">Pobrania</th>
-                            <th className="py-2.5 px-4 font-semibold w-44 text-right">Akcje</th>
+                            <th className="py-2.5 px-4 font-semibold">
+                                <Tooltip content="Nazwa transakcyjna dokumentu, kod taksonomii Dewey oraz fizyczna nazwa pliku źródłowego">
+                                    <span className="cursor-help">Tytuł i Plik Źródłowy</span>
+                                </Tooltip>
+                            </th>
+                            <th className="py-2.5 px-3 font-semibold w-40">
+                                <Tooltip content="Klasyfikacja dokumentu w taksonomii due diligence (np. raport finansowy, umowa, podatki)">
+                                    <span className="cursor-help">Kategoria VDR</span>
+                                </Tooltip>
+                            </th>
+                            <th className="py-2.5 px-3 font-semibold w-36">
+                                <Tooltip content="Kryptograficzny skrót SHA-256 gwarantujący integralność pliku (tamper detection)">
+                                    <span className="cursor-help">Suma SHA-256</span>
+                                </Tooltip>
+                            </th>
+                            <th className="py-2.5 px-3 font-semibold w-24 text-right">
+                                <Tooltip content="Fizyczny rozmiar pliku w formacie binarnym">
+                                    <span className="cursor-help">Rozmiar</span>
+                                </Tooltip>
+                            </th>
+                            <th className="py-2.5 px-3 font-semibold w-36">
+                                <Tooltip content="Operator wprowadzający dokument oraz data wgrania w czasie lokalnym">
+                                    <span className="cursor-help">Wgrał / Data</span>
+                                </Tooltip>
+                            </th>
+                            <th className="py-2.5 px-3 font-semibold w-20 text-center">
+                                <Tooltip content="Liczba zarejestrowanych pobrań pliku odnotowanych w audycie WORM">
+                                    <span className="cursor-help">Pobrania</span>
+                                </Tooltip>
+                            </th>
+                            <th className="py-2.5 px-4 font-semibold w-44 text-right">
+                                <Tooltip content="Dostępne operacje: podgląd ze znakiem wodnym, pobieranie, audyt WORM, edycja, archiwizacja i usunięcie">
+                                    <span className="cursor-help">Akcje</span>
+                                </Tooltip>
+                            </th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-zinc-850">
+                    <tbody className="divide-y divide-zinc-855">
                         {documents.map((doc) => (
                             <tr
                                 key={doc.id}
@@ -118,9 +148,11 @@ export const DocumentTable = ({
                                 {/* Title & Filename */}
                                 <td className="py-2.5 px-4">
                                     <div className="flex items-start gap-2.5">
-                                        <div className="mt-0.5 shrink-0 p-1 rounded bg-zinc-950 border border-zinc-800">
-                                            {getFileIcon(doc.mime_type, doc.type)}
-                                        </div>
+                                        <Tooltip content={`Format pliku: ${doc.mime_type || 'plik binarny'}`}>
+                                            <div className="mt-0.5 shrink-0 p-1 rounded bg-zinc-950 border border-zinc-800 cursor-help">
+                                                {getFileIcon(doc.mime_type, doc.type)}
+                                            </div>
+                                        </Tooltip>
                                         <div className="min-w-0">
                                             <div className="flex items-center gap-1.5 flex-wrap">
                                                 {doc.index_code && (
@@ -131,7 +163,7 @@ export const DocumentTable = ({
                                                     </Tooltip>
                                                 )}
                                                 <Tooltip content={doc.title}>
-                                                    <span className="font-bold text-zinc-100 truncate hover:text-white">
+                                                    <span className="font-bold text-zinc-100 truncate hover:text-white cursor-help">
                                                         {doc.title}
                                                     </span>
                                                 </Tooltip>
@@ -139,20 +171,22 @@ export const DocumentTable = ({
                                                     <WatermarkBadge required={true} size="xs" />
                                                 )}
                                                 {doc.is_archived && (
-                                                    <span className="px-1.5 py-0.2 rounded text-[9px] font-bold uppercase bg-amber-950/80 border border-amber-800 text-amber-300">
-                                                        Archiwum
-                                                    </span>
+                                                    <Tooltip content="Dokument zarchiwizowany — wyłączony ze standardowych audytów">
+                                                        <span className="px-1.5 py-0.2 rounded text-[9px] font-bold uppercase bg-amber-950/80 border border-amber-800 text-amber-300 cursor-help">
+                                                            Archiwum
+                                                        </span>
+                                                    </Tooltip>
                                                 )}
                                             </div>
                                             <div className="flex items-center gap-2 text-[10px] text-zinc-500 truncate mt-0.5">
-                                                <Tooltip content={`Oryginalna nazwa: ${doc.original_name}`}>
-                                                    <span className="truncate">{doc.original_name}</span>
+                                                <Tooltip content={`Oryginalna nazwa pliku: ${doc.original_name}`}>
+                                                    <span className="truncate cursor-help">{doc.original_name}</span>
                                                 </Tooltip>
                                                 {doc.folder && (
                                                     <>
                                                         <span className="text-zinc-650">•</span>
                                                         <Tooltip content={`Folder: ${doc.folder.index_code} ${doc.folder.name}`}>
-                                                            <span className="text-zinc-400 truncate max-w-[220px]">
+                                                            <span className="text-zinc-400 truncate max-w-[220px] cursor-help">
                                                                 📁 {doc.folder.index_code} {doc.folder.name}
                                                             </span>
                                                         </Tooltip>
@@ -197,24 +231,34 @@ export const DocumentTable = ({
 
                                 {/* File Size */}
                                 <td className="py-2.5 px-3 text-right font-mono text-zinc-300 tabular-nums whitespace-nowrap">
-                                    {doc.formatted_size || formatFileSize(doc.size_bytes)}
+                                    <Tooltip content={`Fizyczny rozmiar pliku: ${doc.size_bytes?.toLocaleString('pl-PL') || 0} bajtów`}>
+                                        <span className="cursor-help">
+                                            {doc.formatted_size || formatFileSize(doc.size_bytes)}
+                                        </span>
+                                    </Tooltip>
                                 </td>
 
                                 {/* Uploader & Date */}
                                 <td className="py-2.5 px-3 whitespace-nowrap">
-                                    <div className="text-[11px] text-zinc-300 truncate">
-                                        {doc.uploader?.name || 'Użytkownik'}
-                                    </div>
-                                    <div className="text-[10px] text-zinc-500">
-                                        {formatFinancialDate(doc.created_at)}
-                                    </div>
+                                    <Tooltip content={`Wgrany przez: ${doc.uploader?.name || 'Użytkownik'}${doc.uploader?.email ? ` (${doc.uploader.email})` : ''} w dniu ${formatFinancialDate(doc.created_at)}`}>
+                                        <div className="cursor-help">
+                                            <div className="text-[11px] text-zinc-300 truncate">
+                                                {doc.uploader?.name || 'Użytkownik'}
+                                            </div>
+                                            <div className="text-[10px] text-zinc-500">
+                                                {formatFinancialDate(doc.created_at)}
+                                            </div>
+                                        </div>
+                                    </Tooltip>
                                 </td>
 
                                 {/* Download count */}
                                 <td className="py-2.5 px-3 text-center whitespace-nowrap">
-                                    <span className="inline-flex items-center justify-center px-2 py-0.5 rounded text-[10px] font-bold bg-zinc-950 border border-zinc-800 text-zinc-300 tabular-nums">
-                                        {doc.download_count || 0}
-                                    </span>
+                                    <Tooltip content={`Łączna liczba pobrań: ${doc.download_count || 0}. Zdarzenia są rejestrowane w audycie WORM.`}>
+                                        <span className="inline-flex items-center justify-center px-2 py-0.5 rounded text-[10px] font-bold bg-zinc-950 border border-zinc-800 text-zinc-300 tabular-nums cursor-help">
+                                            {doc.download_count || 0}
+                                        </span>
+                                    </Tooltip>
                                 </td>
 
                                 {/* Actions */}
@@ -241,19 +285,21 @@ export const DocumentTable = ({
                                                 : 'Pobierz dokument (rejestruje pobranie w audycie)'
                                             }
                                         >
-                                            <button
-                                                type="button"
-                                                onClick={() => onDownload(doc)}
-                                                disabled={doc.can_download === false}
-                                                aria-label={doc.can_download === false ? 'Pobieranie zablokowane' : 'Pobierz dokument'}
-                                                className={`p-1.5 rounded transition-colors ${
-                                                    doc.can_download === false
-                                                        ? 'text-zinc-600 border border-zinc-800 cursor-not-allowed opacity-40'
-                                                        : 'text-emerald-400 hover:bg-emerald-950/60 hover:text-emerald-300 border border-emerald-900/60'
-                                                }`}
-                                            >
-                                                <Download className="w-3.5 h-3.5" />
-                                            </button>
+                                            <span>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => onDownload(doc)}
+                                                    disabled={doc.can_download === false}
+                                                    aria-label={doc.can_download === false ? 'Pobieranie zablokowane' : 'Pobierz dokument'}
+                                                    className={`p-1.5 rounded transition-colors ${
+                                                        doc.can_download === false
+                                                            ? 'text-zinc-600 border border-zinc-800 cursor-not-allowed opacity-40'
+                                                            : 'text-emerald-400 hover:bg-emerald-950/60 hover:text-emerald-300 border border-emerald-900/60'
+                                                    }`}
+                                                >
+                                                    <Download className="w-3.5 h-3.5" />
+                                                </button>
+                                            </span>
                                         </Tooltip>
 
                                         {/* View Audit Trail */}

@@ -1,6 +1,7 @@
 import React from 'react';
 import { FolderLock, HardDrive, DownloadCloud, Tags, ShieldCheck, Lock, CheckCircle2 } from 'lucide-react';
 import { formatFileSize } from '../../utils/formatters';
+import { Tooltip, InfoTooltip } from '../ui/Tooltip';
 
 export const DataRoomStats = ({ documents = [], totalCount = 0 }) => {
     const totalBytes = documents.reduce((acc, doc) => acc + (doc.size_bytes || 0), 0);
@@ -19,6 +20,12 @@ export const DataRoomStats = ({ documents = [], totalCount = 0 }) => {
                         <span className="text-[10px] uppercase font-semibold text-zinc-400 tracking-wider flex items-center gap-1.5">
                             <FolderLock className="w-3.5 h-3.5 text-zinc-400" />
                             Dokumenty VDR
+                            <InfoTooltip
+                                size="xs"
+                                title="Dokumenty VDR"
+                                content="Łączna liczba zdeponowanych dokumentów w wirtualnym pokoju danych z podziałem na aktywne pozycje i pozycje archiwalne."
+                                ariaLabel="Więcej informacji o dokumentach VDR"
+                            />
                         </span>
                         <div className="mt-1 text-xl font-bold text-zinc-100 tabular-nums">
                             {totalCount || documents.length}
@@ -35,6 +42,12 @@ export const DataRoomStats = ({ documents = [], totalCount = 0 }) => {
                         <span className="text-[10px] uppercase font-semibold text-zinc-400 tracking-wider flex items-center gap-1.5">
                             <HardDrive className="w-3.5 h-3.5 text-zinc-400" />
                             Wolumen Danych
+                            <InfoTooltip
+                                size="xs"
+                                title="Wolumen Danych"
+                                content="Łączny rozmiar fizyczny wszystkich zdeponowanych plików w zaszyfrowanym magazynie danych (AES-256 GCM)."
+                                ariaLabel="Więcej informacji o wolumenie danych"
+                            />
                         </span>
                         <div className="mt-1 text-xl font-bold text-zinc-100 tabular-nums">
                             {formatFileSize(totalBytes)}
@@ -51,6 +64,12 @@ export const DataRoomStats = ({ documents = [], totalCount = 0 }) => {
                         <span className="text-[10px] uppercase font-semibold text-zinc-400 tracking-wider flex items-center gap-1.5">
                             <DownloadCloud className="w-3.5 h-3.5 text-zinc-400" />
                             Pobrania Audytowe
+                            <InfoTooltip
+                                size="xs"
+                                title="Pobrania Audytowe"
+                                content="Liczba zarejestrowanych pobrań dokumentów. Każde pobranie tworzy niezmienny wpis w rejestrze WORM wraz ze stemplem czasowym, adresem IP i podpisem sesji."
+                                ariaLabel="Więcej informacji o pobraniach audytowych"
+                            />
                         </span>
                         <div className="mt-1 text-xl font-bold text-zinc-100 tabular-nums">
                             {totalDownloads}
@@ -67,6 +86,12 @@ export const DataRoomStats = ({ documents = [], totalCount = 0 }) => {
                         <span className="text-[10px] uppercase font-semibold text-zinc-400 tracking-wider flex items-center gap-1.5">
                             <Tags className="w-3.5 h-3.5 text-zinc-400" />
                             Kategorie Due Diligence
+                            <InfoTooltip
+                                size="xs"
+                                title="Kategorie Due Diligence"
+                                content="Pokrycie 6 standardowych kategorii taksonomii transakcyjnej M&A (raporty finansowe, umowy, deklaracje podatkowe, audyty, prezentacje, inne)."
+                                ariaLabel="Więcej informacji o kategoriach Due Diligence"
+                            />
                         </span>
                         <div className="mt-1 text-xl font-bold text-zinc-100 tabular-nums">
                             {uniqueCategories} / 6
@@ -81,20 +106,26 @@ export const DataRoomStats = ({ documents = [], totalCount = 0 }) => {
             {/* Cryptographic & Compliance Banner */}
             <div className="px-3.5 py-2 bg-zinc-950 border border-zinc-800/80 rounded-md flex flex-wrap items-center justify-between gap-3 text-[10px] text-zinc-400">
                 <div className="flex items-center gap-4">
-                    <span className="flex items-center gap-1.5 text-zinc-300">
-                        <Lock className="w-3 h-3 text-emerald-400" />
-                        <span>SZYFROWANIE DANYCH SPOCZYNKOWYCH: <strong>AES-256 GCM</strong></span>
-                    </span>
+                    <Tooltip content="Wszystkie dokumenty na dysku są szyfrowane sprzętowo algorytmem AES-256 w trybie GCM (Galois/Counter Mode)">
+                        <span className="flex items-center gap-1.5 text-zinc-300 cursor-help">
+                            <Lock className="w-3 h-3 text-emerald-400" />
+                            <span>SZYFROWANIE DANYCH SPOCZYNKOWYCH: <strong>AES-256 GCM</strong></span>
+                        </span>
+                    </Tooltip>
                     <span className="hidden sm:inline text-zinc-700">|</span>
-                    <span className="flex items-center gap-1.5 text-zinc-300">
-                        <ShieldCheck className="w-3 h-3 text-zinc-300" />
-                        <span>INTEGRALNOŚĆ PLIKÓW: <strong>SUMY KONTROLNE SHA-256</strong></span>
-                    </span>
+                    <Tooltip content="Każdy przesłany plik posiada unikalny kryptograficzny skrót SHA-256 weryfikowany przy każdym pobraniu">
+                        <span className="flex items-center gap-1.5 text-zinc-300 cursor-help">
+                            <ShieldCheck className="w-3 h-3 text-zinc-300" />
+                            <span>INTEGRALNOŚĆ PLIKÓW: <strong>SUMY KONTROLNE SHA-256</strong></span>
+                        </span>
+                    </Tooltip>
                 </div>
-                <div className="flex items-center gap-1.5 text-emerald-400 font-bold">
-                    <CheckCircle2 className="w-3 h-3" />
-                    IMMUTABLE AUDIT TRAIL LOGGED
-                </div>
+                <Tooltip content="Niezmienny rejestr zdarzeń WORM (Write Once, Read Many) uniemożliwia modyfikację lub ukrycie historii operacji">
+                    <div className="flex items-center gap-1.5 text-emerald-400 font-bold cursor-help">
+                        <CheckCircle2 className="w-3 h-3" />
+                        IMMUTABLE AUDIT TRAIL LOGGED
+                    </div>
+                </Tooltip>
             </div>
         </div>
     );

@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import apiClient from '../../api/client';
 import { Button } from '../ui/Button';
+import { Tooltip, InfoTooltip } from '../ui/Tooltip';
 import {
     X,
     ShieldCheck,
-    DownloadCloud,
-    UploadCloud,
-    Archive,
-    RotateCcw,
     Clock,
     User,
     Globe,
@@ -58,42 +55,61 @@ export const DocumentAuditModal = ({
                             <ShieldCheck className="w-3.5 h-3.5" />
                         </div>
                         <div>
-                            <h2 className="text-xs font-bold uppercase tracking-wider text-zinc-100">
-                                Rejestr Ścieżki Audytowej Dokumentu
-                            </h2>
+                            <div className="flex items-center gap-1.5">
+                                <h2 className="text-xs font-bold uppercase tracking-wider text-zinc-100">
+                                    Rejestr Ścieżki Audytowej Dokumentu
+                                </h2>
+                                <InfoTooltip
+                                    size="xs"
+                                    title="Niezmienny Dziennik Audytowy (WORM)"
+                                    content="Każde pobranie, zmiana metadanych, zarchiwizowanie oraz modyfikacja uprawnień są trwale logowane w chronionym rejestrze zdarzeń."
+                                    ariaLabel="Więcej informacji o rejestrze audytowym"
+                                />
+                            </div>
                             <p className="text-[10px] text-zinc-500">
                                 IMMUTABLE ACCESS & DOWNLOAD TRAIL
                             </p>
                         </div>
                     </div>
                     <div className="flex items-center gap-2">
-                        <button
-                            onClick={fetchLogs}
-                            disabled={loading}
-                            title="Odśwież wpisy"
-                            className="p-1 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors"
-                        >
-                            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-                        </button>
-                        <button
-                            onClick={onClose}
-                            className="p-1 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors"
-                        >
-                            <X className="w-4 h-4" />
-                        </button>
+                        <Tooltip content="Odśwież wpisy audytowe">
+                            <button
+                                onClick={fetchLogs}
+                                disabled={loading}
+                                title="Odśwież wpisy"
+                                aria-label="Odśwież wpisy"
+                                className="p-1 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors"
+                            >
+                                <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+                            </button>
+                        </Tooltip>
+                        <Tooltip content="Zamknij rejestr audytowy">
+                            <button
+                                onClick={onClose}
+                                title="Zamknij"
+                                aria-label="Zamknij rejestr audytowy"
+                                className="p-1 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors"
+                            >
+                                <X className="w-4 h-4" />
+                            </button>
+                        </Tooltip>
                     </div>
                 </div>
 
                 {/* Subheader info */}
                 <div className="px-5 py-2.5 bg-zinc-950/50 border-b border-zinc-800/80 text-[11px] flex items-center justify-between text-zinc-400 shrink-0">
-                    <div className="flex items-center gap-2 truncate">
-                        <FileText className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
-                        <span className="font-bold text-zinc-200 truncate">{document.title}</span>
-                        <span className="text-zinc-500 text-[10px]">({document.original_name})</span>
-                    </div>
-                    <div className="text-[10px] text-zinc-500 shrink-0 ml-3">
-                        Łącznie zdarzeń: <strong className="text-zinc-200 font-bold">{logs.length}</strong>
-                    </div>
+                    <Tooltip content={`Dokument: ${document.title} (${document.original_name})`}>
+                        <div className="flex items-center gap-2 truncate cursor-help">
+                            <FileText className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
+                            <span className="font-bold text-zinc-200 truncate">{document.title}</span>
+                            <span className="text-zinc-500 text-[10px]">({document.original_name})</span>
+                        </div>
+                    </Tooltip>
+                    <Tooltip content="Łączna liczba zarejestrowanych zdarzeń audytowych">
+                        <div className="text-[10px] text-zinc-500 shrink-0 ml-3 cursor-help">
+                            Łącznie zdarzeń: <strong className="text-zinc-200 font-bold">{logs.length}</strong>
+                        </div>
+                    </Tooltip>
                 </div>
 
                 {/* Body / Log List */}
@@ -119,29 +135,37 @@ export const DocumentAuditModal = ({
                                             {getActionBadge(log.action)}
                                         </div>
                                         <div>
-                                            <div className="font-semibold text-zinc-200 text-xs flex items-center gap-1.5">
-                                                <User className="w-3 h-3 text-zinc-500" />
-                                                {log.user?.name || 'Użytkownik nieznany'}
-                                                <span className="text-[10px] text-zinc-500 font-normal">
-                                                    ({log.user?.email || 'brak e-mail'}) [{log.user?.role || 'N/A'}]
-                                                </span>
-                                            </div>
+                                            <Tooltip content={`Użytkownik: ${log.user?.name || 'Nieznany'} | Email: ${log.user?.email || 'brak'} | Rola: ${log.user?.role || 'N/A'}`}>
+                                                <div className="font-semibold text-zinc-200 text-xs flex items-center gap-1.5 cursor-help">
+                                                    <User className="w-3 h-3 text-zinc-500" />
+                                                    {log.user?.name || 'Użytkownik nieznany'}
+                                                    <span className="text-[10px] text-zinc-500 font-normal">
+                                                        ({log.user?.email || 'brak e-mail'}) [{log.user?.role || 'N/A'}]
+                                                    </span>
+                                                </div>
+                                            </Tooltip>
                                             <div className="text-[10px] text-zinc-500 mt-0.5 flex flex-wrap items-center gap-3">
-                                                <span className="flex items-center gap-1">
-                                                    <Globe className="w-2.5 h-2.5" />
-                                                    IP: <strong className="text-zinc-400">{log.ip_address || '127.0.0.1'}</strong>
-                                                </span>
-                                                <span className="truncate max-w-xs text-zinc-500" title={log.user_agent}>
-                                                    Agent: {log.user_agent || 'Klient FinBoard'}
-                                                </span>
+                                                <Tooltip content={`Adres IP klienta wywołującego żądanie: ${log.ip_address || '127.0.0.1'}`}>
+                                                    <span className="flex items-center gap-1 cursor-help">
+                                                        <Globe className="w-2.5 h-2.5" />
+                                                        IP: <strong className="text-zinc-400">{log.ip_address || '127.0.0.1'}</strong>
+                                                    </span>
+                                                </Tooltip>
+                                                <Tooltip content={`Pełny identyfikator User-Agent: ${log.user_agent || 'Klient FinBoard'}`}>
+                                                    <span className="truncate max-w-xs text-zinc-500 cursor-help" title={log.user_agent}>
+                                                        Agent: {log.user_agent || 'Klient FinBoard'}
+                                                    </span>
+                                                </Tooltip>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className="text-[10px] text-zinc-400 shrink-0 flex items-center gap-1 sm:self-center font-mono">
-                                        <Clock className="w-3 h-3 text-zinc-500" />
-                                        {formatDateTime(log.created_at)}
-                                    </div>
+                                    <Tooltip content={`Dokładny znacznik czasu zdarzenia: ${formatDateTime(log.created_at)}`}>
+                                        <div className="text-[10px] text-zinc-400 shrink-0 flex items-center gap-1 sm:self-center font-mono cursor-help">
+                                            <Clock className="w-3 h-3 text-zinc-500" />
+                                            {formatDateTime(log.created_at)}
+                                        </div>
+                                    </Tooltip>
                                 </div>
                             ))}
                         </div>
@@ -150,12 +174,18 @@ export const DocumentAuditModal = ({
 
                 {/* Footer */}
                 <div className="px-5 py-3 bg-zinc-950 border-t border-zinc-800 flex items-center justify-between shrink-0">
-                    <div className="text-[10px] text-zinc-500">
-                        Zdarzenia audytowe są trwale chronione przed modyfikacją (append-only ledger).
-                    </div>
-                    <Button variant="secondary" size="sm" onClick={onClose}>
-                        Zamknij
-                    </Button>
+                    <Tooltip content="Rejestr zdarzeń WORM chroni przed manipulacją danymi audytowymi">
+                        <div className="text-[10px] text-zinc-500 cursor-help">
+                            Zdarzenia audytowe są trwale chronione przed modyfikacją (append-only ledger).
+                        </div>
+                    </Tooltip>
+                    <Tooltip content="Zamknij rejestr audytowy">
+                        <span>
+                            <Button variant="secondary" size="sm" onClick={onClose} aria-label="Zamknij">
+                                Zamknij
+                            </Button>
+                        </span>
+                    </Tooltip>
                 </div>
             </div>
         </div>

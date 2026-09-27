@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import apiClient from '../../api/client';
 import { useNotification } from '../../context/NotificationContext';
 import { Button } from '../ui/Button';
+import { Tooltip, InfoTooltip } from '../ui/Tooltip';
 import { X, FolderPlus, AlertCircle, FolderTree, Hash, FileText } from 'lucide-react';
 
 export const CreateFolderModal = ({
@@ -135,14 +136,17 @@ export const CreateFolderModal = ({
                             </p>
                         </div>
                     </div>
-                    <button
-                        type="button"
-                        onClick={onClose}
-                        disabled={saving}
-                        className="p-1 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors disabled:opacity-50"
-                    >
-                        <X className="w-4 h-4" />
-                    </button>
+                    <Tooltip content="Zamknij formularz tworzenia folderu">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            disabled={saving}
+                            aria-label="Zamknij formularz"
+                            className="p-1 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors disabled:opacity-50"
+                        >
+                            <X className="w-4 h-4" />
+                        </button>
+                    </Tooltip>
                 </div>
 
                 {/* Form */}
@@ -152,6 +156,12 @@ export const CreateFolderModal = ({
                         <label className="block text-[11px] font-semibold text-zinc-300 mb-1 flex items-center gap-1.5">
                             <FolderTree className="w-3.5 h-3.5 text-zinc-400" />
                             Folder Nadrzędny (Katalog)
+                            <InfoTooltip
+                                size="xs"
+                                title="Folder Nadrzędny"
+                                content="Wskaż folder rodzica w hierarchii dziesiętnej Dewey lub pozostaw pusty, aby utworzyć kategorię główną (Root)."
+                                ariaLabel="Informacje o folderze nadrzędnym"
+                            />
                         </label>
                         <select
                             value={parentId}
@@ -177,6 +187,12 @@ export const CreateFolderModal = ({
                             <label className="block text-[11px] font-semibold text-zinc-300 mb-1 flex items-center gap-1.5">
                                 <Hash className="w-3.5 h-3.5 text-indigo-400" />
                                 Kod Dewey *
+                                <InfoTooltip
+                                    size="xs"
+                                    title="Kod Dewey"
+                                    content="Format dziesiętny taksonomii M&A (np. 01.00 lub 01.01.02), określający unikalny numer i pozycję w strukturze due diligence."
+                                    ariaLabel="Informacje o kodzie Dewey"
+                                />
                             </label>
                             <input
                                 type="text"
@@ -257,24 +273,34 @@ export const CreateFolderModal = ({
 
                     {/* Actions */}
                     <div className="flex items-center justify-end gap-2 pt-3 border-t border-zinc-800">
-                        <Button
-                            type="button"
-                            variant="secondary"
-                            size="sm"
-                            disabled={saving}
-                            onClick={onClose}
-                        >
-                            Anuluj
-                        </Button>
-                        <Button
-                            type="submit"
-                            variant="primary"
-                            size="sm"
-                            loading={saving}
-                            icon={FolderPlus}
-                        >
-                            Utwórz Folder
-                        </Button>
+                        <Tooltip content="Anuluj i zamknij okno tworzenia folderu">
+                            <span>
+                                <Button
+                                    type="button"
+                                    variant="secondary"
+                                    size="sm"
+                                    disabled={saving}
+                                    onClick={onClose}
+                                    aria-label="Anuluj"
+                                >
+                                    Anuluj
+                                </Button>
+                            </span>
+                        </Tooltip>
+                        <Tooltip content="Zapisz nowy folder transakcyjny w strukturze Dewey">
+                            <span>
+                                <Button
+                                    type="submit"
+                                    variant="primary"
+                                    size="sm"
+                                    loading={saving}
+                                    icon={FolderPlus}
+                                    aria-label="Utwórz Folder"
+                                >
+                                    Utwórz Folder
+                                </Button>
+                            </span>
+                        </Tooltip>
                     </div>
                 </form>
             </div>

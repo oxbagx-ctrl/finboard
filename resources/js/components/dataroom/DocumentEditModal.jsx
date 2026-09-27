@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import apiClient from '../../api/client';
 import { useNotification } from '../../context/NotificationContext';
 import { Button } from '../ui/Button';
+import { Tooltip, InfoTooltip } from '../ui/Tooltip';
 import { X, Edit3, AlertCircle, FileText, Hash } from 'lucide-react';
 
 const DOCUMENT_CATEGORIES = [
@@ -128,13 +129,16 @@ export const DocumentEditModal = ({
                             </p>
                         </div>
                     </div>
-                    <button
-                        onClick={onClose}
-                        disabled={saving}
-                        className="p-1 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors disabled:opacity-50"
-                    >
-                        <X className="w-4 h-4" />
-                    </button>
+                    <Tooltip content="Zamknij formularz edycji">
+                        <button
+                            onClick={onClose}
+                            disabled={saving}
+                            aria-label="Zamknij formularz"
+                            className="p-1 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors disabled:opacity-50"
+                        >
+                            <X className="w-4 h-4" />
+                        </button>
+                    </Tooltip>
                 </div>
 
                 {/* Form */}
@@ -146,23 +150,32 @@ export const DocumentEditModal = ({
                             <span className="text-zinc-500">Plik źródłowy:</span>
                             <span className="text-zinc-200 font-semibold truncate">{document.original_name}</span>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <Hash className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
-                            <span className="text-zinc-500">SHA-256:</span>
-                            <span className="text-zinc-300 font-mono text-[10px] truncate">{document.checksum_sha256}</span>
-                        </div>
+                        <Tooltip content={`Pełna suma kontrolna SHA-256: ${document.checksum_sha256}`}>
+                            <div className="flex items-center gap-2 cursor-help">
+                                <Hash className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
+                                <span className="text-zinc-500">SHA-256:</span>
+                                <span className="text-zinc-300 font-mono text-[10px] truncate">{document.checksum_sha256}</span>
+                            </div>
+                        </Tooltip>
                     </div>
 
                     {/* Title */}
                     <div>
-                        <label className="block text-[10px] uppercase font-semibold text-zinc-400 mb-1">
-                            Tytuł Biznesowy Dokumentu
+                        <label className="block text-[10px] uppercase font-semibold text-zinc-400 mb-1 flex items-center gap-1.5">
+                            Tytuł Biznesowy Dokumentu *
+                            <InfoTooltip
+                                size="xs"
+                                title="Tytuł Biznesowy"
+                                content="Oficjalna nazwa dokumentu widoczna dla audytorów i uczestników procesu due diligence."
+                                ariaLabel="Informacje o tytule biznesowym"
+                            />
                         </label>
                         <input
                             type="text"
                             required
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
+                            aria-label="Tytuł Biznesowy Dokumentu"
                             className="w-full bg-zinc-950 border border-zinc-750 rounded px-3 py-2 text-xs text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
                         />
                         {errors.title && (
@@ -176,12 +189,19 @@ export const DocumentEditModal = ({
                     {/* Category & Folder Row */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
-                            <label className="block text-[10px] uppercase font-semibold text-zinc-400 mb-1">
+                            <label className="block text-[10px] uppercase font-semibold text-zinc-400 mb-1 flex items-center gap-1.5">
                                 Kategoria Dokumentu *
+                                <InfoTooltip
+                                    size="xs"
+                                    title="Kategoria Dokumentu"
+                                    content="Obszar transakcyjny lub merytoryczny pliku (raport finansowy, umowa, podatki, audyt, prezentacja itp.)."
+                                    ariaLabel="Informacje o kategorii dokumentu"
+                                />
                             </label>
                             <select
                                 value={type}
                                 onChange={(e) => setType(e.target.value)}
+                                aria-label="Kategoria Dokumentu"
                                 className="w-full bg-zinc-950 border border-zinc-750 rounded px-3 py-2 text-xs text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
                             >
                                 {DOCUMENT_CATEGORIES.map(cat => (
@@ -199,8 +219,14 @@ export const DocumentEditModal = ({
                         </div>
 
                         <div>
-                            <label className="block text-[10px] uppercase font-semibold text-zinc-400 mb-1">
+                            <label className="block text-[10px] uppercase font-semibold text-zinc-400 mb-1 flex items-center gap-1.5">
                                 Folder M&A (Dewey)
+                                <InfoTooltip
+                                    size="xs"
+                                    title="Folder M&A"
+                                    content="Przypisz dokument do pozycji w hierarchicznym drzewie taksonomii Dewey."
+                                    ariaLabel="Informacje o folderze M&A"
+                                />
                             </label>
                             <select
                                 value={folderId}
@@ -214,6 +240,7 @@ export const DocumentEditModal = ({
                                         }
                                     }
                                 }}
+                                aria-label="Folder M&A"
                                 className="w-full bg-zinc-950 border border-zinc-750 rounded px-3 py-2 text-xs text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
                             >
                                 <option value="">— Brak folderu (Nieprzypisany) —</option>
@@ -228,14 +255,21 @@ export const DocumentEditModal = ({
 
                     {/* Dewey Index Code */}
                     <div>
-                        <label className="block text-[10px] uppercase font-semibold text-zinc-400 mb-1">
+                        <label className="block text-[10px] uppercase font-semibold text-zinc-400 mb-1 flex items-center gap-1.5">
                             Kod Indeksu Dewey (np. 01.01.01)
+                            <InfoTooltip
+                                size="xs"
+                                title="Kod Indeksu Dewey"
+                                content="Precyzyjny identyfikator podkatalogowy (np. 01.01.01) pozycjonujący plik w strukturze folderu."
+                                ariaLabel="Informacje o kodzie Dewey"
+                            />
                         </label>
                         <input
                             type="text"
                             value={indexCode}
                             onChange={(e) => setIndexCode(e.target.value)}
                             placeholder="np. 01.01.01 (opcjonalny)"
+                            aria-label="Kod Indeksu Dewey"
                             className="w-full bg-zinc-950 border border-zinc-750 rounded px-3 py-2 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
                         />
                         {errors.index_code && (
@@ -251,23 +285,33 @@ export const DocumentEditModal = ({
 
                     {/* Actions */}
                     <div className="pt-2 border-t border-zinc-800 flex items-center justify-end gap-2">
-                        <Button
-                            variant="secondary"
-                            size="sm"
-                            type="button"
-                            onClick={onClose}
-                            disabled={saving}
-                        >
-                            Anuluj
-                        </Button>
-                        <Button
-                            variant="primary"
-                            size="sm"
-                            type="submit"
-                            loading={saving}
-                        >
-                            Zapisz Zmiany
-                        </Button>
+                        <Tooltip content="Odrzuć zmiany i zamknij okno edycji">
+                            <span>
+                                <Button
+                                    variant="secondary"
+                                    size="sm"
+                                    type="button"
+                                    onClick={onClose}
+                                    disabled={saving}
+                                    aria-label="Anuluj"
+                                >
+                                    Anuluj
+                                </Button>
+                            </span>
+                        </Tooltip>
+                        <Tooltip content="Zapisz zaktualizowane metadane dokumentu VDR">
+                            <span>
+                                <Button
+                                    variant="primary"
+                                    size="sm"
+                                    type="submit"
+                                    loading={saving}
+                                    aria-label="Zapisz Zmiany"
+                                >
+                                    Zapisz Zmiany
+                                </Button>
+                            </span>
+                        </Tooltip>
                     </div>
                 </form>
             </div>

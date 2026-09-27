@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import apiClient from '../../api/client';
 import { useNotification } from '../../context/NotificationContext';
 import { Button } from '../ui/Button';
+import { Tooltip } from '../ui/Tooltip';
 import { AlertTriangle, X, Trash2 } from 'lucide-react';
 
 export const DeleteDocumentModal = ({
@@ -39,13 +40,16 @@ export const DeleteDocumentModal = ({
                             Potwierdzenie Usunięcia Dokumentu
                         </h2>
                     </div>
-                    <button
-                        onClick={onClose}
-                        disabled={deleting}
-                        className="p-1 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors disabled:opacity-50"
-                    >
-                        <X className="w-4 h-4" />
-                    </button>
+                    <Tooltip content="Zamknij okno potwierdzenia">
+                        <button
+                            onClick={onClose}
+                            disabled={deleting}
+                            aria-label="Zamknij okno"
+                            className="p-1 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors disabled:opacity-50"
+                        >
+                            <X className="w-4 h-4" />
+                        </button>
+                    </Tooltip>
                 </div>
 
                 <div className="p-5 space-y-4">
@@ -59,31 +63,43 @@ export const DeleteDocumentModal = ({
                         <div className="text-[10px] text-zinc-500">ID: {document.id}</div>
                     </div>
 
-                    <div className="text-[10px] text-rose-400 bg-rose-950/30 border border-rose-900/60 p-2.5 rounded flex items-start gap-2">
-                        <AlertTriangle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
-                        <span>
-                            Operacja jest nieodwracalna. Plik binarny oraz rekord w bazie zostaną trwale wykasowane.
-                        </span>
-                    </div>
+                    <Tooltip content="Trwałe usunięcie jest nieodwracalne i zostanie odnotowane w ścieżce audytowej WORM">
+                        <div className="text-[10px] text-rose-400 bg-rose-950/30 border border-rose-900/60 p-2.5 rounded flex items-start gap-2 cursor-help">
+                            <AlertTriangle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                            <span>
+                                Operacja jest nieodwracalna. Plik binarny oraz rekord w bazie zostaną trwale wykasowane.
+                            </span>
+                        </div>
+                    </Tooltip>
 
                     <div className="pt-2 border-t border-zinc-800 flex items-center justify-end gap-2">
-                        <Button
-                            variant="secondary"
-                            size="sm"
-                            onClick={onClose}
-                            disabled={deleting}
-                        >
-                            Anuluj
-                        </Button>
-                        <Button
-                            variant="danger"
-                            size="sm"
-                            icon={Trash2}
-                            loading={deleting}
-                            onClick={handleDelete}
-                        >
-                            Usuń Dokument
-                        </Button>
+                        <Tooltip content="Anuluj i powróć do listy dokumentów">
+                            <span>
+                                <Button
+                                    variant="secondary"
+                                    size="sm"
+                                    onClick={onClose}
+                                    disabled={deleting}
+                                    aria-label="Anuluj"
+                                >
+                                    Anuluj
+                                </Button>
+                            </span>
+                        </Tooltip>
+                        <Tooltip content="Potwierdź trwałe skasowanie pliku i metadanych z VDR">
+                            <span>
+                                <Button
+                                    variant="danger"
+                                    size="sm"
+                                    icon={Trash2}
+                                    loading={deleting}
+                                    onClick={handleDelete}
+                                    aria-label="Usuń Dokument"
+                                >
+                                    Usuń Dokument
+                                </Button>
+                            </span>
+                        </Tooltip>
                     </div>
                 </div>
             </div>

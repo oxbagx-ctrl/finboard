@@ -3,6 +3,7 @@ import apiClient from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
 import { Button } from '../components/ui/Button';
+import { Tooltip, InfoTooltip } from '../components/ui/Tooltip';
 import { DataRoomStats } from '../components/dataroom/DataRoomStats';
 import { DocumentTable } from '../components/dataroom/DocumentTable';
 import { FolderTreeNav } from '../components/dataroom/FolderTreeNav';
@@ -19,17 +20,12 @@ import {
     Search,
     RefreshCw,
     Shield,
-    ShieldCheck,
     Archive,
-    Filter,
     X,
     ChevronLeft,
     ChevronRight,
-    ExternalLink,
     FolderTree,
     Folder,
-    FolderPlus,
-    Eye
 } from 'lucide-react';
 
 const CATEGORY_TABS = [
@@ -266,17 +262,27 @@ export const DataRoomView = () => {
             {/* Header & Main Actions */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-zinc-900 border border-zinc-800 rounded-lg p-4 shadow-sm">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded bg-zinc-950 border border-zinc-750 flex items-center justify-center text-zinc-200 shrink-0">
-                        <FolderLock className="w-5 h-5 text-emerald-400" />
-                    </div>
+                    <Tooltip content="Kryptograficznie chroniony skarbiec wirtualnego pokoju danych z audytem WORM">
+                        <div className="w-10 h-10 rounded bg-zinc-950 border border-zinc-750 flex items-center justify-center text-zinc-200 shrink-0 cursor-help">
+                            <FolderLock className="w-5 h-5 text-emerald-400" />
+                        </div>
+                    </Tooltip>
                     <div>
                         <div className="flex items-center gap-2">
                             <h1 className="text-sm font-bold uppercase tracking-wider text-zinc-100">
-                                Wirtualny Pokój Danych (Virtual Data Room)
+                                Virtual Data Room (VDR) – Dokumentacja Transakcyjna
                             </h1>
-                            <span className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-zinc-950 border border-zinc-750 text-zinc-400">
-                                {activeCompany?.name || 'Spółka'}
-                            </span>
+                            <InfoTooltip
+                                size="xs"
+                                title="Virtual Data Room (VDR)"
+                                content="Bezpieczne repozytorium transakcyjne due diligence, umów i audytów M&A z taksonomią dziesiętną Dewey, sumami kontrolnymi SHA-256 oraz niezmienną ścieżką audytową WORM."
+                                ariaLabel="Więcej informacji o module Virtual Data Room"
+                            />
+                            <Tooltip content={`Aktywna spółka transakcyjna: ${activeCompany?.name || 'Spółka'}`}>
+                                <span className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-zinc-950 border border-zinc-750 text-zinc-400 cursor-help">
+                                    {activeCompany?.code || activeCompany?.name || 'Spółka'}
+                                </span>
+                            </Tooltip>
                         </div>
                         <p className="text-[10px] text-zinc-400 mt-0.5">
                             Kryptograficznie audytowane repozytorium transakcyjne due diligence, umów i audytów M&A.
@@ -285,52 +291,61 @@ export const DataRoomView = () => {
                 </div>
 
                 <div className="flex items-center gap-2 flex-wrap">
-                    <Button
-                        variant={isFolderSidebarOpen ? 'secondary' : 'primary'}
-                        size="sm"
-                        icon={FolderTree}
-                        onClick={() => setIsFolderSidebarOpen(prev => !prev)}
-                        title="Przełącz widok drzewa folderów M&A"
-                    >
-                        {isFolderSidebarOpen ? 'Ukryj Foldery' : 'Foldery M&A'}
-                    </Button>
-                    <Button
-                        variant="secondary"
-                        size="sm"
-                        icon={RefreshCw}
-                        loading={loading || foldersLoading}
-                        onClick={() => {
-                            fetchDocuments(pagination.currentPage);
-                            fetchFolders();
-                        }}
-                        title="Odśwież repozytorium"
-                    >
-                        Odśwież
-                    </Button>
-                    {canManagePermissions && (
+                    <Tooltip content={isFolderSidebarOpen ? 'Ukryj boczny panel taksonomii folderów M&A' : 'Pokaż drzewo dziesiętne folderów Dewey M&A'}>
+                        <Button
+                            variant={isFolderSidebarOpen ? 'secondary' : 'primary'}
+                            size="sm"
+                            icon={FolderTree}
+                            onClick={() => setIsFolderSidebarOpen(prev => !prev)}
+                            aria-label={isFolderSidebarOpen ? 'Ukryj boczny panel taksonomii folderów M&A' : 'Przełącz widok drzewa folderów M&A'}
+                        >
+                            {isFolderSidebarOpen ? 'Ukryj Foldery' : 'Foldery M&A'}
+                        </Button>
+                    </Tooltip>
+                    <Tooltip content="Odśwież rejestr dokumentów i strukturę folderów VDR">
                         <Button
                             variant="secondary"
                             size="sm"
-                            icon={Shield}
-                            onClick={() => setIsMatrixOpen(true)}
-                            title="Zarządzaj matrycą uprawnień VDR (role, użytkownicy, znak wodny)"
+                            icon={RefreshCw}
+                            loading={loading || foldersLoading}
+                            onClick={() => {
+                                fetchDocuments(pagination.currentPage);
+                                fetchFolders();
+                            }}
+                            aria-label="Odśwież repozytorium VDR"
                         >
-                            Matryca Uprawnień
+                            Odśwież
                         </Button>
+                    </Tooltip>
+                    {canManagePermissions && (
+                        <Tooltip content="Zarządzaj granularną matrycą uprawnień VDR (role, użytkownicy, znak wodny)">
+                            <Button
+                                variant="secondary"
+                                size="sm"
+                                icon={Shield}
+                                onClick={() => setIsMatrixOpen(true)}
+                                aria-label="Otwórz konfigurację matrycy uprawnień VDR"
+                            >
+                                Matryca Uprawnień
+                            </Button>
+                        </Tooltip>
                     )}
-                    <Button
-                        variant="primary"
-                        size="sm"
-                        icon={UploadCloud}
-                        onClick={() => setIsUploadOpen(true)}
-                    >
-                        Wgraj Dokument
-                    </Button>
+                    <Tooltip content="Wgraj nowy dokument transakcyjny z automatyczną weryfikacją sumy SHA-256">
+                        <Button
+                            variant="primary"
+                            size="sm"
+                            icon={UploadCloud}
+                            onClick={() => setIsUploadOpen(true)}
+                            aria-label="Zdeponuj nowy dokument transakcyjny"
+                        >
+                            Wgraj Dokument
+                        </Button>
+                    </Tooltip>
                 </div>
             </div>
 
             {/* Stats strip */}
-            <DataRoomStats documents={documents} totalCount={pagination.total} />
+            <DataRoomStats stats={null} documents={documents} totalCount={pagination.total} />
 
             {/* Main Content with Folder Tree Navigation Sidebar */}
             <div className="flex flex-col lg:flex-row gap-4 items-start">
@@ -359,21 +374,26 @@ export const DataRoomView = () => {
                     {/* Active Folder Filter Chip (if selected) */}
                     {selectedFolderId && (
                         <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-indigo-950/60 border border-indigo-800/80 text-xs text-indigo-300">
-                            <div className="flex items-center gap-2 min-w-0">
-                                <Folder className="w-4 h-4 text-indigo-400 shrink-0" />
-                                <span className="text-zinc-400">Filtrowanie folderu:</span>
-                                <strong className="text-zinc-100 font-bold truncate">
-                                    {activeFolderLabel}
-                                </strong>
-                            </div>
-                            <button
-                                type="button"
-                                onClick={() => setSelectedFolderId('')}
-                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-colors shrink-0 ml-2"
-                            >
-                                <X className="w-3.5 h-3.5" />
-                                Wyczyść filtr folderu
-                            </button>
+                            <Tooltip content={`Aktywny filtr struktury folderów: ${activeFolderLabel}`}>
+                                <div className="flex items-center gap-2 min-w-0 cursor-help">
+                                    <Folder className="w-4 h-4 text-indigo-400 shrink-0" />
+                                    <span className="text-zinc-400">Filtrowanie folderu:</span>
+                                    <strong className="text-zinc-100 font-bold truncate">
+                                        {activeFolderLabel}
+                                    </strong>
+                                </div>
+                            </Tooltip>
+                            <Tooltip content="Wyczyść aktywny filtr folderu i pokaż wszystkie dokumenty">
+                                <button
+                                    type="button"
+                                    onClick={() => setSelectedFolderId('')}
+                                    aria-label="Wyczyść filtr folderu"
+                                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-colors shrink-0 ml-2"
+                                >
+                                    <X className="w-3.5 h-3.5" />
+                                    Wyczyść filtr folderu
+                                </button>
+                            </Tooltip>
                         </div>
                     )}
 
@@ -382,55 +402,68 @@ export const DataRoomView = () => {
                         {/* Category tabs */}
                         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
                             {CATEGORY_TABS.map(tab => (
-                                <button
-                                    key={tab.id}
-                                    type="button"
-                                    onClick={() => setSelectedCategory(tab.id)}
-                                    className={`px-3 py-1.5 rounded text-xs font-semibold whitespace-nowrap transition-colors ${
-                                        selectedCategory === tab.id
-                                            ? 'bg-zinc-100 text-zinc-900 shadow-sm'
-                                            : 'bg-zinc-950 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 border border-zinc-800'
-                                    }`}
-                                >
-                                    {tab.label}
-                                </button>
+                                <Tooltip key={tab.id} content={`Filtruj dokumenty: ${tab.label}`}>
+                                    <button
+                                        type="button"
+                                        onClick={() => setSelectedCategory(tab.id)}
+                                        aria-label={tab.id === '' ? 'Filtruj: Wszystkie dokumenty transakcyjne' : `Filtruj kategorię: ${tab.label}`}
+                                        className={`px-3 py-1.5 rounded text-xs font-semibold whitespace-nowrap transition-colors ${
+                                            selectedCategory === tab.id
+                                                ? 'bg-zinc-100 text-zinc-900 shadow-sm'
+                                                : 'bg-zinc-950 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 border border-zinc-800'
+                                        }`}
+                                    >
+                                        {tab.label}
+                                    </button>
+                                </Tooltip>
                             ))}
                         </div>
 
                         {/* Search & Archived Toggle */}
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-t border-zinc-855">
                             <div className="relative flex-1 max-w-md">
-                                <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
+                                <Tooltip content="Wyszukaj dokumenty po nazwie lub nazwie pliku">
+                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 cursor-help">
+                                        <Search className="w-3.5 h-3.5" />
+                                    </span>
+                                </Tooltip>
                                 <input
-                                    type="text"
+                                    type="search"
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     placeholder="Szukaj po nazwie dokumentu lub pliku źródłowym..."
+                                    aria-label="Wyszukaj dokumenty w pokoju danych"
                                     className="w-full bg-zinc-950 border border-zinc-800 rounded pl-8 pr-8 py-1.5 text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
                                 />
                                 {searchQuery && (
-                                    <button
-                                        type="button"
-                                        onClick={() => setSearchQuery('')}
-                                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300"
-                                    >
-                                        <X className="w-3.5 h-3.5" />
-                                    </button>
+                                    <Tooltip content="Wyczyść wpisaną frazę wyszukiwania">
+                                        <button
+                                            type="button"
+                                            onClick={() => setSearchQuery('')}
+                                            aria-label="Wyczyść wyszukiwanie"
+                                            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300"
+                                        >
+                                            <X className="w-3.5 h-3.5" />
+                                        </button>
+                                    </Tooltip>
                                 )}
                             </div>
 
-                            <label className="flex items-center gap-2 cursor-pointer text-xs text-zinc-400 select-none">
-                                <input
-                                    type="checkbox"
-                                    checked={includeArchived}
-                                    onChange={(e) => setIncludeArchived(e.target.checked)}
-                                    className="rounded border-zinc-750 bg-zinc-950 text-zinc-200 focus:ring-0 focus:ring-offset-0"
-                                />
-                                <span className="flex items-center gap-1">
-                                    <Archive className="w-3 h-3 text-zinc-500" />
-                                    Pokaż zarchiwizowane dokumenty
-                                </span>
-                            </label>
+                            <Tooltip content="Włącz wyświetlanie dokumentów przeniesionych do archiwum transakcyjnego">
+                                <label className="flex items-center gap-2 cursor-pointer text-xs text-zinc-400 select-none">
+                                    <input
+                                        type="checkbox"
+                                        checked={includeArchived}
+                                        onChange={(e) => setIncludeArchived(e.target.checked)}
+                                        aria-label="Pokaż zarchiwizowane dokumenty"
+                                        className="rounded border-zinc-750 bg-zinc-950 text-zinc-200 focus:ring-0 focus:ring-offset-0"
+                                    />
+                                    <span className="flex items-center gap-1">
+                                        <Archive className="w-3 h-3 text-zinc-500" />
+                                        Pokaż zarchiwizowane dokumenty
+                                    </span>
+                                </label>
+                            </Tooltip>
                         </div>
                     </div>
 
@@ -440,7 +473,7 @@ export const DataRoomView = () => {
                         loading={loading}
                         onDownload={handleDownload}
                         onPreview={handlePreviewDocument}
-                        onViewAudit={(doc) => setAuditDoc(doc)}
+                        onAudit={(doc) => setAuditDoc(doc)}
                         onEdit={(doc) => setEditingDoc(doc)}
                         onToggleArchive={handleToggleArchive}
                         onDelete={(doc) => setDeletingDoc(doc)}
@@ -449,31 +482,45 @@ export const DataRoomView = () => {
                     {/* Pagination Controls */}
                     {pagination.total > 0 && (
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-2.5 text-xs text-zinc-400">
-                            <div>
-                                Dokumenty: <strong className="text-zinc-200">{documents.length}</strong> z <strong className="text-zinc-200">{pagination.total}</strong>
-                            </div>
+                            <Tooltip content={`Wyświetlono ${documents.length} pozycji z łącznej puli ${pagination.total} dokumentów`}>
+                                <div className="cursor-help">
+                                    Dokumenty: <strong className="text-zinc-200">{documents.length}</strong> z <strong className="text-zinc-200">{pagination.total}</strong>
+                                </div>
+                            </Tooltip>
                             <div className="flex items-center gap-2">
-                                <Button
-                                    variant="secondary"
-                                    size="sm"
-                                    icon={ChevronLeft}
-                                    disabled={pagination.currentPage <= 1 || loading}
-                                    onClick={() => fetchDocuments(pagination.currentPage - 1)}
-                                >
-                                    Poprzednia
-                                </Button>
-                                <span className="px-2 text-zinc-300 tabular-nums">
-                                    Strona {pagination.currentPage} z {pagination.lastPage}
-                                </span>
-                                <Button
-                                    variant="secondary"
-                                    size="sm"
-                                    icon={ChevronRight}
-                                    disabled={pagination.currentPage >= pagination.lastPage || loading}
-                                    onClick={() => fetchDocuments(pagination.currentPage + 1)}
-                                >
-                                    Następna
-                                </Button>
+                                <Tooltip content={pagination.currentPage <= 1 ? 'Jesteś na pierwszej stronie' : 'Przejdź do poprzedniej strony dokumentów'}>
+                                    <span>
+                                        <Button
+                                            variant="secondary"
+                                            size="sm"
+                                            icon={ChevronLeft}
+                                            disabled={pagination.currentPage <= 1 || loading}
+                                            onClick={() => fetchDocuments(pagination.currentPage - 1)}
+                                            aria-label="Poprzednia strona"
+                                        >
+                                            Poprzednia
+                                        </Button>
+                                    </span>
+                                </Tooltip>
+                                <Tooltip content={`Bieżąca strona: ${pagination.currentPage} z ${pagination.lastPage}`}>
+                                    <span className="px-2 text-zinc-300 tabular-nums cursor-help">
+                                        Strona {pagination.currentPage} z {pagination.lastPage}
+                                    </span>
+                                </Tooltip>
+                                <Tooltip content={pagination.currentPage >= pagination.lastPage ? 'Jesteś na ostatniej stronie' : 'Przejdź do następnej strony dokumentów'}>
+                                    <span>
+                                        <Button
+                                            variant="secondary"
+                                            size="sm"
+                                            icon={ChevronRight}
+                                            disabled={pagination.currentPage >= pagination.lastPage || loading}
+                                            onClick={() => fetchDocuments(pagination.currentPage + 1)}
+                                            aria-label="Następna strona"
+                                        >
+                                            Następna
+                                        </Button>
+                                    </span>
+                                </Tooltip>
                             </div>
                         </div>
                     )}
