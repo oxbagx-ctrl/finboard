@@ -23,6 +23,8 @@ final class DocumentAccessLog extends Model
     protected $fillable = [
         'id',
         'document_id',
+        'document_title',
+        'company_id',
         'user_id',
         'action',
         'ip_address',
@@ -39,7 +41,15 @@ final class DocumentAccessLog extends Model
      */
     public function document(): BelongsTo
     {
-        return $this->belongsTo(Document::class, 'document_id');
+        return $this->belongsTo(Document::class, 'document_id')->withTrashed();
+    }
+
+    /**
+     * @return BelongsTo<Company, DocumentAccessLog>
+     */
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class, 'company_id');
     }
 
     /**

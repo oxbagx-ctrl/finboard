@@ -25,6 +25,8 @@ interface DocumentRepositoryInterface
         string $userId,
         string $action,
         ?string $ipAddress = null,
-        ?string $userAgent = null
+        ?string $userAgent = null,
+        ?string $documentTitle = null,
+        ?string $companyId = null
     ): void;
 }

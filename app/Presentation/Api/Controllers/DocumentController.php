@@ -271,7 +271,7 @@ final class DocumentController
      */
     public function auditLogs(string $id, Request $request): AnonymousResourceCollection
     {
-        $document = EloquentDocument::find($id);
+        $document = EloquentDocument::withTrashed()->find($id);
 
         if ($document === null) {
             throw new NotFoundHttpException('Dokument nie został odnaleziony.');
@@ -280,7 +280,9 @@ final class DocumentController
         $this->ensureCanAccessDocument($request->user(), $document);
 
         $logs = DocumentAccessLog::query()
-            ->with(['user', 'document'])
+            ->with(['user', 'document' => function ($q) {
+                $q->withTrashed();
+            }])
             ->where('document_id', $id)
             ->orderBy('created_at', 'desc')
             ->paginate($request->integer('per_page', 20));
@@ -296,10 +298,15 @@ final class DocumentController
         $companyId = $this->resolveCompanyId($request);
 
         $logs = DocumentAccessLog::query()
-            ->whereHas('document', function ($q) use ($companyId) {
-                $q->where('company_id', $companyId);
+            ->where(function ($query) use ($companyId) {
+                $query->where('company_id', $companyId)
+                    ->orWhereHas('document', function ($q) use ($companyId) {
+                        $q->withTrashed()->where('company_id', $companyId);
+                    });
             })
-            ->with(['user', 'document'])
+            ->with(['user', 'document' => function ($q) {
+                $q->withTrashed();
+            }])
             ->orderBy('created_at', 'desc')
             ->paginate($request->integer('per_page', 25));
 

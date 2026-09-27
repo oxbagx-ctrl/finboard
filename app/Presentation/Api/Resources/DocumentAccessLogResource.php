@@ -21,7 +21,8 @@ final class DocumentAccessLogResource extends JsonResource
         return [
             'id' => $this->id,
             'document_id' => $this->document_id,
-            'document_title' => $this->document?->title,
+            'document_title' => $this->document_title ?? $this->document?->title,
+            'company_id' => $this->company_id ?? $this->document?->company_id,
             'user_id' => $this->user_id,
             'user' => [
                 'id' => $this->user?->id,

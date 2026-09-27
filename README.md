@@ -737,6 +737,11 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Likwidacja sztucznej blokady `403 Forbidden` dla użytkowników z rolą `super_admin` oraz Doradców transakcyjnych (`advisor`) przypisanych do spółek przez relację `advisor_company`.
     - Zastąpienie sztywnego porównania roli `'admin'` i `company_id` domenową metodą `$user->canAccessCompany($companyId)`.
     - Pełna integracja autoryzacji domenowej w metodach `show`, `download`, `update`, `archive`, `destroy` oraz `auditLogs`.
+  - [x] Nienaruszalność ścieżki audytowej WORM i usunięcie kaskadowego kasowania logów (Commit 250).
+    - Wdrożenie mechanizmu `SoftDeletes` dla tabeli `documents` oraz modelu `Document`.
+    - Usunięcie reguły `cascadeOnDelete()` z klucza obcego `document_id` w `document_access_logs` i zastąpienie jej regułą `nullOnDelete()`.
+    - Dodanie kolumn snapshotowych `document_title` oraz `company_id` w `document_access_logs`, gwarantujących czytelność i filtrację logów po usunięciu dokumentu.
+    - Zabezpieczenie zapytań audytowych z wykorzystaniem `withTrashed()` zapobiegające utracie historii zdarzeń.
 
 ---
 

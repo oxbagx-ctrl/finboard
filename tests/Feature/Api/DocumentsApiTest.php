@@ -248,8 +248,14 @@ final class DocumentsApiTest extends TestCase
         $deleteResponse->assertStatus(200)
             ->assertJsonPath('status', 'deleted');
 
-        $this->assertDatabaseMissing('documents', [
+        $this->assertSoftDeleted('documents', [
             'id' => $docId,
+        ]);
+
+        // Verify audit trail is preserved (WORM principle)
+        $this->assertDatabaseHas('document_access_logs', [
+            'document_id' => $docId,
+            'action' => 'upload',
         ]);
     }
 

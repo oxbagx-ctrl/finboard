@@ -86,11 +86,21 @@ final class EloquentDocumentRepository implements DocumentRepositoryInterface
         string $userId,
         string $action,
         ?string $ipAddress = null,
-        ?string $userAgent = null
+        ?string $userAgent = null,
+        ?string $documentTitle = null,
+        ?string $companyId = null
     ): void {
+        if ($documentTitle === null || $companyId === null) {
+            $doc = EloquentDocument::withTrashed()->find($documentId->value());
+            $documentTitle = $documentTitle ?? $doc?->title;
+            $companyId = $companyId ?? $doc?->company_id;
+        }
+
         EloquentAccessLog::create([
             'id' => Str::uuid()->toString(),
             'document_id' => $documentId->value(),
+            'document_title' => $documentTitle,
+            'company_id' => $companyId,
             'user_id' => $userId,
             'action' => $action,
             'ip_address' => $ipAddress,
