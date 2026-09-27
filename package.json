@@ -24,6 +24,7 @@
         "vitest": "^4.1.11"
     },
     "dependencies": {
+        "@floating-ui/react": "^0.27.20",
         "@vitejs/plugin-react": "^4.7.0",
         "clsx": "^2.1.1",
         "lucide-react": "^1.47.0",
