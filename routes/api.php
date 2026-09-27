@@ -17,6 +17,7 @@ use App\Presentation\Api\Controllers\InvestmentProject\InvestmentProjectControll
 use App\Presentation\Api\Controllers\InvestmentProject\InvestmentStatementController;
 use App\Presentation\Api\Controllers\InvitationController;
 use App\Presentation\Api\Controllers\KpiController;
+use App\Presentation\Api\Controllers\TransactionFolderController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -157,6 +158,16 @@ Route::prefix('v1')->group(function () {
 
         // Virtual Data Room (VDR) Endpoints
         Route::prefix('documents')->group(function () {
+            // Transaction Folders (Dewey Decimal M&A Hierarchy)
+            Route::prefix('folders')->group(function () {
+                Route::get('/', [TransactionFolderController::class, 'index'])->name('api.documents.folders.index');
+                Route::post('/', [TransactionFolderController::class, 'store'])->name('api.documents.folders.store');
+                Route::post('/init-standard', [TransactionFolderController::class, 'initStandard'])->name('api.documents.folders.init-standard');
+                Route::get('/{id}', [TransactionFolderController::class, 'show'])->name('api.documents.folders.show');
+                Route::put('/{id}', [TransactionFolderController::class, 'update'])->name('api.documents.folders.update');
+                Route::delete('/{id}', [TransactionFolderController::class, 'destroy'])->name('api.documents.folders.destroy');
+            });
+
             Route::get('/audit-logs', [DocumentController::class, 'allAuditLogs']
                 )->name('api.documents.all-audit-logs');
             Route::get('/', [DocumentController::class, 'index']

@@ -64,6 +64,7 @@ final class DocumentController
             includeArchived: $request->boolean('include_archived', false),
             type: $request->filled('type') ? (string) $request->query('type') : null,
             search: $request->filled('search') ? (string) $request->query('search') : null,
+            folderId: $request->has('folder_id') ? (string) $request->query('folder_id') : null,
             perPage: $request->integer('per_page', 20),
             page: $request->integer('page', 1)
         );
@@ -92,6 +93,8 @@ final class DocumentController
             mimeType: $file->getClientMimeType() ?: 'application/octet-stream',
             sizeBytes: (int) $file->getSize(),
             extension: (string) ($file->getClientOriginalExtension() ?: 'bin'),
+            folderId: $request->filled('folder_id') ? (string) $request->input('folder_id') : null,
+            indexCode: $request->filled('index_code') ? (string) $request->input('index_code') : null,
             ipAddress: $request->ip(),
             userAgent: $request->userAgent()
         );
@@ -158,11 +161,25 @@ final class DocumentController
 
         $this->ensureCanAccessDocument($request->user(), $document);
 
+        $folderId = null;
+        if ($request->has('folder_id')) {
+            $rawFolder = $request->input('folder_id');
+            $folderId = ($rawFolder !== null && $rawFolder !== '') ? (string) $rawFolder : '';
+        }
+
+        $indexCode = null;
+        if ($request->has('index_code')) {
+            $rawIndex = $request->input('index_code');
+            $indexCode = ($rawIndex !== null && $rawIndex !== '') ? (string) $rawIndex : '';
+        }
+
         $updated = $this->updateDocumentHandler->handle(new UpdateDocumentCommand(
             id: $id,
             title: (string) $request->input('title'),
             type: (string) $request->input('type'),
             userId: (string) $request->user()->id,
+            folderId: $folderId,
+            indexCode: $indexCode,
             ipAddress: $request->ip(),
             userAgent: $request->userAgent()
         ));

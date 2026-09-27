@@ -32,6 +32,8 @@ final class Document extends Model
         'size_bytes',
         'checksum_sha256',
         'storage_path',
+        'folder_id',
+        'index_code',
         'download_count',
         'is_archived',
     ];
@@ -41,6 +43,14 @@ final class Document extends Model
         'download_count' => 'integer',
         'is_archived' => 'boolean',
     ];
+
+    /**
+     * @return BelongsTo<TransactionFolder, Document>
+     */
+    public function folder(): BelongsTo
+    {
+        return $this->belongsTo(TransactionFolder::class, 'folder_id');
+    }
 
     /**
      * @return BelongsTo<Company, Document>

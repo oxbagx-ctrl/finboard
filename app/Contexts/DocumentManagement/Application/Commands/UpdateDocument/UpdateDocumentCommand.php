@@ -11,6 +11,8 @@ final readonly class UpdateDocumentCommand
         public string $title,
         public string $type,
         public string $userId,
+        public ?string $folderId = null,
+        public ?string $indexCode = null,
         public ?string $ipAddress = null,
         public ?string $userAgent = null
     ) {

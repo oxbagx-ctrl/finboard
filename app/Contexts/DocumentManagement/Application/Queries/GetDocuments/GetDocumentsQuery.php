@@ -11,6 +11,7 @@ final readonly class GetDocumentsQuery
         public bool $includeArchived = false,
         public ?string $type = null,
         public ?string $search = null,
+        public ?string $folderId = null,
         public int $perPage = 20,
         public int $page = 1
     ) {

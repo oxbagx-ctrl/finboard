@@ -16,6 +16,8 @@ final readonly class UploadDocumentCommand
         public string $mimeType,
         public int $sizeBytes,
         public string $extension,
+        public ?string $folderId = null,
+        public ?string $indexCode = null,
         public ?string $ipAddress = null,
         public ?string $userAgent = null
     ) {

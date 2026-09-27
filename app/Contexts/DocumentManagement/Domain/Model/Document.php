@@ -24,6 +24,8 @@ final class Document extends AggregateRoot
         private DocumentType $type,
         private readonly FileMetadata $fileMetadata,
         private readonly string $storagePath,
+        private ?\App\Contexts\DocumentManagement\Domain\ValueObjects\FolderId $folderId = null,
+        private ?\App\Contexts\DocumentManagement\Domain\ValueObjects\DeweyIndexCode $indexCode = null,
         private int $downloadCount = 0,
         private bool $isArchived = false,
         private readonly DateTimeImmutable $createdAt = new DateTimeImmutable(),
@@ -49,7 +51,9 @@ final class Document extends AggregateRoot
         string $title,
         DocumentType $type,
         FileMetadata $fileMetadata,
-        string $storagePath
+        string $storagePath,
+        ?\App\Contexts\DocumentManagement\Domain\ValueObjects\FolderId $folderId = null,
+        ?\App\Contexts\DocumentManagement\Domain\ValueObjects\DeweyIndexCode $indexCode = null
     ): self {
         $document = new self(
             id: $id,
@@ -59,6 +63,8 @@ final class Document extends AggregateRoot
             type: $type,
             fileMetadata: $fileMetadata,
             storagePath: trim($storagePath),
+            folderId: $folderId,
+            indexCode: $indexCode,
             downloadCount: 0,
             isArchived: false,
             createdAt: new DateTimeImmutable()
@@ -188,6 +194,31 @@ final class Document extends AggregateRoot
     public function updateType(DocumentType $newType): void
     {
         $this->type = $newType;
+        $this->updatedAt = new DateTimeImmutable();
+    }
+
+    public function folderId(): ?\App\Contexts\DocumentManagement\Domain\ValueObjects\FolderId
+    {
+        return $this->folderId;
+    }
+
+    public function indexCode(): ?\App\Contexts\DocumentManagement\Domain\ValueObjects\DeweyIndexCode
+    {
+        return $this->indexCode;
+    }
+
+    public function assignToFolder(
+        ?\App\Contexts\DocumentManagement\Domain\ValueObjects\FolderId $folderId,
+        ?\App\Contexts\DocumentManagement\Domain\ValueObjects\DeweyIndexCode $indexCode = null
+    ): void {
+        $this->folderId = $folderId;
+        $this->indexCode = $indexCode;
+        $this->updatedAt = new DateTimeImmutable();
+    }
+
+    public function updateIndexCode(?\App\Contexts\DocumentManagement\Domain\ValueObjects\DeweyIndexCode $indexCode): void
+    {
+        $this->indexCode = $indexCode;
         $this->updatedAt = new DateTimeImmutable();
     }
 }

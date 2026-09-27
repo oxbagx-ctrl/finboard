@@ -181,6 +181,19 @@ final class TransactionFolder extends AggregateRoot
         $this->touch();
     }
 
+    public function updateDetails(?string $name = null, ?string $description = null, ?int $sortOrder = null): void
+    {
+        if ($name !== null) {
+            $this->rename($name);
+        }
+        if ($description !== null) {
+            $this->updateDescription($description);
+        }
+        if ($sortOrder !== null) {
+            $this->updateSortOrder($sortOrder);
+        }
+    }
+
     public function markDeleted(): void
     {
         $this->recordThat(new TransactionFolderDeleted(

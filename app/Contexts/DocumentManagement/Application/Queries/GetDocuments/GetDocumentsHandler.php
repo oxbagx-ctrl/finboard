@@ -13,7 +13,7 @@ final class GetDocumentsHandler
     public function handle(GetDocumentsQuery $query): LengthAwarePaginator
     {
         $builder = EloquentDocument::query()
-            ->with('uploader')
+            ->with(['uploader', 'folder'])
             ->where('company_id', $query->companyId);
 
         if (!$query->includeArchived) {
@@ -24,13 +24,23 @@ final class GetDocumentsHandler
             $builder->where('type', trim($query->type));
         }
 
+        if ($query->folderId !== null && trim($query->folderId) !== '') {
+            $folderId = trim($query->folderId);
+            if ($folderId === 'root' || $folderId === 'unassigned') {
+                $builder->whereNull('folder_id');
+            } else {
+                $builder->where('folder_id', $folderId);
+            }
+        }
+
         if ($query->search !== null && trim($query->search) !== '') {
             $search = '%' . trim($query->search) . '%';
             $likeOp = DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
 
             $builder->where(function ($q) use ($search, $likeOp) {
                 $q->where('title', $likeOp, $search)
-                  ->orWhere('original_name', $likeOp, $search);
+                  ->orWhere('original_name', $likeOp, $search)
+                  ->orWhere('index_code', $likeOp, $search);
             });
         }
 

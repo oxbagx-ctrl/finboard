@@ -11,7 +11,7 @@ final class GetDocumentByIdHandler
 {
     public function handle(GetDocumentByIdQuery $query): EloquentDocument
     {
-        $builder = EloquentDocument::query()->with('uploader');
+        $builder = EloquentDocument::query()->with(['uploader', 'folder']);
 
         if ($query->withTrash) {
             $builder->withTrashed();

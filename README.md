@@ -192,15 +192,21 @@ npm test
 - `GET /api/v1/finance/analytics/liquidity` – Dynamika wskaźników płynności (Current & Quick Ratio)
 
 ### Wirtualny Pokój Danych (Virtual Data Room - VDR)
-- `GET /api/v1/documents` – Lista dokumentów firmy z filtrami kategorii, archiwum i wyszukiwarką
-- `POST /api/v1/documents` – Upload nowego dokumentu z wyliczeniem SHA-256 i wpisem audytowym
-- `GET /api/v1/documents/{id}` – Metadane pojedynczego dokumentu
-- `PUT /api/v1/documents/{id}` – Aktualizacja tytułu i kategorii dokumentu
+- `GET /api/v1/documents` – Lista dokumentów firmy z filtrami kategorii, folderu, archiwum i wyszukiwarką
+- `POST /api/v1/documents` – Upload nowego dokumentu z wyliczeniem SHA-256, opcjonalnym folderem i indeksem Dewey oraz wpisem audytowym
+- `GET /api/v1/documents/{id}` – Metadane pojedynczego dokumentu z informacją o przypisanym folderze transakcyjnym
+- `PUT /api/v1/documents/{id}` – Aktualizacja tytułu, kategorii oraz przypisania folderu i indeksu dokumentu
 - `GET /api/v1/documents/{id}/download` – Bezpieczne pobranie pliku z inkrementacją licznika i wpisem w dzienniku pobrań
 - `PATCH /api/v1/documents/{id}/archive` – Przełączenie statusu archiwalnego dokumentu
 - `DELETE /api/v1/documents/{id}` – Usunięcie pliku z magazynu i bazy danych
 - `GET /api/v1/documents/{id}/audit-logs` – Rejestr zdarzeń i pobrań dla wskazanego dokumentu
 - `GET /api/v1/documents/audit-logs` – Zbiorczy dziennik audytowy operacji na dokumentach firmy
+- `GET /api/v1/documents/folders` – Lista folderów transakcyjnych firmy (płaska lub zagnieżdżone drzewo `?tree=1` z liczbą dokumentów)
+- `POST /api/v1/documents/folders` – Tworzenie nowego folderu transakcyjnego z indeksem dziesiętnym Dewey
+- `POST /api/v1/documents/folders/init-standard` – Inicjalizacja standardowej taksonomii M&A (33 foldery dla 8 obszarów Due Diligence)
+- `GET /api/v1/documents/folders/{id}` – Szczegóły folderu wraz z folderami podrzędnymi i liczbą dokumentów
+- `PUT /api/v1/documents/folders/{id}` – Aktualizacja nazwy, opisu, sortowania lub indeksu Dewey folderu
+- `DELETE /api/v1/documents/folders/{id}` – Usunięcie folderu (z zachowaniem dokumentów – `ON DELETE SET NULL`)
 
 ### Planowanie Inwestycyjne & Wycena DCF (Deal Advisory & Project Finance)
 - `GET /api/v1/investment-projects` – Lista projektów inwestycyjnych przypisanych do aktywnej spółki
@@ -794,6 +800,13 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Serwis domenowy `DeweyMnaStructureGenerator` dostarczający standardową taksonomię 8 głównych obszarów Due Diligence (ponad 25 folderów transakcyjnych).
     - Implementacja repozytorium `EloquentTransactionFolderRepository` powiązanego z interfejsem domenowym `TransactionFolderRepositoryInterface` z sortowaniem Dewey.
     - Zestaw testów jednostkowych w `DeweyIndexCodeTest`, `TransactionFolderTest` oraz `TransactionFolderRepositoryTest` (17 testów, 62 asercje).
+  - [x] Aktualizacja encji Document, migracji i REST API dla zagnieżdżonej hierarchii folderów i indeksów Dewey (Commit 260).
+    - Migracja `documents` dodająca `folder_id` (relacja z `transaction_folders`, `ON DELETE SET NULL`) oraz `index_code` (indeks B-tree, format dziesiętny Dewey).
+    - Rozszerzenie encji domenowej `Document` o metody `assignToFolder()` oraz `updateIndexCode()`.
+    - Aktualizacja modeli Eloquent, komend i zapytań CQRS (`UploadDocumentCommand`, `UpdateDocumentCommand`, `GetDocumentsQuery`) z obsługą filtrowania po `folder_id` i eager loadingiem folderu.
+    - Wdrożenie `TransactionFolderController`, `TransactionFolderResource` oraz żądań walidacji (`CreateTransactionFolderRequest`, `UpdateTransactionFolderRequest`).
+    - Zapewnienie pełnej izolacji wielodostępowej (multi-tenant) i autoryzacji opartej o `ResolvesCompanyContext`.
+    - Pakiet testów integracyjnych API w `TransactionFolderApiTest.php` (9 testów, 38 asercji), 100% PASS w pełnym zestawie 662 testów PHPUnit oraz 502 testów Vitest.
 
 ---
 

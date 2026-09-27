@@ -66,6 +66,8 @@ final class EloquentDocumentRepository implements DocumentRepositoryInterface
                 'size_bytes' => $document->fileMetadata()->sizeInBytes(),
                 'checksum_sha256' => $document->fileMetadata()->checksumSha256(),
                 'storage_path' => $document->storagePath(),
+                'folder_id' => $document->folderId()?->value(),
+                'index_code' => $document->indexCode()?->value(),
                 'download_count' => $document->downloadCount(),
                 'is_archived' => $document->isArchived(),
             ]
@@ -129,6 +131,8 @@ final class EloquentDocumentRepository implements DocumentRepositoryInterface
             type: DocumentType::from($eloquent->type),
             fileMetadata: $metadata,
             storagePath: $eloquent->storage_path,
+            folderId: $eloquent->folder_id !== null ? \App\Contexts\DocumentManagement\Domain\ValueObjects\FolderId::fromString($eloquent->folder_id) : null,
+            indexCode: $eloquent->index_code !== null ? \App\Contexts\DocumentManagement\Domain\ValueObjects\DeweyIndexCode::fromString($eloquent->index_code) : null,
             downloadCount: (int) $eloquent->download_count,
             isArchived: (bool) $eloquent->is_archived,
             createdAt: $createdAt,

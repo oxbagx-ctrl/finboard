@@ -21,6 +21,8 @@ final class UpdateDocumentRequest extends FormRequest
         return [
             'title' => ['required', 'string', 'max:255'],
             'type' => ['required', 'string', 'in:financial_report,contract,tax_declaration,audit_report,presentation,other'],
+            'folder_id' => ['nullable', 'uuid', 'exists:transaction_folders,id'],
+            'index_code' => ['nullable', 'string', 'max:50'],
         ];
     }
 }

@@ -27,6 +27,8 @@ final class UploadDocumentRequest extends FormRequest
             ],
             'title' => ['required', 'string', 'max:255'],
             'type' => ['required', 'string', 'in:financial_report,contract,tax_declaration,audit_report,presentation,other'],
+            'folder_id' => ['nullable', 'uuid', 'exists:transaction_folders,id'],
+            'index_code' => ['nullable', 'string', 'max:50'],
             'company_id' => ['nullable', 'uuid', 'exists:companies,id'],
         ];
     }
