@@ -467,4 +467,146 @@ describe('AuditLogsView Component', () => {
             }));
         });
     });
+
+    it('handles VDR server-side action filtering, debounced search, and pagination without client truncation', async () => {
+        // Mock with pagination for VDR (last_page: 2, total: 30)
+        apiClient.get.mockImplementation((url, config) => {
+            if (url === '/documents/audit-logs') {
+                const page = config?.params?.page || 1;
+                return Promise.resolve({
+                    data: {
+                        data: mockVdrLogs,
+                        meta: {
+                            current_page: page,
+                            last_page: 2,
+                            total: 30,
+                            per_page: 25,
+                        },
+                    },
+                });
+            }
+            if (url === '/finance/audit-logs/stats') {
+                return Promise.resolve({ data: { data: mockFinanceStats } });
+            }
+            if (url === '/finance/audit-logs') {
+                return Promise.resolve({
+                    data: { data: mockFinanceLogs, meta: { current_page: 1, last_page: 1, total: 3, per_page: 25 } },
+                });
+            }
+            return Promise.resolve({ data: { data: [] } });
+        });
+
+        renderComponent();
+
+        // Switch to VDR tab
+        fireEvent.click(screen.getByTestId('audit-tab-vdr'));
+
+        await waitFor(() => {
+            expect(screen.getByTestId('vdr-audit-container')).toBeInTheDocument();
+        });
+
+        // 1. Action filtering: Click 'Pobrania' (id: 'download')
+        const downloadFilterBtn = screen.getByTestId('vdr-action-filter-download');
+        fireEvent.click(downloadFilterBtn);
+
+        await waitFor(() => {
+            expect(apiClient.get).toHaveBeenCalledWith('/documents/audit-logs', expect.objectContaining({
+                params: expect.objectContaining({
+                    action: 'download',
+                    page: 1,
+                }),
+            }));
+        });
+
+        // 2. Search debouncing: Type into VDR search input
+        const searchInput = screen.getByTestId('vdr-search-input');
+        fireEvent.change(searchInput, { target: { value: 'Umowa' } });
+
+        await waitFor(() => {
+            expect(apiClient.get).toHaveBeenCalledWith('/documents/audit-logs', expect.objectContaining({
+                params: expect.objectContaining({
+                    action: 'download',
+                    search: 'Umowa',
+                }),
+            }));
+        }, { timeout: 1500 });
+
+        // 3. Pagination: Click next page
+        const nextPageBtn = screen.getByTestId('vdr-next-page');
+        expect(nextPageBtn).not.toBeDisabled();
+        fireEvent.click(nextPageBtn);
+
+        await waitFor(() => {
+            expect(apiClient.get).toHaveBeenCalledWith('/documents/audit-logs', expect.objectContaining({
+                params: expect.objectContaining({
+                    page: 2,
+                    action: 'download',
+                    search: 'Umowa',
+                }),
+            }));
+        });
+
+        // 4. Clear search
+        const clearSearchBtn = screen.getByTestId('vdr-search-clear');
+        fireEvent.click(clearSearchBtn);
+        expect(searchInput.value).toBe('');
+
+        await waitFor(() => {
+            expect(apiClient.get).toHaveBeenCalledWith('/documents/audit-logs', expect.objectContaining({
+                params: expect.not.objectContaining({
+                    search: 'Umowa',
+                }),
+            }));
+        });
+    });
+
+    it('handles VDR empty results and clear filters button', async () => {
+        apiClient.get.mockImplementation((url) => {
+            if (url === '/documents/audit-logs') {
+                return Promise.resolve({
+                    data: {
+                        data: [],
+                        meta: { current_page: 1, last_page: 1, total: 0, per_page: 25 },
+                    },
+                });
+            }
+            if (url === '/finance/audit-logs/stats') {
+                return Promise.resolve({ data: { data: mockFinanceStats } });
+            }
+            return Promise.resolve({ data: { data: [] } });
+        });
+
+        renderComponent();
+
+        // Switch to VDR tab
+        fireEvent.click(screen.getByTestId('audit-tab-vdr'));
+
+        await waitFor(() => {
+            expect(screen.getByTestId('vdr-audit-container')).toBeInTheDocument();
+        });
+
+        // Type search to trigger empty state with active filter
+        const searchInput = screen.getByTestId('vdr-search-input');
+        fireEvent.change(searchInput, { target: { value: 'NonExistent' } });
+
+        await waitFor(() => {
+            expect(screen.getByTestId('vdr-audit-empty')).toBeInTheDocument();
+            expect(screen.getByTestId('vdr-clear-filters-btn')).toBeInTheDocument();
+        });
+
+        // Click clear filters button
+        fireEvent.click(screen.getByTestId('vdr-clear-filters-btn'));
+
+        expect(searchInput.value).toBe('');
+
+        await waitFor(() => {
+            expect(apiClient.get).toHaveBeenCalledWith('/documents/audit-logs', expect.objectContaining({
+                params: expect.not.objectContaining({
+                    search: 'NonExistent',
+                    action: expect.anything(),
+                }),
+            }));
+        });
+    });
 });
+

@@ -146,6 +146,7 @@ export const AuditLogsView = () => {
     const [vdrLogs, setVdrLogs] = useState([]);
     const [vdrLoading, setVdrLoading] = useState(false);
     const [vdrSelectedAction, setVdrSelectedAction] = useState('');
+    const [vdrSearchInput, setVdrSearchInput] = useState('');
     const [vdrSearchQuery, setVdrSearchQuery] = useState('');
     const [vdrPagination, setVdrPagination] = useState({
         currentPage: 1,
@@ -172,7 +173,7 @@ export const AuditLogsView = () => {
     const [selectedDetailLog, setSelectedDetailLog] = useState(null);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
-    // Fetch VDR logs
+    // Fetch VDR logs with server-side action and search filtering
     const fetchVdrLogs = useCallback(
         async (page = 1) => {
             if (!activeCompany?.id) {
@@ -189,25 +190,16 @@ export const AuditLogsView = () => {
                     company_id: activeCompany.id,
                 };
 
-                const res = await apiClient.get('/documents/audit-logs', { params });
-                let records = res.data.data || [];
-
                 if (vdrSelectedAction) {
-                    records = records.filter((l) => l.action === vdrSelectedAction);
+                    params.action = vdrSelectedAction;
                 }
 
                 if (vdrSearchQuery.trim()) {
-                    const q = vdrSearchQuery.toLowerCase();
-                    records = records.filter(
-                        (l) =>
-                            l.document_title?.toLowerCase().includes(q) ||
-                            l.user?.name?.toLowerCase().includes(q) ||
-                            l.user?.email?.toLowerCase().includes(q) ||
-                            l.ip_address?.includes(q)
-                    );
+                    params.search = vdrSearchQuery.trim();
                 }
 
-                setVdrLogs(records);
+                const res = await apiClient.get('/documents/audit-logs', { params });
+                setVdrLogs(res.data.data || []);
                 if (res.data.meta) {
                     setVdrPagination({
                         currentPage: res.data.meta.current_page,
@@ -293,6 +285,7 @@ export const AuditLogsView = () => {
         setFinanceSearchInput('');
         setFinanceSearchQuery('');
         setFinanceActionFilter('');
+        setVdrSearchInput('');
         setVdrSearchQuery('');
         setVdrSelectedAction('');
     }, [activeCompany?.id]);
@@ -323,6 +316,7 @@ export const AuditLogsView = () => {
             setFinanceSearchInput('');
             setFinanceSearchQuery('');
             setFinanceActionFilter('');
+            setVdrSearchInput('');
             setVdrSearchQuery('');
             setVdrSelectedAction('');
 
@@ -348,7 +342,7 @@ export const AuditLogsView = () => {
         };
     }, [activeTab, fetchFinanceLogs, fetchFinanceStats, fetchVdrLogs, activeCompany?.id]);
 
-    // Debounce search query input (300ms)
+    // Debounce search query input (300ms) for Finance
     useEffect(() => {
         const timer = setTimeout(() => {
             setFinanceSearchQuery(financeSearchInput);
@@ -356,9 +350,27 @@ export const AuditLogsView = () => {
         return () => clearTimeout(timer);
     }, [financeSearchInput]);
 
+    // Debounce search query input (300ms) for VDR
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setVdrSearchQuery(vdrSearchInput);
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [vdrSearchInput]);
+
     const handleClearFinanceSearch = () => {
         setFinanceSearchInput('');
         setFinanceSearchQuery('');
+    };
+
+    const handleSelectVdrAction = (actionId) => {
+        setVdrSelectedAction(actionId);
+        setVdrPagination((prev) => ({ ...prev, currentPage: 1 }));
+    };
+
+    const handleClearVdrSearch = () => {
+        setVdrSearchInput('');
+        setVdrSearchQuery('');
     };
 
     const handleOpenDetailModal = (log) => {
@@ -868,13 +880,14 @@ export const AuditLogsView = () => {
                     </div>
 
                     {/* Filters */}
-                    <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3 space-y-3">
+                    <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3 space-y-3" data-testid="vdr-filters-bar">
                         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
                             {VDR_ACTION_FILTERS.map((filter) => (
                                 <button
                                     key={filter.id}
                                     type="button"
-                                    onClick={() => setVdrSelectedAction(filter.id)}
+                                    data-testid={`vdr-action-filter-${filter.id || 'all'}`}
+                                    onClick={() => handleSelectVdrAction(filter.id)}
                                     className={`px-3 py-1.5 rounded text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
                                         vdrSelectedAction === filter.id
                                             ? 'bg-zinc-100 text-zinc-900 shadow-sm'
@@ -890,15 +903,17 @@ export const AuditLogsView = () => {
                             <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
                             <input
                                 type="text"
-                                value={vdrSearchQuery}
-                                onChange={(e) => setVdrSearchQuery(e.target.value)}
+                                data-testid="vdr-search-input"
+                                value={vdrSearchInput}
+                                onChange={(e) => setVdrSearchInput(e.target.value)}
                                 placeholder="Szukaj po dokumencie, użytkowniku lub IP..."
                                 className="w-full bg-zinc-950 border border-zinc-800 rounded pl-8 pr-8 py-1.5 text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
                             />
-                            {vdrSearchQuery && (
+                            {vdrSearchInput && (
                                 <button
                                     type="button"
-                                    onClick={() => setVdrSearchQuery('')}
+                                    data-testid="vdr-search-clear"
+                                    onClick={handleClearVdrSearch}
                                     className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 cursor-pointer"
                                 >
                                     <X className="w-3.5 h-3.5" />
@@ -918,18 +933,19 @@ export const AuditLogsView = () => {
                             <div className="p-12 text-center text-zinc-500" data-testid="vdr-audit-empty">
                                 <ShieldCheck className="w-10 h-10 mx-auto text-zinc-600 mb-2 opacity-80" />
                                 <div className="text-zinc-300 font-bold">
-                                    {vdrSearchQuery || vdrSelectedAction
+                                    {vdrSearchInput || vdrSelectedAction
                                         ? 'Brak zdarzeń audytowych VDR pasujących do wybranych filtrów'
                                         : 'Brak zdarzeń audytowych VDR'}
                                 </div>
                                 <div className="text-[10px] text-zinc-500 mt-1">
-                                    {vdrSearchQuery || vdrSelectedAction ? (
+                                    {vdrSearchInput || vdrSelectedAction ? (
                                         <div className="flex items-center justify-center gap-2 mt-2">
                                             <span>Kryteria wyszukiwania nie zwróciły żadnych operacji VDR.</span>
                                             <button
                                                 type="button"
                                                 data-testid="vdr-clear-filters-btn"
                                                 onClick={() => {
+                                                    setVdrSearchInput('');
                                                     setVdrSearchQuery('');
                                                     setVdrSelectedAction('');
                                                 }}
@@ -1021,7 +1037,10 @@ export const AuditLogsView = () => {
 
                     {/* Pagination Controls */}
                     {vdrPagination.total > 0 && (
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-2.5 text-xs text-zinc-400">
+                        <div
+                            className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-2.5 text-xs text-zinc-400"
+                            data-testid="vdr-pagination"
+                        >
                             <div>
                                 Wpisy audytowe: <strong className="text-zinc-200">{vdrLogs.length}</strong> z <strong className="text-zinc-200">{vdrPagination.total}</strong>
                             </div>
@@ -1030,18 +1049,20 @@ export const AuditLogsView = () => {
                                     variant="secondary"
                                     size="sm"
                                     icon={ChevronLeft}
+                                    data-testid="vdr-prev-page"
                                     disabled={vdrPagination.currentPage <= 1 || vdrLoading}
                                     onClick={() => fetchVdrLogs(vdrPagination.currentPage - 1)}
                                 >
                                     Poprzednia
                                 </Button>
-                                <span className="px-2 text-zinc-300 tabular-nums">
+                                <span className="px-2 text-zinc-300 tabular-nums" data-testid="vdr-page-info">
                                     Strona {vdrPagination.currentPage} z {vdrPagination.lastPage}
                                 </span>
                                 <Button
                                     variant="secondary"
                                     size="sm"
                                     icon={ChevronRight}
+                                    data-testid="vdr-next-page"
                                     disabled={vdrPagination.currentPage >= vdrPagination.lastPage || vdrLoading}
                                     onClick={() => fetchVdrLogs(vdrPagination.currentPage + 1)}
                                 >

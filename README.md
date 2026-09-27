@@ -767,6 +767,12 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Eliminacja problemu pustych stron przy paginacji dzięki przeniesieniu filtrowania przed zapytanie `paginate()`.
     - Integracja handlera w metodach `allAuditLogs` oraz `auditLogs` w `DocumentController`.
     - Dedykowane testy jednostkowe `GetVdrAuditLogsQueryTest` oraz weryfikacja endpointu REST w `DocumentsApiTest`.
+  - [x] Integracja frontendu AuditLogsView z backendowym filtrowaniem VDR (Commit 256).
+    - Eliminacja obcinania paginacji (client-side pagination truncation) przez usunięcie lokalnego filtrowania tablicy `records.filter()`.
+    - Przekazywanie parametrów `action` oraz `search` bezpośrednio do zapytania `apiClient.get('/documents/audit-logs')`.
+    - Wprowadzenie mechanizmu debouncingu 300ms dla pola wyszukiwania VDR (`vdrSearchInput` -> `vdrSearchQuery`) oraz resetowania do strony 1 przy zmianie filtrów.
+    - Dodanie przycisku czyszczenia wyszukiwania oraz przycisku czyszczenia filtrów w stanie pustym.
+    - Testy jednostkowe i integracyjne Vitest w `AuditLogsView.test.jsx` oraz `vdrAuditRegression.test.jsx` (100% PASS w pełnym pakiecie 502 testów).
 
 ---
 

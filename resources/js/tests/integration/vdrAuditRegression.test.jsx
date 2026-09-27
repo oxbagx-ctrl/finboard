@@ -88,13 +88,32 @@ describe('VDR Document Audit Regression Tests: Pagination & Filtering', () => {
 
         apiClient.get.mockImplementation((url, config = {}) => {
             if (url === '/documents/audit-logs') {
+                let filtered = [...mockVdrLogs];
+                const action = config?.params?.action;
+                const search = config?.params?.search;
+                const page = config?.params?.page || 1;
+
+                if (action) {
+                    filtered = filtered.filter((l) => l.action === action);
+                }
+                if (search) {
+                    const q = search.toLowerCase();
+                    filtered = filtered.filter(
+                        (l) =>
+                            l.document_title?.toLowerCase().includes(q) ||
+                            l.user?.name?.toLowerCase().includes(q) ||
+                            l.user?.email?.toLowerCase().includes(q) ||
+                            l.ip_address?.includes(q)
+                    );
+                }
+
                 return Promise.resolve({
                     data: {
-                        data: mockVdrLogs,
+                        data: filtered,
                         meta: {
-                            current_page: 1,
+                            current_page: page,
                             last_page: 1,
-                            total: mockVdrLogs.length,
+                            total: filtered.length,
                             per_page: 25,
                         },
                     },
