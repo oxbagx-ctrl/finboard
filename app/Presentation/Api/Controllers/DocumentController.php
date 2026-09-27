@@ -118,7 +118,9 @@ final class DocumentController
             userId: $user->id,
             action: 'upload',
             ipAddress: $request->ip(),
-            userAgent: $request->userAgent()
+            userAgent: $request->userAgent(),
+            documentTitle: $domainDoc->title(),
+            companyId: $companyId
         );
 
         $eloquentDoc = EloquentDocument::with('uploader')->findOrFail($docId->value());
@@ -172,7 +174,9 @@ final class DocumentController
             userId: $user->id,
             action: 'download',
             ipAddress: $request->ip(),
-            userAgent: $request->userAgent()
+            userAgent: $request->userAgent(),
+            documentTitle: $domainDoc->title(),
+            companyId: $domainDoc->companyId()
         );
 
         return response($fileContent, Response::HTTP_OK, [
@@ -201,6 +205,17 @@ final class DocumentController
         $domainDoc->updateType(DocumentType::from((string) $request->input('type')));
 
         $this->repository->save($domainDoc);
+
+        $user = $request->user();
+        $this->repository->logAccess(
+            documentId: $domainDoc->documentId(),
+            userId: $user->id,
+            action: 'update',
+            ipAddress: $request->ip(),
+            userAgent: $request->userAgent(),
+            documentTitle: $domainDoc->title(),
+            companyId: $domainDoc->companyId()
+        );
 
         $eloquentDoc = EloquentDocument::with('uploader')->findOrFail($id);
 
@@ -236,7 +251,9 @@ final class DocumentController
             userId: $user->id,
             action: $action,
             ipAddress: $request->ip(),
-            userAgent: $request->userAgent()
+            userAgent: $request->userAgent(),
+            documentTitle: $domainDoc->title(),
+            companyId: $domainDoc->companyId()
         );
 
         $eloquentDoc = EloquentDocument::with('uploader')->findOrFail($id);
@@ -255,7 +272,18 @@ final class DocumentController
             throw new NotFoundHttpException('Dokument nie został odnaleziony.');
         }
 
-        $this->ensureCanAccessCompany($request->user(), $domainDoc->companyId());
+        $user = $request->user();
+        $this->ensureCanAccessCompany($user, $domainDoc->companyId());
+
+        $this->repository->logAccess(
+            documentId: $domainDoc->documentId(),
+            userId: $user->id,
+            action: 'destroy',
+            ipAddress: $request->ip(),
+            userAgent: $request->userAgent(),
+            documentTitle: $domainDoc->title(),
+            companyId: $domainDoc->companyId()
+        );
 
         $this->storage->delete($domainDoc->storagePath());
         $this->repository->delete($domainDoc->documentId());

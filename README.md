@@ -704,7 +704,7 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Frontendowy test integracyjny w `phase44StatementsAndValuationIntegration.test.jsx` sprawdzający parzystość kalkulacji Web Worker, akcelerację odliczenia w roku 2 oraz interaktywne rozwijanie sub-wierszy CIT w `ThreeStatementGrid`.
     - Poprawa izolacji bazy danych w `InvestmentProjectSeederTest.php` z użyciem `DatabaseTransactions`.
     - Zapewnienie 100% zielonego wyniku testów: 603 testy PHPUnit (7915 asercji) oraz 477 testów Vitest (52 pliki testowe).
-- [x] **Faza 50: Ulepszenie interaktywności, transparentności symulatora What-If oraz wizualizacja DCF i CAPEX w Kokpicie Wrażliwości (Commit 245)**
+- [x] **Faza 50: Ulepszenie interaktywności, transparentności symulatora What-If oraz wizualizacja DCF i CAPEX w Kokpicie Wrażliwości **
   - Przełącznik trybów prezentacji wykresu 15-letniego w `SensitivityCockpitView.jsx` (Segmented Control: tryb *Nominalne (P&L i CF)* vs *Zdyskontowane (DCF & NPV)*).
   - Wzbogacenie wykresu nominalnego o dedykowaną serię słupkową nakładów majątkowych *CAPEX & Reinwestycje* (#818cf8) i etykietowanie lat z odtworzeniami na osi X (`Rok X (CAPEX)`).
   - Pełna wizualizacja trajektorii zdyskontowanych przepływów pieniężnych (słupki *Zdyskontowany FCFF*) oraz narastającej krzywej wartości bieżącej netto (*Skumulowane NPV*) reagującej na żywo na suwak WACC.
@@ -713,7 +713,7 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
   - Utrzymanie pełnej zgodności i spójności 10-wierszowej macierzy wariancji Base Case vs What-If.
   - Rozszerzenie zestawu testów jednostkowych Vitest w `SensitivityCockpitView.test.jsx` (14 testów) oraz pełna weryfikacja regresji (482 testy Vitest, 603 testy PHPUnit).
 
-- [x] **Faza 51: Wyeliminowanie krytycznych rozbieżności między silnikiem przepływów pieniężnych a modułem audytu kowenantów LMA (Commity 246–248)**
+- [x] **Faza 51: Wyeliminowanie krytycznych rozbieżności między silnikiem przepływów pieniężnych a modułem audytu kowenantów LMA **
   -  Wyeliminowanie rozbieżności Cash Flow dotacji unijnych (EU Grants) i guardraile wskaźników płynności w audycie kowenantów LMA (`BankingCovenantsStrip` & `financialCalculations.ts`).
     - Likwidacja sztucznej 10-milionowej dziury płynnościowej w fazie CAPEX poprzez włączenie transz dotacji unijnych (`grant_disbursement_schedule` oraz fallback na zakończenie kwalifikowanych etapów CAPEX) do miesięcznych przepływów finansowych Web Workera (`fcf = debtDrawdown + grantReceived - debtRepaid - upfrontFee`) oraz rocznych agregacji `grantReceived` w Cash Flow Statement.
     - Wprowadzenie dynamicznych kontenerów (tło/obramowanie `bg-zinc-950/70 border-zinc-800` vs `bg-rose-950/20 border-rose-800/40`) oraz kolorystyki kafelków Płynności Bieżącej (CR) i Rezerwy DSRF w `BankingCovenantsStrip.jsx`.
@@ -742,6 +742,10 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Usunięcie reguły `cascadeOnDelete()` z klucza obcego `document_id` w `document_access_logs` i zastąpienie jej regułą `nullOnDelete()`.
     - Dodanie kolumn snapshotowych `document_title` oraz `company_id` w `document_access_logs`, gwarantujących czytelność i filtrację logów po usunięciu dokumentu.
     - Zabezpieczenie zapytań audytowych z wykorzystaniem `withTrashed()` zapobiegające utracie historii zdarzeń.
+  - [x] Rejestracja audytowa operacji modyfikacji (update) i likwidacji (destroy) dokumentów VDR (Commit 251).
+    - Zabezpieczenie pełnego cyklu życia pliku: automatyczna rejestracja zdarzeń `update` oraz `destroy` w `DocumentController`.
+    - Utrwalanie tożsamości użytkownika, adresu IP, User-Agent oraz snapshotu metadanych pliku przed fizycznym usunięciem.
+    - Rozszerzenie frontendowej palety akcji audytowych `AuditActionBadge` oraz filtrów VDR `VDR_ACTION_FILTERS` w widoku `AuditLogsView`.
 
 ---
 

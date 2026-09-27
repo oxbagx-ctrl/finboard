@@ -95,6 +95,24 @@ export const AUDIT_ACTION_CONFIG = {
         category: 'document',
         icon: DownloadCloud,
     },
+    update: {
+        label: 'Modyfikacja',
+        color: 'blue',
+        category: 'document',
+        icon: ArrowRightLeft,
+    },
+    destroy: {
+        label: 'Usunięcie',
+        color: 'rose',
+        category: 'document',
+        icon: Trash2,
+    },
+    delete: {
+        label: 'Usunięcie',
+        color: 'rose',
+        category: 'document',
+        icon: Trash2,
+    },
     archive: {
         label: 'Archiwizacja',
         color: 'amber',

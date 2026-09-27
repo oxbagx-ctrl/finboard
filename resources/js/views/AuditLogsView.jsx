@@ -38,6 +38,8 @@ const VDR_ACTION_FILTERS = [
     { id: '', label: 'Wszystkie Zdarzenia' },
     { id: 'download', label: 'Pobrania' },
     { id: 'upload', label: 'Wgrania (Upload)' },
+    { id: 'update', label: 'Modyfikacje' },
+    { id: 'destroy', label: 'Usunięcia' },
     { id: 'archive', label: 'Archiwizacje' },
     { id: 'unarchive', label: 'Przywrócenia' },
 ];

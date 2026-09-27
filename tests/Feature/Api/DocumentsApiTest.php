@@ -204,6 +204,14 @@ final class DocumentsApiTest extends TestCase
             'title' => 'Zatwierdzona Umowa Przejęcia',
             'type' => 'contract',
         ]);
+
+        // Verify update audit log is recorded
+        $this->assertDatabaseHas('document_access_logs', [
+            'document_id' => $docId,
+            'action' => 'update',
+            'user_id' => $this->clientUser->id,
+            'document_title' => 'Zatwierdzona Umowa Przejęcia',
+        ]);
     }
 
     public function test_archive_and_unarchive_document(): void
@@ -252,10 +260,17 @@ final class DocumentsApiTest extends TestCase
             'id' => $docId,
         ]);
 
-        // Verify audit trail is preserved (WORM principle)
+        // Verify upload and destroy audit trails are preserved (WORM principle)
         $this->assertDatabaseHas('document_access_logs', [
             'document_id' => $docId,
             'action' => 'upload',
+        ]);
+
+        $this->assertDatabaseHas('document_access_logs', [
+            'document_id' => $docId,
+            'action' => 'destroy',
+            'user_id' => $this->clientUser->id,
+            'document_title' => 'Dokument do skasowania',
         ]);
     }
 

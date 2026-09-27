@@ -112,9 +112,19 @@ describe('AuditActionBadge and Audit Palette Harmonization', () => {
             expect(screen.getByTestId('badge-vdr-arch').className).toContain('bg-amber-950/70');
             u3();
 
-            render(<AuditActionBadge action="unarchive" testId="badge-vdr-unarch" />);
+            const { unmount: u4 } = render(<AuditActionBadge action="unarchive" testId="badge-vdr-unarch" />);
             expect(screen.getByTestId('badge-vdr-unarch')).toHaveTextContent('Przywrócenie');
             expect(screen.getByTestId('badge-vdr-unarch').className).toContain('bg-zinc-850');
+            u4();
+
+            const { unmount: u5 } = render(<AuditActionBadge action="update" testId="badge-vdr-upd" />);
+            expect(screen.getByTestId('badge-vdr-upd')).toHaveTextContent('Modyfikacja');
+            expect(screen.getByTestId('badge-vdr-upd').className).toContain('bg-blue-950/70');
+            u5();
+
+            render(<AuditActionBadge action="destroy" testId="badge-vdr-del" />);
+            expect(screen.getByTestId('badge-vdr-del')).toHaveTextContent('Usunięcie');
+            expect(screen.getByTestId('badge-vdr-del').className).toContain('bg-rose-950/70');
         });
 
         it('allows custom override of label, color, and hidden icon', () => {
