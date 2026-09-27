@@ -754,37 +754,46 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Zestaw testów w `tests/Feature/DocumentManagement/VdrHardeningSecurityRegressionTest.php` weryfikujący dostęp doradców transakcyjnych (`advisor`), administratorów (`super_admin`), blokadę 403 dla obcych spółek, WORM audit retention przy soft delete, walidację limitu 50MB i typów MIME oraz nagłówek RFC 5987.
     - 100% PASS w pełnym pakiecie testów: 614 testów PHPUnit (8119 asercji) oraz 500 testów Vitest (53 pliki testowe).
 
-- [x] **Faza 53: CQRS, Storage Rollback & Server-side Audit Filtering (Commity 254–258)**
-  - [x] Transakcyjny menedżer pamięci masowej (Transactional Storage Manager) z rollbackiem plików (Commit 254).
+- [x] **Faza 53: CQRS, Storage Rollback & Server-side Audit Filtering**
+  - Transakcyjny menedżer pamięci masowej (Transactional Storage Manager) z rollbackiem plików.
     - Zapobieganie powstawaniu osieroconych plików (orphan files) na dysku w przypadku błędu transakcji bazodanowej lub wyjątku SQL.
     - Implementacja interfejsu domenowego `TransactionalStorageManagerInterface` oraz klasy infrastruktury `TransactionalStorageManager`.
     - Dwufazowa koordynacja: automatyczny rollback (`delete`) plików utworzonych w transakcji w przypadku `Throwable`, oraz odroczone fizyczne usuwanie plików (`stageDeletion`) dopiero po zatwierdzeniu transakcji DB.
     - Integracja w `DocumentController::store` oraz `DocumentController::destroy`.
     - Zestaw dedykowanych testów jednostkowych w `TransactionalStorageManagerTest.php` (5 testów, 14 asercji).
-  - [x] Wzorzec CQRS Query dla logów audytowych VDR z filtrowaniem serwerowym (Commit 255).
+  - Wzorzec CQRS Query dla logów audytowych VDR z filtrowaniem serwerowym.
     - Wprowadzenie `GetVdrAuditLogsQuery` oraz `GetVdrAuditLogsHandler` w warstwie Application modułu `DocumentManagement`.
     - Filtrowanie po stronie SQL (backend) według typu zdarzenia (`action`: pojedyncza akcja lub lista oddzielona przecinkami) oraz frazy wyszukiwania (`search` z wykorzystaniem `ilike` po tytule dokumentu, nazwisku i adresie email użytkownika oraz adresie IP).
     - Eliminacja problemu pustych stron przy paginacji dzięki przeniesieniu filtrowania przed zapytanie `paginate()`.
     - Integracja handlera w metodach `allAuditLogs` oraz `auditLogs` w `DocumentController`.
     - Dedykowane testy jednostkowe `GetVdrAuditLogsQueryTest` oraz weryfikacja endpointu REST w `DocumentsApiTest`.
-  - [x] Integracja frontendu AuditLogsView z backendowym filtrowaniem VDR (Commit 256).
+  - Integracja frontendu AuditLogsView z backendowym filtrowaniem VDR.
     - Eliminacja obcinania paginacji (client-side pagination truncation) przez usunięcie lokalnego filtrowania tablicy `records.filter()`.
     - Przekazywanie parametrów `action` oraz `search` bezpośrednio do zapytania `apiClient.get('/documents/audit-logs')`.
     - Wprowadzenie mechanizmu debouncingu 300ms dla pola wyszukiwania VDR (`vdrSearchInput` -> `vdrSearchQuery`) oraz resetowania do strony 1 przy zmianie filtrów.
     - Dodanie przycisku czyszczenia wyszukiwania oraz przycisku czyszczenia filtrów w stanie pustym.
     - Testy jednostkowe i integracyjne Vitest w `AuditLogsView.test.jsx` oraz `vdrAuditRegression.test.jsx` (100% PASS w pełnym pakiecie 502 testów).
-  - [x] Wzorzec CQRS (Query & Command Handlers) dla repozytorium dokumentów VDR (Commit 257).
+  - Wzorzec CQRS (Query & Command Handlers) dla repozytorium dokumentów VDR.
     - Pełne rozdzielenie operacji odczytu (Queries) i zapisu (Commands) w warstwie `Application` modułu `DocumentManagement`.
     - Implementacja zapytań: `GetDocumentsQuery` & `GetDocumentsHandler` (filtrowanie, wyszukiwanie, paginacja) oraz `GetDocumentByIdQuery` & `GetDocumentByIdHandler` (wyszukiwanie po UUID, obsługa `withTrashed`, domenowy `DocumentNotFoundException`).
     - Implementacja komend: `UploadDocumentCommand` & `UploadDocumentHandler` (transakcyjny storage manager, wyliczenie SHA-256, audyt uploadu), `UpdateDocumentCommand` & `UpdateDocumentHandler`, `ArchiveDocumentCommand` & `ArchiveDocumentHandler`, `DeleteDocumentCommand` & `DeleteDocumentHandler` (soft-delete + odroczone usuwanie z dysku `stageDeletion`), `DownloadDocumentCommand` & `DownloadDocumentHandler` (inkrementacja pobrań, obsługa `FileNotFoundInStorageException`).
     - Przekształcenie `DocumentController` w cienki kontroler HTTP delegujący wszystkie operacje bezpośrednio do handlerów CQRS przy zachowaniu harmonizacji autoryzacji multi-tenant.
     - Dedykowany pakiet testów jednostkowych w `DocumentCqrsHandlersTest.php` (7 testów, 25 asercji) ze 100% PASS w testach jednostkowych, integracyjnych i regresyjnych.
-  - [x] Testy integracyjne rollbacku storage i serwerowej paginacji audytu VDR (Commit 258).
+  - Testy integracyjne rollbacku storage i serwerowej paginacji audytu VDR.
     - Opracowanie zaawansowanego pakietu testów integracyjnych w `tests/Feature/DocumentManagement/VdrStorageRollbackAndAuditPaginationIntegrationTest.php` (5 testów, 159 asercji).
     - Weryfikacja automatycznego usuwania fizycznych plików z dysku w przypadku zakleszczenia lub błędu transakcji bazy danych (eliminacja orphan files).
     - Weryfikacja odroczenia i anulowania usunięcia pliku z dysku przy błędzie DB w trakcie kasowania oraz pomyślnego usunięcia po commit.
     - Weryfikacja wielostronicowej paginacji audytu VDR, filtracji po pojedynczej lub wielu akcjach (`action=upload,download`), wyszukiwania frazowego (`search`) oraz szczelnej izolacji multi-tenant.
     - Zapewnienie 100% zielonego wyniku testów: 636 testów PHPUnit (8369 asercji) oraz 502 testy Vitest (53 pliki testowe).
+
+- [ ] **Faza 54: Standard M&A Due Diligence – Hierarchia Folderów i Indeks Dziesiętny Dewey (Commity 259–263)**
+  - [x] Agregat TransactionFolder oraz system indeksowania dziesiętnego Dewey (Commit 259).
+    - Wdrożenie migracji tabeli `transaction_folders` (UUID, `company_id`, rekurencyjny `parent_id`, `index_code`, `name`, `description`, `sort_order`, klucz unikalny na parze firma-indeks).
+    - Implementacja obiektów wartości `FolderId` oraz `DeweyIndexCode` (walidacja, normalizacja do formatu `01.00`, wyznaczanie poziomu hierarchii, kod rodzica, generowanie podkodów potomnych, sortowanie segmentowe).
+    - Implementacja korzenia agregatu `TransactionFolder` ze zdarzeniami domenowymi `TransactionFolderCreated`, `TransactionFolderUpdated`, `TransactionFolderDeleted`.
+    - Serwis domenowy `DeweyMnaStructureGenerator` dostarczający standardową taksonomię 8 głównych obszarów Due Diligence (ponad 25 folderów transakcyjnych).
+    - Implementacja repozytorium `EloquentTransactionFolderRepository` powiązanego z interfejsem domenowym `TransactionFolderRepositoryInterface` z sortowaniem Dewey.
+    - Zestaw testów jednostkowych w `DeweyIndexCodeTest`, `TransactionFolderTest` oraz `TransactionFolderRepositoryTest` (17 testów, 62 asercje).
 
 ---
 

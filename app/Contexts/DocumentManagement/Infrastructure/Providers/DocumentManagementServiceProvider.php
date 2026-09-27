@@ -30,6 +30,11 @@ final class DocumentManagementServiceProvider extends ServiceProvider
             TransactionalStorageManagerInterface::class,
             TransactionalStorageManager::class
         );
+
+        $this->app->bind(
+            \App\Contexts\DocumentManagement\Domain\Repositories\TransactionFolderRepositoryInterface::class,
+            \App\Contexts\DocumentManagement\Infrastructure\Repositories\EloquentTransactionFolderRepository::class
+        );
     }
 
     public function boot(): void
