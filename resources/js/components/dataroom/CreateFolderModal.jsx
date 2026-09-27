@@ -193,7 +193,7 @@ export const CreateFolderModal = ({
                             {errors.index_code && (
                                 <p className="text-[10px] text-rose-400 mt-1 flex items-center gap-1">
                                     <AlertCircle className="w-3 h-3 shrink-0" />
-                                    {errors.index_code[0] || errors.index_code}
+                                    {Array.isArray(errors.index_code) ? errors.index_code[0] : errors.index_code}
                                 </p>
                             )}
                         </div>
@@ -235,7 +235,7 @@ export const CreateFolderModal = ({
                         {errors.name && (
                             <p className="text-[10px] text-rose-400 mt-1 flex items-center gap-1">
                                 <AlertCircle className="w-3 h-3 shrink-0" />
-                                {errors.name[0] || errors.name}
+                                {Array.isArray(errors.name) ? errors.name[0] : errors.name}
                             </p>
                         )}
                     </div>

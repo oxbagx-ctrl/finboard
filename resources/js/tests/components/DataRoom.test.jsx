@@ -33,6 +33,13 @@ const mockDocs = [
         is_archived: false,
         created_at: '2026-02-15T10:00:00Z',
         uploader: { name: 'Jan Kowalski' },
+        folder_id: 'folder-1',
+        index_code: '01.01.01',
+        folder: {
+            id: 'folder-1',
+            name: 'Umowy Spółki',
+            index_code: '01.01',
+        },
     },
     {
         id: 'doc-2',
@@ -82,6 +89,23 @@ describe('DocumentTable Component', () => {
         expect(screen.getByText('raport_2025.pdf')).toBeInTheDocument();
         expect(screen.getByText('Umowa Kredytowa PKO BP')).toBeInTheDocument();
         expect(screen.getByText('Archiwum')).toBeInTheDocument();
+    });
+
+    it('renders Dewey decimal index badges and folder associations', () => {
+        render(
+            <DocumentTable
+                documents={mockDocs}
+                loading={false}
+                onDownload={vi.fn()}
+                onViewAudit={vi.fn()}
+                onEdit={vi.fn()}
+                onToggleArchive={vi.fn()}
+                onDelete={vi.fn()}
+            />
+        );
+
+        expect(screen.getByText('01.01.01')).toBeInTheDocument();
+        expect(screen.getByText(/01.01 Umowy Spółki/)).toBeInTheDocument();
     });
 
     it('renders empty state when no documents are provided', () => {
@@ -167,6 +191,35 @@ describe('DocumentUploadModal Component', () => {
         const submitBtn = screen.getByText('Zdeponuj w VDR');
         expect(submitBtn).toBeDisabled();
     });
+
+    it('renders folder options and pre-fills Dewey index code on folder change', () => {
+        const testFolders = [
+            { id: 'f-1', index_code: '01.00', name: 'Korporacyjne', children: [
+                { id: 'f-1-1', index_code: '01.01', name: 'Umowy', children: [] }
+            ]}
+        ];
+
+        render(
+            <NotificationProvider>
+                <DocumentUploadModal
+                    isOpen={true}
+                    onClose={vi.fn()}
+                    onSuccess={vi.fn()}
+                    folders={testFolders}
+                />
+            </NotificationProvider>
+        );
+
+        expect(screen.getByText(/Folder M&A/)).toBeInTheDocument();
+        const indexInput = screen.getByPlaceholderText(/01.01.01/);
+        expect(indexInput).toBeInTheDocument();
+
+        // Select folder f-1-1
+        const folderSelect = screen.getAllByRole('combobox')[1];
+        fireEvent.change(folderSelect, { target: { value: 'f-1-1' } });
+
+        expect(indexInput.value).toBe('01.01.01');
+    });
 });
 
 describe('DocumentEditModal Component', () => {
@@ -185,7 +238,7 @@ describe('DocumentEditModal Component', () => {
         render(
             <NotificationProvider>
                 <DocumentEditModal
-                    document={mockDocs[0]}
+                    document={{ ...mockDocs[0], folder_id: null, index_code: null }}
                     isOpen={true}
                     onClose={onClose}
                     onSuccess={onSuccess}
@@ -208,6 +261,46 @@ describe('DocumentEditModal Component', () => {
             });
             expect(onSuccess).toHaveBeenCalled();
             expect(onClose).toHaveBeenCalled();
+        });
+    });
+
+    it('reassigns folder and Dewey index code when submitted', async () => {
+        apiClient.put.mockResolvedValueOnce({
+            data: { data: { ...mockDocs[0], folder_id: 'new-f-2', index_code: '02.01.05' } },
+        });
+
+        const testFolders = [
+            { id: 'new-f-2', index_code: '02.01', name: 'Audyty', children: [] }
+        ];
+
+        render(
+            <NotificationProvider>
+                <DocumentEditModal
+                    document={mockDocs[0]}
+                    isOpen={true}
+                    folders={testFolders}
+                    onClose={vi.fn()}
+                    onSuccess={vi.fn()}
+                />
+            </NotificationProvider>
+        );
+
+        const folderSelect = screen.getAllByRole('combobox')[1];
+        fireEvent.change(folderSelect, { target: { value: 'new-f-2' } });
+
+        const indexInput = screen.getByPlaceholderText(/01.01.01/);
+        fireEvent.change(indexInput, { target: { value: '02.01.05' } });
+
+        const submitBtn = screen.getByText('Zapisz Zmiany');
+        fireEvent.submit(submitBtn.closest('form'));
+
+        await waitFor(() => {
+            expect(apiClient.put).toHaveBeenCalledWith('/documents/doc-1', {
+                title: 'Sprawozdanie Finansowe 2025',
+                type: 'financial_report',
+                folder_id: 'new-f-2',
+                index_code: '02.01.05',
+            });
         });
     });
 });

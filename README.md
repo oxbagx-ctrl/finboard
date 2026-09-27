@@ -792,33 +792,41 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Weryfikacja wielostronicowej paginacji audytu VDR, filtracji po pojedynczej lub wielu akcjach (`action=upload,download`), wyszukiwania frazowego (`search`) oraz szczelnej izolacji multi-tenant.
     - Zapewnienie 100% zielonego wyniku testów: 636 testów PHPUnit (8369 asercji) oraz 502 testy Vitest (53 pliki testowe).
 
-- [ ] **Faza 54: Standard M&A Due Diligence – Hierarchia Folderów i Indeks Dziesiętny Dewey (Commity 259–263)**
-  - [x] Agregat TransactionFolder oraz system indeksowania dziesiętnego Dewey (Commit 259).
+- [x] **Faza 54: Standard M&A Due Diligence – Hierarchia Folderów i Indeks Dziesiętny Dewey (Commity 259–263)**
+  - Agregat TransactionFolder oraz system indeksowania dziesiętnego Dewey.
     - Wdrożenie migracji tabeli `transaction_folders` (UUID, `company_id`, rekurencyjny `parent_id`, `index_code`, `name`, `description`, `sort_order`, klucz unikalny na parze firma-indeks).
     - Implementacja obiektów wartości `FolderId` oraz `DeweyIndexCode` (walidacja, normalizacja do formatu `01.00`, wyznaczanie poziomu hierarchii, kod rodzica, generowanie podkodów potomnych, sortowanie segmentowe).
     - Implementacja korzenia agregatu `TransactionFolder` ze zdarzeniami domenowymi `TransactionFolderCreated`, `TransactionFolderUpdated`, `TransactionFolderDeleted`.
     - Serwis domenowy `DeweyMnaStructureGenerator` dostarczający standardową taksonomię 8 głównych obszarów Due Diligence (ponad 25 folderów transakcyjnych).
     - Implementacja repozytorium `EloquentTransactionFolderRepository` powiązanego z interfejsem domenowym `TransactionFolderRepositoryInterface` z sortowaniem Dewey.
     - Zestaw testów jednostkowych w `DeweyIndexCodeTest`, `TransactionFolderTest` oraz `TransactionFolderRepositoryTest` (17 testów, 62 asercje).
-  - [x] Aktualizacja encji Document, migracji i REST API dla zagnieżdżonej hierarchii folderów i indeksów Dewey (Commit 260).
+  - Aktualizacja encji Document, migracji i REST API dla zagnieżdżonej hierarchii folderów i indeksów Dewey.
     - Migracja `documents` dodająca `folder_id` (relacja z `transaction_folders`, `ON DELETE SET NULL`) oraz `index_code` (indeks B-tree, format dziesiętny Dewey).
     - Rozszerzenie encji domenowej `Document` o metody `assignToFolder()` oraz `updateIndexCode()`.
     - Aktualizacja modeli Eloquent, komend i zapytań CQRS (`UploadDocumentCommand`, `UpdateDocumentCommand`, `GetDocumentsQuery`) z obsługą filtrowania po `folder_id` i eager loadingiem folderu.
     - Wdrożenie `TransactionFolderController`, `TransactionFolderResource` oraz żądań walidacji (`CreateTransactionFolderRequest`, `UpdateTransactionFolderRequest`).
     - Zapewnienie pełnej izolacji wielodostępowej (multi-tenant) i autoryzacji opartej o `ResolvesCompanyContext`.
     - Pakiet testów integracyjnych API w `TransactionFolderApiTest.php` (9 testów, 38 asercji), 100% PASS w pełnym zestawie 662 testów PHPUnit oraz 502 testów Vitest.
-  - [x] Nawigacja po drzewie folderów Dewey i odznaki indeksów w DocumentTable (Commit 261).
+  - Nawigacja po drzewie folderów Dewey i odznaki indeksów w DocumentTable.
     - Komponent nawigacji po hierarchii `FolderTreeNav` z rozwijaniem/zwijaniem węzłów, szybkim filtrowaniem ("Wszystkie dokumenty", "Nieprzypisane") oraz dynamicznymi licznikami plików `documents_count`.
     - Wdrożenie przycisku inicjalizacji taksonomii M&A (33 kategorie Due Diligence) bezpośrednio z panelu bocznego pokoju danych.
     - Wizualizacja odznak kodów Dewey (np. `01.01.01`) o wysokim kontraście oraz etykiet folderów nadrzędnych w tabeli `DocumentTable`.
     - Elastyczny, responsywny układ dwukolumnowy z możliwością ukrywania/pokazywania paska bocznego folderów i chipem aktywnego filtra.
     - 100% PASS w 53 plikach testowych Vitest (502 testy) oraz pełnym zestawie 662 testów PHPUnit (8469 asercji).
-  - [x] Modal tworzenia folderów CreateFolderModal i przypisywanie dokumentów w DataRoomView (Commit 262).
+  - Modal tworzenia folderów CreateFolderModal i przypisywanie dokumentów w DataRoomView.
     - Komponent `CreateFolderModal` do tworzenia niestandardowych folderów transakcyjnych (wybór rodzica z wcięciem głębokości, walidacja i dynamiczna sugestia prefiksów kodu Dewey, nazwa, opis, kolejność sortowania).
     - Rozszerzenie `DocumentUploadModal` o wybór folderu docelowego i automatyczne uzupełnianie indeksu Dewey pliku.
     - Rozszerzenie `DocumentEditModal` o możliwość przenoszenia dokumentów pomiędzy folderami, odpinania (`folder_id: null`) i aktualizacji indeksów Dewey.
     - Integracja w `FolderTreeNav` (przycisk "+ Nowy Folder Dewey") oraz automatyczna synchronizacja liczników w `DataRoomView`.
     - 100% PASS w 53 plikach testowych Vitest (502 testy) oraz pełnym pakiecie PHPUnit (662 testy).
+  - Testy jednostkowe i komponentowe drzewa nawigacji, indeksowania Dewey i modali.
+    - Nowy pakiet testów komponentowych `FolderTreeNav.test.jsx` (weryfikacja renderowania kodów Dewey, liczników dokumentów, filtrów, rozwijania/zwijania gałęzi, inicjalizacji taksonomii oraz otwierania modalu).
+    - Nowy pakiet testów komponentowych `CreateFolderModal.test.jsx` (weryfikacja walidacji kodu Dewey i nazwy, hierarchii folderów nadrzędnych, automatycznej podpowiedzi prefiksu, obsługi żądań API POST).
+    - Rozszerzenie `DataRoom.test.jsx` o asercje odznak indeksu Dewey w tabeli dokumentów oraz modali przypisywania.
+    - Poprawka renderowania błędów walidacji po stronie klienta w `CreateFolderModal.jsx`.
+    - 100% PASS w pełnym pakiecie 515 testów Vitest (55 plików testowych) oraz 662 testów PHPUnit (8469 asercji).
+
+- [ ] **Faza 55: Permission Matrix, Dynamic PDF Watermarking & Final VDR Security (Commity 264–268)**
 
 ---
 
