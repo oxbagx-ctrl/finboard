@@ -732,26 +732,30 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Opracowanie frontendowego pakietu testów integracyjnych w `resources/js/tests/integration/phase51CovenantsAndProjectFinanceIntegration.test.jsx` (6 testów): weryfikacja 15-letniej symulacji z separacją rezerwy DSRA i zerową wariancją gotówkową, formuły dyskontowania LLCR stopą Kd z uwzględnieniem bufora DSRA, reguł prezentacyjnych LMA (brak ujemnych wartości dla CR i DSRF), algorytmu Deal Advisory Equity Cure dla projektów zagrożonych, certyfikatu bankowalności LMA dla projektów w 100% bankowalnych oraz interaktywnego suwaka progów i presetów bankowych.
     - Zapewnienie 100% zielonego wyniku testów: 607 testów PHPUnit (8063 asercje) oraz 500 testów Vitest (53 pliki testowe).
 
-- [ ] **Faza 52: Uszczelnienie Bezpieczeństwa Multi-Tenant, Integralność Audytu WORM i Poprawki Krytyczne (Commity 249–253)**
-  - [x] Harmonizacja weryfikacji dostępu multi-tenant w `DocumentController` za pomocą `User::canAccessCompany` (Commit 249).
+- [x] **Faza 52: Uszczelnienie Bezpieczeństwa Multi-Tenant, Integralność Audytu WORM i Poprawki Krytyczne**
+  - [x] Harmonizacja weryfikacji dostępu multi-tenant w `DocumentController` za pomocą `User::canAccessCompany`.
     - Likwidacja sztucznej blokady `403 Forbidden` dla użytkowników z rolą `super_admin` oraz Doradców transakcyjnych (`advisor`) przypisanych do spółek przez relację `advisor_company`.
     - Zastąpienie sztywnego porównania roli `'admin'` i `company_id` domenową metodą `$user->canAccessCompany($companyId)`.
     - Pełna integracja autoryzacji domenowej w metodach `show`, `download`, `update`, `archive`, `destroy` oraz `auditLogs`.
-  - [x] Nienaruszalność ścieżki audytowej WORM i usunięcie kaskadowego kasowania logów (Commit 250).
+  - [x] Nienaruszalność ścieżki audytowej WORM i usunięcie kaskadowego kasowania logów.
     - Wdrożenie mechanizmu `SoftDeletes` dla tabeli `documents` oraz modelu `Document`.
     - Usunięcie reguły `cascadeOnDelete()` z klucza obcego `document_id` w `document_access_logs` i zastąpienie jej regułą `nullOnDelete()`.
     - Dodanie kolumn snapshotowych `document_title` oraz `company_id` w `document_access_logs`, gwarantujących czytelność i filtrację logów po usunięciu dokumentu.
     - Zabezpieczenie zapytań audytowych z wykorzystaniem `withTrashed()` zapobiegające utracie historii zdarzeń.
-  - [x] Rejestracja audytowa operacji modyfikacji (update) i likwidacji (destroy) dokumentów VDR (Commit 251).
+  - [x] Rejestracja audytowa operacji modyfikacji (update) i likwidacji (destroy) dokumentów VDR.
     - Zabezpieczenie pełnego cyklu życia pliku: automatyczna rejestracja zdarzeń `update` oraz `destroy` w `DocumentController`.
     - Utrwalanie tożsamości użytkownika, adresu IP, User-Agent oraz snapshotu metadanych pliku przed fizycznym usunięciem.
     - Rozszerzenie frontendowej palety akcji audytowych `AuditActionBadge` oraz filtrów VDR `VDR_ACTION_FILTERS` w widoku `AuditLogsView`.
-  - [x] Synchronizacja limitów uploadu (50 MB), walidacja MIME i standard RFC 5987 / RFC 6266 (Commit 252).
+  - [x] Synchronizacja limitów uploadu (50 MB), walidacja MIME i standard RFC 5987 / RFC 6266.
     - Podniesienie limitu wielkości pliku w `UploadDocumentRequest` do `max:51200` (50 MB) usuwające rozbieżność z interfejsem React.
     - Ścisła walidacja rozszerzeń i typów MIME (`pdf`, `xlsx`, `xls`, `doc`, `docx`, `zip`) zabezpieczająca przed złośliwymi skryptami.
     - Implementacja kodowania znaków UTF-8 (np. polskich znaków diakrytycznych) w nagłówku `Content-Disposition` z wykorzystaniem `HeaderUtils::makeDisposition` i bezpiecznym fallbackiem ASCII.
+  - [x] Testy regresyjne bezpieczeństwa i integralności VDR.
+    - Zestaw testów w `tests/Feature/DocumentManagement/VdrHardeningSecurityRegressionTest.php` weryfikujący dostęp doradców transakcyjnych (`advisor`), administratorów (`super_admin`), blokadę 403 dla obcych spółek, WORM audit retention przy soft delete, walidację limitu 50MB i typów MIME oraz nagłówek RFC 5987.
+    - 100% PASS w pełnym pakiecie testów: 614 testów PHPUnit (8119 asercji) oraz 500 testów Vitest (53 pliki testowe).
 
 ---
+
 
 
 ## 📜 Licencja
