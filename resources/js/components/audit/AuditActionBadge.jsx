@@ -195,8 +195,9 @@ export const getActionBadgeClass = getAuditBadgeColorClass;
 
 /**
  * Harmonized action badge component with icon, label, and terminal styling.
+ * Equipped with React.forwardRef for seamless Floating UI Tooltip integration.
  */
-export const AuditActionBadge = ({
+export const AuditActionBadge = React.forwardRef(({
     action,
     label,
     color,
@@ -205,7 +206,8 @@ export const AuditActionBadge = ({
     showIcon = true,
     testId,
     className = '',
-}) => {
+    ...props
+}, ref) => {
     const config = AUDIT_ACTION_CONFIG[action] || {};
     const effectiveColor = color || config.color || 'zinc';
     const effectiveLabel = label || config.label || action || 'Nieznana akcja';
@@ -215,13 +217,17 @@ export const AuditActionBadge = ({
 
     return (
         <span
+            ref={ref}
             className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${colorClasses} ${className}`}
             data-testid={testId}
+            {...props}
         >
             {showIcon && IconComponent && <IconComponent className="w-3 h-3 shrink-0" />}
             <span>{effectiveLabel}</span>
         </span>
     );
-};
+});
+
+AuditActionBadge.displayName = 'AuditActionBadge';
 
 export default AuditActionBadge;
