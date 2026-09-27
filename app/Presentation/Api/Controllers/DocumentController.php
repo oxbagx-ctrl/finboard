@@ -4,17 +4,23 @@ declare(strict_types=1);
 
 namespace App\Presentation\Api\Controllers;
 
+use App\Contexts\DocumentManagement\Application\Commands\ArchiveDocument\ArchiveDocumentCommand;
+use App\Contexts\DocumentManagement\Application\Commands\ArchiveDocument\ArchiveDocumentHandler;
+use App\Contexts\DocumentManagement\Application\Commands\DeleteDocument\DeleteDocumentCommand;
+use App\Contexts\DocumentManagement\Application\Commands\DeleteDocument\DeleteDocumentHandler;
+use App\Contexts\DocumentManagement\Application\Commands\DownloadDocument\DownloadDocumentCommand;
+use App\Contexts\DocumentManagement\Application\Commands\DownloadDocument\DownloadDocumentHandler;
+use App\Contexts\DocumentManagement\Application\Commands\UpdateDocument\UpdateDocumentCommand;
+use App\Contexts\DocumentManagement\Application\Commands\UpdateDocument\UpdateDocumentHandler;
+use App\Contexts\DocumentManagement\Application\Commands\UploadDocument\UploadDocumentCommand;
+use App\Contexts\DocumentManagement\Application\Commands\UploadDocument\UploadDocumentHandler;
+use App\Contexts\DocumentManagement\Application\Queries\GetDocumentById\GetDocumentByIdHandler;
+use App\Contexts\DocumentManagement\Application\Queries\GetDocumentById\GetDocumentByIdQuery;
+use App\Contexts\DocumentManagement\Application\Queries\GetDocuments\GetDocumentsHandler;
+use App\Contexts\DocumentManagement\Application\Queries\GetDocuments\GetDocumentsQuery;
 use App\Contexts\DocumentManagement\Application\Queries\GetVdrAuditLogs\GetVdrAuditLogsHandler;
 use App\Contexts\DocumentManagement\Application\Queries\GetVdrAuditLogs\GetVdrAuditLogsQuery;
-use App\Contexts\DocumentManagement\Domain\Model\Document as DomainDocument;
-use App\Contexts\DocumentManagement\Domain\Repositories\DocumentRepositoryInterface;
-use App\Contexts\DocumentManagement\Domain\Services\DocumentStorageInterface;
-use App\Contexts\DocumentManagement\Domain\Services\TransactionalStorageManagerInterface;
-use App\Contexts\DocumentManagement\Domain\ValueObjects\DocumentId;
-use App\Contexts\DocumentManagement\Domain\ValueObjects\DocumentType;
-use App\Contexts\DocumentManagement\Domain\ValueObjects\FileMetadata;
 use App\Models\Document as EloquentDocument;
-use App\Models\DocumentAccessLog;
 use App\Models\User;
 use App\Presentation\Api\Requests\UpdateDocumentRequest;
 use App\Presentation\Api\Requests\UploadDocumentRequest;
@@ -29,23 +35,21 @@ use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 final class DocumentController
 {
     use ResolvesCompanyContext;
 
-    private readonly TransactionalStorageManagerInterface $storageManager;
-    private readonly GetVdrAuditLogsHandler $getVdrAuditLogsHandler;
-
     public function __construct(
-        private readonly DocumentRepositoryInterface $repository,
-        private readonly DocumentStorageInterface $storage,
-        ?TransactionalStorageManagerInterface $storageManager = null,
-        ?GetVdrAuditLogsHandler $getVdrAuditLogsHandler = null
+        private readonly GetDocumentsHandler $getDocumentsHandler,
+        private readonly GetDocumentByIdHandler $getDocumentByIdHandler,
+        private readonly UploadDocumentHandler $uploadDocumentHandler,
+        private readonly UpdateDocumentHandler $updateDocumentHandler,
+        private readonly ArchiveDocumentHandler $archiveDocumentHandler,
+        private readonly DeleteDocumentHandler $deleteDocumentHandler,
+        private readonly DownloadDocumentHandler $downloadDocumentHandler,
+        private readonly GetVdrAuditLogsHandler $getVdrAuditLogsHandler
     ) {
-        $this->storageManager = $storageManager ?? app(TransactionalStorageManagerInterface::class);
-        $this->getVdrAuditLogsHandler = $getVdrAuditLogsHandler ?? app(GetVdrAuditLogsHandler::class);
     }
 
     /**
@@ -55,29 +59,16 @@ final class DocumentController
     {
         $companyId = $this->resolveCompanyId($request);
 
-        $query = EloquentDocument::query()
-            ->with('uploader')
-            ->where('company_id', $companyId);
+        $query = new GetDocumentsQuery(
+            companyId: $companyId,
+            includeArchived: $request->boolean('include_archived', false),
+            type: $request->filled('type') ? (string) $request->query('type') : null,
+            search: $request->filled('search') ? (string) $request->query('search') : null,
+            perPage: $request->integer('per_page', 20),
+            page: $request->integer('page', 1)
+        );
 
-        if (!$request->boolean('include_archived', false)) {
-            $query->where('is_archived', false);
-        }
-
-        if ($request->filled('type')) {
-            $query->where('type', $request->query('type'));
-        }
-
-        if ($request->filled('search')) {
-            $search = '%' . trim((string) $request->query('search')) . '%';
-            $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', $search)
-                  ->orWhere('original_name', 'like', $search);
-            });
-        }
-
-        $documents = $query
-            ->orderBy('created_at', 'desc')
-            ->paginate($request->integer('per_page', 20));
+        $documents = $this->getDocumentsHandler->handle($query);
 
         return DocumentResource::collection($documents);
     }
@@ -91,66 +82,23 @@ final class DocumentController
         $user = $request->user();
         $file = $request->file('file');
 
-        $docId = DocumentId::generate();
-        $fileContent = (string) file_get_contents($file->getRealPath());
-        $checksum = hash('sha256', $fileContent);
-        $originalName = $file->getClientOriginalName();
-        $mimeType = $file->getClientMimeType() ?: 'application/octet-stream';
-        $sizeBytes = $file->getSize();
-
-        $metadata = new FileMetadata(
-            originalName: $originalName,
-            mimeType: $mimeType,
-            sizeInBytes: $sizeBytes,
-            checksumSha256: $checksum
+        $command = new UploadDocumentCommand(
+            companyId: $companyId,
+            userId: (string) $user->id,
+            title: (string) $request->input('title'),
+            type: (string) $request->input('type'),
+            fileContent: (string) file_get_contents($file->getRealPath()),
+            originalName: $file->getClientOriginalName(),
+            mimeType: $file->getClientMimeType() ?: 'application/octet-stream',
+            sizeBytes: (int) $file->getSize(),
+            extension: (string) ($file->getClientOriginalExtension() ?: 'bin'),
+            ipAddress: $request->ip(),
+            userAgent: $request->userAgent()
         );
 
-        $extension = $file->getClientOriginalExtension() ?: 'bin';
-        $directory = sprintf('dataroom/%s', $companyId);
-        $filename = sprintf('%s.%s', $docId->value(), $extension);
-        $documentType = DocumentType::from((string) $request->input('type'));
-        $title = (string) $request->input('title');
+        $document = $this->uploadDocumentHandler->handle($command);
 
-        $eloquentDoc = $this->storageManager->transaction(function (TransactionalStorageManagerInterface $manager) use (
-            $fileContent,
-            $directory,
-            $filename,
-            $docId,
-            $companyId,
-            $user,
-            $title,
-            $documentType,
-            $metadata,
-            $request
-        ) {
-            $storagePath = $manager->store($fileContent, $directory, $filename);
-
-            $domainDoc = DomainDocument::upload(
-                id: $docId,
-                companyId: $companyId,
-                uploadedByUserId: $user->id,
-                title: $title,
-                type: $documentType,
-                fileMetadata: $metadata,
-                storagePath: $storagePath
-            );
-
-            $this->repository->save($domainDoc);
-
-            $this->repository->logAccess(
-                documentId: $docId,
-                userId: $user->id,
-                action: 'upload',
-                ipAddress: $request->ip(),
-                userAgent: $request->userAgent(),
-                documentTitle: $domainDoc->title(),
-                companyId: $companyId
-            );
-
-            return EloquentDocument::with('uploader')->findOrFail($docId->value());
-        });
-
-        return (new DocumentResource($eloquentDoc))
+        return (new DocumentResource($document))
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
     }
@@ -160,11 +108,7 @@ final class DocumentController
      */
     public function show(string $id, Request $request): DocumentResource
     {
-        $document = EloquentDocument::with('uploader')->find($id);
-
-        if ($document === null) {
-            throw new NotFoundHttpException('Dokument nie został odnaleziony.');
-        }
+        $document = $this->getDocumentByIdHandler->handle(new GetDocumentByIdQuery(id: $id));
 
         $this->ensureCanAccessDocument($request->user(), $document);
 
@@ -176,35 +120,18 @@ final class DocumentController
      */
     public function download(string $id, Request $request): HttpResponse
     {
-        $domainDoc = $this->repository->findById(DocumentId::fromString($id));
+        $document = $this->getDocumentByIdHandler->handle(new GetDocumentByIdQuery(id: $id));
 
-        if ($domainDoc === null) {
-            throw new NotFoundHttpException('Dokument nie został odnaleziony.');
-        }
+        $this->ensureCanAccessDocument($request->user(), $document);
 
-        $user = $request->user();
-        $this->ensureCanAccessCompany($user, $domainDoc->companyId());
-
-        $fileContent = $this->storage->get($domainDoc->storagePath());
-
-        if ($fileContent === null) {
-            throw new NotFoundHttpException('Plik dokumentu nie istnieje na dysku.');
-        }
-
-        $domainDoc->recordDownload($user->id);
-        $this->repository->save($domainDoc);
-
-        $this->repository->logAccess(
-            documentId: $domainDoc->documentId(),
-            userId: $user->id,
-            action: 'download',
+        $result = $this->downloadDocumentHandler->handle(new DownloadDocumentCommand(
+            id: $id,
+            userId: (string) $request->user()->id,
             ipAddress: $request->ip(),
-            userAgent: $request->userAgent(),
-            documentTitle: $domainDoc->title(),
-            companyId: $domainDoc->companyId()
-        );
+            userAgent: $request->userAgent()
+        ));
 
-        $originalName = $domainDoc->fileMetadata()->originalName();
+        $originalName = $result->originalName;
         $fallbackName = Str::ascii($originalName);
         $fallbackName = preg_replace('/[^\x20-\x7e]/', '', $fallbackName) ?: 'document';
         $disposition = HeaderUtils::makeDisposition(
@@ -213,9 +140,9 @@ final class DocumentController
             $fallbackName
         );
 
-        return response($fileContent, Response::HTTP_OK, [
-            'Content-Type' => $domainDoc->fileMetadata()->mimeType(),
-            'Content-Length' => (string) strlen($fileContent),
+        return response($result->fileContent, Response::HTTP_OK, [
+            'Content-Type' => $result->mimeType,
+            'Content-Length' => (string) $result->sizeBytes,
             'Content-Disposition' => $disposition,
         ]);
     }
@@ -227,33 +154,20 @@ final class DocumentController
         string $id,
         UpdateDocumentRequest $request
     ): DocumentResource {
-        $domainDoc = $this->repository->findById(DocumentId::fromString($id));
+        $document = $this->getDocumentByIdHandler->handle(new GetDocumentByIdQuery(id: $id));
 
-        if ($domainDoc === null) {
-            throw new NotFoundHttpException('Dokument nie został odnaleziony.');
-        }
+        $this->ensureCanAccessDocument($request->user(), $document);
 
-        $this->ensureCanAccessCompany($request->user(), $domainDoc->companyId());
-
-        $domainDoc->updateTitle((string) $request->input('title'));
-        $domainDoc->updateType(DocumentType::from((string) $request->input('type')));
-
-        $this->repository->save($domainDoc);
-
-        $user = $request->user();
-        $this->repository->logAccess(
-            documentId: $domainDoc->documentId(),
-            userId: $user->id,
-            action: 'update',
+        $updated = $this->updateDocumentHandler->handle(new UpdateDocumentCommand(
+            id: $id,
+            title: (string) $request->input('title'),
+            type: (string) $request->input('type'),
+            userId: (string) $request->user()->id,
             ipAddress: $request->ip(),
-            userAgent: $request->userAgent(),
-            documentTitle: $domainDoc->title(),
-            companyId: $domainDoc->companyId()
-        );
+            userAgent: $request->userAgent()
+        ));
 
-        $eloquentDoc = EloquentDocument::with('uploader')->findOrFail($id);
-
-        return new DocumentResource($eloquentDoc);
+        return new DocumentResource($updated);
     }
 
     /**
@@ -261,38 +175,18 @@ final class DocumentController
      */
     public function archive(string $id, Request $request): DocumentResource
     {
-        $domainDoc = $this->repository->findById(DocumentId::fromString($id));
+        $document = $this->getDocumentByIdHandler->handle(new GetDocumentByIdQuery(id: $id));
 
-        if ($domainDoc === null) {
-            throw new NotFoundHttpException('Dokument nie został odnaleziony.');
-        }
+        $this->ensureCanAccessDocument($request->user(), $document);
 
-        $user = $request->user();
-        $this->ensureCanAccessCompany($user, $domainDoc->companyId());
-
-        if ($domainDoc->isArchived()) {
-            $domainDoc->unarchive();
-            $action = 'unarchive';
-        } else {
-            $domainDoc->archive();
-            $action = 'archive';
-        }
-
-        $this->repository->save($domainDoc);
-
-        $this->repository->logAccess(
-            documentId: $domainDoc->documentId(),
-            userId: $user->id,
-            action: $action,
+        $archived = $this->archiveDocumentHandler->handle(new ArchiveDocumentCommand(
+            id: $id,
+            userId: (string) $request->user()->id,
             ipAddress: $request->ip(),
-            userAgent: $request->userAgent(),
-            documentTitle: $domainDoc->title(),
-            companyId: $domainDoc->companyId()
-        );
+            userAgent: $request->userAgent()
+        ));
 
-        $eloquentDoc = EloquentDocument::with('uploader')->findOrFail($id);
-
-        return new DocumentResource($eloquentDoc);
+        return new DocumentResource($archived);
     }
 
     /**
@@ -300,33 +194,16 @@ final class DocumentController
      */
     public function destroy(string $id, Request $request): JsonResponse
     {
-        $domainDoc = $this->repository->findById(DocumentId::fromString($id));
+        $document = $this->getDocumentByIdHandler->handle(new GetDocumentByIdQuery(id: $id));
 
-        if ($domainDoc === null) {
-            throw new NotFoundHttpException('Dokument nie został odnaleziony.');
-        }
+        $this->ensureCanAccessDocument($request->user(), $document);
 
-        $user = $request->user();
-        $this->ensureCanAccessCompany($user, $domainDoc->companyId());
-
-        $this->storageManager->transaction(function (TransactionalStorageManagerInterface $manager) use (
-            $domainDoc,
-            $user,
-            $request
-        ) {
-            $this->repository->logAccess(
-                documentId: $domainDoc->documentId(),
-                userId: $user->id,
-                action: 'destroy',
-                ipAddress: $request->ip(),
-                userAgent: $request->userAgent(),
-                documentTitle: $domainDoc->title(),
-                companyId: $domainDoc->companyId()
-            );
-
-            $this->repository->delete($domainDoc->documentId());
-            $manager->stageDeletion($domainDoc->storagePath());
-        });
+        $this->deleteDocumentHandler->handle(new DeleteDocumentCommand(
+            id: $id,
+            userId: (string) $request->user()->id,
+            ipAddress: $request->ip(),
+            userAgent: $request->userAgent()
+        ));
 
         return new JsonResponse([
             'status' => 'deleted',
@@ -339,11 +216,7 @@ final class DocumentController
      */
     public function auditLogs(string $id, Request $request): AnonymousResourceCollection
     {
-        $document = EloquentDocument::withTrashed()->find($id);
-
-        if ($document === null) {
-            throw new NotFoundHttpException('Dokument nie został odnaleziony.');
-        }
+        $document = $this->getDocumentByIdHandler->handle(new GetDocumentByIdQuery(id: $id, withTrash: true));
 
         $this->ensureCanAccessDocument($request->user(), $document);
 

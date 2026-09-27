@@ -704,7 +704,7 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Frontendowy test integracyjny w `phase44StatementsAndValuationIntegration.test.jsx` sprawdzający parzystość kalkulacji Web Worker, akcelerację odliczenia w roku 2 oraz interaktywne rozwijanie sub-wierszy CIT w `ThreeStatementGrid`.
     - Poprawa izolacji bazy danych w `InvestmentProjectSeederTest.php` z użyciem `DatabaseTransactions`.
     - Zapewnienie 100% zielonego wyniku testów: 603 testy PHPUnit (7915 asercji) oraz 477 testów Vitest (52 pliki testowe).
-- [x] **Faza 50: Ulepszenie interaktywności, transparentności symulatora What-If oraz wizualizacja DCF i CAPEX w Kokpicie Wrażliwości **
+- [x] **Faza 50: Ulepszenie interaktywności, transparentności symulatora What-If oraz wizualizacja DCF i CAPEX w Kokpicie Wrażliwości**
   - Przełącznik trybów prezentacji wykresu 15-letniego w `SensitivityCockpitView.jsx` (Segmented Control: tryb *Nominalne (P&L i CF)* vs *Zdyskontowane (DCF & NPV)*).
   - Wzbogacenie wykresu nominalnego o dedykowaną serię słupkową nakładów majątkowych *CAPEX & Reinwestycje* (#818cf8) i etykietowanie lat z odtworzeniami na osi X (`Rok X (CAPEX)`).
   - Pełna wizualizacja trajektorii zdyskontowanych przepływów pieniężnych (słupki *Zdyskontowany FCFF*) oraz narastającej krzywej wartości bieżącej netto (*Skumulowane NPV*) reagującej na żywo na suwak WACC.
@@ -713,7 +713,7 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
   - Utrzymanie pełnej zgodności i spójności 10-wierszowej macierzy wariancji Base Case vs What-If.
   - Rozszerzenie zestawu testów jednostkowych Vitest w `SensitivityCockpitView.test.jsx` (14 testów) oraz pełna weryfikacja regresji (482 testy Vitest, 603 testy PHPUnit).
 
-- [x] **Faza 51: Wyeliminowanie krytycznych rozbieżności między silnikiem przepływów pieniężnych a modułem audytu kowenantów LMA **
+- [x] **Faza 51: Wyeliminowanie krytycznych rozbieżności między silnikiem przepływów pieniężnych a modułem audytu kowenantów LMA**
   -  Wyeliminowanie rozbieżności Cash Flow dotacji unijnych (EU Grants) i guardraile wskaźników płynności w audycie kowenantów LMA (`BankingCovenantsStrip` & `financialCalculations.ts`).
     - Likwidacja sztucznej 10-milionowej dziury płynnościowej w fazie CAPEX poprzez włączenie transz dotacji unijnych (`grant_disbursement_schedule` oraz fallback na zakończenie kwalifikowanych etapów CAPEX) do miesięcznych przepływów finansowych Web Workera (`fcf = debtDrawdown + grantReceived - debtRepaid - upfrontFee`) oraz rocznych agregacji `grantReceived` w Cash Flow Statement.
     - Wprowadzenie dynamicznych kontenerów (tło/obramowanie `bg-zinc-950/70 border-zinc-800` vs `bg-rose-950/20 border-rose-800/40`) oraz kolorystyki kafelków Płynności Bieżącej (CR) i Rezerwy DSRF w `BankingCovenantsStrip.jsx`.
@@ -733,24 +733,24 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Zapewnienie 100% zielonego wyniku testów: 607 testów PHPUnit (8063 asercje) oraz 500 testów Vitest (53 pliki testowe).
 
 - [x] **Faza 52: Uszczelnienie Bezpieczeństwa Multi-Tenant, Integralność Audytu WORM i Poprawki Krytyczne**
-  - [x] Harmonizacja weryfikacji dostępu multi-tenant w `DocumentController` za pomocą `User::canAccessCompany`.
+  - Harmonizacja weryfikacji dostępu multi-tenant w `DocumentController` za pomocą `User::canAccessCompany`.
     - Likwidacja sztucznej blokady `403 Forbidden` dla użytkowników z rolą `super_admin` oraz Doradców transakcyjnych (`advisor`) przypisanych do spółek przez relację `advisor_company`.
     - Zastąpienie sztywnego porównania roli `'admin'` i `company_id` domenową metodą `$user->canAccessCompany($companyId)`.
     - Pełna integracja autoryzacji domenowej w metodach `show`, `download`, `update`, `archive`, `destroy` oraz `auditLogs`.
-  - [x] Nienaruszalność ścieżki audytowej WORM i usunięcie kaskadowego kasowania logów.
+  - Nienaruszalność ścieżki audytowej WORM i usunięcie kaskadowego kasowania logów.
     - Wdrożenie mechanizmu `SoftDeletes` dla tabeli `documents` oraz modelu `Document`.
     - Usunięcie reguły `cascadeOnDelete()` z klucza obcego `document_id` w `document_access_logs` i zastąpienie jej regułą `nullOnDelete()`.
     - Dodanie kolumn snapshotowych `document_title` oraz `company_id` w `document_access_logs`, gwarantujących czytelność i filtrację logów po usunięciu dokumentu.
     - Zabezpieczenie zapytań audytowych z wykorzystaniem `withTrashed()` zapobiegające utracie historii zdarzeń.
-  - [x] Rejestracja audytowa operacji modyfikacji (update) i likwidacji (destroy) dokumentów VDR.
+  - Rejestracja audytowa operacji modyfikacji (update) i likwidacji (destroy) dokumentów VDR.
     - Zabezpieczenie pełnego cyklu życia pliku: automatyczna rejestracja zdarzeń `update` oraz `destroy` w `DocumentController`.
     - Utrwalanie tożsamości użytkownika, adresu IP, User-Agent oraz snapshotu metadanych pliku przed fizycznym usunięciem.
     - Rozszerzenie frontendowej palety akcji audytowych `AuditActionBadge` oraz filtrów VDR `VDR_ACTION_FILTERS` w widoku `AuditLogsView`.
-  - [x] Synchronizacja limitów uploadu (50 MB), walidacja MIME i standard RFC 5987 / RFC 6266.
+  - Synchronizacja limitów uploadu (50 MB), walidacja MIME i standard RFC 5987 / RFC 6266.
     - Podniesienie limitu wielkości pliku w `UploadDocumentRequest` do `max:51200` (50 MB) usuwające rozbieżność z interfejsem React.
     - Ścisła walidacja rozszerzeń i typów MIME (`pdf`, `xlsx`, `xls`, `doc`, `docx`, `zip`) zabezpieczająca przed złośliwymi skryptami.
     - Implementacja kodowania znaków UTF-8 (np. polskich znaków diakrytycznych) w nagłówku `Content-Disposition` z wykorzystaniem `HeaderUtils::makeDisposition` i bezpiecznym fallbackiem ASCII.
-  - [x] Testy regresyjne bezpieczeństwa i integralności VDR.
+  - Testy regresyjne bezpieczeństwa i integralności VDR.
     - Zestaw testów w `tests/Feature/DocumentManagement/VdrHardeningSecurityRegressionTest.php` weryfikujący dostęp doradców transakcyjnych (`advisor`), administratorów (`super_admin`), blokadę 403 dla obcych spółek, WORM audit retention przy soft delete, walidację limitu 50MB i typów MIME oraz nagłówek RFC 5987.
     - 100% PASS w pełnym pakiecie testów: 614 testów PHPUnit (8119 asercji) oraz 500 testów Vitest (53 pliki testowe).
 
@@ -773,6 +773,12 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Wprowadzenie mechanizmu debouncingu 300ms dla pola wyszukiwania VDR (`vdrSearchInput` -> `vdrSearchQuery`) oraz resetowania do strony 1 przy zmianie filtrów.
     - Dodanie przycisku czyszczenia wyszukiwania oraz przycisku czyszczenia filtrów w stanie pustym.
     - Testy jednostkowe i integracyjne Vitest w `AuditLogsView.test.jsx` oraz `vdrAuditRegression.test.jsx` (100% PASS w pełnym pakiecie 502 testów).
+  - [x] Wzorzec CQRS (Query & Command Handlers) dla repozytorium dokumentów VDR (Commit 257).
+    - Pełne rozdzielenie operacji odczytu (Queries) i zapisu (Commands) w warstwie `Application` modułu `DocumentManagement`.
+    - Implementacja zapytań: `GetDocumentsQuery` & `GetDocumentsHandler` (filtrowanie, wyszukiwanie, paginacja) oraz `GetDocumentByIdQuery` & `GetDocumentByIdHandler` (wyszukiwanie po UUID, obsługa `withTrashed`, domenowy `DocumentNotFoundException`).
+    - Implementacja komend: `UploadDocumentCommand` & `UploadDocumentHandler` (transakcyjny storage manager, wyliczenie SHA-256, audyt uploadu), `UpdateDocumentCommand` & `UpdateDocumentHandler`, `ArchiveDocumentCommand` & `ArchiveDocumentHandler`, `DeleteDocumentCommand` & `DeleteDocumentHandler` (soft-delete + odroczone usuwanie z dysku `stageDeletion`), `DownloadDocumentCommand` & `DownloadDocumentHandler` (inkrementacja pobrań, obsługa `FileNotFoundInStorageException`).
+    - Przekształcenie `DocumentController` w cienki kontroler HTTP delegujący wszystkie operacje bezpośrednio do handlerów CQRS przy zachowaniu harmonizacji autoryzacji multi-tenant.
+    - Dedykowany pakiet testów jednostkowych w `DocumentCqrsHandlersTest.php` (7 testów, 25 asercji) ze 100% PASS w testach jednostkowych, integracyjnych i regresyjnych.
 
 ---
 
