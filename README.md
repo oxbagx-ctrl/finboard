@@ -936,6 +936,15 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Wdrożenie dymków w modalnym oknie inspekcji `FinancialAuditDetailModal.jsx`: nagłówek z tarczą, odznaką akcji, czasem i UUID, przycisk zamykania z zachowaniem `title="Zamknij"` i `aria-label`, objaśnienia sekcji opisu, operacji usunięcia rekordów, profilu operatora, środowiska sieciowego oraz porównania zrzutów migawkowych JSON diff (`old_values` vs `new_values`).
     - Weryfikacja testowa: dedykowany zestaw testowy `AuditLogsTooltips.test.jsx` (8/8), `AuditLogsView.test.jsx` (10/10), `FinancialAuditDetailModal.test.jsx` (6/6), `AuditActionBadge.test.jsx` (10/10), `vdrAuditRegression.test.jsx` (4/4), 100% PASS w pełnym zestawie 64 plików Vitest (593 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
+  - [x] Wdrożenie dostępnych podpowiedzi Tooltip i InfoTooltip w module Doradcy & Przypisania (AdvisorsManagementView, modale operacyjne i diagnostyka SMTP).
+    - Wzbogacenie paska nagłówka `AdvisorsManagementView.jsx`: `<Tooltip>` dla ikony tarczy Deal Advisory (`role="img"`, `tabIndex={0}`), odznak ról (`SUPER ADMIN`, `DORADCA M&A`, `MULTI-TENANT RBAC`), przycisków akcji ("Testuj SMTP", "Dodaj Spółkę", "Zaproś Użytkownika", "Odśwież") oraz `<InfoTooltip size="xs">` objaśniający architekturę Multi-Tenant RBAC i separację danych podmiotów.
+    - Dostarczenie objaśnień metodologicznych w 4 kartach KPI (`MetricCard` z `tooltipContent`): Doradcy & Partnerzy, Spółki w Portfelu, Oczekujące Zaproszenia oraz Aktywowane Konta.
+    - Dostępna nawigacja zakładkowa z dymkami `<Tooltip>` i etykietami `aria-label` dla Rejestru Doradców, Matrycy Spółek Portfelowych, Wysłanych Zaproszeń i Diagnostyki SMTP.
+    - Dostępne podpowiedzi w tabeli doradców (filtry wyszukiwania, nagłówki kolumn, awatary inicjałów, odznaki ról i spółek, przyciski operacyjne "Spółki" i "Dezaktywuj / Aktywuj"), w matrycy pokrycia spółek (tickery, NIP, obsada analityczna, liczniki doradców i klientów) oraz w rejestrze zaproszeń (statusy, 48h limit tokena, link aktywacyjny, akcje "Kopiuj link", "Wyślij ponownie", "Anuluj").
+    - Wdrożenie dymków `<Tooltip>` i komponentów `<InfoTooltip>` w modalach operacyjnych: `AdvisorAssignmentModal.jsx` (przypisania spółek, masowe akcje, baner audytu WORM), `CreateCompanyModal.jsx` (izolacja podmiotu, nazwa, ticker, NIP, checklist doradców), `InviteUserModal.jsx` (standard Zero-Trust, email, role RBAC, ważność 48h) oraz `TestMailModal.jsx` (weryfikacja handshake SMTP, diagnostyka).
+    - Integracja dostępnych dymków w komponencie telemetrii `SmtpStatusWidget.jsx` (kompaktowy i pełny widok, wskaźniki gniazda TCP, detekcja blokady portu 25 w OCI, karty konfiguracji i terminal powitalny kod 220).
+    - Weryfikacja testowa: dedykowany zestaw testowy `AdvisorsTooltips.test.jsx` (8/8), `AdvisorsManagement.test.jsx` (15/15), `CreateCompanyModal.test.jsx` (8/8), `InviteUserModal.test.jsx` (9/9), `MailDiagnostics.test.jsx` (9/9), 100% PASS w pełnym zestawie 65 plików Vitest (601 testów) oraz bezbłędny build produkcyjny (`npm run build`).
+
 ---
 
 

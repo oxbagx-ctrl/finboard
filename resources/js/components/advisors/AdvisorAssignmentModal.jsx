@@ -3,6 +3,7 @@ import apiClient from '../../api/client';
 import { useNotification } from '../../context/NotificationContext';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
+import { Tooltip, InfoTooltip } from '../ui/Tooltip';
 import {
     X,
     Building2,
@@ -102,29 +103,44 @@ export const AdvisorAssignmentModal = ({ isOpen, onClose, advisor, onSaved, comp
                 {/* Header */}
                 <div className="px-5 py-3.5 bg-zinc-950 border-b border-zinc-800 flex items-center justify-between shrink-0">
                     <div className="flex items-center gap-2.5">
-                        <div className="w-7 h-7 rounded bg-zinc-850 border border-zinc-750 flex items-center justify-center text-zinc-300">
-                            <Briefcase className="w-4 h-4" />
-                        </div>
+                        <Tooltip content="Zarządzanie zakresem dostępu doradcy do spółek portfelowych">
+                            <div
+                                tabIndex={0}
+                                role="img"
+                                aria-label="Zarządzanie zakresem dostępu doradcy do spółek portfelowych"
+                                className="w-7 h-7 rounded bg-zinc-850 border border-zinc-750 flex items-center justify-center text-zinc-300 focus:outline-none focus:ring-1 focus:ring-zinc-400"
+                            >
+                                <Briefcase className="w-4 h-4" />
+                            </div>
+                        </Tooltip>
                         <div>
                             <div className="flex items-center gap-2">
                                 <h2 className="text-xs font-bold uppercase tracking-wider text-zinc-100">
                                     Przypisanie Spółek Portfelowych
                                 </h2>
-                                <Badge variant={advisor.role === 'super_admin' ? 'purple' : 'brand'} size="sm">
-                                    {advisor.role.toUpperCase()}
-                                </Badge>
+                                <Tooltip content={`Rola systemowa: ${advisor.role.toUpperCase()}`}>
+                                    <span>
+                                        <Badge variant={advisor.role === 'super_admin' ? 'purple' : 'brand'} size="sm">
+                                            {advisor.role.toUpperCase()}
+                                        </Badge>
+                                    </span>
+                                </Tooltip>
                             </div>
                             <p className="text-[10px] text-zinc-500 mt-0.5">
                                 DORADCA: <span className="text-zinc-300 font-semibold">{advisor.name}</span> ({advisor.email})
                             </p>
                         </div>
                     </div>
-                    <button
-                        onClick={onClose}
-                        className="p-1 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors"
-                    >
-                        <X className="w-4 h-4" />
-                    </button>
+                    <Tooltip content="Zamknij (Esc)">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            aria-label="Zamknij"
+                            className="p-1 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors cursor-pointer"
+                        >
+                            <X className="w-4 h-4" />
+                        </button>
+                    </Tooltip>
                 </div>
 
                 {/* Sub-bar: Search & Selection Controls */}
@@ -143,26 +159,34 @@ export const AdvisorAssignmentModal = ({ isOpen, onClose, advisor, onSaved, comp
                     <div className="flex items-center justify-between text-[10px] text-zinc-400">
                         <div className="flex items-center gap-2">
                             <span>ZAZNACZONO:</span>
-                            <span className="font-bold text-zinc-100 bg-zinc-800 px-1.5 py-0.5 rounded border border-zinc-700">
-                                {selectedCompanyIds.length} / {companies.length}
-                            </span>
+                            <Tooltip content="Liczba spółek wybranych do przypisania dla tego doradcy">
+                                <span tabIndex={0} className="font-bold text-zinc-100 bg-zinc-800 px-1.5 py-0.5 rounded border border-zinc-700 cursor-help focus:outline-none focus:ring-1 focus:ring-zinc-400">
+                                    {selectedCompanyIds.length} / {companies.length}
+                                </span>
+                            </Tooltip>
                         </div>
                         <div className="flex items-center gap-2">
-                            <button
-                                type="button"
-                                onClick={handleSelectAll}
-                                className="text-zinc-400 hover:text-zinc-200 underline cursor-pointer"
-                            >
-                                Zaznacz wszystkie
-                            </button>
+                            <Tooltip content="Przypisz wszystkie dostępne spółki portfelowe">
+                                <button
+                                    type="button"
+                                    onClick={handleSelectAll}
+                                    aria-label="Zaznacz wszystkie spółki"
+                                    className="text-zinc-400 hover:text-zinc-200 underline cursor-pointer"
+                                >
+                                    Zaznacz wszystkie
+                                </button>
+                            </Tooltip>
                             <span>•</span>
-                            <button
-                                type="button"
-                                onClick={handleDeselectAll}
-                                className="text-zinc-400 hover:text-zinc-200 underline cursor-pointer"
-                            >
-                                Odznacz wszystkie
-                            </button>
+                            <Tooltip content="Usuń przypisanie do wszystkich spółek">
+                                <button
+                                    type="button"
+                                    onClick={handleDeselectAll}
+                                    aria-label="Odznacz wszystkie spółki"
+                                    className="text-zinc-400 hover:text-zinc-200 underline cursor-pointer"
+                                >
+                                    Odznacz wszystkie
+                                </button>
+                            </Tooltip>
                         </div>
                     </div>
                 </div>
@@ -182,46 +206,54 @@ export const AdvisorAssignmentModal = ({ isOpen, onClose, advisor, onSaved, comp
                             const isSelected = selectedCompanyIds.includes(comp.id);
 
                             return (
-                                <button
+                                <Tooltip
                                     key={comp.id}
-                                    type="button"
-                                    onClick={() => toggleCompany(comp.id)}
-                                    className={`w-full text-left p-2.5 rounded border transition-all flex items-center justify-between cursor-pointer ${
-                                        isSelected
-                                            ? 'bg-zinc-850/90 border-zinc-600 text-zinc-100 shadow-xs'
-                                            : 'bg-zinc-950/40 border-zinc-800/80 text-zinc-400 hover:bg-zinc-900 hover:border-zinc-700'
-                                    }`}
+                                    content={isSelected
+                                        ? `Spółka ${comp.name} jest przypisana. Kliknij, aby usunąć przypisanie.`
+                                        : `Kliknij, aby przypisać spółkę ${comp.name} do doradcy.`
+                                    }
                                 >
-                                    <div className="flex items-center gap-3 min-w-0">
-                                        <div className="shrink-0 text-zinc-400">
-                                            {isSelected ? (
-                                                <CheckSquare className="w-4 h-4 text-emerald-400" />
-                                            ) : (
-                                                <Square className="w-4 h-4 text-zinc-600" />
-                                            )}
+                                    <button
+                                        type="button"
+                                        onClick={() => toggleCompany(comp.id)}
+                                        aria-label={`${comp.name} (${comp.code}) - ${isSelected ? 'przypisana' : 'nieprzypisana'}`}
+                                        className={`w-full text-left p-2.5 rounded border transition-all flex items-center justify-between cursor-pointer ${
+                                            isSelected
+                                                ? 'bg-zinc-850/90 border-zinc-600 text-zinc-100 shadow-xs'
+                                                : 'bg-zinc-950/40 border-zinc-800/80 text-zinc-400 hover:bg-zinc-900 hover:border-zinc-700'
+                                        }`}
+                                    >
+                                        <div className="flex items-center gap-3 min-w-0">
+                                            <div className="shrink-0 text-zinc-400">
+                                                {isSelected ? (
+                                                    <CheckSquare className="w-4 h-4 text-emerald-400" />
+                                                ) : (
+                                                    <Square className="w-4 h-4 text-zinc-600" />
+                                                )}
+                                            </div>
+
+                                            <div className="min-w-0">
+                                                <div className="text-xs font-semibold flex items-center gap-2 truncate">
+                                                    <span className="truncate text-zinc-100">{comp.name}</span>
+                                                    <Badge variant="default" size="sm">{comp.code}</Badge>
+                                                </div>
+                                                <div className="text-[10px] text-zinc-500 flex items-center gap-2 mt-0.5">
+                                                    <span>NIP: {comp.tax_id || 'Brak NIP'}</span>
+                                                    <span>•</span>
+                                                    <span>Doradców: {comp.assigned_advisors_count || 0}</span>
+                                                    <span>•</span>
+                                                    <span>Klientów: {comp.clients_count || 0}</span>
+                                                </div>
+                                            </div>
                                         </div>
 
-                                        <div className="min-w-0">
-                                            <div className="text-xs font-semibold flex items-center gap-2 truncate">
-                                                <span className="truncate text-zinc-100">{comp.name}</span>
-                                                <Badge variant="default" size="sm">{comp.code}</Badge>
-                                            </div>
-                                            <div className="text-[10px] text-zinc-500 flex items-center gap-2 mt-0.5">
-                                                <span>NIP: {comp.tax_id || 'Brak NIP'}</span>
-                                                <span>•</span>
-                                                <span>Doradców: {comp.assigned_advisors_count || 0}</span>
-                                                <span>•</span>
-                                                <span>Klientów: {comp.clients_count || 0}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {isSelected && (
-                                        <Badge variant="success" size="sm">
-                                            PRZYPISANA
-                                        </Badge>
-                                    )}
-                                </button>
+                                        {isSelected && (
+                                            <Badge variant="success" size="sm">
+                                                PRZYPISANA
+                                            </Badge>
+                                        )}
+                                    </button>
+                                </Tooltip>
                             );
                         })
                     )}
@@ -229,28 +261,38 @@ export const AdvisorAssignmentModal = ({ isOpen, onClose, advisor, onSaved, comp
 
                 {/* Footer Controls */}
                 <div className="px-5 py-3 bg-zinc-950 border-t border-zinc-800 flex items-center justify-between shrink-0">
-                    <div className="text-[10px] text-zinc-500">
-                        AUDYT: Rejestracja zdarzeń Tenant / RBAC
-                    </div>
+                    <Tooltip content="Wszelkie modyfikacje przypisań doradców są utrwalane w niezmiennym rejestrze audytowym WORM">
+                        <div tabIndex={0} className="text-[10px] text-zinc-500 cursor-help focus:outline-none focus:underline">
+                            AUDYT: Rejestracja zdarzeń Tenant / RBAC
+                        </div>
+                    </Tooltip>
                     <div className="flex items-center gap-2">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={onClose}
-                            disabled={saving}
-                        >
-                            Anuluj
-                        </Button>
-                        <Button
-                            variant="primary"
-                            size="sm"
-                            icon={Save}
-                            onClick={handleSave}
-                            loading={saving}
-                            disabled={loading || saving}
-                        >
-                            Zapisz przypisania ({selectedCompanyIds.length})
-                        </Button>
+                        <Tooltip content="Odrzuć zmiany i zamknij okno">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={onClose}
+                                disabled={saving}
+                                aria-label="Anuluj"
+                            >
+                                Anuluj
+                            </Button>
+                        </Tooltip>
+                        <Tooltip content="Zapisz zaktualizowane przypisania spółek w bazie">
+                            <span>
+                                <Button
+                                    variant="primary"
+                                    size="sm"
+                                    icon={Save}
+                                    onClick={handleSave}
+                                    loading={saving}
+                                    disabled={loading || saving}
+                                    aria-label={`Zapisz przypisania (${selectedCompanyIds.length})`}
+                                >
+                                    Zapisz przypisania ({selectedCompanyIds.length})
+                                </Button>
+                            </span>
+                        </Tooltip>
                     </div>
                 </div>
             </div>

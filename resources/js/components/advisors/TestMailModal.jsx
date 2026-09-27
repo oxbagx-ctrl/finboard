@@ -3,6 +3,7 @@ import apiClient from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { useNotification } from '../../context/NotificationContext';
 import { Button } from '../ui/Button';
+import { Tooltip, InfoTooltip } from '../ui/Tooltip';
 import {
     X,
     Mail,
@@ -102,9 +103,16 @@ export const TestMailModal = ({
                 {/* Modal Header */}
                 <div className="px-5 py-3.5 bg-zinc-950 border-b border-zinc-800 flex items-center justify-between shrink-0">
                     <div className="flex items-center gap-2.5">
-                        <div className="w-7 h-7 rounded bg-blue-950/60 border border-blue-700/60 flex items-center justify-center text-blue-400">
-                            <Send className="w-4 h-4" />
-                        </div>
+                        <Tooltip content="Wysyłka testowa i badanie opóźnienia transportu pocztowego SMTP">
+                            <div
+                                tabIndex={0}
+                                role="img"
+                                aria-label="Diagnostyka połączenia SMTP"
+                                className="w-7 h-7 rounded bg-blue-950/60 border border-blue-700/60 flex items-center justify-center text-blue-400 focus:outline-none focus:ring-1 focus:ring-zinc-400"
+                            >
+                                <Send className="w-4 h-4" />
+                            </div>
+                        </Tooltip>
                         <div>
                             <h2 className="text-xs font-bold uppercase tracking-wider text-zinc-100">
                                 Diagnostyka Połączenia SMTP
@@ -114,29 +122,45 @@ export const TestMailModal = ({
                             </p>
                         </div>
                     </div>
-                    <button
-                        onClick={onClose}
-                        className="p-1 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors cursor-pointer"
-                        title="Zamknij"
-                    >
-                        <X className="w-4 h-4" />
-                    </button>
+                    <Tooltip content="Zamknij (Esc)">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="p-1 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors cursor-pointer"
+                            title="Zamknij"
+                            aria-label="Zamknij okno testu SMTP"
+                        >
+                            <X className="w-4 h-4" />
+                        </button>
+                    </Tooltip>
                 </div>
 
                 {/* Modal Body */}
                 <form onSubmit={handleSendTest} noValidate className="p-5 space-y-4 overflow-y-auto">
                     <div className="p-3 rounded bg-zinc-850/70 border border-zinc-750/70 flex items-start gap-2.5">
                         <Server className="w-4 h-4 text-zinc-400 shrink-0 mt-0.5" />
-                        <div className="text-[11px] text-zinc-300 leading-relaxed">
+                        <div className="text-[11px] text-zinc-300 leading-relaxed flex-1">
                             Narzędzie wykonuje autentyczny handshake z serwerem pocztowym (TLS port 587 lub SSL port 465), autoryzuje poświadczenia i wysyła szablon diagnostyczny Deal Advisory z pomiarem opóźnienia.
                         </div>
+                        <InfoTooltip
+                            content="Wysyłka testowa pozwala potwierdzić, że serwer docelowy nie odrzuca wiadomości ze względu na brak rekordów SPF/DKIM lub niewłaściwy certyfikat SSL."
+                            ariaLabel="Szczegóły o teście SMTP"
+                            size="xs"
+                        />
                     </div>
 
                     {/* Email Input */}
                     <div>
-                        <label className="block text-[11px] font-semibold text-zinc-300 uppercase tracking-wider mb-1.5">
-                            Adres E-mail Odbiorcy Testu <span className="text-rose-400">*</span>
-                        </label>
+                        <div className="flex items-center justify-between mb-1.5">
+                            <label className="block text-[11px] font-semibold text-zinc-300 uppercase tracking-wider">
+                                Adres E-mail Odbiorcy Testu <span className="text-rose-400">*</span>
+                            </label>
+                            <InfoTooltip
+                                content="Wpisz adres e-mail, na który ma dotrzeć testowy pakiet weryfikacyjny Deal Advisory."
+                                ariaLabel="Informacje o odbiorcy testu"
+                                size="xs"
+                            />
+                        </div>
                         <div className="relative">
                             <Mail className="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
                             <input
@@ -203,25 +227,33 @@ export const TestMailModal = ({
 
                     {/* Footer Actions */}
                     <div className="flex items-center justify-end gap-2 pt-2 border-t border-zinc-800">
-                        <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={onClose}
-                            disabled={submitting}
-                        >
-                            Zamknij
-                        </Button>
-                        <Button
-                            type="submit"
-                            variant="primary"
-                            size="sm"
-                            icon={Send}
-                            loading={submitting}
-                            disabled={submitting}
-                        >
-                            {submitting ? 'Nawiązywanie połączenia...' : 'Wyślij Email Testowy'}
-                        </Button>
+                        <Tooltip content="Zamknij okno diagnostyki SMTP">
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={onClose}
+                                disabled={submitting}
+                                aria-label="Zamknij"
+                            >
+                                Zamknij
+                            </Button>
+                        </Tooltip>
+                        <Tooltip content="Rozpocznij próbę doręczenia wiadomości testowej">
+                            <span>
+                                <Button
+                                    type="submit"
+                                    variant="primary"
+                                    size="sm"
+                                    icon={Send}
+                                    loading={submitting}
+                                    disabled={submitting}
+                                    aria-label="Wyślij Email Testowy"
+                                >
+                                    {submitting ? 'Nawiązywanie połączenia...' : 'Wyślij Email Testowy'}
+                                </Button>
+                            </span>
+                        </Tooltip>
                     </div>
                 </form>
             </div>

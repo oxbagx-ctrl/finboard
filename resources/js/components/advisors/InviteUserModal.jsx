@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useNotification } from '../../context/NotificationContext';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
+import { Tooltip, InfoTooltip } from '../ui/Tooltip';
 import {
     X,
     UserPlus,
@@ -121,6 +122,7 @@ export const InviteUserModal = ({
             setLoadingCompanies(false);
         }
     };
+
     const filteredAssignedCompanies = useMemo(() => {
         const query = companySearch.toLowerCase().trim();
         if (!query) return allCompanies;
@@ -221,9 +223,16 @@ export const InviteUserModal = ({
                 {/* Header */}
                 <div className="px-5 py-3.5 bg-zinc-950 border-b border-zinc-800 flex items-center justify-between shrink-0">
                     <div className="flex items-center gap-2.5">
-                        <div className="w-7 h-7 rounded bg-zinc-850 border border-zinc-750 flex items-center justify-center text-zinc-300">
-                            <UserPlus className="w-4 h-4 text-emerald-400" />
-                        </div>
+                        <Tooltip content="Generowanie zaproszenia i jednorazowego tokenu aktywacyjnego">
+                            <div
+                                tabIndex={0}
+                                role="img"
+                                aria-label="Zaproś nowego użytkownika"
+                                className="w-7 h-7 rounded bg-zinc-850 border border-zinc-750 flex items-center justify-center text-zinc-300 focus:outline-none focus:ring-1 focus:ring-zinc-400"
+                            >
+                                <UserPlus className="w-4 h-4 text-emerald-400" />
+                            </div>
+                        </Tooltip>
                         <div>
                             <h2 className="text-xs font-bold uppercase tracking-wider text-zinc-100">
                                 Zaproś Nowego Użytkownika
@@ -233,12 +242,16 @@ export const InviteUserModal = ({
                             </p>
                         </div>
                     </div>
-                    <button
-                        onClick={onClose}
-                        className="p-1 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors"
-                    >
-                        <X className="w-4 h-4" />
-                    </button>
+                    <Tooltip content="Zamknij (Esc)">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            aria-label="Zamknij"
+                            className="p-1 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors cursor-pointer"
+                        >
+                            <X className="w-4 h-4" />
+                        </button>
+                    </Tooltip>
                 </div>
 
                 {/* Form Body */}
@@ -246,17 +259,29 @@ export const InviteUserModal = ({
                     {/* Security Info Notice */}
                     <div className="p-3 rounded bg-blue-950/30 border border-blue-800/60 flex items-start gap-2.5">
                         <Info className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
-                        <div className="text-[11px] text-zinc-300 leading-relaxed">
+                        <div className="text-[11px] text-zinc-300 leading-relaxed flex-1">
                             <span className="font-semibold text-blue-300">Zasada zerowego zaufania (Zero-Trust): </span>
                             Hasła nie są ustawiane ręcznie przez administratorów. Zaproszony użytkownik otrzyma szyfrowany link aktywacyjny, za pomocą którego samodzielnie ustawi silne hasło.
                         </div>
+                        <InfoTooltip
+                            content="Zero-Trust zapobiega przesyłaniu haseł w otwartym tekście przez administratorów. Użytkownik aktywuje konto przy użyciu kryptograficznego tokenu unieważnianego po jednorazowym użyciu lub upływie czasu ważności."
+                            ariaLabel="Szczegóły o zasadzie zerowego zaufania"
+                            size="xs"
+                        />
                     </div>
 
                     {/* Email Input */}
                     <div>
-                        <label className="block text-[11px] font-semibold text-zinc-300 uppercase tracking-wider mb-1.5">
-                            Adres E-mail Odbiorcy <span className="text-rose-400">*</span>
-                        </label>
+                        <div className="flex items-center justify-between mb-1.5">
+                            <label className="block text-[11px] font-semibold text-zinc-300 uppercase tracking-wider">
+                                Adres E-mail Odbiorcy <span className="text-rose-400">*</span>
+                            </label>
+                            <InfoTooltip
+                                content="Na ten adres e-mail system wyśle zaproszenie z bezpiecznym linkiem aktywacyjnym."
+                                ariaLabel="Informacje o adresie e-mail odbiorcy"
+                                size="xs"
+                            />
+                        </div>
                         <div className="relative">
                             <Mail className="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
                             <input
@@ -282,57 +307,75 @@ export const InviteUserModal = ({
 
                     {/* Role Selection */}
                     <div>
-                        <label className="block text-[11px] font-semibold text-zinc-300 uppercase tracking-wider mb-1.5">
-                            Rola Systemowa & Uprawnienia <span className="text-rose-400">*</span>
-                        </label>
+                        <div className="flex items-center justify-between mb-1.5">
+                            <label className="block text-[11px] font-semibold text-zinc-300 uppercase tracking-wider">
+                                Rola Systemowa & Uprawnienia <span className="text-rose-400">*</span>
+                            </label>
+                            <InfoTooltip
+                                content="Wybierz poziom uprawnień w modelu RBAC. Klient widzi wyłącznie swoją spółkę, doradca wybrane spółki, a Super Admin zarządza całym portfelem."
+                                ariaLabel="Informacje o rolach systemowych"
+                                size="xs"
+                            />
+                        </div>
                         {isAdvisor ? (
-                            <div className="p-2.5 rounded bg-zinc-950 border border-zinc-800 flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    <Badge variant="default" size="sm">KLIENT / CFO</Badge>
-                                    <span className="text-xs text-zinc-300">Klient podmiotu portfelowego</span>
+                            <Tooltip content="Doradca może zapraszać wyłącznie użytkowników po stronie klienta do przypisanych sobie spółek">
+                                <div className="p-2.5 rounded bg-zinc-950 border border-zinc-800 flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <Badge variant="default" size="sm">KLIENT / CFO</Badge>
+                                        <span className="text-xs text-zinc-300">Klient podmiotu portfelowego</span>
+                                    </div>
+                                    <span className="text-[10px] text-zinc-500 italic">Uprawnienia doradcy</span>
                                 </div>
-                                <span className="text-[10px] text-zinc-500 italic">Uprawnienia doradcy</span>
-                            </div>
+                            </Tooltip>
                         ) : (
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                                <button
-                                    type="button"
-                                    onClick={() => setRole('client')}
-                                    className={`p-2.5 rounded text-left border transition-all cursor-pointer ${
-                                        role === 'client'
-                                            ? 'bg-zinc-800 border-zinc-600 text-zinc-100 shadow-xs'
-                                            : 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:border-zinc-700'
-                                    }`}
-                                >
-                                    <div className="text-xs font-bold text-zinc-200">Klient / CFO</div>
-                                    <div className="text-[10px] text-zinc-500 mt-0.5">Dostęp do 1 spółki</div>
-                                </button>
+                                <Tooltip content="Dostęp ograniczony do wybranej pojedynczej spółki portfelowej (izolacja najemcy)">
+                                    <button
+                                        type="button"
+                                        onClick={() => setRole('client')}
+                                        aria-label="Rola: Klient / CFO (dostęp do 1 spółki)"
+                                        className={`p-2.5 rounded text-left border transition-all cursor-pointer ${
+                                            role === 'client'
+                                                ? 'bg-zinc-800 border-zinc-600 text-zinc-100 shadow-xs'
+                                                : 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:border-zinc-700'
+                                        }`}
+                                    >
+                                        <div className="text-xs font-bold text-zinc-200">Klient / CFO</div>
+                                        <div className="text-[10px] text-zinc-500 mt-0.5">Dostęp do 1 spółki</div>
+                                    </button>
+                                </Tooltip>
 
-                                <button
-                                    type="button"
-                                    onClick={() => setRole('advisor')}
-                                    className={`p-2.5 rounded text-left border transition-all cursor-pointer ${
-                                        role === 'advisor'
-                                            ? 'bg-zinc-800 border-zinc-600 text-zinc-100 shadow-xs'
-                                            : 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:border-zinc-700'
-                                    }`}
-                                >
-                                    <div className="text-xs font-bold text-zinc-200">Doradca M&A</div>
-                                    <div className="text-[10px] text-zinc-500 mt-0.5">Przypisane spółki</div>
-                                </button>
+                                <Tooltip content="Dostęp analityczny do wyznaczonych spółek portfelowych w procesach M&A">
+                                    <button
+                                        type="button"
+                                        onClick={() => setRole('advisor')}
+                                        aria-label="Rola: Doradca M&A (przypisane spółki)"
+                                        className={`p-2.5 rounded text-left border transition-all cursor-pointer ${
+                                            role === 'advisor'
+                                                ? 'bg-zinc-800 border-zinc-600 text-zinc-100 shadow-xs'
+                                                : 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:border-zinc-700'
+                                        }`}
+                                    >
+                                        <div className="text-xs font-bold text-zinc-200">Doradca M&A</div>
+                                        <div className="text-[10px] text-zinc-500 mt-0.5">Przypisane spółki</div>
+                                    </button>
+                                </Tooltip>
 
-                                <button
-                                    type="button"
-                                    onClick={() => setRole('super_admin')}
-                                    className={`p-2.5 rounded text-left border transition-all cursor-pointer ${
-                                        role === 'super_admin'
-                                            ? 'bg-zinc-800 border-zinc-600 text-zinc-100 shadow-xs'
-                                            : 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:border-zinc-700'
-                                    }`}
-                                >
-                                    <div className="text-xs font-bold text-zinc-200">Super Admin</div>
-                                    <div className="text-[10px] text-zinc-500 mt-0.5">Globalny partner</div>
-                                </button>
+                                <Tooltip content="Globalny dostęp administracyjny do wszystkich spółek i konfiguracji platformy">
+                                    <button
+                                        type="button"
+                                        onClick={() => setRole('super_admin')}
+                                        aria-label="Rola: Super Admin (globalny partner)"
+                                        className={`p-2.5 rounded text-left border transition-all cursor-pointer ${
+                                            role === 'super_admin'
+                                                ? 'bg-zinc-800 border-zinc-600 text-zinc-100 shadow-xs'
+                                                : 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:border-zinc-700'
+                                        }`}
+                                    >
+                                        <div className="text-xs font-bold text-zinc-200">Super Admin</div>
+                                        <div className="text-[10px] text-zinc-500 mt-0.5">Globalny partner</div>
+                                    </button>
+                                </Tooltip>
                             </div>
                         )}
                     </div>
@@ -340,9 +383,16 @@ export const InviteUserModal = ({
                     {/* Company Selection for Client Role */}
                     {role === 'client' && (
                         <div>
-                            <label className="block text-[11px] font-semibold text-zinc-300 uppercase tracking-wider mb-1.5">
-                                Przypisana Spółka Portfelowa <span className="text-rose-400">*</span>
-                            </label>
+                            <div className="flex items-center justify-between mb-1.5">
+                                <label className="block text-[11px] font-semibold text-zinc-300 uppercase tracking-wider">
+                                    Przypisana Spółka Portfelowa <span className="text-rose-400">*</span>
+                                </label>
+                                <InfoTooltip
+                                    content="Klient otrzyma dostęp wyłącznie do danych tej wybranej spółki. Pozostałe podmioty będą dla niego całkowicie niewidoczne."
+                                    ariaLabel="Informacje o spółce klienta"
+                                    size="xs"
+                                />
+                            </div>
                             <div className="relative">
                                 <Building2 className="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
                                 <select
@@ -382,21 +432,27 @@ export const InviteUserModal = ({
                                     Początkowe Przypisanie Spółek Portfelowych
                                 </label>
                                 <div className="flex items-center gap-2 text-[10px]">
-                                    <button
-                                        type="button"
-                                        onClick={handleSelectAllCompanies}
-                                        className="text-zinc-400 hover:text-zinc-200 underline cursor-pointer"
-                                    >
-                                        Wszystkie
-                                    </button>
+                                    <Tooltip content="Zaznacz wszystkie spółki portfelowe">
+                                        <button
+                                            type="button"
+                                            onClick={handleSelectAllCompanies}
+                                            aria-label="Zaznacz wszystkie spółki"
+                                            className="text-zinc-400 hover:text-zinc-200 underline cursor-pointer"
+                                        >
+                                            Wszystkie
+                                        </button>
+                                    </Tooltip>
                                     <span>•</span>
-                                    <button
-                                        type="button"
-                                        onClick={handleDeselectAllCompanies}
-                                        className="text-zinc-400 hover:text-zinc-200 underline cursor-pointer"
-                                    >
-                                        Wyczyść
-                                    </button>
+                                    <Tooltip content="Wyczyść zaznaczone spółki">
+                                        <button
+                                            type="button"
+                                            onClick={handleDeselectAllCompanies}
+                                            aria-label="Odznacz wszystkie spółki"
+                                            className="text-zinc-400 hover:text-zinc-200 underline cursor-pointer"
+                                        >
+                                            Wyczyść
+                                        </button>
+                                    </Tooltip>
                                 </div>
                             </div>
 
@@ -420,29 +476,37 @@ export const InviteUserModal = ({
                                     filteredAssignedCompanies.map((c) => {
                                         const isChecked = assignedCompanyIds.includes(c.id);
                                         return (
-                                            <button
+                                            <Tooltip
                                                 key={c.id}
-                                                type="button"
-                                                onClick={() => toggleAssignedCompany(c.id)}
-                                                className={`w-full text-left p-2 rounded text-xs flex items-center justify-between cursor-pointer ${
-                                                    isChecked
-                                                        ? 'bg-zinc-800 text-zinc-100'
-                                                        : 'hover:bg-zinc-900 text-zinc-400'
-                                                }`}
+                                                content={isChecked
+                                                    ? `Spółka ${c.name} jest wybrana. Kliknij, aby odznaczyć.`
+                                                    : `Kliknij, aby przypisać spółkę ${c.name} do doradcy.`
+                                                }
                                             >
-                                                <div className="flex items-center gap-2 truncate">
-                                                    {isChecked ? (
-                                                        <CheckSquare className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                                                    ) : (
-                                                        <Square className="w-3.5 h-3.5 text-zinc-600 shrink-0" />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => toggleAssignedCompany(c.id)}
+                                                    aria-label={`${c.name} (${c.code}) - ${isChecked ? 'przypisana' : 'nieprzypisana'}`}
+                                                    className={`w-full text-left p-2 rounded text-xs flex items-center justify-between cursor-pointer ${
+                                                        isChecked
+                                                            ? 'bg-zinc-800 text-zinc-100'
+                                                            : 'hover:bg-zinc-900 text-zinc-400'
+                                                    }`}
+                                                >
+                                                    <div className="flex items-center gap-2 truncate">
+                                                        {isChecked ? (
+                                                            <CheckSquare className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                                                        ) : (
+                                                            <Square className="w-3.5 h-3.5 text-zinc-600 shrink-0" />
+                                                        )}
+                                                        <span className="font-semibold text-zinc-200">[{c.code}]</span>
+                                                        <span className="truncate">{c.name}</span>
+                                                    </div>
+                                                    {isChecked && (
+                                                        <Badge variant="success" size="sm">DODANA</Badge>
                                                     )}
-                                                    <span className="font-semibold text-zinc-200">[{c.code}]</span>
-                                                    <span className="truncate">{c.name}</span>
-                                                </div>
-                                                {isChecked && (
-                                                    <Badge variant="success" size="sm">DODANA</Badge>
-                                                )}
-                                            </button>
+                                                </button>
+                                            </Tooltip>
                                         );
                                     })
                                 )}
@@ -455,16 +519,24 @@ export const InviteUserModal = ({
 
                     {/* Global access notice for SuperAdmin role */}
                     {role === 'super_admin' && (
-                        <div className="p-3 rounded bg-purple-950/30 border border-purple-800/60 text-[11px] text-purple-200">
-                            Rola Super Admin otrzymuje globalny dostęp do wszystkich spółek w systemie FinBoard oraz uprawnienia do zarządzania zespołem doradców.
+                        <div className="p-3 rounded bg-purple-950/30 border border-purple-800/60 text-[11px] text-purple-200 flex items-start gap-2">
+                            <Shield className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
+                            <span>Rola Super Admin otrzymuje globalny dostęp do wszystkich spółek w systemie FinBoard oraz uprawnienia do zarządzania zespołem doradców.</span>
                         </div>
                     )}
 
                     {/* Validity Expiration Period */}
                     <div>
-                        <label className="block text-[11px] font-semibold text-zinc-300 uppercase tracking-wider mb-1.5">
-                            Czas Ważności Tokenu Zaproszenia
-                        </label>
+                        <div className="flex items-center justify-between mb-1.5">
+                            <label className="block text-[11px] font-semibold text-zinc-300 uppercase tracking-wider">
+                                Czas Ważności Tokenu Zaproszenia
+                            </label>
+                            <InfoTooltip
+                                content="Po upływie zdefiniowanego czasu token aktywacyjny wygasa i użytkownik nie będzie mógł ustawić hasła bez ponownego zaproszenia."
+                                ariaLabel="Informacje o czasie ważności tokenu zaproszenia"
+                                size="xs"
+                            />
+                        </div>
                         <div className="relative">
                             <Clock className="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
                             <select
@@ -485,25 +557,33 @@ export const InviteUserModal = ({
 
                     {/* Footer buttons */}
                     <div className="pt-3 border-t border-zinc-800 flex items-center justify-between">
-                        <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={onClose}
-                            disabled={submitting}
-                        >
-                            Anuluj
-                        </Button>
-                        <Button
-                            type="submit"
-                            variant="primary"
-                            size="sm"
-                            icon={UserPlus}
-                            loading={submitting}
-                            disabled={submitting || loadingCompanies}
-                        >
-                            Wyślij Zaproszenie E-mail
-                        </Button>
+                        <Tooltip content="Anuluj i zamknij okno zaproszenia">
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={onClose}
+                                disabled={submitting}
+                                aria-label="Anuluj"
+                            >
+                                Anuluj
+                            </Button>
+                        </Tooltip>
+                        <Tooltip content="Wyślij bezpieczne zaproszenie z linkiem aktywacyjnym">
+                            <span>
+                                <Button
+                                    type="submit"
+                                    variant="primary"
+                                    size="sm"
+                                    icon={UserPlus}
+                                    loading={submitting}
+                                    disabled={submitting || loadingCompanies}
+                                    aria-label="Wyślij Zaproszenie E-mail"
+                                >
+                                    Wyślij Zaproszenie E-mail
+                                </Button>
+                            </span>
+                        </Tooltip>
                     </div>
                 </form>
             </div>

@@ -4,6 +4,7 @@ import { useNotification } from '../../context/NotificationContext';
 import { useAuth } from '../../context/AuthContext';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
+import { Tooltip, InfoTooltip } from '../ui/Tooltip';
 import {
     X,
     Building2,
@@ -213,9 +214,16 @@ export const CreateCompanyModal = ({
                 {/* Header */}
                 <div className="px-5 py-3.5 bg-zinc-950 border-b border-zinc-800 flex items-center justify-between shrink-0">
                     <div className="flex items-center gap-2.5">
-                        <div className="w-7 h-7 rounded bg-zinc-850 border border-zinc-750 flex items-center justify-center text-zinc-300">
-                            <Building2 className="w-4 h-4 text-emerald-400" />
-                        </div>
+                        <Tooltip content="Rejestracja nowego podmiotu gospodarczego w architekturze Multi-Tenant">
+                            <div
+                                tabIndex={0}
+                                role="img"
+                                aria-label="Rejestracja nowej spółki portfelowej"
+                                className="w-7 h-7 rounded bg-zinc-850 border border-zinc-750 flex items-center justify-center text-zinc-300 focus:outline-none focus:ring-1 focus:ring-zinc-400"
+                            >
+                                <Building2 className="w-4 h-4 text-emerald-400" />
+                            </div>
+                        </Tooltip>
                         <div>
                             <h2 className="text-xs font-bold uppercase tracking-wider text-zinc-100">
                                 Dodaj Nową Spółkę Portfelową
@@ -225,13 +233,17 @@ export const CreateCompanyModal = ({
                             </p>
                         </div>
                     </div>
-                    <button
-                        onClick={onClose}
-                        className="p-1 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors cursor-pointer"
-                        title="Zamknij (Esc)"
-                    >
-                        <X className="w-4 h-4" />
-                    </button>
+                    <Tooltip content="Zamknij (Esc)">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="p-1 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors cursor-pointer"
+                            title="Zamknij (Esc)"
+                            aria-label="Zamknij formularz rejestracji spółki"
+                        >
+                            <X className="w-4 h-4" />
+                        </button>
+                    </Tooltip>
                 </div>
 
                 {/* Form Body */}
@@ -249,17 +261,29 @@ export const CreateCompanyModal = ({
                     {/* Information Strip */}
                     <div className="p-3 rounded bg-blue-950/30 border border-blue-800/60 flex items-start gap-2.5">
                         <Info className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
-                        <div className="text-[11px] text-zinc-300 leading-relaxed">
+                        <div className="text-[11px] text-zinc-300 leading-relaxed flex-1">
                             <span className="font-semibold text-blue-300">Izolacja Danych Najemcy: </span>
                             Nowo zarejestrowana spółka uzyska unikalny identyfikator portfelowy. Przypisani doradcy uzyskają natychmiastowy dostęp analityczny do jej sprawozdań i wskaźników.
                         </div>
+                        <InfoTooltip
+                            content="W modelu wielonajemczym FinBoard podmioty gospodarcze mają odseparowane rekordy finansowe, rejestry audytowe oraz dokumenty VDR. Doradca widzi wyłącznie spółki z aktywnym przypisaniem."
+                            ariaLabel="Szczegóły o izolacji danych podmiotu portfelowego"
+                            size="xs"
+                        />
                     </div>
 
                     {/* Company Name */}
                     <div>
-                        <label className="block text-[11px] font-semibold text-zinc-300 uppercase tracking-wider mb-1.5">
-                            Pełna Nazwa Podmiotu <span className="text-rose-400">*</span>
-                        </label>
+                        <div className="flex items-center justify-between mb-1.5">
+                            <label className="block text-[11px] font-semibold text-zinc-300 uppercase tracking-wider">
+                                Pełna Nazwa Podmiotu <span className="text-rose-400">*</span>
+                            </label>
+                            <InfoTooltip
+                                content="Wprowadź oficjalną nazwę prawną podmiotu gospodarczego zarejestrowaną w KRS / CEIDG."
+                                ariaLabel="Informacje o pełnej nazwie spółki"
+                                size="xs"
+                            />
+                        </div>
                         <div className="relative">
                             <Building2 className="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
                             <input
@@ -291,9 +315,16 @@ export const CreateCompanyModal = ({
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {/* Company Code / Ticker */}
                         <div>
-                            <label className="block text-[11px] font-semibold text-zinc-300 uppercase tracking-wider mb-1.5">
-                                Kod / Ticker <span className="text-rose-400">*</span>
-                            </label>
+                            <div className="flex items-center justify-between mb-1.5">
+                                <label className="block text-[11px] font-semibold text-zinc-300 uppercase tracking-wider">
+                                    Kod / Ticker <span className="text-rose-400">*</span>
+                                </label>
+                                <InfoTooltip
+                                    content="Unikalny identyfikator podmiotu (np. ACME), używany w raportach, tabelach przestawnych i selektorze spółek."
+                                    ariaLabel="Informacje o kodzie spółki"
+                                    size="xs"
+                                />
+                            </div>
                             <div className="relative">
                                 <Hash className="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
                                 <input
@@ -318,9 +349,16 @@ export const CreateCompanyModal = ({
 
                         {/* Tax ID (NIP) */}
                         <div>
-                            <label className="block text-[11px] font-semibold text-zinc-300 uppercase tracking-wider mb-1.5">
-                                NIP / Tax ID <span className="text-zinc-500 text-[10px] lowercase font-normal">(opcjonalny)</span>
-                            </label>
+                            <div className="flex items-center justify-between mb-1.5">
+                                <label className="block text-[11px] font-semibold text-zinc-300 uppercase tracking-wider">
+                                    NIP / Tax ID <span className="text-zinc-500 text-[10px] lowercase font-normal">(opcjonalny)</span>
+                                </label>
+                                <InfoTooltip
+                                    content="Numer Identyfikacji Podatkowej (NIP / VAT-UE). Pomaga w automatycznym kojarzeniu wyciągów bankowych oraz integracjach zewnętrznych."
+                                    ariaLabel="Informacje o NIP podmiotu"
+                                    size="xs"
+                                />
+                            </div>
                             <div className="relative">
                                 <FileText className="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
                                 <input
@@ -362,21 +400,27 @@ export const CreateCompanyModal = ({
                             </div>
                             {advisors.length > 0 && (
                                 <div className="flex items-center gap-2 text-[10px]">
-                                    <button
-                                        type="button"
-                                        onClick={handleSelectAllAdvisors}
-                                        className="text-zinc-400 hover:text-zinc-200 underline cursor-pointer"
-                                    >
-                                        Wszyscy
-                                    </button>
+                                    <Tooltip content="Zaznacz wszystkich dostępnych doradców M&A">
+                                        <button
+                                            type="button"
+                                            onClick={handleSelectAllAdvisors}
+                                            aria-label="Przypisz wszystkich doradców"
+                                            className="text-zinc-400 hover:text-zinc-200 underline cursor-pointer"
+                                        >
+                                            Wszyscy
+                                        </button>
+                                    </Tooltip>
                                     <span className="text-zinc-600">•</span>
-                                    <button
-                                        type="button"
-                                        onClick={handleDeselectAllAdvisors}
-                                        className="text-zinc-400 hover:text-zinc-200 underline cursor-pointer"
-                                    >
-                                        Wyczyść
-                                    </button>
+                                    <Tooltip content="Wyczyść zaznaczenie doradców">
+                                        <button
+                                            type="button"
+                                            onClick={handleDeselectAllAdvisors}
+                                            aria-label="Odznacz wszystkich doradców"
+                                            className="text-zinc-400 hover:text-zinc-200 underline cursor-pointer"
+                                        >
+                                            Wyczyść
+                                        </button>
+                                    </Tooltip>
                                 </div>
                             )}
                         </div>
@@ -413,31 +457,39 @@ export const CreateCompanyModal = ({
                                 filteredAdvisors.map((adv) => {
                                     const isChecked = assignedAdvisorIds.includes(adv.id);
                                     return (
-                                        <button
+                                        <Tooltip
                                             key={adv.id}
-                                            type="button"
-                                            onClick={() => toggleAdvisor(adv.id)}
-                                            className={`w-full text-left p-2 rounded text-xs flex items-center justify-between cursor-pointer transition-colors ${
-                                                isChecked
-                                                    ? 'bg-zinc-800 text-zinc-100 border border-zinc-700'
-                                                    : 'hover:bg-zinc-900 text-zinc-400 border border-transparent'
-                                            }`}
+                                            content={isChecked
+                                                ? `Doradca ${adv.name} jest przypisany. Kliknij, aby usunąć przypisanie.`
+                                                : `Kliknij, aby przypisać doradcę ${adv.name} do tworzonej spółki.`
+                                            }
                                         >
-                                            <div className="flex items-center gap-2 truncate">
-                                                {isChecked ? (
-                                                    <CheckSquare className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                                                ) : (
-                                                    <Square className="w-3.5 h-3.5 text-zinc-600 shrink-0" />
+                                            <button
+                                                type="button"
+                                                onClick={() => toggleAdvisor(adv.id)}
+                                                aria-label={`${adv.name} (${adv.email}) - ${isChecked ? 'przypisany' : 'nieprzypisany'}`}
+                                                className={`w-full text-left p-2 rounded text-xs flex items-center justify-between cursor-pointer transition-colors ${
+                                                    isChecked
+                                                        ? 'bg-zinc-800 text-zinc-100 border border-zinc-700'
+                                                        : 'hover:bg-zinc-900 text-zinc-400 border border-transparent'
+                                                }`}
+                                            >
+                                                <div className="flex items-center gap-2 truncate">
+                                                    {isChecked ? (
+                                                        <CheckSquare className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                                                    ) : (
+                                                        <Square className="w-3.5 h-3.5 text-zinc-600 shrink-0" />
+                                                    )}
+                                                    <span className="font-semibold text-zinc-200 truncate">{adv.name}</span>
+                                                    <span className="text-[10px] text-zinc-500 truncate hidden sm:inline">
+                                                        ({adv.email})
+                                                    </span>
+                                                </div>
+                                                {isChecked && (
+                                                    <Badge variant="brand" size="sm">PRZYPISANY</Badge>
                                                 )}
-                                                <span className="font-semibold text-zinc-200 truncate">{adv.name}</span>
-                                                <span className="text-[10px] text-zinc-500 truncate hidden sm:inline">
-                                                    ({adv.email})
-                                                </span>
-                                            </div>
-                                            {isChecked && (
-                                                <Badge variant="brand" size="sm">PRZYPISANY</Badge>
-                                            )}
-                                        </button>
+                                            </button>
+                                        </Tooltip>
                                     );
                                 })
                             )}
@@ -452,25 +504,33 @@ export const CreateCompanyModal = ({
 
                     {/* Footer buttons */}
                     <div className="pt-3 border-t border-zinc-800 flex items-center justify-between">
-                        <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={onClose}
-                            disabled={submitting}
-                        >
-                            Anuluj
-                        </Button>
-                        <Button
-                            type="submit"
-                            variant="primary"
-                            size="sm"
-                            icon={Plus}
-                            loading={submitting}
-                            disabled={submitting || loadingAdvisors}
-                        >
-                            Utwórz Spółkę
-                        </Button>
+                        <Tooltip content="Anuluj i zamknij bez rejestrowania spółki">
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={onClose}
+                                disabled={submitting}
+                                aria-label="Anuluj rejestrację spółki"
+                            >
+                                Anuluj
+                            </Button>
+                        </Tooltip>
+                        <Tooltip content="Zarejestruj nową spółkę w systemie FinBoard">
+                            <span>
+                                <Button
+                                    type="submit"
+                                    variant="primary"
+                                    size="sm"
+                                    icon={Plus}
+                                    loading={submitting}
+                                    disabled={submitting || loadingAdvisors}
+                                    aria-label="Utwórz Spółkę"
+                                >
+                                    Utwórz Spółkę
+                                </Button>
+                            </span>
+                        </Tooltip>
                     </div>
                 </form>
             </div>
