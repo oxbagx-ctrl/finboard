@@ -12,6 +12,7 @@ import {
     Square
 } from 'lucide-react';
 import { Button } from '../ui/Button';
+import { Tooltip, InfoTooltip } from '../ui/Tooltip';
 import { CURRENCIES } from '../../context/DealContext';
 
 export const CONFIDENTIALITY_LEVELS = [
@@ -42,6 +43,14 @@ const COMMENTARY_PRESETS = [
         text: 'Wskaźniki płynności bieżącej i szybkiej wskazują na nadwyżkę kapitału obrotowego netto. Podmiot jest w pełni przygotowany do dalszej ekspansji lub integracji kapitałowej w ramach grupy inwestycyjnej.'
     },
 ];
+
+const SECTION_DESCRIPTIONS = {
+    kpi: 'Kluczowe wskaźniki przychodowe, marże operacyjne i rentowność netto (KPI Scorecard)',
+    pnl: 'Zestawienie rachunku wyników od przychodów po wynik netto w standardzie PSR/MSR',
+    liquidity: 'Wskaźniki płynności bieżącej (CR), szybkiej (QR) oraz kapitał obrotowy netto (NWC)',
+    opex: 'Dekompozycja kosztów rodzajowych i udział poszczególnych pozycji w strukturze OPEX',
+    audit: 'Kryptograficzny skrót SHA-256, znacznik czasu WORM oraz strefa podpisów doradcy i CFO',
+};
 
 export const ReportConfigurator = ({
     config,
@@ -92,38 +101,55 @@ export const ReportConfigurator = ({
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-800">
                 <div className="flex items-center gap-2 text-zinc-100 font-bold uppercase tracking-wider text-xs">
                     <Sliders className="w-4 h-4 text-zinc-400" />
-                    Konfigurator Parametrów Raportu Zarządczego (Executive Memo)
+                    <span>Konfigurator Parametrów Raportu Zarządczego (Executive Memo)</span>
+                    <InfoTooltip
+                        size="xs"
+                        ariaLabel="Więcej informacji o konfiguratorze parametrów raportu"
+                        title="Konfigurator Raportu M&A"
+                        content="Dostosuj horyzont czasowy, walutę przeliczeniową, poziom klauzuli poufności oraz włączane sekcje analityczne przed wydrukiem lub eksportem raportu."
+                    />
                 </div>
 
                 <div className="flex items-center gap-2 flex-wrap">
-                    <Button
-                        variant="secondary"
-                        size="sm"
-                        icon={RefreshCw}
-                        loading={loading}
-                        onClick={onRefresh}
-                        title="Przelicz dane raportu"
-                    >
-                        Przelicz
-                    </Button>
-                    <Button
-                        variant="secondary"
-                        size="sm"
-                        icon={Download}
-                        onClick={onExportJson}
-                        title="Eksportuj surowe dane JSON"
-                    >
-                        Eksport JSON
-                    </Button>
-                    <Button
-                        variant="primary"
-                        size="sm"
-                        icon={Printer}
-                        onClick={onPrint}
-                        title="Drukuj lub zapisz jako wektorowy plik PDF"
-                    >
-                        Drukuj / Eksportuj PDF
-                    </Button>
+                    <Tooltip content="Pobierz aktualne dane analityczne z backendu i przelicz sumy kontrolne raportu">
+                        <span className="inline-flex">
+                            <Button
+                                variant="secondary"
+                                size="sm"
+                                icon={RefreshCw}
+                                loading={loading}
+                                onClick={onRefresh}
+                                title="Przelicz dane raportu"
+                                aria-label="Przelicz dane raportu"
+                            >
+                                Przelicz
+                            </Button>
+                        </span>
+                    </Tooltip>
+                    <Tooltip content="Pobierz pełną strukturę danych analitycznych i metadanych raportu w formacie JSON">
+                        <Button
+                            variant="secondary"
+                            size="sm"
+                            icon={Download}
+                            onClick={onExportJson}
+                            title="Eksportuj surowe dane JSON"
+                            aria-label="Eksportuj surowe dane JSON"
+                        >
+                            Eksport JSON
+                        </Button>
+                    </Tooltip>
+                    <Tooltip content="Uruchom podgląd wydruku przeglądarki z wektorowym formatowaniem A4 lub zapisz do pliku PDF">
+                        <Button
+                            variant="primary"
+                            size="sm"
+                            icon={Printer}
+                            onClick={onPrint}
+                            title="Drukuj lub zapisz jako wektorowy plik PDF"
+                            aria-label="Drukuj lub zapisz jako wektorowy plik PDF"
+                        >
+                            Drukuj / Eksportuj PDF
+                        </Button>
+                    </Tooltip>
                 </div>
             </div>
 
@@ -134,38 +160,53 @@ export const ReportConfigurator = ({
                     <label className="block text-[10px] uppercase font-semibold text-zinc-400 flex items-center gap-1.5">
                         <Calendar className="w-3 h-3 text-zinc-500" />
                         Horyzont Czasowy Raportu
+                        <InfoTooltip
+                            size="xs"
+                            ariaLabel="Więcej informacji o horyzoncie czasowym"
+                            title="Horyzont Czasowy"
+                            content="Określa zakres danych finansowych uwzględnionych w sprawozdaniu (pełna historia, ostatnie 12 miesięcy LTM, konkretny rok obrotowy lub własny przedział dat)."
+                        />
                     </label>
-                    <select
-                        value={config.periodPreset}
-                        onChange={(e) => handlePresetPeriod(e.target.value)}
-                        className="w-full bg-zinc-950 border border-zinc-750 rounded px-2.5 py-1.5 text-xs text-zinc-200 focus:outline-none focus:ring-1 focus:ring-zinc-400"
-                    >
-                        {PERIOD_PRESETS.map((p) => (
-                            <option key={p.id} value={p.id} className="bg-zinc-950 text-zinc-200">
-                                {p.label}
-                            </option>
-                        ))}
-                    </select>
+                    <Tooltip content="Wybierz predefiniowany horyzont czasowy lub własny zakres dat dla badania Due Diligence">
+                        <select
+                            value={config.periodPreset}
+                            onChange={(e) => handlePresetPeriod(e.target.value)}
+                            className="w-full bg-zinc-950 border border-zinc-750 rounded px-2.5 py-1.5 text-xs text-zinc-200 focus:outline-none focus:ring-1 focus:ring-zinc-400 cursor-pointer"
+                            aria-label="Wybierz horyzont czasowy raportu"
+                        >
+                            {PERIOD_PRESETS.map((p) => (
+                                <option key={p.id} value={p.id} className="bg-zinc-950 text-zinc-200">
+                                    {p.label}
+                                </option>
+                            ))}
+                        </select>
+                    </Tooltip>
 
                     {config.periodPreset === 'custom' && (
                         <div className="grid grid-cols-2 gap-2 pt-1">
                             <div>
                                 <span className="text-[9px] text-zinc-500 block mb-0.5">OD:</span>
-                                <input
-                                    type="date"
-                                    value={config.startDate}
-                                    onChange={(e) => onChange({ ...config, startDate: e.target.value })}
-                                    className="w-full bg-zinc-950 border border-zinc-800 rounded px-2 py-1 text-[11px] text-zinc-200"
-                                />
+                                <Tooltip content="Początkowa data analizowanego okresu obrachunkowego (RRRR-MM-DD)">
+                                    <input
+                                        type="date"
+                                        value={config.startDate}
+                                        onChange={(e) => onChange({ ...config, startDate: e.target.value })}
+                                        className="w-full bg-zinc-950 border border-zinc-800 rounded px-2 py-1 text-[11px] text-zinc-200"
+                                        aria-label="Początkowa data analizowanego okresu"
+                                    />
+                                </Tooltip>
                             </div>
                             <div>
                                 <span className="text-[9px] text-zinc-500 block mb-0.5">DO:</span>
-                                <input
-                                    type="date"
-                                    value={config.endDate}
-                                    onChange={(e) => onChange({ ...config, endDate: e.target.value })}
-                                    className="w-full bg-zinc-950 border border-zinc-800 rounded px-2 py-1 text-[11px] text-zinc-200"
-                                />
+                                <Tooltip content="Końcowa data analizowanego okresu obrachunkowego (RRRR-MM-DD)">
+                                    <input
+                                        type="date"
+                                        value={config.endDate}
+                                        onChange={(e) => onChange({ ...config, endDate: e.target.value })}
+                                        className="w-full bg-zinc-950 border border-zinc-800 rounded px-2 py-1 text-[11px] text-zinc-200"
+                                        aria-label="Końcowa data analizowanego okresu"
+                                    />
+                                </Tooltip>
                             </div>
                         </div>
                     )}
@@ -176,34 +217,52 @@ export const ReportConfigurator = ({
                     <label className="block text-[10px] uppercase font-semibold text-zinc-400 flex items-center gap-1.5">
                         <Coins className="w-3 h-3 text-zinc-500" />
                         Waluta Prezentacji & Przeliczenia
+                        <InfoTooltip
+                            size="xs"
+                            ariaLabel="Więcej informacji o walucie prezentacji"
+                            title="Waluta Prezentacji"
+                            content="Waluta wyjściowa prezentacji sprawozdania finansowego. Wszystkie pozycje zostaną przeliczone według aktualnych kursów FX Deal Advisory."
+                        />
                     </label>
-                    <select
-                        value={config.currency}
-                        onChange={(e) => onChange({ ...config, currency: e.target.value })}
-                        className="w-full bg-zinc-950 border border-zinc-750 rounded px-2.5 py-1.5 text-xs text-zinc-200 focus:outline-none focus:ring-1 focus:ring-zinc-400"
-                    >
-                        {CURRENCIES.map((c) => (
-                            <option key={c.code} value={c.code} className="bg-zinc-950 text-zinc-200">
-                                {c.code} – {c.label}
-                            </option>
-                        ))}
-                    </select>
+                    <Tooltip content="Wybierz walutę denominacji raportu (PLN, EUR, USD, GBP)">
+                        <select
+                            value={config.currency}
+                            onChange={(e) => onChange({ ...config, currency: e.target.value })}
+                            className="w-full bg-zinc-950 border border-zinc-750 rounded px-2.5 py-1.5 text-xs text-zinc-200 focus:outline-none focus:ring-1 focus:ring-zinc-400 cursor-pointer"
+                            aria-label="Wybierz walutę prezentacji raportu"
+                        >
+                            {CURRENCIES.map((c) => (
+                                <option key={c.code} value={c.code} className="bg-zinc-950 text-zinc-200">
+                                    {c.code} – {c.label}
+                                </option>
+                            ))}
+                        </select>
+                    </Tooltip>
 
                     <label className="block text-[10px] uppercase font-semibold text-zinc-400 pt-1 flex items-center gap-1.5">
                         <Shield className="w-3 h-3 text-zinc-500" />
                         Klauzula Poufności (Header Watermark)
+                        <InfoTooltip
+                            size="xs"
+                            ariaLabel="Więcej informacji o klauzuli poufności"
+                            title="Klauzula Poufności"
+                            content="Oficjalna klauzula poufności drukowana w nagłówku każdej strony memorandum transakcyjnego."
+                        />
                     </label>
-                    <select
-                        value={config.confidentiality}
-                        onChange={(e) => onChange({ ...config, confidentiality: e.target.value })}
-                        className="w-full bg-zinc-950 border border-zinc-750 rounded px-2.5 py-1.5 text-xs text-zinc-200 focus:outline-none focus:ring-1 focus:ring-zinc-400"
-                    >
-                        {CONFIDENTIALITY_LEVELS.map((level) => (
-                            <option key={level.id} value={level.id} className="bg-zinc-950 text-zinc-200">
-                                {level.label}
-                            </option>
-                        ))}
-                    </select>
+                    <Tooltip content="Wybierz poziom poufności dokumentu transakcyjnego">
+                        <select
+                            value={config.confidentiality}
+                            onChange={(e) => onChange({ ...config, confidentiality: e.target.value })}
+                            className="w-full bg-zinc-950 border border-zinc-750 rounded px-2.5 py-1.5 text-xs text-zinc-200 focus:outline-none focus:ring-1 focus:ring-zinc-400 cursor-pointer"
+                            aria-label="Wybierz klauzulę poufności raportu"
+                        >
+                            {CONFIDENTIALITY_LEVELS.map((level) => (
+                                <option key={level.id} value={level.id} className="bg-zinc-950 text-zinc-200">
+                                    {level.label}
+                                </option>
+                            ))}
+                        </select>
+                    </Tooltip>
                 </div>
 
                 {/* 3. Sections Checkboxes */}
@@ -211,6 +270,12 @@ export const ReportConfigurator = ({
                     <label className="block text-[10px] uppercase font-semibold text-zinc-400 flex items-center gap-1.5">
                         <FileText className="w-3 h-3 text-zinc-500" />
                         Sekcje Do Uwzględnienia w Raporcie
+                        <InfoTooltip
+                            size="xs"
+                            ariaLabel="Więcej informacji o zakresie sekcji"
+                            title="Zakres Sekcji"
+                            content="Zaznacz moduły i zestawienia finansowe, które mają zostać wygenerowane w finalnym dokumencie PDF."
+                        />
                     </label>
                     <div className="space-y-1 pt-0.5">
                         {[
@@ -220,21 +285,26 @@ export const ReportConfigurator = ({
                             { id: 'opex', label: 'Struktura Kosztów Operacyjnych (OPEX)' },
                             { id: 'audit', label: 'Certyfikat Integralności i SHA-256' },
                         ].map((sec) => (
-                            <button
+                            <Tooltip
                                 key={sec.id}
-                                type="button"
-                                onClick={() => toggleSection(sec.id)}
-                                className="flex items-center gap-2 text-[11px] text-zinc-300 hover:text-white transition-colors cursor-pointer w-full text-left"
+                                content={`${config.sections[sec.id] ? 'Kliknij, aby wykluczyć' : 'Kliknij, aby dołączyć'}: ${SECTION_DESCRIPTIONS[sec.id] || sec.label}`}
                             >
-                                {config.sections[sec.id] ? (
-                                    <CheckSquare className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                                ) : (
-                                    <Square className="w-3.5 h-3.5 text-zinc-600 shrink-0" />
-                                )}
-                                <span className={config.sections[sec.id] ? 'text-zinc-200' : 'text-zinc-500'}>
-                                    {sec.label}
-                                </span>
-                            </button>
+                                <button
+                                    type="button"
+                                    onClick={() => toggleSection(sec.id)}
+                                    className="flex items-center gap-2 text-[11px] text-zinc-300 hover:text-white transition-colors cursor-pointer w-full text-left"
+                                    aria-label={`Przełącz sekcję: ${sec.label}`}
+                                >
+                                    {config.sections[sec.id] ? (
+                                        <CheckSquare className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                                    ) : (
+                                        <Square className="w-3.5 h-3.5 text-zinc-600 shrink-0" />
+                                    )}
+                                    <span className={config.sections[sec.id] ? 'text-zinc-200' : 'text-zinc-500'}>
+                                        {sec.label}
+                                    </span>
+                                </button>
+                            </Tooltip>
                         ))}
                     </div>
                 </div>
@@ -243,30 +313,44 @@ export const ReportConfigurator = ({
             {/* Commentary / Recommendation */}
             <div className="pt-2 border-t border-zinc-800/80 space-y-1.5">
                 <div className="flex items-center justify-between">
-                    <label className="block text-[10px] uppercase font-semibold text-zinc-400">
+                    <label className="block text-[10px] uppercase font-semibold text-zinc-400 flex items-center gap-1.5">
                         Komentarz Analityczny Doradcy M&A / CFO (Opcjonalny do wydruku)
+                        <InfoTooltip
+                            size="xs"
+                            ariaLabel="Więcej informacji o komentarzu analitycznym"
+                            title="Komentarz Analityczny"
+                            content="Oficjalna opinia i rekomendacja doradcy transakcyjnego lub CFO dołączana do memorandum dla komitetu inwestycyjnego."
+                        />
                     </label>
                     <div className="flex items-center gap-1.5 text-[10px] text-zinc-500">
                         <span>Wstaw szablon:</span>
                         {COMMENTARY_PRESETS.map((preset, idx) => (
-                            <button
+                            <Tooltip
                                 key={idx}
-                                type="button"
-                                onClick={() => onChange({ ...config, commentary: preset.text })}
-                                className="text-zinc-400 hover:text-zinc-200 underline"
+                                content={`Wstaw szablon rekomendacji: "${preset.label}"`}
                             >
-                                {preset.label}
-                            </button>
+                                <button
+                                    type="button"
+                                    onClick={() => onChange({ ...config, commentary: preset.text })}
+                                    className="text-zinc-400 hover:text-zinc-200 underline cursor-pointer"
+                                    aria-label={`Wstaw szablon: ${preset.label}`}
+                                >
+                                    {preset.label}
+                                </button>
+                            </Tooltip>
                         ))}
                     </div>
                 </div>
-                <textarea
-                    rows={2}
-                    value={config.commentary}
-                    onChange={(e) => onChange({ ...config, commentary: e.target.value })}
-                    placeholder="Wprowadź rekomendację dla komitetu inwestycyjnego lub zarządu..."
-                    className="w-full bg-zinc-950 border border-zinc-750 rounded px-3 py-2 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
-                />
+                <Tooltip content="Wprowadź treść opinii analitycznej doradcy transakcyjnego lub zarządu (zostanie wydrukowana w sekcji 5 memorandum)">
+                    <textarea
+                        rows={2}
+                        value={config.commentary}
+                        onChange={(e) => onChange({ ...config, commentary: e.target.value })}
+                        placeholder="Wprowadź rekomendację dla komitetu inwestycyjnego lub zarządu..."
+                        className="w-full bg-zinc-950 border border-zinc-750 rounded px-3 py-2 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
+                        aria-label="Komentarz analityczny doradcy M&A lub CFO"
+                    />
+                </Tooltip>
             </div>
         </div>
     );

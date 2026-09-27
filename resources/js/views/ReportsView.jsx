@@ -6,6 +6,7 @@ import { useNotification } from '../context/NotificationContext';
 import { ReportConfigurator } from '../components/reports/ReportConfigurator';
 import { ExecutivePdfReport } from '../components/reports/ExecutivePdfReport';
 import { FileText, Printer, CheckCircle2, Shield } from 'lucide-react';
+import { Tooltip, InfoTooltip } from '../components/ui/Tooltip';
 
 export const ReportsView = () => {
     const { user, activeCompany } = useAuth();
@@ -70,7 +71,7 @@ export const ReportsView = () => {
 
             // Run requests in parallel with resilient fallbacks
             const [metricsRes, trendsRes, breakdownRes] = await Promise.all([
-                apiClient.get('/finance/analytics/metrics', { params }),
+                apiClient.get('/finance/analytics/metrics', { params }).catch(() => ({ data: { data: {} } })),
                 apiClient.get('/finance/analytics/trends', { params }).catch(() => ({ data: { data: [] } })),
                 apiClient.get('/finance/analytics/breakdown', {
                     params: { ...params, record_type: 'EXPENSE', category_type: 'OPEX' }
@@ -160,17 +161,27 @@ export const ReportsView = () => {
             {/* Top Info Banner (Screen only) */}
             <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm print:hidden">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded bg-zinc-950 border border-zinc-750 flex items-center justify-center text-zinc-200 shrink-0">
-                        <FileText className="w-5 h-5 text-emerald-400" />
-                    </div>
+                    <Tooltip content="Podsystem generowania oficjalnych memorandów zarządczych i raportów Due Diligence M&A">
+                        <div className="w-10 h-10 rounded bg-zinc-950 border border-zinc-750 flex items-center justify-center text-zinc-200 shrink-0 cursor-help" tabIndex={0} role="img" aria-label="Generator raportów zarządczych">
+                            <FileText className="w-5 h-5 text-emerald-400" />
+                        </div>
+                    </Tooltip>
                     <div>
                         <div className="flex items-center gap-2">
-                            <h1 className="text-sm font-bold uppercase tracking-wider text-zinc-100">
+                            <h1 className="text-sm font-bold uppercase tracking-wider text-zinc-100 flex items-center gap-1.5">
                                 Generator Raportów Zarządczych & Podsumowań M&A (PDF)
+                                <InfoTooltip
+                                    size="xs"
+                                    ariaLabel="Więcej informacji o generatorze raportów zarządczych"
+                                    title="Oficjalne Memorandum Due Diligence"
+                                    content="Moduł generowania oficjalnych memorandów Due Diligence, podsumowań zarządczych P&L i wskaźników płynności z certyfikatem integralności SHA-256 w wektorowym formacie A4."
+                                />
                             </h1>
-                            <span className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-zinc-950 border border-zinc-750 text-zinc-400">
-                                {activeCompany?.name || 'Spółka'}
-                            </span>
+                            <Tooltip content={`Aktywny podmiot transakcyjny podlegający analizie i badaniu Due Diligence: ${activeCompany?.name || 'Spółka'}`}>
+                                <span className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-zinc-950 border border-zinc-750 text-zinc-400 cursor-help" tabIndex={0}>
+                                    {activeCompany?.name || 'Spółka'}
+                                </span>
+                            </Tooltip>
                         </div>
                         <p className="text-[10px] text-zinc-400 mt-0.5">
                             Przygotuj, skonfiguruj i wyeksportuj oficjalne memorandum finansowe z certyfikatem integralności SHA-256.
@@ -179,10 +190,12 @@ export const ReportsView = () => {
                 </div>
 
                 <div className="flex items-center gap-2 text-xs">
-                    <span className="flex items-center gap-1.5 text-zinc-400 bg-zinc-950 px-2.5 py-1 rounded border border-zinc-800 text-[11px]">
-                        <Shield className="w-3.5 h-3.5 text-emerald-400" />
-                        A4 WEKTOROWY PDF
-                    </span>
+                    <Tooltip content="Wektorowy wydruk A4 dopasowany do standardów komitetów inwestycyjnych i bankowości transakcyjnej">
+                        <span className="flex items-center gap-1.5 text-zinc-400 bg-zinc-950 px-2.5 py-1 rounded border border-zinc-800 text-[11px] cursor-help" tabIndex={0}>
+                            <Shield className="w-3.5 h-3.5 text-emerald-400" />
+                            A4 WEKTOROWY PDF
+                        </span>
+                    </Tooltip>
                 </div>
             </div>
 
