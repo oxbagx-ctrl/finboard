@@ -807,6 +807,12 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Wdrożenie `TransactionFolderController`, `TransactionFolderResource` oraz żądań walidacji (`CreateTransactionFolderRequest`, `UpdateTransactionFolderRequest`).
     - Zapewnienie pełnej izolacji wielodostępowej (multi-tenant) i autoryzacji opartej o `ResolvesCompanyContext`.
     - Pakiet testów integracyjnych API w `TransactionFolderApiTest.php` (9 testów, 38 asercji), 100% PASS w pełnym zestawie 662 testów PHPUnit oraz 502 testów Vitest.
+  - [x] Nawigacja po drzewie folderów Dewey i odznaki indeksów w DocumentTable (Commit 261).
+    - Komponent nawigacji po hierarchii `FolderTreeNav` z rozwijaniem/zwijaniem węzłów, szybkim filtrowaniem ("Wszystkie dokumenty", "Nieprzypisane") oraz dynamicznymi licznikami plików `documents_count`.
+    - Wdrożenie przycisku inicjalizacji taksonomii M&A (33 kategorie Due Diligence) bezpośrednio z panelu bocznego pokoju danych.
+    - Wizualizacja odznak kodów Dewey (np. `01.01.01`) o wysokim kontraście oraz etykiet folderów nadrzędnych w tabeli `DocumentTable`.
+    - Elastyczny, responsywny układ dwukolumnowy z możliwością ukrywania/pokazywania paska bocznego folderów i chipem aktywnego filtra.
+    - 100% PASS w 53 plikach testowych Vitest (502 testy) oraz pełnym zestawie 662 testów PHPUnit (8469 asercji).
 
 ---
 

@@ -119,7 +119,15 @@ export const DocumentTable = ({
                                             {getFileIcon(doc.mime_type, doc.type)}
                                         </div>
                                         <div className="min-w-0">
-                                            <div className="flex items-center gap-1.5">
+                                            <div className="flex items-center gap-1.5 flex-wrap">
+                                                {doc.index_code && (
+                                                    <span
+                                                        className="px-1.5 py-0.2 rounded text-[10px] font-mono font-bold bg-indigo-950/80 border border-indigo-700/80 text-indigo-300 shrink-0"
+                                                        title={`Indeks Dewey: ${doc.index_code}${doc.folder?.name ? ` (${doc.folder.name})` : ''}`}
+                                                    >
+                                                        {doc.index_code}
+                                                    </span>
+                                                )}
                                                 <span className="font-bold text-zinc-100 truncate hover:text-white" title={doc.title}>
                                                     {doc.title}
                                                 </span>
@@ -129,8 +137,19 @@ export const DocumentTable = ({
                                                     </span>
                                                 )}
                                             </div>
-                                            <div className="text-[10px] text-zinc-500 truncate" title={doc.original_name}>
-                                                {doc.original_name}
+                                            <div className="flex items-center gap-2 text-[10px] text-zinc-500 truncate mt-0.5">
+                                                <span title={doc.original_name}>{doc.original_name}</span>
+                                                {doc.folder && (
+                                                    <>
+                                                        <span className="text-zinc-650">•</span>
+                                                        <span
+                                                            className="text-zinc-400 truncate max-w-[220px]"
+                                                            title={`Folder: ${doc.folder.index_code} ${doc.folder.name}`}
+                                                        >
+                                                            📁 {doc.folder.index_code} {doc.folder.name}
+                                                        </span>
+                                                    </>
+                                                )}
                                             </div>
                                         </div>
                                     </div>
