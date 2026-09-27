@@ -663,40 +663,40 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
   - Dodanie towarzyszącego panelu szacunków wieloletnich przychodów (`revenue-projection-panel`) uwzględniającego dynamikę organiczną i krzywą ramp-up.
   - Rozszerzenie zestawu testów Vitest (`OperatingAssumptionsForm.test.jsx`) o weryfikację reaktywności suwaków i projekcji wieloletniej.
 - [x] **Faza 49: Bankowalny model podatkowy (CIT & Tax Loss Carry-Forward) zgodny z art. 7 ust. 5 i art. 19 ustawy o CIT**
-  - [x] Korekta UI, synchronizacja stawki CIT z tarczą podatkową WACC i parametryzacja FormRequest.
+  - Korekta UI, synchronizacja stawki CIT z tarczą podatkową WACC i parametryzacja FormRequest.
     - Eliminacja literówki w `OperatingAssumptionsForm.jsx` (*Limit Rocznego Odliczenia Straty (%)*).
     - Synchronizacja tarczy podatkowej długu WACC $K_d \cdot (1 - T)$ z dynamiczną stawką CIT projektu (19% lub preferencyjne 9% dla małych podatników).
     - Rozszerzenie metody fabrycznej `WaccParameters::defaultForPoland(?float $preTaxCostOfDebt = null, ?float $taxRatePercent = null)` oraz `WaccCalculatorService`.
     - Dodanie interaktywnej karty tarczy podatkowej WACC w zakładce *5. Podatki & CIT*.
     - Parametryzacja reguł walidacyjnych w żądaniach `UpdateInvestmentProjectRequest`, `InvestmentStatementQueryRequest` oraz `InvestmentAppraisalQueryRequest`.
     - Testy jednostkowe WACC (`WaccCalculatorServiceTest.php`) oraz frontendowe (`OperatingAssumptionsForm.test.jsx`).
-  - [x] Model domenowy rocznikowania strat podatkowych (Tax Loss Vintages & 5-Year Expiry).
+  - Model domenowy rocznikowania strat podatkowych (Tax Loss Vintages & 5-Year Expiry).
     - Implementacja enum `TaxLossSettlementMode` (`standard_loss_cap`, `one_off_5m`, `ebt_cap`) zgodnie z art. 7 ust. 5 ustawy o CIT.
     - Implementacja obiektu wartości `TaxLossVintage` (rok powstania, kwota pierwotna, pozostała, rozliczona, rok wygaśnięcia $T+5$).
     - Implementacja agregatu wartości `TaxLossPool` z kolejką FIFO i bezpowrotnym wygaszaniem strat po upływie 5 lat podatkowych.
     - Wprowadzenie obiektu `TaxLossSettlementResult` rejestrującego kwoty rozliczone, wygasłe oraz salda otwarcia/zamknięcia.
     - Rozszerzenie `OperatingAssumptions`, `IncomeStatementPeriod` i `AnnualIncomeStatement` o atrybuty `taxLossExpired` i `taxLossCarryForwardOpening`.
     - Kompletny zestaw testów jednostkowych (`TaxLossPoolTest.php`).
-  - [x] Roczny model zaliczek CIT (YTD) i obsługa jednorazowego odliczenia 5 mln zł w IncomeStatementService.
+  - Roczny model zaliczek CIT (YTD) i obsługa jednorazowego odliczenia 5 mln zł w IncomeStatementService.
     - Implementacja ustawowego, narastającego modelu zaliczek na CIT (YTD - Year-To-Date) zgodnie z art. 25 ust. 1 ustawy o CIT w `IncomeStatementService`.
     - Eliminacja błędu zniekształcenia podatkowego w ujęciu miesięcznym (zaliczka CIT należna wyłącznie przy dodatnim rocznym dochodzie narastającym po odliczeniu strat z lat ubiegłych).
     - Integracja agregatu domenowego `TaxLossPool` z mechanizmem rocznikowania (vintages) i obsługą trybów rozliczeń: standardowy limit 50% (`STANDARD_LOSS_CAP`), jednorazowe odliczenie do 5 mln zł (`ONE_OFF_5M`) wg art. 7 ust. 5 pkt 2 CIT oraz legacy limit EBT (`EBT_CAP`).
     - Obsługa bezpowrotnego wygasania strat podatkowych po 5 kolejno następujących po sobie latach podatkowych ($T+5$) oraz ewidencja salda otwarcia i wygasłych strat w okresach miesięcznych i rocznych.
     - Rozszerzenie zestawu testów jednostkowych w `IncomeStatementServiceTest.php` weryfikujących pełne odliczenie do 5 mln zł vs standardowe 50%, progresję miesięcznych zaliczek YTD oraz 5-letnie wygasanie strat.
-  - [x] Parzystość matematyczna w silniku Web Worker (financialCalculations.ts).
+  - Parzystość matematyczna w silniku Web Worker (financialCalculations.ts).
     - Implementacja struktur domenowych `TaxLossVintage` oraz `TaxLossPool` w TypeScript odzwierciedlających logikę backendową (kolejka FIFO, 5-letnie wygaszanie $T+5$, limit standardowy 50%, odliczenie jednorazowe do 5 mln zł wg art. 7 ust. 5 CIT).
     - Refaktoryzacja silnika symulacji 15-letniej `calculate15YearStatements` z wprowadzeniem rocznej pętli zewnętrznej i podziału na miesięczne zaliczki YTD (Year-To-Date) wg art. 25 ust. 1 ustawy o CIT.
     - Zapewnienie pełnej tożsamości sumy zaliczek miesięcznych z rocznym CIT ($\sum_{m=1}^{12} monthCit \equiv annualCit$) oraz 100% kompensacji bieżących strat śródrocznych w danym roku obrotowym.
     - Wzbogacenie modeli `MonthlyStatementPeriod` oraz `AnnualStatementPeriod` o atrybuty tarczy podatkowej (`taxLossCarryForwardOpening`, `taxLossExpired`, `taxLossUsed`, `taxLossCarryForwardClosing`, `taxableIncome`).
     - Dynamiczna synchronizacja stawki podatkowej w formule tarczy długu WACC z parametrami założeń operacyjnych projektu (`cit_rate_percent`).
     - Rozszerzenie zestawu testów Vitest w `investmentCalculationWorker.test.js` (8 nowych testów weryfikujących logikę klas podatkowych, porównanie trybów rozliczeń, równość sumy zaliczek YTD oraz wygasanie strat).
-  - [x] Interfejs UI fiskalnego panelu CIT i podgląd trajektorii tarczy podatkowej (Tax Loss Roll-Forward).
+  - Interfejs UI fiskalnego panelu CIT i podgląd trajektorii tarczy podatkowej (Tax Loss Roll-Forward).
     - Rozszerzenie formularza założeń operacyjnych (`OperatingAssumptionsForm.jsx`) o obsługę trybów rozliczania strat podatkowych (`tax_loss_settlement_mode`: standardowy 50%, jednorazowy do 5 mln zł wg art. 7 ust. 5 pkt 2 CIT, limit dochodu EBT) oraz konfigurowalny limit jednorazowy `tax_loss_one_off_cap_amount`.
     - Wdrożenie live symulacji `taxRollForwardTrajectory` z natychmiastowym przeliczaniem 15-letniego modelu i prezentacją 5 syntetycznych wskaźników KPI (straty wygenerowane, wykorzystana tarcza, oszczędność CIT, wygasłe $T+5$, saldo końcowe).
     - Dedykowana tabela 15-letniej projekcji podatkowej (`tax-loss-rollforward-panel`) z przepływem salda otwarcia, EBT, odliczeń, podatku należnego i salda zamknięcia tarczy.
     - Rozszerzenie tabeli sprawozdań finansowych (`ThreeStatementGrid.jsx`) o interaktywne rozwijanie pozycji CIT na wiersze analityczne tarczy podatkowej oraz integrację z eksportem CSV.
     - Zestaw testów jednostkowych i integracyjnych w `OperatingAssumptionsForm.test.jsx`, `ThreeStatementGrid.test.jsx` oraz `InvestmentStateValidation.test.jsx`.
-  - [x] Kompleksowe testy integracyjne, regresja 3-Statement & aktualizacja dokumentacji README.md.
+  - Kompleksowe testy integracyjne, regresja 3-Statement & aktualizacja dokumentacji README.md.
     - End-to-end test integracyjny w `ThreeStatementEngineIntegrationTest.php` weryfikujący pełną symulację 15-letnią dla trybów `STANDARD_LOSS_CAP` (50%) oraz `ONE_OFF_5M` (jednorazowe do 5 mln zł).
     - Weryfikacja zerowej wariancji bilansu ($Assets = Liabilities + Equity$) we wszystkich 180 okresach miesięcznych w obu trybach rozliczeń.
     - Weryfikacja tożsamości sumy miesięcznych zaliczek YTD z rocznym podatkiem CIT ($\sum_{m=1}^{12} \text{CIT}_m \equiv \text{CIT}_{rok}$) dla wszystkich 15 lat.
@@ -714,23 +714,29 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
   - Rozszerzenie zestawu testów jednostkowych Vitest w `SensitivityCockpitView.test.jsx` (14 testów) oraz pełna weryfikacja regresji (482 testy Vitest, 603 testy PHPUnit).
 
 - [x] **Faza 51: Wyeliminowanie krytycznych rozbieżności między silnikiem przepływów pieniężnych a modułem audytu kowenantów LMA (Commity 246–248)**
-  - [x] Wyeliminowanie rozbieżności Cash Flow dotacji unijnych (EU Grants) i guardraile wskaźników płynności w audycie kowenantów LMA (`BankingCovenantsStrip` & `financialCalculations.ts`).
+  -  Wyeliminowanie rozbieżności Cash Flow dotacji unijnych (EU Grants) i guardraile wskaźników płynności w audycie kowenantów LMA (`BankingCovenantsStrip` & `financialCalculations.ts`).
     - Likwidacja sztucznej 10-milionowej dziury płynnościowej w fazie CAPEX poprzez włączenie transz dotacji unijnych (`grant_disbursement_schedule` oraz fallback na zakończenie kwalifikowanych etapów CAPEX) do miesięcznych przepływów finansowych Web Workera (`fcf = debtDrawdown + grantReceived - debtRepaid - upfrontFee`) oraz rocznych agregacji `grantReceived` w Cash Flow Statement.
     - Wprowadzenie dynamicznych kontenerów (tło/obramowanie `bg-zinc-950/70 border-zinc-800` vs `bg-rose-950/20 border-rose-800/40`) oraz kolorystyki kafelków Płynności Bieżącej (CR) i Rezerwy DSRF w `BankingCovenantsStrip.jsx`.
     - Trójstopniowa logiczna ewaluacja statusów bankowych: dla CR (`ZGODNY`, `OSTRZEŻENIE`, `DEFICYT PŁYNNOŚCI`) i DSRF (`ZABEZPIECZONE`, `NISKI BUFOR`, `BRAK REZERWY`), eliminująca mylące, statyczne etykiety.
     - Rygorystyczne guardraile prezentacyjne zapobiegające wyświetlaniu ujemnych wartości wskaźników płynności i buforów czasowych: automatyczna konwersja wartości ujemnych do `0.00x (Deficyt NWC)` dla CR oraz `0.0 m. (Luka gotówkowa)` dla DSRF na kafelkach, w opisach naruszeń kowenantów oraz w 15-letniej tabeli analitycznej.
     - Zestaw dedykowanych testów w `BankingCovenantsStrip.test.jsx` oraz `investmentCalculationWorker.test.js`, osiągający 100% PASS w pełnym pakiecie Vitest (52 pliki testowe, 486 testów).
-  - [x] Wdrożenie wskaźnika LLCR (Loan Life Coverage Ratio), dedykowanego bufora DSRA oraz asystenta dokapitalizowania naprawczego (Equity Cure Simulator).
+  -  Wdrożenie wskaźnika LLCR (Loan Life Coverage Ratio), dedykowanego bufora DSRA oraz asystenta dokapitalizowania naprawczego (Equity Cure Simulator).
     - Implementacja formuły LLCR (Loan Life Coverage Ratio) według standardu Loan Market Association (LMA) dla Project Finance: $\text{LLCR}_t = \frac{\sum_{i=t}^{\text{tenor}} \frac{\text{CFADS}_i}{(1 + K_d)^{i-t}} + \text{Rezerwa DSRA}_t}{\text{Saldo Zadłużenia}_t}$ z dyskontowaniem stopą $K_d$ i wyznaczaniem `minLlcr`, `avgLlcr` oraz `llcrHeadroom`.
     - Bilansowe wyodrębnienie rezerwy DSRA (`dsraReserve`: środki zablokowane na rachunku escrow w wysokości 6 miesięcy obsługi zadłużenia) od wolnych środków pieniężnych (`freeCash = closingCash - dsraReserve`), z automatycznym zwolnieniem rezerwy do wolnej gotówki po całkowitej spłacie długu.
     - Autonomiczny silnik Deal Advisory kalkulacji zastrzyku naprawczego (`calculateEquityCureRequirement`), wyliczający skumulowaną kwotę wsparcia kapitałowego w PLN, szczytowy transfer roczny, harmonogram transz z przyczynami deficytu oraz rekomendacjami instrumentów strukturyzacyjnych (pożyczka podporządkowana, kredyt obrotowy, akredytywa Standby LC).
     - Oficjalny Certyfikat Bankowalności LMA (Project Bankability Certificate) generowany w pod-zakładce wąskiego gardła dla projektów spełniających wszystkie wymogi ostrożnościowe komitetu kredytowego.
     - Rozszerzenie paska `BankingCovenantsStrip.jsx` o 6. kafelek KPI (LLCR), kolumnę LLCR w 15-letniej rocznej matrycy kowenantów, interaktywny suwak progu LLCR w konfiguratorze oraz dynamiczny panel Equity Cure vs Certyfikat LMA.
     - Zestaw dedykowanych testów jednostkowych Vitest w `investmentCalculationWorker.test.js` (32 testy) i `BankingCovenantsStrip.test.jsx` (17 testów) oraz pełna spójność bilansowa $Aktywa = Pasywa$.
-  - [x] Kompleksowe testy integracyjne i regresyjne w PHPUnit oraz Vitest dla modułu kowenantów LMA, rezerwy DSRA i certyfikacji bankowalności.
+  -  Kompleksowe testy integracyjne i regresyjne w PHPUnit oraz Vitest dla modułu kowenantów LMA, rezerwy DSRA i certyfikacji bankowalności.
     - Opracowanie backendowego pakietu testów integracyjnych w `tests/Feature/InvestmentProject/ProjectFinanceLmaCovenantsIntegrationTest.php` (4 testy, 148 asercji): weryfikacja zapisu i izolacji multi-tenant harmonogramu dotacji w strukturze finansowania, zerowej wariancji 15-letniego bilansu (Assets = Liabilities + Equity) przy spłacie długu senioralnego i dotacjach unijnych, profilu spłaty długu LMA (CFADS i obsługa długu w 120-miesięcznym tenorze z karencją) oraz ekspozycji API.
     - Opracowanie frontendowego pakietu testów integracyjnych w `resources/js/tests/integration/phase51CovenantsAndProjectFinanceIntegration.test.jsx` (6 testów): weryfikacja 15-letniej symulacji z separacją rezerwy DSRA i zerową wariancją gotówkową, formuły dyskontowania LLCR stopą Kd z uwzględnieniem bufora DSRA, reguł prezentacyjnych LMA (brak ujemnych wartości dla CR i DSRF), algorytmu Deal Advisory Equity Cure dla projektów zagrożonych, certyfikatu bankowalności LMA dla projektów w 100% bankowalnych oraz interaktywnego suwaka progów i presetów bankowych.
     - Zapewnienie 100% zielonego wyniku testów: 607 testów PHPUnit (8063 asercje) oraz 500 testów Vitest (53 pliki testowe).
+
+- [ ] **Faza 52: Uszczelnienie Bezpieczeństwa Multi-Tenant, Integralność Audytu WORM i Poprawki Krytyczne (Commity 249–253)**
+  - [x] Harmonizacja weryfikacji dostępu multi-tenant w `DocumentController` za pomocą `User::canAccessCompany` (Commit 249).
+    - Likwidacja sztucznej blokady `403 Forbidden` dla użytkowników z rolą `super_admin` oraz Doradców transakcyjnych (`advisor`) przypisanych do spółek przez relację `advisor_company`.
+    - Zastąpienie sztywnego porównania roli `'admin'` i `company_id` domenową metodą `$user->canAccessCompany($companyId)`.
+    - Pełna integracja autoryzacji domenowej w metodach `show`, `download`, `update`, `archive`, `destroy` oraz `auditLogs`.
 
 ---
 

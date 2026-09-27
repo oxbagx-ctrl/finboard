@@ -313,7 +313,7 @@ final class DocumentController
 
     private function ensureCanAccessCompany(User $user, string $companyId): void
     {
-        if ($user->role !== 'admin' && (string) $user->company_id !== $companyId) {
+        if (!$user->canAccessCompany($companyId)) {
             throw new AccessDeniedHttpException('Brak uprawnień do zasobów wirtualnego pokoju danych innej firmy.');
         }
     }
