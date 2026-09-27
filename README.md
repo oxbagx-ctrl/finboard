@@ -886,6 +886,12 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Weryfikacja kryteriów WCAG: Dismissible (klawisz Escape bez utraty fokusu), Hoverable (bezpieczne najechanie na treść podpowiedzi), Persistent (brak przedwczesnego wygasania).
     - Potwierdzenie bezkolizyjnego współistnienia w DOM i nasłuchiwaczach pomiędzy dymkami UI a wykresem Recharts (`CustomChartTooltip`).
     - 100% PASS w pełnym zestawie testów Vitest oraz pomyślna kompilacja produkcyjna (`npm run build`).
+  - [x] Wdrożenie dostępnych podpowiedzi Tooltip i InfoTooltip w widoku Pulpitu Zarządczego (Executive Overview).
+    - Rozszerzenie `MetricCard` o obsługę `tooltipContent` z dedykowaną ikonką `<InfoTooltip size="xs" />`.
+    - Dostępne objaśnienia metodologiczne dla 4 głównych kart KPI: Przychody ze Sprzedaży, Wynik EBITDA, Zysk Operacyjny (EBIT) oraz Wskaźnik Płynności Bieżącej.
+    - Zastąpienie natywnego `title="..."` na przycisku celów benchmarkowych M&A oraz dodanie podpowiedzi dla odznaki spółki, NIP, filtru zakresu, waluty i silnika CQRS/DDD.
+    - Wzbogacenie nagłówków i przełączników wykresów (`TREND P&L` / `PŁYNNOŚĆ CR/QR`) oraz dziennika audytowego WORM (`AuditTrailSnippet`) o interaktywne dymki.
+    - Weryfikacja testowa: `MetricCard.test.jsx` (4/4), `DashboardView.test.jsx` (9/9), `dashboardViewE2EWorkflow.test.jsx` (6/6).
 
 ---
 

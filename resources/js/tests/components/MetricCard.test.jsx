@@ -78,4 +78,18 @@ describe('MetricCard Component', () => {
         expect(screen.getByText(/2\s*500\s*000/)).toBeInTheDocument();
         expect(screen.getByText('+15.5%')).toBeInTheDocument();
     });
+
+    it('renders accessible InfoTooltip next to title when tooltipContent is provided', () => {
+        render(
+            <MetricCard
+                title="Wynik EBITDA"
+                value={1200000}
+                currency="PLN"
+                tooltipContent="Zysk operacyjny przed potrąceniem odsetek, podatków i amortyzacji."
+            />
+        );
+
+        const infoBtn = screen.getByRole('button', { name: 'Informacje o: Wynik EBITDA' });
+        expect(infoBtn).toBeInTheDocument();
+    });
 });

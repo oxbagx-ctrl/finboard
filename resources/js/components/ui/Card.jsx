@@ -1,6 +1,7 @@
 import React from 'react';
 import { FinancialValue } from './FinancialValue';
 import { PercentageBadge } from './PercentageBadge';
+import { InfoTooltip } from './Tooltip';
 
 export const Card = ({ children, className = '', title, subtitle, action }) => {
     return (
@@ -30,6 +31,7 @@ export const MetricCard = ({
     isRatio = false,
     ratioSuffix = 'x',
     className = '',
+    tooltipContent = null,
 }) => {
     const isFallback = value === null || value === undefined || value === '—' || value === '-' || value === 'N/A';
     const displayValue = isFallback ? '—' : value;
@@ -37,9 +39,19 @@ export const MetricCard = ({
     return (
         <div className={`bg-zinc-900 border border-zinc-800 rounded-lg p-4 shadow-sm relative group hover:border-zinc-700 transition-colors ${className}`}>
             <div className="flex items-center justify-between mb-2.5">
-                <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-zinc-400">{title}</span>
+                <div className="flex items-center gap-1.5 min-w-0">
+                    <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-zinc-400 truncate">{title}</span>
+                    {tooltipContent && (
+                        <InfoTooltip
+                            content={tooltipContent}
+                            title={typeof title === 'string' ? title : undefined}
+                            ariaLabel={`Informacje o: ${title}`}
+                            size="xs"
+                        />
+                    )}
+                </div>
                 {Icon && (
-                    <div className="w-6 h-6 rounded bg-zinc-950 border border-zinc-800 flex items-center justify-center text-zinc-400">
+                    <div className="w-6 h-6 rounded bg-zinc-950 border border-zinc-800 flex items-center justify-center text-zinc-400 shrink-0">
                         <Icon className="w-3.5 h-3.5" />
                     </div>
                 )}

@@ -12,6 +12,7 @@ import { BenchmarkConfigModal } from '../components/benchmarks/BenchmarkConfigMo
 import { PnlTrendChart } from '../components/charts/PnlTrendChart';
 import { CostBreakdownChart } from '../components/charts/CostBreakdownChart';
 import { LiquidityTrendChart } from '../components/charts/LiquidityTrendChart';
+import { Tooltip, InfoTooltip } from '../components/ui/Tooltip';
 import { formatCurrency, formatDelta } from '../utils/formatters';
 import {
     DollarSign,
@@ -382,38 +383,50 @@ export const DashboardView = () => {
                     <div>
                         <div className="text-xs font-bold text-zinc-100 flex items-center gap-2 font-mono">
                             <span>{activeCompany?.name || 'Spółka Portfelowa'}</span>
-                            <Badge variant="default" size="sm">{activeCompany?.code || 'PODMIOT'}</Badge>
+                            <Tooltip content="Kod identyfikacyjny podmiotu w portfelu Deal Advisory">
+                                <Badge variant="default" size="sm">{activeCompany?.code || 'PODMIOT'}</Badge>
+                            </Tooltip>
                             <span className="text-zinc-600 font-normal">|</span>
-                            <span className="text-zinc-400 font-normal text-[11px]">NIP: {activeCompany?.tax_id || '525-24-11-980'}</span>
+                            <Tooltip content="Numer Identyfikacji Podatkowej podmiotu zarejestrowany w KRS">
+                                <span className="text-zinc-400 font-normal text-[11px] cursor-help">NIP: {activeCompany?.tax_id || '525-24-11-980'}</span>
+                            </Tooltip>
                         </div>
-                        <div className="text-[10px] text-zinc-500 flex items-center gap-1.5 mt-0.5 font-mono">
-                            <Calendar className="w-3 h-3 text-zinc-600" />
-                            <span>FILTR ZAKRESU: {dateRange?.label?.toUpperCase() || 'CAŁY OKRES'}</span>
-                        </div>
+                        <Tooltip content="Zakres dat i horyzont czasowy dla skonsolidowanych danych finansowych">
+                            <div className="text-[10px] text-zinc-500 flex items-center gap-1.5 mt-0.5 font-mono cursor-help">
+                                <Calendar className="w-3 h-3 text-zinc-600" />
+                                <span>FILTR ZAKRESU: {dateRange?.label?.toUpperCase() || 'CAŁY OKRES'}</span>
+                            </div>
+                        </Tooltip>
                     </div>
                 </div>
 
                 <div className="flex items-center gap-3 text-[11px] font-mono text-zinc-400">
                     {(isAdmin || isAdvisor) && (
-                        <button
-                            type="button"
-                            onClick={() => setIsBenchmarkModalOpen(true)}
-                            className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-zinc-800 hover:bg-zinc-750 text-zinc-200 border border-zinc-700 hover:border-zinc-600 text-xs transition-colors"
-                            title="Konfiguracja celów benchmarkowych spółki"
-                        >
-                            <Sliders className="w-3.5 h-3.5 text-emerald-400" />
-                            <span>Cele Benchmarkowe (M&A)</span>
-                        </button>
+                        <Tooltip content="Konfiguracja celów benchmarkowych spółki (progi M&A, wskaźniki płynności i marżowości)">
+                            <button
+                                type="button"
+                                onClick={() => setIsBenchmarkModalOpen(true)}
+                                className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-zinc-800 hover:bg-zinc-750 text-zinc-200 border border-zinc-700 hover:border-zinc-600 text-xs transition-colors"
+                                aria-label="Konfiguracja celów benchmarkowych spółki"
+                            >
+                                <Sliders className="w-3.5 h-3.5 text-emerald-400" />
+                                <span>Cele Benchmarkowe (M&A)</span>
+                            </button>
+                        </Tooltip>
                     )}
-                    <div className="flex items-center gap-1.5">
-                        <Coins className="w-3.5 h-3.5 text-zinc-500" />
-                        <span className="text-zinc-300 text-[10px]">WALUTA: {currency}</span>
-                    </div>
+                    <Tooltip content="Waluta sprawozdawcza aktywnego podglądu (przeliczana w locie)">
+                        <div className="flex items-center gap-1.5 cursor-help">
+                            <Coins className="w-3.5 h-3.5 text-zinc-500" />
+                            <span className="text-zinc-300 text-[10px]">WALUTA: {currency}</span>
+                        </div>
+                    </Tooltip>
                     <span className="text-zinc-700 hidden sm:inline">|</span>
-                    <div className="items-center gap-1.5 hidden sm:flex">
-                        <Cpu className="w-3.5 h-3.5 text-zinc-500" />
-                        <span className="text-[10px] text-zinc-400">ENGINE: CQRS / DDD</span>
-                    </div>
+                    <Tooltip content="Silnik analityczny oparty na architekturze CQRS i Domain-Driven Design (DDD)">
+                        <div className="items-center gap-1.5 hidden sm:flex cursor-help">
+                            <Cpu className="w-3.5 h-3.5 text-zinc-500" />
+                            <span className="text-[10px] text-zinc-400">ENGINE: CQRS / DDD</span>
+                        </div>
+                    </Tooltip>
                 </div>
             </div>
 
@@ -426,6 +439,7 @@ export const DashboardView = () => {
                     icon={DollarSign}
                     change={yoyRevenueGrowth}
                     subtitle={yoyRevenueGrowth != null ? `DYNAMIKA R/R (${yoyRevenueGrowth > 0 ? '+' : ''}${yoyRevenueGrowth.toFixed(1)}%)` : 'DYNAMIKA R/R'}
+                    tooltipContent="Całkowite skonsolidowane przychody operacyjne netto ze sprzedaży produktów, towarów i usług w wybranym okresie."
                 />
 
                 <MetricCard
@@ -435,6 +449,7 @@ export const DashboardView = () => {
                     icon={TrendingUp}
                     change={yoyEbitdaGrowth}
                     subtitle={`MARŻA: ${(ebitdaMargin * 100).toFixed(1)}%`}
+                    tooltipContent="Zysk operacyjny przed potrąceniem odsetek, podatków i amortyzacji (EBITDA). Kluczowa miara gotówkowego wyniku operacyjnego."
                 />
 
                 <MetricCard
@@ -444,6 +459,7 @@ export const DashboardView = () => {
                     icon={PieChart}
                     change={yoyEbitGrowth}
                     subtitle={`MARŻA: ${(operatingMargin * 100).toFixed(1)}%`}
+                    tooltipContent="Zysk operacyjny (Operating Profit / EBIT) po uwzględnieniu odpisów amortyzacji. Odzwierciedla rentowność operacyjną spółki."
                 />
 
                 <MetricCard
@@ -454,6 +470,7 @@ export const DashboardView = () => {
                     icon={ShieldAlert}
                     change={yoyCurrentRatioDiff}
                     subtitle={crSubtitle}
+                    tooltipContent="Relacja aktywów obrotowych do zobowiązań krótkoterminowych (Current Ratio). Benchmark rynkowy wynosi min. 1.20x."
                 />
             </div>
 
@@ -479,7 +496,15 @@ export const DashboardView = () => {
                         <div>
                             <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-100 flex items-center gap-2">
                                 <BarChart3 className="w-3.5 h-3.5 text-zinc-400" />
-                                {chartMode === 'pnl' ? 'DYNAMIKA WYNIKOWA P&L (PRZYCHODY / EBITDA / OPEX)' : 'EWOLUCJA WSKAŹNIKÓW PŁYNNOŚCI (CR / QR)'}
+                                <span>{chartMode === 'pnl' ? 'DYNAMIKA WYNIKOWA P&L (PRZYCHODY / EBITDA / OPEX)' : 'EWOLUCJA WSKAŹNIKÓW PŁYNNOŚCI (CR / QR)'}</span>
+                                <InfoTooltip
+                                    content={chartMode === 'pnl'
+                                        ? 'Miesięczna ewolucja przychodów, kosztów operacyjnych OPEX, zysku EBITDA oraz wyniku netto w układzie porównawczym.'
+                                        : 'Wskaźniki płynności finansowej: bieżącej (Current Ratio) oraz szybkiej (Quick Ratio) w poszczególnych miesiącach.'
+                                    }
+                                    ariaLabel="Informacje o wykresie trendów"
+                                    size="xs"
+                                />
                             </h3>
                             <p className="text-[10px] font-mono text-zinc-500 mt-0.5">
                                 Horyzont miesięczny skonsolidowany | Seria czasowa PSR
@@ -488,26 +513,34 @@ export const DashboardView = () => {
 
                         {/* Chart View Switcher */}
                         <div className="flex items-center gap-1 bg-zinc-950 p-1 rounded border border-zinc-800 text-[10px] font-mono">
-                            <button
-                                onClick={() => setChartMode('pnl')}
-                                className={`px-2.5 py-1 rounded transition-colors ${
-                                    chartMode === 'pnl'
-                                        ? 'bg-zinc-800 text-zinc-100 font-bold'
-                                        : 'text-zinc-500 hover:text-zinc-300'
-                                }`}
-                            >
-                                TREND P&L
-                            </button>
-                            <button
-                                onClick={() => setChartMode('liquidity')}
-                                className={`px-2.5 py-1 rounded transition-colors ${
-                                    chartMode === 'liquidity'
-                                        ? 'bg-zinc-800 text-zinc-100 font-bold'
-                                        : 'text-zinc-500 hover:text-zinc-300'
-                                }`}
-                            >
-                                PŁYNNOŚĆ CR/QR
-                            </button>
+                            <Tooltip content="Przełącz na wieloletni i miesięczny trend pozycji Rachunku Zysków i Strat (P&L)">
+                                <button
+                                    type="button"
+                                    onClick={() => setChartMode('pnl')}
+                                    aria-label="Pokaż trend wyników P&L"
+                                    className={`px-2.5 py-1 rounded transition-colors ${
+                                        chartMode === 'pnl'
+                                            ? 'bg-zinc-800 text-zinc-100 font-bold'
+                                            : 'text-zinc-500 hover:text-zinc-300'
+                                    }`}
+                                >
+                                    TREND P&L
+                                </button>
+                            </Tooltip>
+                            <Tooltip content="Przełącz na wykres płynności finansowej i ewolucji wskaźników Current Ratio i Quick Ratio">
+                                <button
+                                    type="button"
+                                    onClick={() => setChartMode('liquidity')}
+                                    aria-label="Pokaż wykres płynności CR i QR"
+                                    className={`px-2.5 py-1 rounded transition-colors ${
+                                        chartMode === 'liquidity'
+                                            ? 'bg-zinc-800 text-zinc-100 font-bold'
+                                            : 'text-zinc-500 hover:text-zinc-300'
+                                    }`}
+                                >
+                                    PŁYNNOŚĆ CR/QR
+                                </button>
+                            </Tooltip>
                         </div>
                     </div>
 
@@ -530,7 +563,12 @@ export const DashboardView = () => {
                     <div className="border-b border-zinc-800 pb-3 mb-3">
                         <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-100 flex items-center gap-2">
                             <Activity className="w-3.5 h-3.5 text-zinc-400" />
-                            Struktura Kosztów Operacyjnych
+                            <span>Struktura Kosztów Operacyjnych</span>
+                            <InfoTooltip
+                                content="Udział poszczególnych kategorii rodzajowych (COGS, wynagrodzenia, usługi obce, IT) w całkowitej bazie kosztów operacyjnych spółki."
+                                ariaLabel="Informacje o strukturze kosztów operacyjnych"
+                                size="xs"
+                            />
                         </h3>
                         <p className="text-[10px] font-mono text-zinc-500 mt-0.5">
                             Rozbicie według kategorii rodzajowych

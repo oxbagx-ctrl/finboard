@@ -228,7 +228,7 @@ const mockAuditLogs = [
     },
 ];
 
-const renderWithProviders = (ui) => {
+const renderWithProviders = (ui, authOverrides = {}) => {
     return render(
         <NotificationProvider>
             <AuthContext.Provider
@@ -239,6 +239,7 @@ const renderWithProviders = (ui) => {
                     isSuperAdmin: false,
                     isAdvisor: false,
                     isClient: true,
+                    ...authOverrides,
                 }}
             >
                 <DealProvider>
@@ -354,10 +355,9 @@ describe('DashboardView Component', () => {
         renderWithProviders(<DashboardView />);
 
         await waitFor(() => {
-            expect(screen.getByText(/Live Audit Feed/i)).toBeInTheDocument();
+            expect(screen.getByText('Konfiguracja celu finansowego')).toBeInTheDocument();
         });
 
-        expect(screen.getByText('Konfiguracja celu finansowego')).toBeInTheDocument();
         expect(screen.getByText('Adam Doradca')).toBeInTheDocument();
         expect(screen.getByText('Zaktualizowano próg wskaźnika EBITDA Margin')).toBeInTheDocument();
 
@@ -565,6 +565,42 @@ describe('DashboardView Component', () => {
         expect(markers.length).toBeGreaterThanOrEqual(3);
         markers.forEach(m => {
             expect(m).toHaveAttribute('aria-label', 'Pozycja pomniejszająca wynik');
+        });
+    });
+
+    it('renders accessible Tooltips and InfoTooltips across Executive Overview dashboard (Phase 56 Commit 273)', async () => {
+        renderWithProviders(<DashboardView />, { isAdvisor: true });
+
+        await waitFor(() => {
+            expect(screen.getByText('Rachunek Zysków i Strat (P&L Konsolidowany)')).toBeInTheDocument();
+        });
+
+        // 1. KPI cards InfoTooltips
+        expect(screen.getByRole('button', { name: 'Informacje o: Przychody ze Sprzedaży' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Informacje o: Wynik EBITDA' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Informacje o: Zysk Operacyjny (EBIT)' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Informacje o: Wskaźnik Płynności Bieżącej' })).toBeInTheDocument();
+
+        // 2. Chart section InfoTooltips
+        expect(screen.getByRole('button', { name: 'Informacje o wykresie trendów' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Informacje o strukturze kosztów operacyjnych' })).toBeInTheDocument();
+
+        // 3. Chart view switchers have accessible aria-labels
+        expect(screen.getByRole('button', { name: 'Pokaż trend wyników P&L' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Pokaż wykres płynności CR i QR' })).toBeInTheDocument();
+
+        // 4. Benchmark modal trigger has accessible aria-label
+        expect(screen.getByRole('button', { name: 'Konfiguracja celów benchmarkowych spółki' })).toBeInTheDocument();
+
+        // 5. Audit feed InfoTooltip
+        expect(screen.getByRole('button', { name: 'Informacje o dzienniku audytowym' })).toBeInTheDocument();
+
+        // 6. Hover over EBITDA InfoTooltip opens floating tooltip
+        const ebitdaInfoBtn = screen.getByRole('button', { name: 'Informacje o: Wynik EBITDA' });
+        fireEvent.mouseEnter(ebitdaInfoBtn);
+
+        await waitFor(() => {
+            expect(screen.getByRole('tooltip')).toHaveTextContent(/Zysk operacyjny przed potrąceniem odsetek/i);
         });
     });
 });

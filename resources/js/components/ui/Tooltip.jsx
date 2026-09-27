@@ -183,6 +183,13 @@ export function Tooltip({
     );
 }
 
+const SIZE_PRESETS = {
+    xs: { px: 12, cls: 'w-3 h-3' },
+    sm: { px: 13, cls: 'w-3.5 h-3.5' },
+    md: { px: 16, cls: 'w-4 h-4' },
+    lg: { px: 20, cls: 'w-5 h-5' },
+};
+
 /**
  * Dedicated ergonomic info/metric tooltip rendering an icon button trigger
  */
@@ -190,7 +197,7 @@ export function InfoTooltip({
     content,
     title,
     ariaLabel = 'Więcej informacji',
-    size = 13,
+    size = 'sm',
     icon = 'info',
     className = '',
     iconClassName = '',
@@ -202,6 +209,18 @@ export function InfoTooltip({
     const IconComponent = typeof icon === 'function' 
         ? icon 
         : (icon === 'help' ? HelpCircle : Info);
+
+    const preset = typeof size === 'string' && SIZE_PRESETS[size]
+        ? SIZE_PRESETS[size]
+        : typeof size === 'number'
+            ? {
+                px: size,
+                cls: size <= 12 ? 'w-3 h-3' : size <= 14 ? 'w-3.5 h-3.5' : size <= 16 ? 'w-4 h-4' : 'w-5 h-5'
+            }
+            : SIZE_PRESETS.sm;
+
+    const numericSize = preset.px;
+    const sizeClass = preset.cls;
 
     const tooltipBody = title ? (
         <div className="space-y-1">
@@ -230,14 +249,14 @@ export function InfoTooltip({
                 className={clsx(
                     'inline-flex items-center justify-center text-zinc-500 hover:text-zinc-200',
                     'focus:outline-none focus-visible:ring-1 focus-visible:ring-brand-500 rounded p-0.5',
-                    'transition-colors cursor-help shrink-0 align-middle',
+                    'transition-colors cursor-help shrink-0 align-middle leading-none',
                     className
                 )}
                 onClick={(e) => e.stopPropagation()}
             >
                 <IconComponent
-                    size={size}
-                    className={clsx('shrink-0', iconClassName)}
+                    size={numericSize}
+                    className={clsx('shrink-0', sizeClass, iconClassName)}
                     aria-hidden="true"
                 />
             </button>

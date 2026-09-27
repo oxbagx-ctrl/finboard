@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import apiClient from '../../api/client';
 import { Terminal, ShieldCheck, Activity } from 'lucide-react';
+import { Tooltip, InfoTooltip } from './Tooltip';
 
 export const AuditTrailSnippet = ({ className = '', logs: propLogs = null }) => {
     const [logs, setLogs] = useState(propLogs || []);
@@ -73,11 +74,18 @@ export const AuditTrailSnippet = ({ className = '', logs: propLogs = null }) => 
                 <div className="flex items-center gap-2 text-zinc-300">
                     <Terminal className="w-3.5 h-3.5 text-zinc-400" />
                     <span className="font-semibold uppercase text-[11px]">Dziennik Audytowy Ścieżki Nadzoru (Live Audit Feed)</span>
+                    <InfoTooltip
+                        content="Niezmienny rejestr zdarzeń transakcyjnych i operacji finansowych (WORM - Write Once, Read Many). Rejestruje modyfikacje, pobrania oraz zdarzenia kontrolne."
+                        ariaLabel="Informacje o dzienniku audytowym"
+                        size="xs"
+                    />
                 </div>
-                <div className="flex items-center gap-2 text-[10px] text-zinc-500">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span>LOGGING ACTIVE // IMMUTABLE</span>
-                </div>
+                <Tooltip content="Rejestr WORM: wpisy są kryptograficznie zabezpieczone przed usunięciem lub modyfikacją">
+                    <div className="flex items-center gap-2 text-[10px] text-zinc-500 cursor-help">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span>LOGGING ACTIVE // IMMUTABLE</span>
+                    </div>
+                </Tooltip>
             </div>
 
             <div className="overflow-x-auto">
@@ -120,8 +128,22 @@ export const AuditTrailSnippet = ({ className = '', logs: propLogs = null }) => 
                                         <td className="py-2 px-4 text-zinc-500 tabular-nums whitespace-nowrap">{timeStr}</td>
                                         <td className="py-2 px-3 font-semibold text-zinc-200 whitespace-nowrap">{actionText}</td>
                                         <td className="py-2 px-3 text-zinc-400 whitespace-nowrap">{actorText}</td>
-                                        <td className="py-2 px-3 text-zinc-300 max-w-xs truncate" title={resourceText}>{resourceText}</td>
-                                        <td className="py-2 px-3 text-zinc-500 tabular-nums">{entityIdText}</td>
+                                        <td className="py-2 px-3 text-zinc-300 max-w-xs truncate">
+                                            {resourceText ? (
+                                                <Tooltip content={resourceText}>
+                                                    <span className="truncate block cursor-default">{resourceText}</span>
+                                                </Tooltip>
+                                            ) : '—'}
+                                        </td>
+                                        <td className="py-2 px-3 text-zinc-500 tabular-nums">
+                                            {log.entity_id ? (
+                                                <Tooltip content={`Identyfikator encji: ${log.entity_id}`}>
+                                                    <span className="cursor-help">{entityIdText}</span>
+                                                </Tooltip>
+                                            ) : (
+                                                entityIdText
+                                            )}
+                                        </td>
                                         <td className="py-2 px-4 text-right whitespace-nowrap">
                                             <span className={`px-1.5 py-0.5 rounded text-[9px] font-mono uppercase border ${badgeClass}`}>
                                                 {categoryText}
