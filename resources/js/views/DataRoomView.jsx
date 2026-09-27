@@ -6,6 +6,7 @@ import { Button } from '../components/ui/Button';
 import { DataRoomStats } from '../components/dataroom/DataRoomStats';
 import { DocumentTable } from '../components/dataroom/DocumentTable';
 import { FolderTreeNav } from '../components/dataroom/FolderTreeNav';
+import { CreateFolderModal } from '../components/dataroom/CreateFolderModal';
 import { DocumentUploadModal } from '../components/dataroom/DocumentUploadModal';
 import { DocumentEditModal } from '../components/dataroom/DocumentEditModal';
 import { DocumentAuditModal } from '../components/dataroom/DocumentAuditModal';
@@ -23,7 +24,8 @@ import {
     ChevronRight,
     ExternalLink,
     FolderTree,
-    Folder
+    Folder,
+    FolderPlus
 } from 'lucide-react';
 
 const CATEGORY_TABS = [
@@ -56,6 +58,8 @@ export const DataRoomView = () => {
     const [selectedFolderId, setSelectedFolderId] = useState('');
     const [initLoading, setInitLoading] = useState(false);
     const [isFolderSidebarOpen, setIsFolderSidebarOpen] = useState(true);
+    const [isCreateFolderOpen, setIsCreateFolderOpen] = useState(false);
+    const [createFolderParentId, setCreateFolderParentId] = useState('');
 
     // Filters
     const [selectedCategory, setSelectedCategory] = useState('');
@@ -291,6 +295,10 @@ export const DataRoomView = () => {
                             selectedFolderId={selectedFolderId}
                             onSelectFolder={(fId) => setSelectedFolderId(fId)}
                             onInitStandardFolders={handleInitStandardFolders}
+                            onOpenCreateFolder={() => {
+                                setCreateFolderParentId(selectedFolderId && selectedFolderId !== 'unassigned' ? selectedFolderId : '');
+                                setIsCreateFolderOpen(true);
+                            }}
                             loading={foldersLoading}
                             initLoading={initLoading}
                             totalCount={pagination.total}
@@ -428,6 +436,8 @@ export const DataRoomView = () => {
             <DocumentUploadModal
                 isOpen={isUploadOpen}
                 onClose={() => setIsUploadOpen(false)}
+                folders={folders}
+                defaultFolderId={selectedFolderId !== 'unassigned' ? selectedFolderId : ''}
                 onSuccess={() => {
                     fetchDocuments(1);
                     fetchFolders();
@@ -437,10 +447,24 @@ export const DataRoomView = () => {
             <DocumentEditModal
                 document={editingDoc}
                 isOpen={!!editingDoc}
+                folders={folders}
                 onClose={() => setEditingDoc(null)}
                 onSuccess={() => {
                     fetchDocuments(pagination.currentPage);
                     fetchFolders();
+                }}
+            />
+
+            <CreateFolderModal
+                isOpen={isCreateFolderOpen}
+                onClose={() => setIsCreateFolderOpen(false)}
+                folders={folders}
+                defaultParentId={createFolderParentId}
+                onSuccess={(newFolder) => {
+                    fetchFolders();
+                    if (newFolder?.id) {
+                        setSelectedFolderId(newFolder.id);
+                    }
                 }}
             />
 

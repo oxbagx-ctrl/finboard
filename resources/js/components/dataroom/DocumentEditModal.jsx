@@ -18,17 +18,42 @@ export const DocumentEditModal = ({
     isOpen,
     onClose,
     onSuccess,
+    folders = [],
 }) => {
     const { success, error } = useNotification();
     const [title, setTitle] = useState('');
     const [type, setType] = useState('financial_report');
+    const [folderId, setFolderId] = useState('');
+    const [indexCode, setIndexCode] = useState('');
     const [saving, setSaving] = useState(false);
     const [errors, setErrors] = useState({});
+
+    // Flatten tree folders for select list
+    const flattenedFolders = React.useMemo(() => {
+        const result = [];
+        const traverse = (items, depth = 0) => {
+            for (const item of items) {
+                result.push({
+                    id: item.id,
+                    index_code: item.index_code,
+                    name: item.name,
+                    depth,
+                });
+                if (item.children && item.children.length > 0) {
+                    traverse(item.children, depth + 1);
+                }
+            }
+        };
+        traverse(folders);
+        return result;
+    }, [folders]);
 
     useEffect(() => {
         if (document) {
             setTitle(document.title || '');
             setType(document.type || 'financial_report');
+            setFolderId(document.folder_id || '');
+            setIndexCode(document.index_code || '');
             setErrors({});
         }
     }, [document, isOpen]);
@@ -51,12 +76,26 @@ export const DocumentEditModal = ({
         setErrors({});
 
         try {
-            await apiClient.put(`/documents/${document.id}`, {
+            const payload = {
                 title: title.trim(),
                 type: type,
-            });
+            };
 
-            success('Zaktualizowano metadane dokumentu VDR.');
+            if (folderId) {
+                payload.folder_id = folderId;
+            } else if (document.folder_id) {
+                payload.folder_id = null;
+            }
+
+            if (indexCode.trim()) {
+                payload.index_code = indexCode.trim();
+            } else if (document.index_code) {
+                payload.index_code = null;
+            }
+
+            await apiClient.put(`/documents/${document.id}`, payload);
+
+            success('Zaktualizowano metadane i przypisanie folderu dokumentu VDR.');
             onSuccess();
             onClose();
         } catch (err) {
@@ -134,28 +173,80 @@ export const DocumentEditModal = ({
                         )}
                     </div>
 
-                    {/* Category */}
+                    {/* Category & Folder Row */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label className="block text-[10px] uppercase font-semibold text-zinc-400 mb-1">
+                                Kategoria Dokumentu *
+                            </label>
+                            <select
+                                value={type}
+                                onChange={(e) => setType(e.target.value)}
+                                className="w-full bg-zinc-950 border border-zinc-750 rounded px-3 py-2 text-xs text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
+                            >
+                                {DOCUMENT_CATEGORIES.map(cat => (
+                                    <option key={cat.value} value={cat.value} className="bg-zinc-950 text-zinc-100">
+                                        {cat.label}
+                                    </option>
+                                ))}
+                            </select>
+                            {errors.type && (
+                                <div className="text-[10px] text-rose-400 mt-1 flex items-center gap-1">
+                                    <AlertCircle className="w-3 h-3" />
+                                    {errors.type}
+                                </div>
+                            )}
+                        </div>
+
+                        <div>
+                            <label className="block text-[10px] uppercase font-semibold text-zinc-400 mb-1">
+                                Folder M&A (Dewey)
+                            </label>
+                            <select
+                                value={folderId}
+                                onChange={(e) => {
+                                    const val = e.target.value;
+                                    setFolderId(val);
+                                    if (val) {
+                                        const selected = flattenedFolders.find(f => f.id === val);
+                                        if (selected && (!indexCode || indexCode === '')) {
+                                            setIndexCode(`${selected.index_code}.01`);
+                                        }
+                                    }
+                                }}
+                                className="w-full bg-zinc-950 border border-zinc-750 rounded px-3 py-2 text-xs text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
+                            >
+                                <option value="">— Brak folderu (Nieprzypisany) —</option>
+                                {flattenedFolders.map(f => (
+                                    <option key={f.id} value={f.id} className="bg-zinc-950 text-zinc-100">
+                                        {'\u00A0'.repeat(f.depth * 2)}[{f.index_code}] {f.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+
+                    {/* Dewey Index Code */}
                     <div>
                         <label className="block text-[10px] uppercase font-semibold text-zinc-400 mb-1">
-                            Kategoria Taksonomiczna Due Diligence
+                            Kod Indeksu Dewey (np. 01.01.01)
                         </label>
-                        <select
-                            value={type}
-                            onChange={(e) => setType(e.target.value)}
-                            className="w-full bg-zinc-950 border border-zinc-750 rounded px-3 py-2 text-xs text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
-                        >
-                            {DOCUMENT_CATEGORIES.map(cat => (
-                                <option key={cat.value} value={cat.value} className="bg-zinc-950 text-zinc-100">
-                                    {cat.label}
-                                </option>
-                            ))}
-                        </select>
-                        {errors.type && (
+                        <input
+                            type="text"
+                            value={indexCode}
+                            onChange={(e) => setIndexCode(e.target.value)}
+                            placeholder="np. 01.01.01 (opcjonalny)"
+                            className="w-full bg-zinc-950 border border-zinc-750 rounded px-3 py-2 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
+                        />
+                        {errors.index_code && (
                             <div className="text-[10px] text-rose-400 mt-1 flex items-center gap-1">
                                 <AlertCircle className="w-3 h-3" />
-                                {errors.type}
+                                {errors.index_code}
                             </div>
                         )}
+                        <p className="text-[9px] text-zinc-500 mt-0.5">
+                            Hierarchiczny identyfikator dokumentu w taksonomii Dewey.
+                        </p>
                     </div>
 
                     {/* Actions */}

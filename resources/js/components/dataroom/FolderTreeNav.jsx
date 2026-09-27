@@ -3,6 +3,7 @@ import {
     Folder,
     FolderOpen,
     FolderTree,
+    FolderPlus,
     ChevronDown,
     ChevronRight,
     Sparkles,
@@ -16,6 +17,7 @@ export const FolderTreeNav = ({
     selectedFolderId = '',
     onSelectFolder,
     onInitStandardFolders,
+    onOpenCreateFolder,
     loading = false,
     initLoading = false,
     totalCount = 0,
@@ -94,6 +96,18 @@ export const FolderTreeNav = ({
                     </div>
                 )}
             </div>
+
+            {/* Action to create new folder */}
+            {onOpenCreateFolder && (
+                <button
+                    type="button"
+                    onClick={onOpenCreateFolder}
+                    className="w-full flex items-center justify-center gap-1.5 py-1.5 mb-2.5 rounded bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-white transition-all text-xs font-semibold"
+                >
+                    <FolderPlus className="w-3.5 h-3.5 text-emerald-400" />
+                    + Nowy Folder Dewey
+                </button>
+            )}
 
             {/* Quick selectors: All documents & Unassigned */}
             <div className="space-y-1 mb-2.5">

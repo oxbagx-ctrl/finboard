@@ -813,6 +813,12 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Wizualizacja odznak kodów Dewey (np. `01.01.01`) o wysokim kontraście oraz etykiet folderów nadrzędnych w tabeli `DocumentTable`.
     - Elastyczny, responsywny układ dwukolumnowy z możliwością ukrywania/pokazywania paska bocznego folderów i chipem aktywnego filtra.
     - 100% PASS w 53 plikach testowych Vitest (502 testy) oraz pełnym zestawie 662 testów PHPUnit (8469 asercji).
+  - [x] Modal tworzenia folderów CreateFolderModal i przypisywanie dokumentów w DataRoomView (Commit 262).
+    - Komponent `CreateFolderModal` do tworzenia niestandardowych folderów transakcyjnych (wybór rodzica z wcięciem głębokości, walidacja i dynamiczna sugestia prefiksów kodu Dewey, nazwa, opis, kolejność sortowania).
+    - Rozszerzenie `DocumentUploadModal` o wybór folderu docelowego i automatyczne uzupełnianie indeksu Dewey pliku.
+    - Rozszerzenie `DocumentEditModal` o możliwość przenoszenia dokumentów pomiędzy folderami, odpinania (`folder_id: null`) i aktualizacji indeksów Dewey.
+    - Integracja w `FolderTreeNav` (przycisk "+ Nowy Folder Dewey") oraz automatyczna synchronizacja liczników w `DataRoomView`.
+    - 100% PASS w 53 plikach testowych Vitest (502 testy) oraz pełnym pakiecie PHPUnit (662 testy).
 
 ---
 

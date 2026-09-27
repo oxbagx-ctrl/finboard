@@ -27,6 +27,8 @@ export const DocumentUploadModal = ({
     isOpen,
     onClose,
     onSuccess,
+    folders = [],
+    defaultFolderId = '',
 }) => {
     const { success, error } = useNotification();
     const fileInputRef = useRef(null);
@@ -34,9 +36,43 @@ export const DocumentUploadModal = ({
     const [file, setFile] = useState(null);
     const [title, setTitle] = useState('');
     const [type, setType] = useState('financial_report');
+    const [folderId, setFolderId] = useState('');
+    const [indexCode, setIndexCode] = useState('');
     const [isDragging, setIsDragging] = useState(false);
     const [uploading, setUploading] = useState(false);
     const [errors, setErrors] = useState({});
+
+    // Flatten tree folders for select list
+    const flattenedFolders = React.useMemo(() => {
+        const result = [];
+        const traverse = (items, depth = 0) => {
+            for (const item of items) {
+                result.push({
+                    id: item.id,
+                    index_code: item.index_code,
+                    name: item.name,
+                    depth,
+                });
+                if (item.children && item.children.length > 0) {
+                    traverse(item.children, depth + 1);
+                }
+            }
+        };
+        traverse(folders);
+        return result;
+    }, [folders]);
+
+    React.useEffect(() => {
+        if (isOpen) {
+            setFolderId(defaultFolderId || '');
+            if (defaultFolderId) {
+                const f = flattenedFolders.find(item => item.id === defaultFolderId);
+                if (f) {
+                    setIndexCode(`${f.index_code}.01`);
+                }
+            }
+        }
+    }, [isOpen, defaultFolderId, flattenedFolders]);
 
     if (!isOpen) return null;
 
@@ -105,6 +141,12 @@ export const DocumentUploadModal = ({
             formData.append('file', file);
             formData.append('title', title.trim());
             formData.append('type', type);
+            if (folderId) {
+                formData.append('folder_id', folderId);
+            }
+            if (indexCode.trim()) {
+                formData.append('index_code', indexCode.trim());
+            }
 
             await apiClient.post('/documents', formData, {
                 headers: {
@@ -131,6 +173,8 @@ export const DocumentUploadModal = ({
         setFile(null);
         setTitle('');
         setType('financial_report');
+        setFolderId('');
+        setIndexCode('');
         setErrors({});
         onClose();
     };
@@ -253,28 +297,86 @@ export const DocumentUploadModal = ({
                         )}
                     </div>
 
-                    {/* Category Selection */}
+                    {/* Category & Folder Selection Row */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label className="block text-[10px] uppercase font-semibold text-zinc-400 mb-1">
+                                Kategoria Dokumentu *
+                            </label>
+                            <select
+                                value={type}
+                                onChange={(e) => setType(e.target.value)}
+                                className="w-full bg-zinc-950 border border-zinc-750 rounded px-3 py-2 text-xs text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
+                            >
+                                {DOCUMENT_CATEGORIES.map(cat => (
+                                    <option key={cat.value} value={cat.value} className="bg-zinc-950 text-zinc-100">
+                                        {cat.label}
+                                    </option>
+                                ))}
+                            </select>
+                            {errors.type && (
+                                <div className="text-[10px] text-rose-400 mt-1 flex items-center gap-1">
+                                    <AlertCircle className="w-3 h-3" />
+                                    {errors.type}
+                                </div>
+                            )}
+                        </div>
+
+                        <div>
+                            <label className="block text-[10px] uppercase font-semibold text-zinc-400 mb-1">
+                                Folder M&A (Dewey)
+                            </label>
+                            <select
+                                value={folderId}
+                                onChange={(e) => {
+                                    const val = e.target.value;
+                                    setFolderId(val);
+                                    if (val) {
+                                        const selected = flattenedFolders.find(f => f.id === val);
+                                        if (selected && !indexCode) {
+                                            setIndexCode(`${selected.index_code}.01`);
+                                        }
+                                    }
+                                }}
+                                className="w-full bg-zinc-950 border border-zinc-750 rounded px-3 py-2 text-xs text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
+                            >
+                                <option value="">— Brak (Folder główny) —</option>
+                                {flattenedFolders.map(f => (
+                                    <option key={f.id} value={f.id} className="bg-zinc-950 text-zinc-100">
+                                        {'\u00A0'.repeat(f.depth * 2)}[{f.index_code}] {f.name}
+                                    </option>
+                                ))}
+                            </select>
+                            {errors.folder_id && (
+                                <div className="text-[10px] text-rose-400 mt-1 flex items-center gap-1">
+                                    <AlertCircle className="w-3 h-3" />
+                                    {errors.folder_id}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Dewey Index Code */}
                     <div>
                         <label className="block text-[10px] uppercase font-semibold text-zinc-400 mb-1">
-                            Kategoria Taksonomiczna Due Diligence
+                            Kod Indeksu Dewey (np. 01.01.01)
                         </label>
-                        <select
-                            value={type}
-                            onChange={(e) => setType(e.target.value)}
-                            className="w-full bg-zinc-950 border border-zinc-750 rounded px-3 py-2 text-xs text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
-                        >
-                            {DOCUMENT_CATEGORIES.map(cat => (
-                                <option key={cat.value} value={cat.value} className="bg-zinc-950 text-zinc-100">
-                                    {cat.label}
-                                </option>
-                            ))}
-                        </select>
-                        {errors.type && (
+                        <input
+                            type="text"
+                            value={indexCode}
+                            onChange={(e) => setIndexCode(e.target.value)}
+                            placeholder="np. 01.01.01 lub 02.01.03 (opcjonalny)"
+                            className="w-full bg-zinc-950 border border-zinc-750 rounded px-3 py-2 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
+                        />
+                        {errors.index_code && (
                             <div className="text-[10px] text-rose-400 mt-1 flex items-center gap-1">
                                 <AlertCircle className="w-3 h-3" />
-                                {errors.type}
+                                {errors.index_code}
                             </div>
                         )}
+                        <p className="text-[9px] text-zinc-500 mt-0.5">
+                            Pozycjonowanie dokumentu w drzewie Due Diligence wg standardu Dewey.
+                        </p>
                     </div>
 
                     {/* Security notice */}
