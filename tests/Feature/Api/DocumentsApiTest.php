@@ -384,5 +384,45 @@ final class DocumentsApiTest extends TestCase
             ->assertJsonPath('meta.current_page', 2)
             ->assertJsonPath('meta.per_page', 2);
     }
+
+    public function test_vdr_audit_logs_server_side_filtering_by_action_and_search(): void
+    {
+        Sanctum::actingAs($this->clientUser);
+
+        // Upload doc
+        $file = UploadedFile::fake()->createWithContent("audit_search_test.pdf", "CONTENT SEARCH");
+        $upload = $this->postJson('/api/v1/documents', [
+            'file' => $file,
+            'title' => "Sprawozdanie Finansowe Zarządu",
+            'type' => 'financial_report',
+        ]);
+        $upload->assertStatus(201);
+        $docId = $upload->json('data.id');
+
+        // Download doc to generate download log
+        $this->get('/api/v1/documents/' . $docId . '/download');
+
+        // Filter by action=download
+        $downloadOnly = $this->getJson('/api/v1/documents/audit-logs?action=download');
+        $downloadOnly->assertStatus(200);
+        foreach ($downloadOnly->json('data') as $log) {
+            $this->assertSame('download', $log['action']);
+        }
+
+        // Filter by action=upload
+        $uploadOnly = $this->getJson('/api/v1/documents/audit-logs?action=upload');
+        $uploadOnly->assertStatus(200);
+        foreach ($uploadOnly->json('data') as $log) {
+            $this->assertSame('upload', $log['action']);
+        }
+
+        // Filter by search query matching title
+        $searchResponse = $this->getJson('/api/v1/documents/audit-logs?' . http_build_query(['search' => 'Zarządu']));
+        $searchResponse->assertStatus(200);
+        $this->assertNotEmpty($searchResponse->json('data'));
+        foreach ($searchResponse->json('data') as $log) {
+            $this->assertStringContainsStringIgnoringCase('Zarządu', $log['document_title'] ?? '');
+        }
+    }
 }
 

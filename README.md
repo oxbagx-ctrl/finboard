@@ -761,6 +761,12 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Dwufazowa koordynacja: automatyczny rollback (`delete`) plików utworzonych w transakcji w przypadku `Throwable`, oraz odroczone fizyczne usuwanie plików (`stageDeletion`) dopiero po zatwierdzeniu transakcji DB.
     - Integracja w `DocumentController::store` oraz `DocumentController::destroy`.
     - Zestaw dedykowanych testów jednostkowych w `TransactionalStorageManagerTest.php` (5 testów, 14 asercji).
+  - [x] Wzorzec CQRS Query dla logów audytowych VDR z filtrowaniem serwerowym (Commit 255).
+    - Wprowadzenie `GetVdrAuditLogsQuery` oraz `GetVdrAuditLogsHandler` w warstwie Application modułu `DocumentManagement`.
+    - Filtrowanie po stronie SQL (backend) według typu zdarzenia (`action`: pojedyncza akcja lub lista oddzielona przecinkami) oraz frazy wyszukiwania (`search` z wykorzystaniem `ilike` po tytule dokumentu, nazwisku i adresie email użytkownika oraz adresie IP).
+    - Eliminacja problemu pustych stron przy paginacji dzięki przeniesieniu filtrowania przed zapytanie `paginate()`.
+    - Integracja handlera w metodach `allAuditLogs` oraz `auditLogs` w `DocumentController`.
+    - Dedykowane testy jednostkowe `GetVdrAuditLogsQueryTest` oraz weryfikacja endpointu REST w `DocumentsApiTest`.
 
 ---
 

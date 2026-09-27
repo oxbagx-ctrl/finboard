@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Presentation\Api\Controllers;
 
+use App\Contexts\DocumentManagement\Application\Queries\GetVdrAuditLogs\GetVdrAuditLogsHandler;
+use App\Contexts\DocumentManagement\Application\Queries\GetVdrAuditLogs\GetVdrAuditLogsQuery;
 use App\Contexts\DocumentManagement\Domain\Model\Document as DomainDocument;
 use App\Contexts\DocumentManagement\Domain\Repositories\DocumentRepositoryInterface;
 use App\Contexts\DocumentManagement\Domain\Services\DocumentStorageInterface;
@@ -34,13 +36,16 @@ final class DocumentController
     use ResolvesCompanyContext;
 
     private readonly TransactionalStorageManagerInterface $storageManager;
+    private readonly GetVdrAuditLogsHandler $getVdrAuditLogsHandler;
 
     public function __construct(
         private readonly DocumentRepositoryInterface $repository,
         private readonly DocumentStorageInterface $storage,
-        ?TransactionalStorageManagerInterface $storageManager = null
+        ?TransactionalStorageManagerInterface $storageManager = null,
+        ?GetVdrAuditLogsHandler $getVdrAuditLogsHandler = null
     ) {
         $this->storageManager = $storageManager ?? app(TransactionalStorageManagerInterface::class);
+        $this->getVdrAuditLogsHandler = $getVdrAuditLogsHandler ?? app(GetVdrAuditLogsHandler::class);
     }
 
     /**
@@ -342,36 +347,37 @@ final class DocumentController
 
         $this->ensureCanAccessDocument($request->user(), $document);
 
-        $logs = DocumentAccessLog::query()
-            ->with(['user', 'document' => function ($q) {
-                $q->withTrashed();
-            }])
-            ->where('document_id', $id)
-            ->orderBy('created_at', 'desc')
-            ->paginate($request->integer('per_page', 20));
+        $query = new GetVdrAuditLogsQuery(
+            companyId: (string) $document->company_id,
+            action: $request->filled('action') ? (string) $request->query('action') : null,
+            search: $request->filled('search') ? (string) $request->query('search') : null,
+            documentId: $id,
+            perPage: $request->integer('per_page', 20),
+            page: $request->integer('page', 1)
+        );
+
+        $logs = $this->getVdrAuditLogsHandler->handle($query);
 
         return DocumentAccessLogResource::collection($logs);
     }
 
     /**
-     * Get all audit logs for the company's Data Room.
+     * Get all audit logs for the company's Data Room with server-side action and search filtering.
      */
     public function allAuditLogs(Request $request): AnonymousResourceCollection
     {
         $companyId = $this->resolveCompanyId($request);
 
-        $logs = DocumentAccessLog::query()
-            ->where(function ($query) use ($companyId) {
-                $query->where('company_id', $companyId)
-                    ->orWhereHas('document', function ($q) use ($companyId) {
-                        $q->withTrashed()->where('company_id', $companyId);
-                    });
-            })
-            ->with(['user', 'document' => function ($q) {
-                $q->withTrashed();
-            }])
-            ->orderBy('created_at', 'desc')
-            ->paginate($request->integer('per_page', 25));
+        $query = new GetVdrAuditLogsQuery(
+            companyId: $companyId,
+            action: $request->filled('action') ? (string) $request->query('action') : null,
+            search: $request->filled('search') ? (string) $request->query('search') : null,
+            documentId: $request->filled('document_id') ? (string) $request->query('document_id') : null,
+            perPage: $request->integer('per_page', 25),
+            page: $request->integer('page', 1)
+        );
+
+        $logs = $this->getVdrAuditLogsHandler->handle($query);
 
         return DocumentAccessLogResource::collection($logs);
     }
