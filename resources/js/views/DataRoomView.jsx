@@ -11,11 +11,14 @@ import { DocumentUploadModal } from '../components/dataroom/DocumentUploadModal'
 import { DocumentEditModal } from '../components/dataroom/DocumentEditModal';
 import { DocumentAuditModal } from '../components/dataroom/DocumentAuditModal';
 import { DeleteDocumentModal } from '../components/dataroom/DeleteDocumentModal';
+import { DocumentPreviewModal } from '../components/dataroom/DocumentPreviewModal';
+import { VdrPermissionMatrixModal } from '../components/dataroom/VdrPermissionMatrixModal';
 import {
     FolderLock,
     UploadCloud,
     Search,
     RefreshCw,
+    Shield,
     ShieldCheck,
     Archive,
     Filter,
@@ -25,7 +28,8 @@ import {
     ExternalLink,
     FolderTree,
     Folder,
-    FolderPlus
+    FolderPlus,
+    Eye
 } from 'lucide-react';
 
 const CATEGORY_TABS = [
@@ -39,7 +43,8 @@ const CATEGORY_TABS = [
 ];
 
 export const DataRoomView = () => {
-    const { activeCompany } = useAuth();
+    const { activeCompany, isAdvisor, isSuperAdmin, isAdmin } = useAuth();
+    const canManagePermissions = isAdvisor || isSuperAdmin || isAdmin;
     const { success, error } = useNotification();
 
     // Data states
@@ -71,6 +76,10 @@ export const DataRoomView = () => {
     const [editingDoc, setEditingDoc] = useState(null);
     const [auditDoc, setAuditDoc] = useState(null);
     const [deletingDoc, setDeletingDoc] = useState(null);
+    const [isMatrixOpen, setIsMatrixOpen] = useState(false);
+    const [previewDoc, setPreviewDoc] = useState(null);
+    const [previewUrl, setPreviewUrl] = useState(null);
+    const [previewLoading, setPreviewLoading] = useState(false);
 
     const fetchFolders = useCallback(async () => {
         setFoldersLoading(true);
@@ -211,6 +220,33 @@ export const DataRoomView = () => {
         }
     };
 
+    const handlePreviewDocument = async (doc) => {
+        setPreviewDoc(doc);
+        setPreviewLoading(true);
+        setPreviewUrl(null);
+        try {
+            const response = await apiClient.get(`/documents/${doc.id}/preview`, {
+                responseType: 'blob',
+            });
+            const blob = new Blob([response.data], { type: doc.mime_type || 'application/pdf' });
+            const url = window.URL.createObjectURL(blob);
+            setPreviewUrl(url);
+        } catch (err) {
+            console.error('Preview failed', err);
+            error(err.response?.data?.message || 'Nie udało się wygenerować bezpiecznego podglądu.');
+        } finally {
+            setPreviewLoading(false);
+        }
+    };
+
+    const handleClosePreview = () => {
+        if (previewUrl) {
+            window.URL.revokeObjectURL(previewUrl);
+        }
+        setPreviewDoc(null);
+        setPreviewUrl(null);
+    };
+
     const handleToggleArchive = async (doc) => {
         try {
             const res = await apiClient.patch(`/documents/${doc.id}/archive`);
@@ -271,6 +307,17 @@ export const DataRoomView = () => {
                     >
                         Odśwież
                     </Button>
+                    {canManagePermissions && (
+                        <Button
+                            variant="secondary"
+                            size="sm"
+                            icon={Shield}
+                            onClick={() => setIsMatrixOpen(true)}
+                            title="Zarządzaj matrycą uprawnień VDR (role, użytkownicy, znak wodny)"
+                        >
+                            Matryca Uprawnień
+                        </Button>
+                    )}
                     <Button
                         variant="primary"
                         size="sm"
@@ -392,6 +439,7 @@ export const DataRoomView = () => {
                         documents={documents}
                         loading={loading}
                         onDownload={handleDownload}
+                        onPreview={handlePreviewDocument}
                         onViewAudit={(doc) => setAuditDoc(doc)}
                         onEdit={(doc) => setEditingDoc(doc)}
                         onToggleArchive={handleToggleArchive}
@@ -482,6 +530,24 @@ export const DataRoomView = () => {
                     fetchDocuments(pagination.currentPage);
                     fetchFolders();
                 }}
+            />
+
+            <DocumentPreviewModal
+                isOpen={!!previewDoc}
+                document={previewDoc}
+                previewUrl={previewUrl}
+                loading={previewLoading}
+                onClose={handleClosePreview}
+                onDownload={handleDownload}
+                canDownload={previewDoc?.can_download !== false}
+            />
+
+            <VdrPermissionMatrixModal
+                isOpen={isMatrixOpen}
+                onClose={() => setIsMatrixOpen(false)}
+                companyId={activeCompany?.id}
+                folders={folders}
+                documents={documents}
             />
         </div>
     );

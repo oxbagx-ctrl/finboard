@@ -16,11 +16,13 @@ import {
     Eye
 } from 'lucide-react';
 import { formatFileSize, formatFinancialDate } from '../../utils/formatters';
+import { WatermarkBadge } from './VdrPermissionBadge';
 
 export const DocumentTable = ({
     documents = [],
     loading = false,
     onDownload,
+    onPreview,
     onViewAudit,
     onEdit,
     onToggleArchive,
@@ -131,6 +133,9 @@ export const DocumentTable = ({
                                                 <span className="font-bold text-zinc-100 truncate hover:text-white" title={doc.title}>
                                                     {doc.title}
                                                 </span>
+                                                {(doc.watermark_required || doc.mime_type?.includes('pdf') || doc.original_name?.toLowerCase().endsWith('.pdf')) && (
+                                                    <WatermarkBadge required={true} size="xs" />
+                                                )}
                                                 {doc.is_archived && (
                                                     <span className="px-1.5 py-0.2 rounded text-[9px] font-bold uppercase bg-amber-950/80 border border-amber-800 text-amber-300">
                                                         Archiwum
@@ -211,12 +216,32 @@ export const DocumentTable = ({
                                 {/* Actions */}
                                 <td className="py-2.5 px-4 text-right whitespace-nowrap">
                                     <div className="flex items-center justify-end gap-1">
+                                        {/* Preview with Dynamic Watermark */}
+                                        {onPreview && (
+                                            <button
+                                                type="button"
+                                                onClick={() => onPreview(doc)}
+                                                title="Podgląd dokumentu (otwiera zabezpieczony plik ze znakiem wodnym)"
+                                                className="p-1.5 rounded text-cyan-400 hover:bg-cyan-950/60 hover:text-cyan-300 border border-cyan-900/60 transition-colors"
+                                            >
+                                                <Eye className="w-3.5 h-3.5" />
+                                            </button>
+                                        )}
+
                                         {/* Download */}
                                         <button
                                             type="button"
                                             onClick={() => onDownload(doc)}
-                                            title="Pobierz dokument (rejestruje pobranie w audycie)"
-                                            className="p-1.5 rounded text-emerald-400 hover:bg-emerald-950/60 hover:text-emerald-300 border border-emerald-900/60 transition-colors"
+                                            disabled={doc.can_download === false}
+                                            title={doc.can_download === false
+                                                ? 'Pobieranie zablokowane przez uprawnienia VDR (skorzystaj z podglądu)'
+                                                : 'Pobierz dokument (rejestruje pobranie w audycie)'
+                                            }
+                                            className={`p-1.5 rounded transition-colors ${
+                                                doc.can_download === false
+                                                    ? 'text-zinc-600 border border-zinc-800 cursor-not-allowed opacity-40'
+                                                    : 'text-emerald-400 hover:bg-emerald-950/60 hover:text-emerald-300 border border-emerald-900/60'
+                                            }`}
                                         >
                                             <Download className="w-3.5 h-3.5" />
                                         </button>

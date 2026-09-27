@@ -163,6 +163,73 @@ describe('DocumentTable Component', () => {
 
         expect(onViewAudit).toHaveBeenCalledWith(mockDocs[0]);
     });
+
+    it('triggers onPreview callback when preview button is clicked', () => {
+        const onPreview = vi.fn();
+        render(
+            <DocumentTable
+                documents={mockDocs}
+                loading={false}
+                onDownload={vi.fn()}
+                onPreview={onPreview}
+                onViewAudit={vi.fn()}
+                onEdit={vi.fn()}
+                onToggleArchive={vi.fn()}
+                onDelete={vi.fn()}
+            />
+        );
+
+        const previewButtons = screen.getAllByTitle(/Podgląd dokumentu/);
+        expect(previewButtons.length).toBe(2);
+        fireEvent.click(previewButtons[0]);
+
+        expect(onPreview).toHaveBeenCalledWith(mockDocs[0]);
+    });
+
+    it('renders WatermarkBadge for PDF or watermark-required documents', () => {
+        render(
+            <DocumentTable
+                documents={mockDocs}
+                loading={false}
+                onDownload={vi.fn()}
+                onViewAudit={vi.fn()}
+                onEdit={vi.fn()}
+                onToggleArchive={vi.fn()}
+                onDelete={vi.fn()}
+            />
+        );
+
+        const watermarkBadges = screen.getAllByText('ZNAK WODNY');
+        expect(watermarkBadges.length).toBeGreaterThanOrEqual(1);
+    });
+
+    it('disables download button when can_download is false', () => {
+        const docsWithRestrictions = [
+            {
+                ...mockDocs[0],
+                id: 'doc-restricted',
+                can_download: false,
+            },
+        ];
+
+        const onDownload = vi.fn();
+        render(
+            <DocumentTable
+                documents={docsWithRestrictions}
+                loading={false}
+                onDownload={onDownload}
+                onViewAudit={vi.fn()}
+                onEdit={vi.fn()}
+                onToggleArchive={vi.fn()}
+                onDelete={vi.fn()}
+            />
+        );
+
+        const downloadButton = screen.getByTitle(/Pobieranie zablokowane przez uprawnienia VDR/);
+        expect(downloadButton).toBeDisabled();
+        fireEvent.click(downloadButton);
+        expect(onDownload).not.toHaveBeenCalled();
+    });
 });
 
 describe('DocumentUploadModal Component', () => {

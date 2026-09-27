@@ -833,25 +833,31 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - 100% PASS w pełnym pakiecie 515 testów Vitest (55 plików testowych) oraz 662 testów PHPUnit (8469 asercji).
 
 - [ ] **Faza 55: Permission Matrix, Dynamic PDF Watermarking & Final VDR Security (Commity 264–268)**
-  - [x] Agregat domenowy Matrycy Uprawnień VDR, obiekty wartości i migracje bazy danych (Commit 264).
+  - [x] Agregat domenowy Matrycy Uprawnień VDR, obiekty wartości i migracje bazy danych.
     - Obiekty wartości: `PermissionLevel` (`none`, `view`, `download`, `manage`), `AccessSubject` (role transakcyjne `role:{name}` oraz konkretni użytkownicy `user:{uuid}`), `VdrPermissionId`, `EffectivePermission` ze śledzeniem źródła grantu.
     - Korzenie agregatu i zdarzenia domenowe: `VdrFolderPermission` (`VdrFolderPermissionGranted`, `VdrFolderPermissionRevoked`), `VdrDocumentPermission` (`VdrDocumentPermissionGranted`, `VdrDocumentPermissionRevoked`).
     - Agregat / silnik domenowy `VdrPermissionMatrix` realizujący hierarchiczne wyznaczanie uprawnień efektywnych (nadpisywanie ról przez użytkowników, nadpisywanie folderów przez dokumenty, rekurencyjne dziedziczenie z folderów nadrzędnych Dewey).
     - Migracja bazy danych `2026_03_30_100000_create_vdr_permissions_tables.php` tworząca tabele `vdr_folder_permissions` oraz `vdr_document_permissions` z indeksami unikalnymi i kaskadami kluczy obcych.
     - Modele Eloquent `VdrFolderPermission` i `VdrDocumentPermission` oraz repozytorium `EloquentVdrPermissionRepository` powiązane z `VdrPermissionRepositoryInterface`.
     - Pakiet testów jednostkowych i integracyjnych: `PermissionLevelTest`, `VdrPermissionMatrixTest`, `VdrPermissionRepositoryDatabaseTest` (18 testów, 115 asercji), 100% PASS w pełnym zestawie 680 testów PHPUnit (8584 asercje).
-  - [x] Komendy/zapytania CQRS i punkty końcowe REST API dla Matrycy Uprawnień VDR (Commit 265).
+  - [x] Komendy/zapytania CQRS i punkty końcowe REST API dla Matrycy Uprawnień VDR.
     - Komendy CQRS: `SetVdrFolderPermissionCommand` i `SetVdrFolderPermissionHandler`, `SetVdrDocumentPermissionCommand` i `SetVdrDocumentPermissionHandler`, `RevokeVdrPermissionCommand` i `RevokeVdrPermissionHandler`.
     - Zapytania CQRS: `GetVdrPermissionMatrixQuery` i `GetVdrPermissionMatrixHandler` (pełna matryca z nazwami folderów, indeksami Dewey, tytułami dokumentów i etykietami), `GetEffectiveVdrPermissionQuery` i `GetEffectiveVdrPermissionHandler` (hierarchiczne wyznaczanie uprawnień efektywnych).
     - Warstwa REST API: `VdrPermissionController`, `SetVdrPermissionRequest`, trasy `api.documents.permissions.*` (`GET matrix`, `GET effective`, `POST folders/{folderId}`, `POST documents/{documentId}`, `DELETE {type}/{id}`).
     - Bezpieczeństwo i autoryzacja: restrykcja modyfikacji wyłącznie dla doradców (`advisor`) i administratorów (`super_admin`), ścisła izolacja multi-tenant.
     - Pakiety testów: jednostkowe CQRS `VdrPermissionCqrsHandlersTest` (8 testów, 42 asercje), funkcjonalne REST API `VdrPermissionApiTest` (10 testów, 58 asercji), 100% PASS w pełnym zestawie 698 testów PHPUnit (8684 asercje) oraz 515 testów Vitest.
-  - [x] Usługa dynamicznego nakładania znaków wodnych PDF (Dynamic PDF Watermarking Service) (Commit 266).
+  - [x] Usługa dynamicznego nakładania znaków wodnych PDF (Dynamic PDF Watermarking Service).
     - Obiekt wartości: `WatermarkOptions` (identyfikacja użytkownika, email, IP, znacznik czasu UTC, nazwa spółki, klauzula poufności, przezroczystość alfa, kąt obrotu, rozmiar fontu, formatowanie ukośnych linii, nagłówka i stopki).
     - Silnik FPDI: instalacja `setasign/fpdf` i `setasign/fpdi`, rozszerzenie `WatermarkFpdi` z obsługą przezroczystości PDF 1.4+ (`/ExtGState`) oraz rotacji współrzędnych `rotate()`.
     - Serwis domenowy: `FpdiPdfWatermarkService` implementujący `PdfWatermarkServiceInterface` ze skalowaniem do oryginalnej geometrii stron (A4/Letter, pion/poziom) oraz odpornym fallbackiem przy plikach nie-PDF.
     - Integracja pobierania i podglądu: rozszerzenie `DownloadDocumentCommand` i `DownloadDocumentHandler`, aktualizacja `DocumentController::download` z wymuszeniem znaku wodnego wg uprawnienia efektywnego (`watermarkRequired()`) oraz nowy endpoint podglądu w przeglądarce `GET /api/v1/documents/{id}/preview` (`inline`).
     - Pakiety testów: `WatermarkOptionsTest` (5 testów, 23 asercje), `PdfWatermarkServiceTest` (4 testy, 22 asercje), `PdfWatermarkIntegrationTest` (6 testów, 22 asercje), 100% PASS w pełnym zestawie 713 testów PHPUnit (8751 asercji) oraz 515 testów Vitest.
+  - [x] Interfejs zarządzania matrycą uprawnień VDR, odznaka znaku wodnego i strażnik dostępu (Commit 267).
+    - Komponenty etykiet: `VdrPermissionBadge` (wizualizacja poziomów `none`, `view`, `download`, `manage` ze specjalną paletą kolorów i ikonami) oraz `WatermarkBadge` (bursztynowa odznaka `ZNAK WODNY` z tarczą ostrzegawczą dla dokumentów chronionych).
+    - Modal zarządzania matrycą uprawnień: `VdrPermissionMatrixModal` dostępny dla doradców i administratorów (`canManagePermissions`) z dwoma zakładkami (`📁 Foldery M&A`, `📄 Nadpisania Plików`), tabelą grantów, formularzem konfiguracji ról/użytkowników oraz akcją natychmiastowego odwoływania (`DELETE /documents/permissions/:type/:id`).
+    - Bezpieczny podgląd dokumentów: `DocumentPreviewModal` z osadzonym zabezpieczonym PDF w ramce `<iframe>`, metadanymi, kodem Dewey, sumą SHA-256, banerem ostrzegawczym `POUFNY PODGLĄD VDR` oraz blokadą pobierania przy braku uprawnień.
+    - Tabela dokumentów i DataRoomView: przycisk `Matryca Uprawnień` w nagłówku, przycisk natychmiastowego podglądu dokumentu `onPreview` (ikona oka), blokada przycisku pobierania (`can_download === false`) z etykietą tooltip oraz odznaka `WatermarkBadge` przy plikach PDF.
+    - Pakiety testów: `VdrPermissionBadge.test.jsx` (6 testów), `DocumentPreviewModal.test.jsx` (6 testów), `VdrPermissionMatrixModal.test.jsx` (7 testów), rozszerzony `DataRoom.test.jsx` (14 testów), 100% PASS w 58 plikach testowych Vitest (537 testów) oraz 713 testach PHPUnit (8751 asercji).
 
 ---
 
