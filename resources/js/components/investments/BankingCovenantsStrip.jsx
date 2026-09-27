@@ -26,6 +26,7 @@ import { getInvestmentWorkerClient } from '../../workers/InvestmentWorkerClient'
 import { calculateBankingCovenants } from '../../workers/financialCalculations';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
+import { Tooltip, InfoTooltip } from '../ui/Tooltip';
 
 export const COVENANT_PRESETS = {
     standard: {
@@ -350,9 +351,17 @@ export function BankingCovenantsStrip({
                         : 'bg-rose-950/20 border-rose-800/40'
                 }`}>
                     <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
-                            KOWENANT DSCR
-                        </span>
+                        <div className="flex items-center gap-1">
+                            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                                KOWENANT DSCR
+                            </span>
+                            <InfoTooltip
+                                title="DSCR (Debt Service Coverage Ratio)"
+                                content="Wskaźnik Pokrycia Obsługi Długu (Standard LMA). Relacja rocznych przepływów CFADS (Cash Flow Available for Debt Service) do sumy rat kapitałowych i odsetek. Wartość poniżej progu bankowego oznacza naruszenie kowenantu kredytowego."
+                                ariaLabel="Objaśnienie kowenantu DSCR"
+                                size={11}
+                            />
+                        </div>
                         <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
                             summary?.minDscr != null && summary.minDscr >= thresholds.minDscr
                                 ? 'bg-emerald-500/20 text-emerald-400'
@@ -390,9 +399,17 @@ export function BankingCovenantsStrip({
                         : 'bg-rose-950/20 border-rose-800/40'
                 }`}>
                     <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
-                            POKRYCIE ODSETEK (ICR)
-                        </span>
+                        <div className="flex items-center gap-1">
+                            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                                POKRYCIE ODSETEK (ICR)
+                            </span>
+                            <InfoTooltip
+                                title="ICR (Interest Coverage Ratio)"
+                                content="Wskaźnik Pokrycia Odsetek. Relacja zysku operacyjnego (EBIT) do kosztów obsługi odsetek. Chroni przed utratą płynności odsetkowej. Minimalny wymóg bankowy LMA: ≥ 2.50x."
+                                ariaLabel="Objaśnienie wskaźnika ICR"
+                                size={11}
+                            />
+                        </div>
                         <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
                             summary?.minIcr != null && summary.minIcr >= thresholds.minIcr
                                 ? 'bg-emerald-500/20 text-emerald-400'
@@ -424,9 +441,17 @@ export function BankingCovenantsStrip({
                         : 'bg-rose-950/20 border-rose-800/40'
                 }`}>
                     <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
-                            PŁYNNOŚĆ BIEŻĄCA (CR)
-                        </span>
+                        <div className="flex items-center gap-1">
+                            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                                PŁYNNOŚĆ BIEŻĄCA (CR)
+                            </span>
+                            <InfoTooltip
+                                title="Current Ratio (Płynność Bieżąca)"
+                                content="Relacja aktywów obrotowych do zobowiązań krótkoterminowych w bilansie. Weryfikuje pokrycie operacyjnego kapitału obrotowego (NWC). Minimalny wymóg bankowy: ≥ 1.10x."
+                                ariaLabel="Objaśnienie wskaźnika płynności bieżącej"
+                                size={11}
+                            />
+                        </div>
                         <span className="text-[10px] font-mono text-zinc-400">
                             Aktywa / Zob.
                         </span>
@@ -478,9 +503,17 @@ export function BankingCovenantsStrip({
                         : 'bg-amber-950/20 border-amber-800/40'
                 }`}>
                     <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
-                            DŹWIGNIA (NET DEBT/EBITDA)
-                        </span>
+                        <div className="flex items-center gap-1">
+                            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                                DŹWIGNIA (NET DEBT/EBITDA)
+                            </span>
+                            <InfoTooltip
+                                title="Maksymalna Dźwignia Finansowa (Peak Leverage)"
+                                content="Wskaźnik Dług Netto / EBITDA w szczytowym momencie zadłużenia. Wyznacza maksymalną dopuszczalną wielokrotność zysku operacyjnego w relacji do zadłużenia netto. Limit bankowy: ≤ 3.50x."
+                                ariaLabel="Objaśnienie wskaźnika dźwigni finansowej"
+                                size={11}
+                            />
+                        </div>
                         <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
                             summary?.peakLeverage != null && summary.peakLeverage <= thresholds.maxLeverage
                                 ? 'bg-emerald-500/20 text-emerald-400'
@@ -512,9 +545,17 @@ export function BankingCovenantsStrip({
                         : 'bg-rose-950/20 border-rose-800/40'
                 }`}>
                     <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
-                            REZERWA DSRF
-                        </span>
+                        <div className="flex items-center gap-1">
+                            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                                REZERWA DSRF
+                            </span>
+                            <InfoTooltip
+                                title="DSRF / DSRA (Debt Service Reserve Facility)"
+                                content="Wymóg utrzymywania wyodrębnionego bufora gotówkowego na rachunku rezerwowym obsługi długu (DSRA). Wymóg LMA: równowartość minimum 6 miesięcy przyszłych rat kapitałowo-odsetkowych."
+                                ariaLabel="Objaśnienie rezerwy DSRF"
+                                size={11}
+                            />
+                        </div>
                         <span className="text-[10px] font-mono text-zinc-400">
                             Gotówka / Rata
                         </span>
@@ -566,9 +607,17 @@ export function BankingCovenantsStrip({
                         : "bg-rose-950/20 border-rose-800/40"
                 }`}>
                     <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
-                            POKRYCIE CAŁEGO DŁUGU (LLCR)
-                        </span>
+                        <div className="flex items-center gap-1">
+                            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                                POKRYCIE CAŁEGO DŁUGU (LLCR)
+                            </span>
+                            <InfoTooltip
+                                title="LLCR (Loan Life Coverage Ratio)"
+                                content="Wskaźnik Pokrycia Długu w Całym Okresie Kredytowania. Relacja sumy zdyskontowanych przyszłych przepływów CFADS do aktualnego salda długu. Wymóg LMA dla długu Senior Debt: ≥ 1.35x."
+                                ariaLabel="Objaśnienie wskaźnika LLCR"
+                                size={11}
+                            />
+                        </div>
                         <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
                             summary?.minLlcr != null && summary.minLlcr >= thresholds.minLlcr
                                 ? "bg-emerald-500/20 text-emerald-400"

@@ -1,5 +1,6 @@
 import React from 'react';
 import { formatPercent, formatRatio } from '../../utils/formatters';
+import { Tooltip, InfoTooltip } from './Tooltip';
 
 export const FinancialMultiplesStrip = ({
     ratios = null,
@@ -58,6 +59,22 @@ export const FinancialMultiplesStrip = ({
         }
     };
 
+    const getStatusExplanation = (status, hasData = true, targetStr = '') => {
+        if (!hasData) {
+            return 'Brak danych bilansowych dla wybranego okresu sprawozdawczego.';
+        }
+        switch (status?.toUpperCase()) {
+            case 'OPT':
+                return `Status OPT (Optymalny): Wskaźnik spełnia lub przewyższa benchmark doradcy (${targetStr}).`;
+            case 'WARN':
+                return `Status WARN (Ostrzeżenie): Wskaźnik poniżej progu docelowego (${targetStr}). Wymaga monitoringu.`;
+            case 'CRIT':
+                return `Status CRIT (Krytyczny): Istotne odchylenie od benchmarku (${targetStr}). Zagrożenie płynnościowe.`;
+            default:
+                return `Status neutralny / standardowy (${targetStr}).`;
+        }
+    };
+
     const crBench = benchmarks?.current_ratio ?? benchmarks?.CURRENT_RATIO;
     const qrBench = benchmarks?.quick_ratio ?? benchmarks?.QUICK_RATIO;
     const gmBench = benchmarks?.gross_margin ?? benchmarks?.GROSS_MARGIN;
@@ -103,6 +120,9 @@ export const FinancialMultiplesStrip = ({
     const multiples = [
         {
             label: 'CURRENT RATIO',
+            title: 'Wskaźnik Płynności Bieżącej (Current Ratio)',
+            formula: 'Aktywa obrotowe / Zobowiązania krótkoterminowe',
+            description: 'Mierzy zdolność przedsiębiorstwa do terminowej spłaty bieżących zobowiązań za pomocą aktywów obrotowych. Benchmark doradcy: > 1.20x.',
             value: crStatus.hasData && crVal != null && Number(crVal) > 0 ? formatRatio(crVal, 2) : '—',
             target: formatTarget(crBench, '> 1.20x'),
             status: crStatus.status,
@@ -111,6 +131,9 @@ export const FinancialMultiplesStrip = ({
         },
         {
             label: 'QUICK RATIO',
+            title: 'Wskaźnik Płynności Szybkiej (Quick Ratio)',
+            formula: '(Aktywa obrotowe - Zapasy) / Zobowiązania krótkoterminowe',
+            description: 'Weryfikuje natychmiastowe pokrycie zobowiązań płynnymi środkami, z wyłączeniem trudniej zbywalnych zapasów. Benchmark: > 1.00x.',
             value: qrStatus.hasData && qrVal != null && Number(qrVal) > 0 ? formatRatio(qrVal, 2) : '—',
             target: formatTarget(qrBench, '> 1.00x'),
             status: qrStatus.status,
@@ -119,6 +142,9 @@ export const FinancialMultiplesStrip = ({
         },
         {
             label: 'MARŻA BRUTTO',
+            title: 'Marża Zysku Brutto ze Sprzedaży (Gross Margin)',
+            formula: 'Zysk brutto ze sprzedaży / Przychody ze sprzedaży',
+            description: 'Odzwierciedla rentowność sprzedaży po odliczeniu bezpośrednich kosztów wytworzenia sprzedanych towarów i produktów (COGS). Benchmark: > 30%.',
             value: gmStatus.hasData && gmVal != null ? formatPercent(gmVal, 1, false) : '—',
             target: formatTarget(gmBench, 'Cel: > 30%', true),
             status: gmStatus.status,
@@ -127,6 +153,9 @@ export const FinancialMultiplesStrip = ({
         },
         {
             label: 'MARŻA EBITDA',
+            title: 'Marża Rentowności EBITDA',
+            formula: 'EBITDA / Przychody ze sprzedaży',
+            description: 'Kluczowy mnożnik wyceny transakcyjnej M&A. Odzwierciedla gotówkową rentowność operacyjną przed amortyzacją i podatkami. Benchmark: > 15%.',
             value: emStatus.hasData && emVal != null ? formatPercent(emVal, 1, false) : '—',
             target: formatTarget(emBench, 'Cel: > 15%', true),
             status: emStatus.status,
@@ -135,6 +164,9 @@ export const FinancialMultiplesStrip = ({
         },
         {
             label: 'MARŻA OPERACYJNA',
+            title: 'Marża Zysku Operacyjnego (EBIT Margin)',
+            formula: 'Zysk operacyjny (EBIT) / Przychody ze sprzedaży',
+            description: 'Pokazuje rentowność podstawowej działalności operacyjnej po uwzględnieniu kosztów zarządu i amortyzacji majątku trwałego. Benchmark: > 10%.',
             value: omStatus.hasData && omVal != null ? formatPercent(omVal, 1, false) : '—',
             target: formatTarget(omBench, 'Cel: > 10%', true),
             status: omStatus.status,
@@ -143,6 +175,9 @@ export const FinancialMultiplesStrip = ({
         },
         {
             label: 'MARŻA NETTO',
+            title: 'Marża Zysku Netto (Net Margin)',
+            formula: 'Zysk netto / Przychody ze sprzedaży',
+            description: 'Końcowa rentowność kapitału po odliczeniu wszystkich kosztów operacyjnych, finansowych i podatku dochodowego CIT. Benchmark: > 8%.',
             value: nmStatus.hasData && nmVal != null ? formatPercent(nmVal, 1, false) : '—',
             target: formatTarget(nmBench, 'Cel: > 8%', true),
             status: nmStatus.status,
@@ -151,6 +186,9 @@ export const FinancialMultiplesStrip = ({
         },
         {
             label: 'WSKAŹNIK ZADŁUŻENIA',
+            title: 'Wskaźnik Ogólnego Zadłużenia (Debt-to-Assets)',
+            formula: 'Zobowiązania ogółem / Aktywa ogółem',
+            description: 'Określa stopień finansowania majątku spółki kapitałem obcym. Wskaźnik < 0.60x świadczy o bezpiecznym profilu lewarowania.',
             value: dtaStatus.hasData && dtaVal != null && Number(dtaVal) >= 0 ? formatRatio(dtaVal, 2) : '—',
             target: formatTarget(dtaBench, '< 0.60x', false, true),
             status: dtaStatus.status,
@@ -181,19 +219,37 @@ export const FinancialMultiplesStrip = ({
             <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 divide-x divide-y sm:divide-y-0 divide-zinc-800 font-mono">
                 {multiples.map((item, idx) => {
                     const statusConfig = getStatusStyle(item.status, item.hasData);
+                    const statusTooltip = getStatusExplanation(item.status, item.hasData, item.target);
 
                     return (
                         <div key={idx} className="p-3 bg-zinc-900 hover:bg-zinc-850/60 transition-colors">
-                            <div className="text-[9px] uppercase tracking-wider text-zinc-500 truncate">
-                                {item.label}
+                            <div className="flex items-center justify-between gap-1 text-[9px] uppercase tracking-wider text-zinc-500">
+                                <span className="truncate">{item.label}</span>
+                                <InfoTooltip
+                                    title={item.title}
+                                    content={
+                                        <div className="space-y-1">
+                                            <div className="text-emerald-400 font-mono text-[10px] bg-zinc-900 px-1 py-0.5 rounded border border-zinc-800">
+                                                {item.formula}
+                                            </div>
+                                            <div className="text-zinc-300 text-xs">
+                                                {item.description}
+                                            </div>
+                                        </div>
+                                    }
+                                    ariaLabel={`Objaśnienie wskaźnika ${item.label}`}
+                                    size={11}
+                                />
                             </div>
                             <div className="mt-1 flex items-baseline justify-between gap-1">
                                 <span className={`text-base font-bold tracking-tight tabular-nums ${item.hasData ? 'text-zinc-100' : 'text-zinc-500'}`}>
                                     {item.value}
                                 </span>
-                                <span className={`text-[9px] px-1 py-0.2 rounded uppercase border ${statusConfig.className}`}>
-                                    {statusConfig.label}
-                                </span>
+                                <Tooltip content={statusTooltip}>
+                                    <span className={`text-[9px] px-1 py-0.2 rounded uppercase border cursor-help ${statusConfig.className}`}>
+                                        {statusConfig.label}
+                                    </span>
+                                </Tooltip>
                             </div>
                             <div className="mt-1 text-[9px] text-zinc-500 flex items-center justify-between">
                                 <span className="truncate">{item.note}</span>
@@ -206,3 +262,4 @@ export const FinancialMultiplesStrip = ({
         </div>
     );
 };
+

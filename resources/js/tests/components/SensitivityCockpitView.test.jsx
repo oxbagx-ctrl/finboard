@@ -400,4 +400,29 @@ describe('SensitivityCockpitView Component (Phase 43 Commit 213)', () => {
         });
     });
 
+    describe('What-If Sliders Financial Explanations (Phase 56 Commit 271)', () => {
+        it('renders accessible InfoTooltips for What-If sensitivity sliders and opens on hover', async () => {
+            renderWithContext();
+
+            await waitFor(() => {
+                expect(screen.getByRole('button', { name: 'Informacje o nakładach CAPEX' })).toBeInTheDocument();
+            });
+
+            expect(screen.getByRole('button', { name: 'Informacje o przychodach ze sprzedaży' })).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: 'Informacje o kosztach zmiennych' })).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: 'Informacje o kosztach stałych OPEX' })).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: 'Informacje o funduszu płac' })).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: 'Informacje o stopie dyskontowej WACC' })).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: 'Informacje o nakładach odtworzeniowych Reinvestment' })).toBeInTheDocument();
+
+            const capexInfoBtn = screen.getByRole('button', { name: 'Informacje o nakładach CAPEX' });
+            fireEvent.mouseEnter(capexInfoBtn);
+
+            await waitFor(() => {
+                expect(screen.getByRole('tooltip')).toHaveTextContent(/Wstępne nakłady inwestycyjne/i);
+            });
+        });
+    });
+
 });
+

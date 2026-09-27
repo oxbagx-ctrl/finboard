@@ -39,6 +39,7 @@ import { getInvestmentWorkerClient } from '../../workers/InvestmentWorkerClient'
 import { ReinvestmentManager } from './ReinvestmentManager';
 import { ScenarioPresetSelector, SCENARIO_PRESETS } from './ScenarioPresetSelector';
 import { DebtRepaymentModeSwitcher } from './DebtRepaymentModeSwitcher';
+import { InfoTooltip, Tooltip as UiTooltip } from '../ui/Tooltip';
 
 export const SensitivityCockpitView = () => {
     const { selectedProject } = useInvestmentProject();
@@ -506,7 +507,13 @@ export const SensitivityCockpitView = () => {
                     {/* 1. CAPEX Modifier */}
                     <div className="space-y-2 p-3 bg-zinc-950 border border-zinc-850 rounded">
                         <div className="flex items-center justify-between text-xs">
-                            <span className="font-semibold text-zinc-300 uppercase">Nakłady CAPEX</span>
+                            <div className="flex items-center gap-1.5 font-semibold text-zinc-300 uppercase">
+                                <span>Nakłady CAPEX</span>
+                                <InfoTooltip
+                                    content="Wstępne nakłady inwestycyjne (Faza 0–1). Zwiększenie CAPEX wydłuża Payback Period (DPB) oraz obniża NPV i IRR projektu."
+                                    ariaLabel="Informacje o nakładach CAPEX"
+                                />
+                            </div>
                             <span className={`font-mono font-bold ${capexDelta > 0 ? 'text-rose-400' : capexDelta < 0 ? 'text-emerald-400' : 'text-zinc-300'}`}>
                                 {capexDelta > 0 ? `+${capexDelta}%` : `${capexDelta}%`}
                             </span>
@@ -535,7 +542,13 @@ export const SensitivityCockpitView = () => {
                     {/* 2. Revenue Modifier */}
                     <div className="space-y-2 p-3 bg-zinc-950 border border-zinc-850 rounded">
                         <div className="flex items-center justify-between text-xs">
-                            <span className="font-semibold text-zinc-300 uppercase">Przychody ze Sprzedaży</span>
+                            <div className="flex items-center gap-1.5 font-semibold text-zinc-300 uppercase">
+                                <span>Przychody ze Sprzedaży</span>
+                                <InfoTooltip
+                                    content="Symulacja wahań popytu i cen sprzedaży (±30%). Przychody bezpośrednio determinują przepływy operacyjne OCF i wskaźnik pokrycia długu DSCR."
+                                    ariaLabel="Informacje o przychodach ze sprzedaży"
+                                />
+                            </div>
                             <span className={`font-mono font-bold ${revenueDelta > 0 ? 'text-emerald-400' : revenueDelta < 0 ? 'text-rose-400' : 'text-zinc-300'}`}>
                                 {revenueDelta > 0 ? `+${revenueDelta}%` : `${revenueDelta}%`}
                             </span>
@@ -564,7 +577,13 @@ export const SensitivityCockpitView = () => {
                     {/* 3. Variable Costs Modifier */}
                     <div className="space-y-2 p-3 bg-zinc-950 border border-zinc-850 rounded">
                         <div className="flex items-center justify-between text-xs">
-                            <span className="font-semibold text-zinc-300 uppercase">Koszty Zmienne (% Rev)</span>
+                            <div className="flex items-center gap-1.5 font-semibold text-zinc-300 uppercase">
+                                <span>Koszty Zmienne (% Rev)</span>
+                                <InfoTooltip
+                                    content="Koszty bezpośrednie (COGS / surowce / media technologiczne) skalujące się proporcjonalnie do wolumenu przychodów."
+                                    ariaLabel="Informacje o kosztach zmiennych"
+                                />
+                            </div>
                             <span className={`font-mono font-bold ${varCostDelta > 0 ? 'text-rose-400' : varCostDelta < 0 ? 'text-emerald-400' : 'text-zinc-300'}`}>
                                 {varCostDelta > 0 ? `+${varCostDelta}%` : `${varCostDelta}%`}
                             </span>
@@ -593,7 +612,13 @@ export const SensitivityCockpitView = () => {
                     {/* 4. Fixed Costs Modifier */}
                     <div className="space-y-2 p-3 bg-zinc-950 border border-zinc-850 rounded">
                         <div className="flex items-center justify-between text-xs">
-                            <span className="font-semibold text-zinc-300 uppercase">Koszty Stałe OPEX</span>
+                            <div className="flex items-center gap-1.5 font-semibold text-zinc-300 uppercase">
+                                <span>Koszty Stałe OPEX</span>
+                                <InfoTooltip
+                                    content="Roczna baza kosztów operacyjnych niezależnych od wolumenu (utrzymanie infrastruktury, podatki od nieruchomości, ubezpieczenia, IT)."
+                                    ariaLabel="Informacje o kosztach stałych OPEX"
+                                />
+                            </div>
                             <span className={`font-mono font-bold ${fixedCostDelta > 0 ? 'text-rose-400' : fixedCostDelta < 0 ? 'text-emerald-400' : 'text-zinc-300'}`}>
                                 {fixedCostDelta > 0 ? `+${fixedCostDelta}%` : `${fixedCostDelta}%`}
                             </span>
@@ -622,7 +647,13 @@ export const SensitivityCockpitView = () => {
                     {/* 5. Payroll Costs Modifier */}
                     <div className="space-y-2 p-3 bg-zinc-950 border border-zinc-850 rounded">
                         <div className="flex items-center justify-between text-xs">
-                            <span className="font-semibold text-zinc-300 uppercase">Fundusz Płac & Płace</span>
+                            <div className="flex items-center gap-1.5 font-semibold text-zinc-300 uppercase">
+                                <span>Fundusz Płac & Płace</span>
+                                <InfoTooltip
+                                    content="Roczny narzut wynagrodzeń wraz ze składkami ZUS i świadczeniami pracowniczymi podlegający presji płacowej."
+                                    ariaLabel="Informacje o funduszu płac"
+                                />
+                            </div>
                             <span className={`font-mono font-bold ${payrollDelta > 0 ? 'text-rose-400' : payrollDelta < 0 ? 'text-emerald-400' : 'text-zinc-300'}`}>
                                 {payrollDelta > 0 ? `+${payrollDelta}%` : `${payrollDelta}%`}
                             </span>
@@ -651,7 +682,13 @@ export const SensitivityCockpitView = () => {
                     {/* 6. WACC Discount Rate Override */}
                     <div className="space-y-2 p-3 bg-zinc-950 border border-zinc-850 rounded">
                         <div className="flex items-center justify-between text-xs">
-                            <span className="font-semibold text-zinc-300 uppercase">Stopa Dyskontowa WACC</span>
+                            <div className="flex items-center gap-1.5 font-semibold text-zinc-300 uppercase">
+                                <span>Stopa Dyskontowa WACC</span>
+                                <InfoTooltip
+                                    content="Średni ważony koszt kapitału (WACC). Bazowa stopa dyskontowa w modelu DCF odzwierciedlająca koszt długu i oczekiwaną stopę zwrotu z kapitału własnego (CAPM)."
+                                    ariaLabel="Informacje o stopie dyskontowej WACC"
+                                />
+                            </div>
                             <span className="font-mono font-bold text-blue-400">
                                 {waccOverride !== null ? `${waccOverride.toFixed(2)}% (Manual)` : `${formatPercent(baseResult?.appraisal?.waccPercent ?? 8.50)} (Model)`}
                             </span>
@@ -693,7 +730,13 @@ export const SensitivityCockpitView = () => {
                     {/* 7. Reinvestment CAPEX (A, B, C) Modifier */}
                     <div className="space-y-2 p-3 bg-zinc-950 border border-zinc-850 rounded">
                         <div className="flex items-center justify-between text-xs">
-                            <span className="font-semibold text-zinc-300 uppercase">Reinvestment A, B, C</span>
+                            <div className="flex items-center gap-1.5 font-semibold text-zinc-300 uppercase">
+                                <span>Reinvestment A, B, C</span>
+                                <InfoTooltip
+                                    content="Cykliczne nakłady odtworzeniowe (Replacement CAPEX) w cyklach 5/10/15-letnich na modernizację parku maszynowego i infrastruktury."
+                                    ariaLabel="Informacje o nakładach odtworzeniowych Reinvestment"
+                                />
+                            </div>
                             <span className={`font-mono font-bold ${reinvestmentDelta > 0 ? 'text-rose-400' : reinvestmentDelta < 0 ? 'text-emerald-400' : 'text-zinc-300'}`}>
                                 {reinvestmentsEnabled ? (reinvestmentDelta > 0 ? `+${reinvestmentDelta}%` : `${reinvestmentDelta}%`) : 'WYŁĄCZONY'}
                             </span>
