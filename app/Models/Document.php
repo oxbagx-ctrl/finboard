@@ -76,6 +76,14 @@ final class Document extends Model
         return $this->hasMany(DocumentAccessLog::class, 'document_id');
     }
 
+    /**
+     * @return HasMany<VdrDocumentPermission>
+     */
+    public function permissions(): HasMany
+    {
+        return $this->hasMany(VdrDocumentPermission::class, 'document_id');
+    }
+
     public function scopeForCompany(Builder $query, string $companyId): Builder
     {
         return $query->where('company_id', $companyId);

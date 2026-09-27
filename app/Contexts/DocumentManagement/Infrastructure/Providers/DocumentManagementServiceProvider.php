@@ -35,6 +35,11 @@ final class DocumentManagementServiceProvider extends ServiceProvider
             \App\Contexts\DocumentManagement\Domain\Repositories\TransactionFolderRepositoryInterface::class,
             \App\Contexts\DocumentManagement\Infrastructure\Repositories\EloquentTransactionFolderRepository::class
         );
+
+        $this->app->bind(
+            \App\Contexts\DocumentManagement\Domain\Repositories\VdrPermissionRepositoryInterface::class,
+            \App\Contexts\DocumentManagement\Infrastructure\Repositories\EloquentVdrPermissionRepository::class
+        );
     }
 
     public function boot(): void

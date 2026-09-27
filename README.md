@@ -827,6 +827,13 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - 100% PASS w pełnym pakiecie 515 testów Vitest (55 plików testowych) oraz 662 testów PHPUnit (8469 asercji).
 
 - [ ] **Faza 55: Permission Matrix, Dynamic PDF Watermarking & Final VDR Security (Commity 264–268)**
+  - [x] Agregat domenowy Matrycy Uprawnień VDR, obiekty wartości i migracje bazy danych (Commit 264).
+    - Obiekty wartości: `PermissionLevel` (`none`, `view`, `download`, `manage`), `AccessSubject` (role transakcyjne `role:{name}` oraz konkretni użytkownicy `user:{uuid}`), `VdrPermissionId`, `EffectivePermission` ze śledzeniem źródła grantu.
+    - Korzenie agregatu i zdarzenia domenowe: `VdrFolderPermission` (`VdrFolderPermissionGranted`, `VdrFolderPermissionRevoked`), `VdrDocumentPermission` (`VdrDocumentPermissionGranted`, `VdrDocumentPermissionRevoked`).
+    - Agregat / silnik domenowy `VdrPermissionMatrix` realizujący hierarchiczne wyznaczanie uprawnień efektywnych (nadpisywanie ról przez użytkowników, nadpisywanie folderów przez dokumenty, rekurencyjne dziedziczenie z folderów nadrzędnych Dewey).
+    - Migracja bazy danych `2026_03_30_100000_create_vdr_permissions_tables.php` tworząca tabele `vdr_folder_permissions` oraz `vdr_document_permissions` z indeksami unikalnymi i kaskadami kluczy obcych.
+    - Modele Eloquent `VdrFolderPermission` i `VdrDocumentPermission` oraz repozytorium `EloquentVdrPermissionRepository` powiązane z `VdrPermissionRepositoryInterface`.
+    - Pakiet testów jednostkowych i integracyjnych: `PermissionLevelTest`, `VdrPermissionMatrixTest`, `VdrPermissionRepositoryDatabaseTest` (18 testów, 115 asercji), 100% PASS w pełnym zestawie 680 testów PHPUnit (8584 asercje).
 
 ---
 

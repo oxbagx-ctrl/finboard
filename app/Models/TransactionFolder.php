@@ -52,4 +52,9 @@ final class TransactionFolder extends Model
     {
         return $this->hasMany(Document::class, 'folder_id');
     }
+
+    public function permissions(): HasMany
+    {
+        return $this->hasMany(VdrFolderPermission::class, 'folder_id');
+    }
 }
