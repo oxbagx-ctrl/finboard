@@ -754,6 +754,14 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Zestaw testów w `tests/Feature/DocumentManagement/VdrHardeningSecurityRegressionTest.php` weryfikujący dostęp doradców transakcyjnych (`advisor`), administratorów (`super_admin`), blokadę 403 dla obcych spółek, WORM audit retention przy soft delete, walidację limitu 50MB i typów MIME oraz nagłówek RFC 5987.
     - 100% PASS w pełnym pakiecie testów: 614 testów PHPUnit (8119 asercji) oraz 500 testów Vitest (53 pliki testowe).
 
+- [ ] **Faza 53: CQRS, Storage Rollback & Server-side Audit Filtering (Commity 254–258)**
+  - [x] Transakcyjny menedżer pamięci masowej (Transactional Storage Manager) z rollbackiem plików (Commit 254).
+    - Zapobieganie powstawaniu osieroconych plików (orphan files) na dysku w przypadku błędu transakcji bazodanowej lub wyjątku SQL.
+    - Implementacja interfejsu domenowego `TransactionalStorageManagerInterface` oraz klasy infrastruktury `TransactionalStorageManager`.
+    - Dwufazowa koordynacja: automatyczny rollback (`delete`) plików utworzonych w transakcji w przypadku `Throwable`, oraz odroczone fizyczne usuwanie plików (`stageDeletion`) dopiero po zatwierdzeniu transakcji DB.
+    - Integracja w `DocumentController::store` oraz `DocumentController::destroy`.
+    - Zestaw dedykowanych testów jednostkowych w `TransactionalStorageManagerTest.php` (5 testów, 14 asercji).
+
 ---
 
 

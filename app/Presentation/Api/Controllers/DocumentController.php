@@ -7,6 +7,7 @@ namespace App\Presentation\Api\Controllers;
 use App\Contexts\DocumentManagement\Domain\Model\Document as DomainDocument;
 use App\Contexts\DocumentManagement\Domain\Repositories\DocumentRepositoryInterface;
 use App\Contexts\DocumentManagement\Domain\Services\DocumentStorageInterface;
+use App\Contexts\DocumentManagement\Domain\Services\TransactionalStorageManagerInterface;
 use App\Contexts\DocumentManagement\Domain\ValueObjects\DocumentId;
 use App\Contexts\DocumentManagement\Domain\ValueObjects\DocumentType;
 use App\Contexts\DocumentManagement\Domain\ValueObjects\FileMetadata;
@@ -32,10 +33,14 @@ final class DocumentController
 {
     use ResolvesCompanyContext;
 
+    private readonly TransactionalStorageManagerInterface $storageManager;
+
     public function __construct(
         private readonly DocumentRepositoryInterface $repository,
-        private readonly DocumentStorageInterface $storage
+        private readonly DocumentStorageInterface $storage,
+        ?TransactionalStorageManagerInterface $storageManager = null
     ) {
+        $this->storageManager = $storageManager ?? app(TransactionalStorageManagerInterface::class);
     }
 
     /**
@@ -98,34 +103,47 @@ final class DocumentController
         $extension = $file->getClientOriginalExtension() ?: 'bin';
         $directory = sprintf('dataroom/%s', $companyId);
         $filename = sprintf('%s.%s', $docId->value(), $extension);
-
-        $storagePath = $this->storage->store($fileContent, $directory, $filename);
-
         $documentType = DocumentType::from((string) $request->input('type'));
+        $title = (string) $request->input('title');
 
-        $domainDoc = DomainDocument::upload(
-            id: $docId,
-            companyId: $companyId,
-            uploadedByUserId: $user->id,
-            title: (string) $request->input('title'),
-            type: $documentType,
-            fileMetadata: $metadata,
-            storagePath: $storagePath
-        );
+        $eloquentDoc = $this->storageManager->transaction(function (TransactionalStorageManagerInterface $manager) use (
+            $fileContent,
+            $directory,
+            $filename,
+            $docId,
+            $companyId,
+            $user,
+            $title,
+            $documentType,
+            $metadata,
+            $request
+        ) {
+            $storagePath = $manager->store($fileContent, $directory, $filename);
 
-        $this->repository->save($domainDoc);
+            $domainDoc = DomainDocument::upload(
+                id: $docId,
+                companyId: $companyId,
+                uploadedByUserId: $user->id,
+                title: $title,
+                type: $documentType,
+                fileMetadata: $metadata,
+                storagePath: $storagePath
+            );
 
-        $this->repository->logAccess(
-            documentId: $docId,
-            userId: $user->id,
-            action: 'upload',
-            ipAddress: $request->ip(),
-            userAgent: $request->userAgent(),
-            documentTitle: $domainDoc->title(),
-            companyId: $companyId
-        );
+            $this->repository->save($domainDoc);
 
-        $eloquentDoc = EloquentDocument::with('uploader')->findOrFail($docId->value());
+            $this->repository->logAccess(
+                documentId: $docId,
+                userId: $user->id,
+                action: 'upload',
+                ipAddress: $request->ip(),
+                userAgent: $request->userAgent(),
+                documentTitle: $domainDoc->title(),
+                companyId: $companyId
+            );
+
+            return EloquentDocument::with('uploader')->findOrFail($docId->value());
+        });
 
         return (new DocumentResource($eloquentDoc))
             ->response()
@@ -286,18 +304,24 @@ final class DocumentController
         $user = $request->user();
         $this->ensureCanAccessCompany($user, $domainDoc->companyId());
 
-        $this->repository->logAccess(
-            documentId: $domainDoc->documentId(),
-            userId: $user->id,
-            action: 'destroy',
-            ipAddress: $request->ip(),
-            userAgent: $request->userAgent(),
-            documentTitle: $domainDoc->title(),
-            companyId: $domainDoc->companyId()
-        );
+        $this->storageManager->transaction(function (TransactionalStorageManagerInterface $manager) use (
+            $domainDoc,
+            $user,
+            $request
+        ) {
+            $this->repository->logAccess(
+                documentId: $domainDoc->documentId(),
+                userId: $user->id,
+                action: 'destroy',
+                ipAddress: $request->ip(),
+                userAgent: $request->userAgent(),
+                documentTitle: $domainDoc->title(),
+                companyId: $domainDoc->companyId()
+            );
 
-        $this->storage->delete($domainDoc->storagePath());
-        $this->repository->delete($domainDoc->documentId());
+            $this->repository->delete($domainDoc->documentId());
+            $manager->stageDeletion($domainDoc->storagePath());
+        });
 
         return new JsonResponse([
             'status' => 'deleted',
