@@ -385,19 +385,21 @@ describe('DashboardView Component', () => {
         expect(screen.getByText('8. Podatek Dochodowy od Osób Prawnych (CIT)')).toBeInTheDocument();
         expect(screen.getByText('9. ZYSK NETTO OKRESU (NET PROFIT / EAT)')).toBeInTheDocument();
 
-        // 2. Check deduction indicators (-) rendered with proper title after labels
+        // 2. Check deduction indicators (-) rendered with proper aria-label after labels
         const deductionMarkers = screen.getAllByText('(-)');
         expect(deductionMarkers.length).toBeGreaterThanOrEqual(3); // COGS, D&A, CIT
         deductionMarkers.forEach(marker => {
-            expect(marker).toHaveAttribute('title', 'Pozycja pomniejszająca wynik');
+            expect(marker).toHaveAttribute('aria-label', 'Pozycja pomniejszająca wynik');
         });
 
         // 3. Check final net profit result badge
         expect(screen.getByText('WYNIK KOŃCOWY')).toBeInTheDocument();
 
         // 4. Check expandable groups with category counters
-        const categoryBadges = screen.getAllByText('2 kat.');
-        expect(categoryBadges.length).toBeGreaterThanOrEqual(1);
+        await waitFor(() => {
+            const categoryBadges = screen.getAllByText('2 kat.');
+            expect(categoryBadges.length).toBeGreaterThanOrEqual(1);
+        });
 
         // 5. Expand OPEX group and verify child items with tree branches
         const opexRow = screen.getByText('4. Koszty Działalności Operacyjnej (OPEX)');
@@ -562,7 +564,7 @@ describe('DashboardView Component', () => {
         const markers = screen.getAllByText('(-)');
         expect(markers.length).toBeGreaterThanOrEqual(3);
         markers.forEach(m => {
-            expect(m).toHaveAttribute('title', 'Pozycja pomniejszająca wynik');
+            expect(m).toHaveAttribute('aria-label', 'Pozycja pomniejszająca wynik');
         });
     });
 });

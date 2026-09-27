@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { formatFileSize, formatFinancialDate } from '../../utils/formatters';
 import { WatermarkBadge } from './VdrPermissionBadge';
+import { Tooltip } from '../ui/Tooltip';
 
 export const DocumentTable = ({
     documents = [],
@@ -123,16 +124,17 @@ export const DocumentTable = ({
                                         <div className="min-w-0">
                                             <div className="flex items-center gap-1.5 flex-wrap">
                                                 {doc.index_code && (
-                                                    <span
-                                                        className="px-1.5 py-0.2 rounded text-[10px] font-mono font-bold bg-indigo-950/80 border border-indigo-700/80 text-indigo-300 shrink-0"
-                                                        title={`Indeks Dewey: ${doc.index_code}${doc.folder?.name ? ` (${doc.folder.name})` : ''}`}
-                                                    >
-                                                        {doc.index_code}
-                                                    </span>
+                                                    <Tooltip content={`Indeks Dewey: ${doc.index_code}${doc.folder?.name ? ` (${doc.folder.name})` : ''}`}>
+                                                        <span className="px-1.5 py-0.2 rounded text-[10px] font-mono font-bold bg-indigo-950/80 border border-indigo-700/80 text-indigo-300 shrink-0 cursor-help">
+                                                            {doc.index_code}
+                                                        </span>
+                                                    </Tooltip>
                                                 )}
-                                                <span className="font-bold text-zinc-100 truncate hover:text-white" title={doc.title}>
-                                                    {doc.title}
-                                                </span>
+                                                <Tooltip content={doc.title}>
+                                                    <span className="font-bold text-zinc-100 truncate hover:text-white">
+                                                        {doc.title}
+                                                    </span>
+                                                </Tooltip>
                                                 {(doc.watermark_required || doc.mime_type?.includes('pdf') || doc.original_name?.toLowerCase().endsWith('.pdf')) && (
                                                     <WatermarkBadge required={true} size="xs" />
                                                 )}
@@ -143,16 +145,17 @@ export const DocumentTable = ({
                                                 )}
                                             </div>
                                             <div className="flex items-center gap-2 text-[10px] text-zinc-500 truncate mt-0.5">
-                                                <span title={doc.original_name}>{doc.original_name}</span>
+                                                <Tooltip content={`Oryginalna nazwa: ${doc.original_name}`}>
+                                                    <span className="truncate">{doc.original_name}</span>
+                                                </Tooltip>
                                                 {doc.folder && (
                                                     <>
                                                         <span className="text-zinc-650">•</span>
-                                                        <span
-                                                            className="text-zinc-400 truncate max-w-[220px]"
-                                                            title={`Folder: ${doc.folder.index_code} ${doc.folder.name}`}
-                                                        >
-                                                            📁 {doc.folder.index_code} {doc.folder.name}
-                                                        </span>
+                                                        <Tooltip content={`Folder: ${doc.folder.index_code} ${doc.folder.name}`}>
+                                                            <span className="text-zinc-400 truncate max-w-[220px]">
+                                                                📁 {doc.folder.index_code} {doc.folder.name}
+                                                            </span>
+                                                        </Tooltip>
                                                     </>
                                                 )}
                                             </div>
@@ -168,25 +171,26 @@ export const DocumentTable = ({
                                 {/* SHA-256 Checksum */}
                                 <td className="py-2.5 px-3 whitespace-nowrap">
                                     <div className="flex items-center gap-1.5">
-                                        <span
-                                            className="text-[10px] text-zinc-400 font-mono truncate max-w-[90px]"
-                                            title={`Pełny skrót SHA-256: ${doc.checksum_sha256}`}
-                                        >
-                                            {doc.checksum_sha256 ? `${doc.checksum_sha256.substring(0, 8)}...` : '—'}
-                                        </span>
+                                        <Tooltip content={`Pełny skrót SHA-256: ${doc.checksum_sha256}`}>
+                                            <span className="text-[10px] text-zinc-400 font-mono truncate max-w-[90px] cursor-help">
+                                                {doc.checksum_sha256 ? `${doc.checksum_sha256.substring(0, 8)}...` : '—'}
+                                            </span>
+                                        </Tooltip>
                                         {doc.checksum_sha256 && (
-                                            <button
-                                                type="button"
-                                                onClick={() => handleCopyHash(doc.id, doc.checksum_sha256)}
-                                                title="Kopiuj pełną sumę kontrolną SHA-256"
-                                                className="p-1 rounded text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800 transition-colors"
-                                            >
-                                                {copiedHashId === doc.id ? (
-                                                    <Check className="w-3 h-3 text-emerald-400" />
-                                                ) : (
-                                                    <Copy className="w-3 h-3" />
-                                                )}
-                                            </button>
+                                            <Tooltip content={copiedHashId === doc.id ? 'Skopiowano sumę SHA-256!' : 'Kopiuj pełną sumę kontrolną SHA-256'}>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleCopyHash(doc.id, doc.checksum_sha256)}
+                                                    aria-label="Kopiuj pełną sumę kontrolną SHA-256"
+                                                    className="p-1 rounded text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800 transition-colors"
+                                                >
+                                                    {copiedHashId === doc.id ? (
+                                                        <Check className="w-3 h-3 text-emerald-400" />
+                                                    ) : (
+                                                        <Copy className="w-3 h-3" />
+                                                    )}
+                                                </button>
+                                            </Tooltip>
                                         )}
                                     </div>
                                 </td>
@@ -218,77 +222,91 @@ export const DocumentTable = ({
                                     <div className="flex items-center justify-end gap-1">
                                         {/* Preview with Dynamic Watermark */}
                                         {onPreview && (
-                                            <button
-                                                type="button"
-                                                onClick={() => onPreview(doc)}
-                                                title="Podgląd dokumentu (otwiera zabezpieczony plik ze znakiem wodnym)"
-                                                className="p-1.5 rounded text-cyan-400 hover:bg-cyan-950/60 hover:text-cyan-300 border border-cyan-900/60 transition-colors"
-                                            >
-                                                <Eye className="w-3.5 h-3.5" />
-                                            </button>
+                                            <Tooltip content="Podgląd dokumentu (otwiera zabezpieczony plik ze znakiem wodnym)">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => onPreview(doc)}
+                                                    aria-label="Podgląd dokumentu"
+                                                    className="p-1.5 rounded text-cyan-400 hover:bg-cyan-950/60 hover:text-cyan-300 border border-cyan-900/60 transition-colors"
+                                                >
+                                                    <Eye className="w-3.5 h-3.5" />
+                                                </button>
+                                            </Tooltip>
                                         )}
 
                                         {/* Download */}
-                                        <button
-                                            type="button"
-                                            onClick={() => onDownload(doc)}
-                                            disabled={doc.can_download === false}
-                                            title={doc.can_download === false
+                                        <Tooltip
+                                            content={doc.can_download === false
                                                 ? 'Pobieranie zablokowane przez uprawnienia VDR (skorzystaj z podglądu)'
                                                 : 'Pobierz dokument (rejestruje pobranie w audycie)'
                                             }
-                                            className={`p-1.5 rounded transition-colors ${
-                                                doc.can_download === false
-                                                    ? 'text-zinc-600 border border-zinc-800 cursor-not-allowed opacity-40'
-                                                    : 'text-emerald-400 hover:bg-emerald-950/60 hover:text-emerald-300 border border-emerald-900/60'
-                                            }`}
                                         >
-                                            <Download className="w-3.5 h-3.5" />
-                                        </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => onDownload(doc)}
+                                                disabled={doc.can_download === false}
+                                                aria-label={doc.can_download === false ? 'Pobieranie zablokowane' : 'Pobierz dokument'}
+                                                className={`p-1.5 rounded transition-colors ${
+                                                    doc.can_download === false
+                                                        ? 'text-zinc-600 border border-zinc-800 cursor-not-allowed opacity-40'
+                                                        : 'text-emerald-400 hover:bg-emerald-950/60 hover:text-emerald-300 border border-emerald-900/60'
+                                                }`}
+                                            >
+                                                <Download className="w-3.5 h-3.5" />
+                                            </button>
+                                        </Tooltip>
 
                                         {/* View Audit Trail */}
-                                        <button
-                                            type="button"
-                                            onClick={() => onViewAudit(doc)}
-                                            title="Przeglądaj wpisy ścieżki audytowej"
-                                            className="p-1.5 rounded text-blue-400 hover:bg-blue-950/60 hover:text-blue-300 border border-blue-900/60 transition-colors"
-                                        >
-                                            <ShieldCheck className="w-3.5 h-3.5" />
-                                        </button>
+                                        <Tooltip content="Przeglądaj wpisy ścieżki audytowej">
+                                            <button
+                                                type="button"
+                                                onClick={() => onViewAudit(doc)}
+                                                aria-label="Ścieżka audytowa"
+                                                className="p-1.5 rounded text-blue-400 hover:bg-blue-950/60 hover:text-blue-300 border border-blue-900/60 transition-colors"
+                                            >
+                                                <ShieldCheck className="w-3.5 h-3.5" />
+                                            </button>
+                                        </Tooltip>
 
                                         {/* Edit */}
-                                        <button
-                                            type="button"
-                                            onClick={() => onEdit(doc)}
-                                            title="Edytuj tytuł i kategorię"
-                                            className="p-1.5 rounded text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200 transition-colors"
-                                        >
-                                            <Edit3 className="w-3.5 h-3.5" />
-                                        </button>
+                                        <Tooltip content="Edytuj tytuł i kategorię">
+                                            <button
+                                                type="button"
+                                                onClick={() => onEdit(doc)}
+                                                aria-label="Edytuj dokument"
+                                                className="p-1.5 rounded text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200 transition-colors"
+                                            >
+                                                <Edit3 className="w-3.5 h-3.5" />
+                                            </button>
+                                        </Tooltip>
 
                                         {/* Toggle Archive */}
-                                        <button
-                                            type="button"
-                                            onClick={() => onToggleArchive(doc)}
-                                            title={doc.is_archived ? 'Przywróć z archiwum' : 'Przenieś do archiwum'}
-                                            className="p-1.5 rounded text-zinc-400 hover:bg-zinc-800 hover:text-amber-300 transition-colors"
-                                        >
-                                            {doc.is_archived ? (
-                                                <RotateCcw className="w-3.5 h-3.5" />
-                                            ) : (
-                                                <Archive className="w-3.5 h-3.5" />
-                                            )}
-                                        </button>
+                                        <Tooltip content={doc.is_archived ? 'Przywróć z archiwum' : 'Przenieś do archiwum'}>
+                                            <button
+                                                type="button"
+                                                onClick={() => onToggleArchive(doc)}
+                                                aria-label={doc.is_archived ? 'Przywróć z archiwum' : 'Przenieś do archiwum'}
+                                                className="p-1.5 rounded text-zinc-400 hover:bg-zinc-800 hover:text-amber-300 transition-colors"
+                                            >
+                                                {doc.is_archived ? (
+                                                    <RotateCcw className="w-3.5 h-3.5" />
+                                                ) : (
+                                                    <Archive className="w-3.5 h-3.5" />
+                                                )}
+                                            </button>
+                                        </Tooltip>
 
                                         {/* Delete */}
-                                        <button
-                                            type="button"
-                                            onClick={() => onDelete(doc)}
-                                            title="Trwale usuń z repozytorium"
-                                            className="p-1.5 rounded text-zinc-500 hover:bg-rose-950/60 hover:text-rose-400 transition-colors"
-                                        >
-                                            <Trash2 className="w-3.5 h-3.5" />
-                                        </button>
+                                        <Tooltip content="Trwale usuń z repozytorium">
+                                            <button
+                                                type="button"
+                                                onClick={() => onDelete(doc)}
+                                                aria-label="Usuń dokument"
+                                                className="p-1.5 rounded text-zinc-500 hover:bg-rose-950/60 hover:text-rose-400 transition-colors"
+                                            >
+                                                <Trash2 className="w-3.5 h-3.5" />
+                                            </button>
+                                        </Tooltip>
                                     </div>
                                 </td>
                             </tr>

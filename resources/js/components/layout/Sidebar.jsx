@@ -17,6 +17,7 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import { UserProfileModal } from '../auth/UserProfileModal';
 import { CompanySwitcherModal } from './CompanySwitcherModal';
+import { Tooltip } from '../ui/Tooltip';
 
 export const Sidebar = ({ currentRoute, onRouteChange, isOpen, onClose }) => {
     const { user, activeCompany, isAdmin, isSuperAdmin, isAdvisor, logout } = useAuth();
@@ -163,13 +164,15 @@ export const Sidebar = ({ currentRoute, onRouteChange, isOpen, onClose }) => {
                                 {getRoleLabel()}
                             </div>
                         </button>
-                        <button
-                            onClick={logout}
-                            title="Zakończ sesję"
-                            className="p-1.5 rounded text-zinc-500 hover:text-rose-400 hover:bg-zinc-900 transition-colors"
-                        >
-                            <LogOut className="w-3.5 h-3.5" />
-                        </button>
+                        <Tooltip content="Zakończ sesję">
+                            <button
+                                onClick={logout}
+                                aria-label="Zakończ sesję"
+                                className="p-1.5 rounded text-zinc-500 hover:text-rose-400 hover:bg-zinc-900 transition-colors"
+                            >
+                                <LogOut className="w-3.5 h-3.5" />
+                            </button>
+                        </Tooltip>
                     </div>
                 </div>
             </aside>

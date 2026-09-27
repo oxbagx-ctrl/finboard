@@ -153,7 +153,7 @@ describe('E2E Deal Advisory & Collaboration Workflow Integration', () => {
         expect(screen.getByText('Umowa Spółki Acme i Statut')).toBeInTheDocument();
 
         // 4. Download Trigger in Data Room
-        const downloadButtons = screen.getAllByTitle(/Pobierz dokument/i);
+        const downloadButtons = screen.getAllByRole('button', { name: /Pobierz dokument/i });
         expect(downloadButtons.length).toBeGreaterThanOrEqual(2);
         fireEvent.click(downloadButtons[0]);
 

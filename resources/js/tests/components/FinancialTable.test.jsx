@@ -144,7 +144,7 @@ describe('FinancialTable Component', () => {
         // Deduction indicator '(-)' is rendered next to deduction row
         const deductionIndicator = screen.getByText('(-)');
         expect(deductionIndicator).toBeInTheDocument();
-        expect(deductionIndicator).toHaveAttribute('title', 'Pozycja pomniejszająca wynik');
+        expect(deductionIndicator).toHaveAttribute('aria-label', 'Pozycja pomniejszająca wynik');
 
         // Verify the deduction row has uniform baseline padding px-4 without pl-6 deduction indent
         const cogsCell = cogsLabel.closest('td');

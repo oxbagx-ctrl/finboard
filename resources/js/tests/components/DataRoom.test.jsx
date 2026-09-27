@@ -138,7 +138,7 @@ describe('DocumentTable Component', () => {
             />
         );
 
-        const downloadButtons = screen.getAllByTitle(/Pobierz dokument/);
+        const downloadButtons = screen.getAllByRole('button', { name: /Pobierz dokument/ });
         fireEvent.click(downloadButtons[0]);
 
         expect(onDownload).toHaveBeenCalledWith(mockDocs[0]);
@@ -158,7 +158,7 @@ describe('DocumentTable Component', () => {
             />
         );
 
-        const auditButtons = screen.getAllByTitle(/Przeglądaj wpisy ścieżki audytowej/);
+        const auditButtons = screen.getAllByRole('button', { name: /Ścieżka audytowa/ });
         fireEvent.click(auditButtons[0]);
 
         expect(onViewAudit).toHaveBeenCalledWith(mockDocs[0]);
@@ -179,7 +179,7 @@ describe('DocumentTable Component', () => {
             />
         );
 
-        const previewButtons = screen.getAllByTitle(/Podgląd dokumentu/);
+        const previewButtons = screen.getAllByRole('button', { name: /Podgląd dokumentu/ });
         expect(previewButtons.length).toBe(2);
         fireEvent.click(previewButtons[0]);
 
@@ -225,7 +225,7 @@ describe('DocumentTable Component', () => {
             />
         );
 
-        const downloadButton = screen.getByTitle(/Pobieranie zablokowane przez uprawnienia VDR/);
+        const downloadButton = screen.getByRole('button', { name: /Pobieranie zablokowane/ });
         expect(downloadButton).toBeDisabled();
         fireEvent.click(downloadButton);
         expect(onDownload).not.toHaveBeenCalled();

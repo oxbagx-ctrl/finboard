@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Menu, Building2, RefreshCw, Lock, ChevronDown, User } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { Badge } from '../ui/Badge';
+import { Tooltip } from '../ui/Tooltip';
 import { UserProfileModal } from '../auth/UserProfileModal';
 import { CompanySwitcherModal } from './CompanySwitcherModal';
 
@@ -47,30 +48,34 @@ export const Header = ({ currentRoute, onToggleSidebar, onRefreshData, refreshin
 
                     {/* Refresh button */}
                     {onRefreshData && (
-                        <button
-                            onClick={onRefreshData}
-                            disabled={refreshing}
-                            title="Odśwież dane z serwera"
-                            className="p-1.5 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900 transition-colors disabled:opacity-50"
-                        >
-                            <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin text-zinc-200' : ''}`} />
-                        </button>
+                        <Tooltip content="Odśwież dane z serwera">
+                            <button
+                                onClick={onRefreshData}
+                                disabled={refreshing}
+                                aria-label="Odśwież dane z serwera"
+                                className="p-1.5 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900 transition-colors disabled:opacity-50"
+                            >
+                                <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin text-zinc-200' : ''}`} />
+                            </button>
+                        </Tooltip>
                     )}
 
                     {/* Company Switcher Trigger */}
                     {isAdmin ? (
-                        <button
-                            onClick={() => setSwitcherModalOpen(true)}
-                            title="Kliknij, aby przełączyć spółkę portfelową"
-                            className="flex items-center gap-2 bg-zinc-900 hover:bg-zinc-850 border border-zinc-750 hover:border-zinc-700 rounded px-2.5 py-1 text-xs text-zinc-200 transition-all"
-                        >
-                            <Building2 className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
-                            <span className="font-bold text-[11px] text-zinc-100">{activeCompany?.code || 'PODMIOT'}</span>
-                            <span className="hidden sm:inline text-zinc-500 text-[10px] truncate max-w-[120px]">
-                                {activeCompany?.name}
-                            </span>
-                            <ChevronDown className="w-3 h-3 text-zinc-500 shrink-0 ml-0.5" />
-                        </button>
+                        <Tooltip content="Kliknij, aby przełączyć spółkę portfelową">
+                            <button
+                                onClick={() => setSwitcherModalOpen(true)}
+                                aria-label="Przełącz spółkę portfelową"
+                                className="flex items-center gap-2 bg-zinc-900 hover:bg-zinc-850 border border-zinc-750 hover:border-zinc-700 rounded px-2.5 py-1 text-xs text-zinc-200 transition-all"
+                            >
+                                <Building2 className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+                                <span className="font-bold text-[11px] text-zinc-100">{activeCompany?.code || 'PODMIOT'}</span>
+                                <span className="hidden sm:inline text-zinc-500 text-[10px] truncate max-w-[120px]">
+                                    {activeCompany?.name}
+                                </span>
+                                <ChevronDown className="w-3 h-3 text-zinc-500 shrink-0 ml-0.5" />
+                            </button>
+                        </Tooltip>
                     ) : (
                         <div className="hidden sm:flex items-center gap-1.5 bg-zinc-900 border border-zinc-800 rounded px-2.5 py-1">
                             <Building2 className="w-3.5 h-3.5 text-zinc-500" />
@@ -79,14 +84,15 @@ export const Header = ({ currentRoute, onToggleSidebar, onRefreshData, refreshin
                     )}
 
                     {/* User Profile Trigger Button */}
-                    <button
-                        onClick={() => setProfileModalOpen(true)}
-                        title="Twój profil i ustawienia bezpieczeństwa"
-                        className="flex items-center gap-1.5 bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 hover:border-zinc-700 rounded px-2 py-1 transition-colors"
-                    >
-                        <div className="w-4 h-4 rounded bg-zinc-800 flex items-center justify-center text-zinc-300">
-                            <User className="w-3 h-3" />
-                        </div>
+                    <Tooltip content="Twój profil i ustawienia bezpieczeństwa">
+                        <button
+                            onClick={() => setProfileModalOpen(true)}
+                            aria-label="Twój profil i ustawienia bezpieczeństwa"
+                            className="flex items-center gap-1.5 bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 hover:border-zinc-700 rounded px-2 py-1 transition-colors"
+                        >
+                            <div className="w-4 h-4 rounded bg-zinc-800 flex items-center justify-center text-zinc-300">
+                                <User className="w-3 h-3" />
+                            </div>
                         <span className="hidden md:inline text-xs text-zinc-300 font-semibold max-w-[100px] truncate">
                             {user?.name?.split(' ')[0] || 'Użytkownik'}
                         </span>
@@ -94,6 +100,7 @@ export const Header = ({ currentRoute, onToggleSidebar, onRefreshData, refreshin
                             {isAdmin ? 'ADMIN' : 'CLIENT'}
                         </Badge>
                     </button>
+                    </Tooltip>
                 </div>
             </header>
 

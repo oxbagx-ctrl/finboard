@@ -11,6 +11,7 @@ import {
     FolderX,
     RefreshCw
 } from 'lucide-react';
+import { Tooltip } from '../ui/Tooltip';
 
 export const FolderTreeNav = ({
     folders = [],
@@ -76,23 +77,27 @@ export const FolderTreeNav = ({
 
                 {folders.length > 0 && (
                     <div className="flex items-center gap-1">
-                        <button
-                            type="button"
-                            onClick={expandAll}
-                            title="Rozwiń wszystkie gałęzie"
-                            className="px-1.5 py-0.5 text-[9px] text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 rounded transition-colors"
-                        >
-                            +Rozwiń
-                        </button>
+                        <Tooltip content="Rozwiń wszystkie gałęzie">
+                            <button
+                                type="button"
+                                onClick={expandAll}
+                                aria-label="Rozwiń wszystkie gałęzie"
+                                className="px-1.5 py-0.5 text-[9px] text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 rounded transition-colors"
+                            >
+                                +Rozwiń
+                            </button>
+                        </Tooltip>
                         <span className="text-zinc-650">|</span>
-                        <button
-                            type="button"
-                            onClick={collapseAll}
-                            title="Zwiń wszystkie gałęzie"
-                            className="px-1.5 py-0.5 text-[9px] text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 rounded transition-colors"
-                        >
-                            -Zwiń
-                        </button>
+                        <Tooltip content="Zwiń wszystkie gałęzie">
+                            <button
+                                type="button"
+                                onClick={collapseAll}
+                                aria-label="Zwiń wszystkie gałęzie"
+                                className="px-1.5 py-0.5 text-[9px] text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 rounded transition-colors"
+                            >
+                                -Zwiń
+                            </button>
+                        </Tooltip>
                     </div>
                 )}
             </div>
@@ -220,9 +225,11 @@ export const FolderTreeNav = ({
                                             {folder.index_code}
                                         </span>
 
-                                        <span className="truncate text-xs" title={folder.name}>
-                                            {folder.name}
-                                        </span>
+                                        <Tooltip content={folder.name}>
+                                            <span className="truncate text-xs">
+                                                {folder.name}
+                                            </span>
+                                        </Tooltip>
                                     </div>
 
                                     <span
@@ -256,9 +263,11 @@ export const FolderTreeNav = ({
                                                         <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-zinc-950 border border-zinc-800 text-cyan-400 shrink-0">
                                                             {child.index_code}
                                                         </span>
-                                                        <span className="truncate text-[11px]" title={child.name}>
-                                                            {child.name}
-                                                        </span>
+                                                        <Tooltip content={child.name}>
+                                                            <span className="truncate text-[11px]">
+                                                                {child.name}
+                                                            </span>
+                                                        </Tooltip>
                                                     </div>
 
                                                     <span
@@ -284,20 +293,22 @@ export const FolderTreeNav = ({
             {/* Bottom action to initialize if folders exist */}
             {folders.length > 0 && (
                 <div className="pt-2 mt-2 border-t border-zinc-800">
-                    <button
-                        type="button"
-                        onClick={onInitStandardFolders}
-                        disabled={initLoading}
-                        title="Zainicjalizuj brakujące foldery standardu M&A"
-                        className="w-full flex items-center justify-center gap-1.5 py-1 text-[10px] text-zinc-400 hover:text-emerald-400 hover:bg-zinc-850 rounded transition-colors disabled:opacity-50"
-                    >
-                        {initLoading ? (
-                            <RefreshCw className="w-3 h-3 animate-spin" />
-                        ) : (
-                            <Sparkles className="w-3 h-3 text-emerald-400" />
-                        )}
-                        Uzupełnij standard M&A (33 foldery)
-                    </button>
+                    <Tooltip content="Zainicjalizuj brakujące foldery standardu M&A">
+                        <button
+                            type="button"
+                            onClick={onInitStandardFolders}
+                            disabled={initLoading}
+                            aria-label="Zainicjalizuj brakujące foldery standardu M&A"
+                            className="w-full flex items-center justify-center gap-1.5 py-1 text-[10px] text-zinc-400 hover:text-emerald-400 hover:bg-zinc-850 rounded transition-colors disabled:opacity-50"
+                        >
+                            {initLoading ? (
+                                <RefreshCw className="w-3 h-3 animate-spin" />
+                            ) : (
+                                <Sparkles className="w-3 h-3 text-emerald-400" />
+                            )}
+                            Uzupełnij standard M&A (33 foldery)
+                        </button>
+                    </Tooltip>
                 </div>
             )}
         </div>

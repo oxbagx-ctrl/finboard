@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FinancialValue } from './FinancialValue';
 import { PercentageBadge } from './PercentageBadge';
+import { Tooltip } from './Tooltip';
 import { ChevronRight, ChevronDown } from 'lucide-react';
 
 /**
@@ -109,17 +110,21 @@ export const FinancialTable = ({
                                             {((isDeduction && !row.isGroup && !isSummary) || row.code) && (
                                                 <span className="inline-flex items-center gap-1 shrink-0">
                                                     {isDeduction && !row.isGroup && !isSummary && (
-                                                        <span
-                                                            className="text-[10px] font-mono text-zinc-500 font-normal select-none"
-                                                            title="Pozycja pomniejszająca wynik"
-                                                        >
-                                                            (-)
-                                                        </span>
+                                                        <Tooltip content="Pozycja pomniejszająca wynik">
+                                                            <span
+                                                                className="text-[10px] font-mono text-zinc-500 font-normal select-none cursor-help"
+                                                                aria-label="Pozycja pomniejszająca wynik"
+                                                            >
+                                                                (-)
+                                                            </span>
+                                                        </Tooltip>
                                                     )}
                                                     {row.code && (
-                                                        <span className="text-[10px] font-mono text-zinc-500 font-normal">
-                                                            [{row.code}]
-                                                        </span>
+                                                        <Tooltip content={`Kod pozycji: ${row.code}`}>
+                                                            <span className="text-[10px] font-mono text-zinc-500 font-normal cursor-help">
+                                                                [{row.code}]
+                                                            </span>
+                                                        </Tooltip>
                                                     )}
                                                 </span>
                                             )}
@@ -176,7 +181,9 @@ export const FinancialTable = ({
                                                     <span className="text-zinc-600 font-mono select-none">↳</span>
                                                     <span className="truncate">{child.label}</span>
                                                     {child.code && (
-                                                        <span className="text-[9px] text-zinc-500 font-mono">[{child.code}]</span>
+                                                        <Tooltip content={`Kod kategorii: ${child.code}`}>
+                                                            <span className="text-[9px] text-zinc-500 font-mono cursor-help">[{child.code}]</span>
+                                                        </Tooltip>
                                                     )}
                                                 </td>
 

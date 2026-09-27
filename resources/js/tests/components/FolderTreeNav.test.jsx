@@ -111,11 +111,11 @@ describe('FolderTreeNav Component', () => {
         expect(screen.getByText('Umowy Spółki i Statuty')).toBeInTheDocument();
 
         // Click collapse all
-        fireEvent.click(screen.getByTitle('Zwiń wszystkie gałęzie'));
+        fireEvent.click(screen.getByRole('button', { name: /Zwiń wszystkie gałęzie/ }));
         expect(screen.queryByText('Umowy Spółki i Statuty')).not.toBeInTheDocument();
 
         // Click expand all
-        fireEvent.click(screen.getByTitle('Rozwiń wszystkie gałęzie'));
+        fireEvent.click(screen.getByRole('button', { name: /Rozwiń wszystkie gałęzie/ }));
         expect(screen.getByText('Umowy Spółki i Statuty')).toBeInTheDocument();
     });
 
