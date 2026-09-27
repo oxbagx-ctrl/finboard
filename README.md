@@ -864,6 +864,29 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Uodpornienie kontrolera `VdrPermissionController`: obsługa wyjątków `\InvalidArgumentException` z mapowaniem na czyste kody HTTP 404 (`NotFoundHttpException`).
     - 100% PASS w pełnym zestawie 723 testów PHPUnit (8782 asercje) oraz 58 plikach testowych Vitest (537 testów).
 
+- [x] **Faza 56: Wdrożenie Systemu Tooltipów @floating-ui/react, Audyt Dostępności WCAG 2.1/2.2 AA oraz Wyjaśnialność Wskaźników Finansowych**
+  - [x] Implementacja dostępnych komponentów Tooltip i InfoTooltip z WAI-ARIA role="tooltip" i nawigacją klawiaturą (@floating-ui/react).
+    - Nowoczesny silnik podpowiedzi oparty o `@floating-ui/react` eliminujący ograniczenia natywnego `title="..."` (zgodność z WCAG 2.1/2.2 AA 1.4.13 i 2.1.1).
+    - Komponent `<Tooltip />` z obsługą `useFloating`, `flip()`, `shift({ padding: 8 })`, `offset(8)`, `arrow()` i `safePolygon()`.
+    - Obsługa urządzeń mobilnych/tabletów (toggle on tap) oraz odrzucanie klawiszem Escape bez utraty fokusu.
+    - Dedykowany komponent `<InfoTooltip />` ze wskaźnikiem ikony dla metryk finansowych i nagłówków tabel.
+    - Pakiet testów jednostkowych `Tooltip.test.jsx` (14 testów).
+  - [x] Migracja natywnych atrybutów HTML title na dostępne komponenty Tooltip w VDR, layout i tabelach danych.
+    - Eliminacja natywnego `title="..."` z `DocumentTable.jsx`, `VdrPermissionBadge.jsx`, `FolderTreeNav.jsx`, `BatchActionBar.jsx`, `Header.jsx`, `Sidebar.jsx` oraz `FinancialTable.jsx`.
+    - Interaktywny tooltip kopiowania sumy kontrolnej SHA-256 z dynamicznym feedbackiem ("Kopiuj pełną sumę kontrolną SHA-256" / "Skopiowano sumę SHA-256!").
+    - Dostępne podpowiedzi dla odznaki dynamicznego znaku wodnego oraz wskaźników pozycji pomniejszającej wynik `(-)` i kodów P&L.
+    - Dostępne etykiety `aria-label` dla przycisków ikonowych oraz synchronizacja testów komponentowych.
+  - [x] Kontekstowe podpowiedzi finansowe i definicje kowenantów bankowych LMA w kokpicie i pasku mnożników.
+    - Wzbogacenie pasków wskaźników rynkowych (`FinancialMultiplesStrip.jsx`) o szczegółowe dymki metodologiczne dla EV/EBITDA, EV/EBIT, P/E, Długu Netto / EBITDA i P/BV wraz ze wzorami matematycznymi i interpretacją benchmarków.
+    - Wdrożenie komponentów `<InfoTooltip />` w module kowenantów bankowych (`BankingCovenantsStrip.jsx`) z definicjami LMA dla DSCR, ICR, Current Ratio, Peak Leverage, DSRF oraz LLCR.
+    - Integracja pomocniczych podpowiedzi informacyjnych w matrycy suwaków What-If analizy wrażliwości (`SensitivityCockpitView.jsx`): CAPEX, Przychody ze Sprzedaży, Koszty Zmienne, Koszty Stałe OPEX, Fundusz Płac, Stopa Dyskontowa WACC oraz Reinwestycje A/B/C.
+    - Weryfikacja testowa: `FinancialMultiplesStrip.test.jsx` (3/3), `BankingCovenantsStrip.test.jsx` (17/17), `SensitivityCockpitView.test.jsx` (15/15).
+  - [x] Audyt dostępności WCAG 2.1/2.2 AA, testy regresyjne i integracyjne oraz bezkolizyjne współistnienie z Recharts.
+    - Kompleksowy pakiet testów integracyjnych i regresyjnych `TooltipAccessibilityRegression.test.jsx` (7 testów).
+    - Weryfikacja kryteriów WCAG: Dismissible (klawisz Escape bez utraty fokusu), Hoverable (bezpieczne najechanie na treść podpowiedzi), Persistent (brak przedwczesnego wygasania).
+    - Potwierdzenie bezkolizyjnego współistnienia w DOM i nasłuchiwaczach pomiędzy dymkami UI a wykresem Recharts (`CustomChartTooltip`).
+    - 100% PASS w pełnym zestawie testów Vitest oraz pomyślna kompilacja produkcyjna (`npm run build`).
+
 ---
 
 

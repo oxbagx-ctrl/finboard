@@ -1,6 +1,7 @@
 import React from 'react';
 import { CheckSquare, Trash2, X, Layers } from 'lucide-react';
 import { formatCurrency } from '../../utils/formatters';
+import { Tooltip } from '../ui/Tooltip';
 
 
 export const BatchActionBar = ({
@@ -70,29 +71,33 @@ export const BatchActionBar = ({
 
             {/* Action Buttons */}
             <div className="flex items-center gap-2 w-full sm:w-auto justify-end ml-auto">
-                <button
-                    type="button"
-                    onClick={onClearSelection}
-                    disabled={disabled}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-zinc-700 bg-zinc-800/80 hover:bg-zinc-750 text-zinc-300 hover:text-white transition-colors text-xs font-sans disabled:opacity-50 cursor-pointer"
-                    title="Odznacz wszystkie zaznaczone transakcje"
-                    data-testid="batch-clear-btn"
-                >
-                    <X className="w-3.5 h-3.5" />
-                    <span>Odznacz</span>
-                </button>
+                <Tooltip content="Odznacz wszystkie zaznaczone transakcje">
+                    <button
+                        type="button"
+                        onClick={onClearSelection}
+                        disabled={disabled}
+                        aria-label="Odznacz wszystkie zaznaczone transakcje"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-zinc-700 bg-zinc-800/80 hover:bg-zinc-750 text-zinc-300 hover:text-white transition-colors text-xs font-sans disabled:opacity-50 cursor-pointer"
+                        data-testid="batch-clear-btn"
+                    >
+                        <X className="w-3.5 h-3.5" />
+                        <span>Odznacz</span>
+                    </button>
+                </Tooltip>
 
-                <button
-                    type="button"
-                    onClick={onOpenBatchDelete}
-                    disabled={disabled}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 active:bg-rose-700 text-white font-medium shadow-sm transition-colors text-xs font-sans disabled:opacity-50 cursor-pointer"
-                    title="Usuń wybrane transakcje"
-                    data-testid="batch-delete-btn"
-                >
-                    <Trash2 className="w-3.5 h-3.5" />
-                    <span>Usuń zaznaczone</span>
-                </button>
+                <Tooltip content="Usuń wybrane transakcje">
+                    <button
+                        type="button"
+                        onClick={onOpenBatchDelete}
+                        disabled={disabled}
+                        aria-label="Usuń wybrane transakcje"
+                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 active:bg-rose-700 text-white font-medium shadow-sm transition-colors text-xs font-sans disabled:opacity-50 cursor-pointer"
+                        data-testid="batch-delete-btn"
+                    >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Usuń zaznaczone</span>
+                    </button>
+                </Tooltip>
             </div>
         </div>
     );
