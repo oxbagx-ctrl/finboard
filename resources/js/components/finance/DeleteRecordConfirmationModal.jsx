@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import apiClient from '../../api/client';
 import { useNotification } from '../../context/NotificationContext';
 import { Button } from '../ui/Button';
+import { Tooltip } from '../ui/Tooltip';
 import { AlertTriangle, X, Trash2 } from 'lucide-react';
 import { formatCurrency } from '../../utils/formatters';
 
@@ -43,12 +44,15 @@ export const DeleteRecordConfirmationModal = ({
                             Potwierdzenie Usunięcia Wpisu
                         </h2>
                     </div>
-                    <button
-                        onClick={onClose}
-                        className="p-1 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors"
-                    >
-                        <X className="w-4 h-4" />
-                    </button>
+                    <Tooltip content="Zamknij okno potwierdzenia">
+                        <button
+                            onClick={onClose}
+                            className="p-1 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors"
+                            aria-label="Zamknij okno potwierdzenia"
+                        >
+                            <X className="w-4 h-4" />
+                        </button>
+                    </Tooltip>
                 </div>
 
                 {/* Body */}

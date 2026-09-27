@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { AlertTriangle, Trash2, X, ShieldAlert } from 'lucide-react';
 import { formatCurrency } from '../../utils/formatters';
 import { Button } from '../ui/Button';
+import { Tooltip } from '../ui/Tooltip';
 
 export const MAX_BATCH_DELETE_SIZE = 500;
 
@@ -64,16 +65,18 @@ export const BatchDeleteConfirmationModal = ({
                             </p>
                         </div>
                     </div>
-                    <button
-                        type="button"
-                        onClick={onClose}
-                        disabled={loading}
-                        className="text-zinc-500 hover:text-zinc-300 transition-colors p-1 rounded hover:bg-zinc-800 disabled:opacity-50 cursor-pointer"
-                        data-testid="batch-modal-close-btn"
-                        title="Zamknij"
-                    >
-                        <X className="w-4 h-4" />
-                    </button>
+                    <Tooltip content="Zamknij okno potwierdzenia">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            disabled={loading}
+                            className="text-zinc-500 hover:text-zinc-300 transition-colors p-1 rounded hover:bg-zinc-800 disabled:opacity-50 cursor-pointer"
+                            data-testid="batch-modal-close-btn"
+                            aria-label="Zamknij okno potwierdzenia"
+                        >
+                            <X className="w-4 h-4" />
+                        </button>
+                    </Tooltip>
                 </div>
 
                 <form onSubmit={handleFormSubmit}>

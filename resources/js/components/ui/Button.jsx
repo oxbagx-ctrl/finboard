@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const Button = ({
+export const Button = React.forwardRef(({
     children,
     variant = 'primary',
     size = 'md',
@@ -11,7 +11,7 @@ export const Button = ({
     onClick,
     type = 'button',
     ...props
-}) => {
+}, ref) => {
     const baseClasses = 'inline-flex items-center justify-center font-medium rounded-md transition-colors duration-150 focus:outline-none focus:ring-1 focus:ring-zinc-400 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer';
 
     const sizeClasses = {
@@ -31,6 +31,7 @@ export const Button = ({
 
     return (
         <button
+            ref={ref}
             type={type}
             disabled={disabled || loading}
             onClick={onClick}
@@ -48,4 +49,6 @@ export const Button = ({
             {children}
         </button>
     );
-};
+});
+
+Button.displayName = 'Button';

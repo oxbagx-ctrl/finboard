@@ -11,6 +11,7 @@ import { FinancialValue } from '../components/ui/FinancialValue';
 
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
+import { Tooltip, InfoTooltip } from '../components/ui/Tooltip';
 import {
     TableProperties,
     Plus,
@@ -345,15 +346,45 @@ export const RecordsView = () => {
         switch (normalized) {
             case 'revenue':
             case 'income':
-                return <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-950 border border-emerald-800 text-emerald-400">PRZYCHÓD</span>;
+                return (
+                    <Tooltip content="Przychód operacyjny zwiększający wynik finansowy">
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-950 border border-emerald-800 text-emerald-400 cursor-help">
+                            PRZYCHÓD
+                        </span>
+                    </Tooltip>
+                );
             case 'expense':
-                return <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-rose-950 border border-rose-800 text-rose-400">KOSZT OPEX</span>;
+                return (
+                    <Tooltip content="Koszt operacyjny (OPEX) obciążający marżę spółki">
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-rose-950 border border-rose-800 text-rose-400 cursor-help">
+                            KOSZT OPEX
+                        </span>
+                    </Tooltip>
+                );
             case 'asset':
-                return <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-sky-950 border border-sky-800 text-sky-400">AKTYWA</span>;
+                return (
+                    <Tooltip content="Pozycja bilansowa zwiększająca aktywa trwałe lub obrotowe">
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-sky-950 border border-sky-800 text-sky-400 cursor-help">
+                            AKTYWA
+                        </span>
+                    </Tooltip>
+                );
             case 'liability':
-                return <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-950 border border-amber-800 text-amber-400">PASYWA</span>;
+                return (
+                    <Tooltip content="Zobowiązanie bilansowe lub pasywa obce spółki">
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-950 border border-amber-800 text-amber-400 cursor-help">
+                            PASYWA
+                        </span>
+                    </Tooltip>
+                );
             default:
-                return <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-zinc-800 text-zinc-300">{type}</span>;
+                return (
+                    <Tooltip content={`Typ operacji: ${type}`}>
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-zinc-800 text-zinc-300 cursor-help">
+                            {type}
+                        </span>
+                    </Tooltip>
+                );
         }
     };
 
@@ -362,13 +393,23 @@ export const RecordsView = () => {
             {/* Top Ribbon */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-zinc-900 border border-zinc-800 rounded-lg p-3">
                 <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded bg-zinc-850 border border-zinc-750 flex items-center justify-center text-zinc-300">
-                        <TableProperties className="w-4 h-4" />
-                    </div>
+                    <Tooltip content="Moduł memoriałowej księgi transakcji i planu kont">
+                        <div className="w-8 h-8 rounded bg-zinc-850 border border-zinc-750 flex items-center justify-center text-zinc-300 cursor-help">
+                            <TableProperties className="w-4 h-4" />
+                        </div>
+                    </Tooltip>
                     <div>
                         <div className="text-xs font-bold text-zinc-100 flex items-center gap-2">
                             <span>Księga Operacji Finansowych (General Ledger)</span>
-                            <Badge variant="default" size="sm">{activeCompany?.code || 'PODMIOT'}</Badge>
+                            <InfoTooltip
+                                size="xs"
+                                content="Rejestr memoriałowy wszystkich operacji księgowych spółki, ujętych chronologicznie z podziałem na kategorie P&L oraz pozycje bilansowe"
+                            />
+                            <Tooltip content={`Podmiot gospodarczy: ${activeCompany?.name || 'Spółka portfelowa'} (${activeCompany?.code || 'PODMIOT'})`}>
+                                <span className="inline-flex">
+                                    <Badge variant="default" size="sm">{activeCompany?.code || 'PODMIOT'}</Badge>
+                                </span>
+                            </Tooltip>
                         </div>
                         <p className="text-[10px] text-zinc-500 mt-0.5">
                             Podmiot: {activeCompany?.name} | Rejestr transakcji memoriałowych
@@ -377,39 +418,50 @@ export const RecordsView = () => {
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <Button
-                        variant="secondary"
-                        size="sm"
-                        icon={Download}
-                        onClick={handleExportCSV}
-                        title="Eksportuj bieżący widok do CSV"
-                    >
-                        Eksportuj CSV
-                    </Button>
-                    <Button
-                        variant="primary"
-                        size="sm"
-                        icon={Plus}
-                        onClick={handleOpenCreate}
-                    >
-                        Nowy Zapis Księgowy
-                    </Button>
+                    <Tooltip content="Eksportuj odfiltrowane pozycje księgowe do pliku CSV">
+                        <Button
+                            variant="secondary"
+                            size="sm"
+                            icon={Download}
+                            onClick={handleExportCSV}
+                            aria-label="Eksportuj CSV"
+                        >
+                            Eksportuj CSV
+                        </Button>
+                    </Tooltip>
+                    <Tooltip content="Zarejestruj nową operację memoriałową w księdze głównej">
+                        <Button
+                            variant="primary"
+                            size="sm"
+                            icon={Plus}
+                            onClick={handleOpenCreate}
+                            aria-label="Nowy Zapis Księgowy"
+                        >
+                            Nowy Zapis Księgowy
+                        </Button>
+                    </Tooltip>
                 </div>
             </div>
 
             {/* Quick Metrics Bar for View */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
                 <div className="p-2.5 rounded-lg bg-zinc-900 border border-zinc-800" data-testid="summary-card-total">
-                    <div className="text-[10px] text-zinc-500 uppercase">Łącznie Pozycji</div>
+                    <div className="text-[10px] text-zinc-500 uppercase flex items-center justify-between">
+                        <span>Łącznie Pozycji</span>
+                        <InfoTooltip size="xs" content="Całkowita liczba transakcji memoriałowych spełniających kryteria aktywnego filtra" />
+                    </div>
                     <div className="text-sm font-bold text-zinc-100 tabular-nums mt-0.5" data-testid="summary-total-value">
                         {meta.total} <span className="text-[10px] text-zinc-500 font-normal">wpisów</span>
                     </div>
                 </div>
 
                 <div className="p-2.5 rounded-lg bg-zinc-900 border border-zinc-800" data-testid="summary-card-income">
-                    <div className="text-[10px] text-zinc-500 uppercase flex items-center gap-1">
-                        <ArrowUpRight className="w-3 h-3 text-emerald-400" />
-                        Przychody (Strona)
+                    <div className="text-[10px] text-zinc-500 uppercase flex items-center justify-between">
+                        <span className="flex items-center gap-1">
+                            <ArrowUpRight className="w-3 h-3 text-emerald-400" />
+                            Przychody (Strona)
+                        </span>
+                        <InfoTooltip size="xs" content="Suma operacji przychodowych (REVENUE / INCOME) w bieżącym okresie obrachunkowym" />
                     </div>
                     <div className="text-sm font-bold text-emerald-400 tabular-nums mt-0.5" data-testid="summary-income-value">
                         {formatCurrency(summary.income, currency)}
@@ -417,9 +469,12 @@ export const RecordsView = () => {
                 </div>
 
                 <div className="p-2.5 rounded-lg bg-zinc-900 border border-zinc-800" data-testid="summary-card-expense">
-                    <div className="text-[10px] text-zinc-500 uppercase flex items-center gap-1">
-                        <ArrowDownRight className="w-3 h-3 text-rose-400" />
-                        Koszty OPEX (Strona)
+                    <div className="text-[10px] text-zinc-500 uppercase flex items-center justify-between">
+                        <span className="flex items-center gap-1">
+                            <ArrowDownRight className="w-3 h-3 text-rose-400" />
+                            Koszty OPEX (Strona)
+                        </span>
+                        <InfoTooltip size="xs" content="Suma kosztów operacyjnych (EXPENSE) pomniejszających wynik finansowy okresu" />
                     </div>
                     <div className="text-sm font-bold text-rose-400 tabular-nums mt-0.5" data-testid="summary-expense-value">
                         {formatCurrency(summary.expense, currency)}
@@ -427,9 +482,12 @@ export const RecordsView = () => {
                 </div>
 
                 <div className="p-2.5 rounded-lg bg-zinc-900 border border-zinc-800" data-testid="summary-card-balance">
-                    <div className="text-[10px] text-zinc-500 uppercase flex items-center gap-1">
-                        <DollarSign className="w-3 h-3 text-zinc-400" />
-                        Saldo Operacji (Netto)
+                    <div className="text-[10px] text-zinc-500 uppercase flex items-center justify-between">
+                        <span className="flex items-center gap-1">
+                            <DollarSign className="w-3 h-3 text-zinc-400" />
+                            Saldo Operacji (Netto)
+                        </span>
+                        <InfoTooltip size="xs" content="Różnica między operacjami przychodowymi a kosztami operacyjnymi (Spread memoriałowy)" />
                     </div>
                     <div className={`text-sm font-bold tabular-nums mt-0.5 ${summary.balance >= 0 ? 'text-zinc-100' : 'text-rose-400'}`} data-testid="summary-balance-value">
                         {formatCurrency(summary.balance, currency)}
@@ -442,7 +500,11 @@ export const RecordsView = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5">
                     {/* Search query */}
                     <div className="relative lg:col-span-2">
-                        <Search className="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                        <Tooltip content="Wyszukaj operacje po opisie, tytule przelewu, kontrahencie lub numerze faktury">
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 cursor-help text-zinc-500">
+                                <Search className="w-3.5 h-3.5" />
+                            </span>
+                        </Tooltip>
                         <input
                             type="text"
                             value={search}
@@ -451,87 +513,105 @@ export const RecordsView = () => {
                                 setPage(1);
                             }}
                             placeholder="Szukaj po opisie, kontrahencie, fakturze..."
+                            aria-label="Szukaj po opisie, kontrahencie, fakturze"
                             className="w-full bg-zinc-950 border border-zinc-750 rounded pl-8 pr-3 py-1.5 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
                         />
                     </div>
 
                     {/* Record type filter */}
                     <div>
-                        <select
-                            data-testid="filter-record-type"
-                            value={selectedType}
-                            onChange={(e) => {
-                                setSelectedType(e.target.value);
-                                setPage(1);
-                            }}
-                            className="w-full bg-zinc-950 border border-zinc-750 rounded px-2.5 py-1.5 text-xs text-zinc-200 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
-                        >
-                            <option value="">Wszystkie typy</option>
-                            <option value="revenue">Przychody (REVENUE)</option>
-                            <option value="expense">Koszty (EXPENSE)</option>
-                            <option value="asset">Aktywa (ASSET)</option>
-                            <option value="liability">Pasywa (LIABILITY)</option>
-                        </select>
+                        <Tooltip content="Filtruj operacje według klasyfikacji księgowej: Przychody, Koszty OPEX, Aktywa, Pasywa">
+                            <select
+                                data-testid="filter-record-type"
+                                value={selectedType}
+                                onChange={(e) => {
+                                    setSelectedType(e.target.value);
+                                    setPage(1);
+                                }}
+                                aria-label="Filtruj według typu transakcji"
+                                className="w-full bg-zinc-950 border border-zinc-750 rounded px-2.5 py-1.5 text-xs text-zinc-200 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono cursor-pointer"
+                            >
+                                <option value="">Wszystkie typy</option>
+                                <option value="revenue">Przychody (REVENUE)</option>
+                                <option value="expense">Koszty (EXPENSE)</option>
+                                <option value="asset">Aktywa (ASSET)</option>
+                                <option value="liability">Pasywa (LIABILITY)</option>
+                            </select>
+                        </Tooltip>
                     </div>
 
                     {/* Category filter */}
                     <div>
-                        <select
-                            value={selectedCategory}
-                            onChange={(e) => {
-                                setSelectedCategory(e.target.value);
-                                setPage(1);
-                            }}
-                            className="w-full bg-zinc-950 border border-zinc-750 rounded px-2.5 py-1.5 text-xs text-zinc-200 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono truncate"
-                        >
-                            <option value="">Wszystkie kategorie</option>
-                            {categories.map((c) => (
-                                <option key={c.id} value={c.id}>
-                                    [{c.code}] {c.name}
-                                </option>
-                            ))}
-                        </select>
+                        <Tooltip content="Filtruj transakcje według wybranej kategorii analitycznej planu kont">
+                            <select
+                                value={selectedCategory}
+                                onChange={(e) => {
+                                    setSelectedCategory(e.target.value);
+                                    setPage(1);
+                                }}
+                                aria-label="Filtruj według kategorii analitycznej"
+                                className="w-full bg-zinc-950 border border-zinc-750 rounded px-2.5 py-1.5 text-xs text-zinc-200 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono truncate cursor-pointer"
+                            >
+                                <option value="">Wszystkie kategorie</option>
+                                {categories.map((c) => (
+                                    <option key={c.id} value={c.id}>
+                                        [{c.code}] {c.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </Tooltip>
                     </div>
 
                     {/* Reset button */}
                     <div className="flex items-center gap-2">
-                        <Button
-                            variant="secondary"
-                            size="sm"
-                            icon={RotateCcw}
-                            onClick={handleResetFilters}
-                            className="w-full text-xs"
-                        >
-                            Reset Filtrów
-                        </Button>
+                        <Tooltip content="Przywróć domyślne ustawienia filtrów, wyszukiwania i zakresu dat">
+                            <Button
+                                variant="secondary"
+                                size="sm"
+                                icon={RotateCcw}
+                                onClick={handleResetFilters}
+                                aria-label="Reset Filtrów"
+                                className="w-full text-xs"
+                            >
+                                Reset Filtrów
+                            </Button>
+                        </Tooltip>
                     </div>
                 </div>
 
                 {/* Date range sub-filter */}
                 <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-zinc-850 text-[11px] text-zinc-400">
-                    <span className="flex items-center gap-1 text-zinc-500">
-                        <Calendar className="w-3 h-3" />
-                        ZAKRES DAT:
-                    </span>
-                    <input
-                        type="date"
-                        value={startDate}
-                        onChange={(e) => {
-                            setStartDate(e.target.value);
-                            setPage(1);
-                        }}
-                        className="bg-zinc-950 border border-zinc-800 rounded px-2 py-0.5 text-xs text-zinc-200 focus:outline-none"
-                    />
+                    <Tooltip content="Filtruj operacje według daty księgowania w zadanym przedziale czasowym">
+                        <span className="flex items-center gap-1 text-zinc-500 cursor-help">
+                            <Calendar className="w-3 h-3" />
+                            ZAKRES DAT:
+                        </span>
+                    </Tooltip>
+                    <Tooltip content="Początkowa data księgowania">
+                        <input
+                            type="date"
+                            value={startDate}
+                            aria-label="Początkowa data księgowania"
+                            onChange={(e) => {
+                                setStartDate(e.target.value);
+                                setPage(1);
+                            }}
+                            className="bg-zinc-950 border border-zinc-800 rounded px-2 py-0.5 text-xs text-zinc-200 focus:outline-none"
+                        />
+                    </Tooltip>
                     <span>do</span>
-                    <input
-                        type="date"
-                        value={endDate}
-                        onChange={(e) => {
-                            setEndDate(e.target.value);
-                            setPage(1);
-                        }}
-                        className="bg-zinc-950 border border-zinc-800 rounded px-2 py-0.5 text-xs text-zinc-200 focus:outline-none"
-                    />
+                    <Tooltip content="Końcowa data księgowania">
+                        <input
+                            type="date"
+                            value={endDate}
+                            aria-label="Końcowa data księgowania"
+                            onChange={(e) => {
+                                setEndDate(e.target.value);
+                                setPage(1);
+                            }}
+                            className="bg-zinc-950 border border-zinc-800 rounded px-2 py-0.5 text-xs text-zinc-200 focus:outline-none"
+                        />
+                    </Tooltip>
                 </div>
             </div>
 
@@ -542,24 +622,52 @@ export const RecordsView = () => {
                         <thead>
                             <tr className="bg-zinc-950 border-b border-zinc-800 text-[10px] text-zinc-400 uppercase tracking-wider">
                                 <th className="py-2.5 px-3 w-10 text-center">
-                                    <input
-                                        type="checkbox"
-                                        ref={(el) => {
-                                            if (el) el.indeterminate = someSelected;
-                                        }}
-                                        checked={allSelected}
-                                        onChange={handleToggleSelectAll}
-                                        aria-label="Zaznacz wszystkie transakcje na stronie"
-                                        data-testid="batch-master-checkbox"
-                                        className="rounded border-zinc-750 bg-zinc-900 text-emerald-500 focus:ring-emerald-500/20 focus:ring-offset-0 cursor-pointer w-3.5 h-3.5 accent-emerald-500 align-middle"
-                                    />
+                                    <Tooltip content="Zaznacz lub odznacz wszystkie transakcje na bieżącej stronie">
+                                        <span className="inline-flex">
+                                            <input
+                                                type="checkbox"
+                                                ref={(el) => {
+                                                    if (el) el.indeterminate = someSelected;
+                                                }}
+                                                checked={allSelected}
+                                                onChange={handleToggleSelectAll}
+                                                aria-label="Zaznacz wszystkie transakcje na stronie"
+                                                data-testid="batch-master-checkbox"
+                                                className="rounded border-zinc-750 bg-zinc-900 text-emerald-500 focus:ring-emerald-500/20 focus:ring-offset-0 cursor-pointer w-3.5 h-3.5 accent-emerald-500 align-middle"
+                                            />
+                                        </span>
+                                    </Tooltip>
                                 </th>
-                                <th className="py-2.5 px-3.5 font-semibold w-28">Data</th>
-                                <th className="py-2.5 px-3.5 font-semibold w-36">Kategoria</th>
-                                <th className="py-2.5 px-3.5 font-semibold">Tytuł / Opis Transakcji</th>
-                                <th className="py-2.5 px-3.5 font-semibold w-28 text-center">Typ</th>
-                                <th className="py-2.5 px-3.5 font-semibold w-36 text-right">Kwota ({currency})</th>
-                                <th className="py-2.5 px-3.5 font-semibold w-20 text-center">Akcje</th>
+                                <th className="py-2.5 px-3.5 font-semibold w-28">
+                                    <Tooltip content="Data ujęcia operacji w księgach (układ memoriałowy)">
+                                        <span className="cursor-help">Data</span>
+                                    </Tooltip>
+                                </th>
+                                <th className="py-2.5 px-3.5 font-semibold w-36">
+                                    <Tooltip content="Kod planu kont i analityczna nazwa kategorii P&L lub bilansowej">
+                                        <span className="cursor-help">Kategoria</span>
+                                    </Tooltip>
+                                </th>
+                                <th className="py-2.5 px-3.5 font-semibold">
+                                    <Tooltip content="Tytuł operacji, kontrahent, numer dokumentu źródłowego oraz identyfikator wpisu">
+                                        <span className="cursor-help">Tytuł / Opis Transakcji</span>
+                                    </Tooltip>
+                                </th>
+                                <th className="py-2.5 px-3.5 font-semibold w-28 text-center">
+                                    <Tooltip content="Klasyfikacja księgowa pozycji: PRZYCHÓD, KOSZT OPEX, AKTYWA lub PASYWA">
+                                        <span className="cursor-help">Typ</span>
+                                    </Tooltip>
+                                </th>
+                                <th className="py-2.5 px-3.5 font-semibold w-36 text-right">
+                                    <Tooltip content={`Wartość nominalna operacji przeliczona na walutę raportową (${currency})`}>
+                                        <span className="cursor-help">Kwota ({currency})</span>
+                                    </Tooltip>
+                                </th>
+                                <th className="py-2.5 px-3.5 font-semibold w-20 text-center">
+                                    <Tooltip content="Dostępne operacje na pojedynczym wpisie: edycja parametrów i trwałe usunięcie">
+                                        <span className="cursor-help">Akcje</span>
+                                    </Tooltip>
+                                </th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-zinc-850">
@@ -589,37 +697,52 @@ export const RecordsView = () => {
                                             }`}
                                         >
                                             <td className="py-2.5 px-3 text-center whitespace-nowrap">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={isSelected}
-                                                    onChange={() => handleToggleSelectRow(record)}
-                                                    aria-label={`Zaznacz transakcję ${record.description}`}
-                                                    data-testid={`record-checkbox-${record.id}`}
-                                                    className="rounded border-zinc-750 bg-zinc-900 text-emerald-500 focus:ring-emerald-500/20 focus:ring-offset-0 cursor-pointer w-3.5 h-3.5 accent-emerald-500 align-middle"
-                                                />
+                                                <Tooltip content={`Zaznacz pozycję: ${record.description || record.id.substring(0, 8)}`}>
+                                                    <span className="inline-flex">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={isSelected}
+                                                            onChange={() => handleToggleSelectRow(record)}
+                                                            aria-label={`Zaznacz transakcję ${record.description}`}
+                                                            data-testid={`record-checkbox-${record.id}`}
+                                                            className="rounded border-zinc-750 bg-zinc-900 text-emerald-500 focus:ring-emerald-500/20 focus:ring-offset-0 cursor-pointer w-3.5 h-3.5 accent-emerald-500 align-middle"
+                                                        />
+                                                    </span>
+                                                </Tooltip>
                                             </td>
                                             <td className="py-2.5 px-3.5 text-zinc-400 text-[11px] whitespace-nowrap">
-                                                {record.record_date}
+                                                <Tooltip content={`Data księgowa: ${record.record_date}`}>
+                                                    <span className="cursor-help">{record.record_date}</span>
+                                                </Tooltip>
                                             </td>
 
-
                                             <td className="py-2.5 px-3.5 whitespace-nowrap">
-                                                <span className="font-semibold text-zinc-200">
-                                                    [{record.category?.code || 'N/A'}]
-                                                </span>
-                                                <span className="text-[10px] text-zinc-500 block truncate max-w-[130px]">
-                                                    {record.category?.name || 'Inne'}
-                                                </span>
+                                                <Tooltip content={`Kategoria: ${record.category?.name || 'Inne'} [${record.category?.code || 'N/A'}]`}>
+                                                    <div className="cursor-help">
+                                                        <span className="font-semibold text-zinc-200">
+                                                            [{record.category?.code || 'N/A'}]
+                                                        </span>
+                                                        <span className="text-[10px] text-zinc-500 block truncate max-w-[130px]">
+                                                            {record.category?.name || 'Inne'}
+                                                        </span>
+                                                    </div>
+                                                </Tooltip>
                                             </td>
 
                                             <td className="py-2.5 px-3.5">
-                                                <div className="text-zinc-100 font-medium truncate max-w-md">
-                                                    {record.description}
-                                                </div>
+                                                <Tooltip content={record.description}>
+                                                    <div className="text-zinc-100 font-medium truncate max-w-md cursor-help">
+                                                        {record.description}
+                                                    </div>
+                                                </Tooltip>
                                                 <div className="text-[10px] text-zinc-500 flex items-center gap-2 mt-0.5">
-                                                    <span>ŹRÓDŁO: {record.source?.toUpperCase() || 'MANUAL'}</span>
+                                                    <Tooltip content={`Pochodzenie zapisu: ${record.source?.toUpperCase() === 'MANUAL' ? 'Wprowadzony ręcznie' : 'Zaimportowany z pliku CSV'}`}>
+                                                        <span className="cursor-help">ŹRÓDŁO: {record.source?.toUpperCase() || 'MANUAL'}</span>
+                                                    </Tooltip>
                                                     <span>•</span>
-                                                    <span>ID: {record.id.substring(0, 8)}...</span>
+                                                    <Tooltip content={`Pełny unikalny identyfikator UUID rekordu: ${record.id}`}>
+                                                        <span className="cursor-help font-mono">ID: {record.id.substring(0, 8)}...</span>
+                                                    </Tooltip>
                                                 </div>
                                             </td>
 
@@ -637,20 +760,24 @@ export const RecordsView = () => {
 
                                             <td className="py-2.5 px-3.5 text-center whitespace-nowrap">
                                                 <div className="flex items-center justify-center gap-1">
-                                                    <button
-                                                        onClick={() => handleOpenEdit(record)}
-                                                        title="Edytuj zapis"
-                                                        className="p-1 rounded text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 transition-colors"
-                                                    >
-                                                        <Edit2 className="w-3.5 h-3.5" />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleOpenDelete(record)}
-                                                        title="Usuń zapis"
-                                                        className="p-1 rounded text-zinc-500 hover:text-rose-400 hover:bg-zinc-800 transition-colors"
-                                                    >
-                                                        <Trash2 className="w-3.5 h-3.5" />
-                                                    </button>
+                                                    <Tooltip content="Edytuj parametry i kwotę zapisu księgowego">
+                                                        <button
+                                                            onClick={() => handleOpenEdit(record)}
+                                                            aria-label={`Edytuj zapis: ${record.description}`}
+                                                            className="p-1 rounded text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 transition-colors cursor-pointer"
+                                                        >
+                                                            <Edit2 className="w-3.5 h-3.5" />
+                                                        </button>
+                                                    </Tooltip>
+                                                    <Tooltip content="Usuń zapis z księgi głównej">
+                                                        <button
+                                                            onClick={() => handleOpenDelete(record)}
+                                                            aria-label={`Usuń zapis: ${record.description}`}
+                                                            className="p-1 rounded text-zinc-500 hover:text-rose-400 hover:bg-zinc-800 transition-colors cursor-pointer"
+                                                        >
+                                                            <Trash2 className="w-3.5 h-3.5" />
+                                                        </button>
+                                                    </Tooltip>
                                                 </div>
                                             </td>
                                         </tr>
@@ -670,46 +797,57 @@ export const RecordsView = () => {
 
                         <div className="flex items-center gap-1.5">
                             <span>NA STRONIE:</span>
-                            <select
-                                value={perPage}
-                                onChange={(e) => {
-                                    setPerPage(Number(e.target.value));
-                                    setPage(1);
-                                }}
-                                className="bg-zinc-900 border border-zinc-750 rounded px-1.5 py-0.5 text-zinc-200 text-xs focus:outline-none"
-                            >
-                                <option value={10}>10</option>
-                                <option value={25}>25</option>
-                                <option value={50}>50</option>
-                                <option value={100}>100</option>
-                            </select>
+                            <Tooltip content="Liczba pozycji wyświetlanych na jednej stronie tabeli">
+                                <select
+                                    value={perPage}
+                                    onChange={(e) => {
+                                        setPerPage(Number(e.target.value));
+                                        setPage(1);
+                                    }}
+                                    aria-label="Liczba transakcji na stronie"
+                                    className="bg-zinc-900 border border-zinc-750 rounded px-1.5 py-0.5 text-zinc-200 text-xs focus:outline-none cursor-pointer"
+                                >
+                                    <option value={10}>10</option>
+                                    <option value={25}>25</option>
+                                    <option value={50}>50</option>
+                                    <option value={100}>100</option>
+                                </select>
+                            </Tooltip>
                         </div>
                     </div>
 
                     <div className="flex items-center gap-1.5">
-                        <Button
-                            variant="secondary"
-                            size="sm"
-                            icon={ChevronLeft}
-                            disabled={page <= 1}
-                            onClick={() => setPage((p) => Math.max(1, p - 1))}
-                        >
-                            Poprzednia
-                        </Button>
+                        <Tooltip content="Przejdź do poprzedniej strony wyników">
+                            <Button
+                                variant="secondary"
+                                size="sm"
+                                icon={ChevronLeft}
+                                disabled={page <= 1}
+                                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                                aria-label="Poprzednia strona"
+                            >
+                                Poprzednia
+                            </Button>
+                        </Tooltip>
 
-                        <span className="px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800 text-zinc-300 font-mono text-xs">
-                            {meta.current_page} / {meta.last_page || 1}
-                        </span>
+                        <Tooltip content={`Bieżąca strona ${meta.current_page} z łącznej liczby stron ${meta.last_page || 1}`}>
+                            <span className="px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800 text-zinc-300 font-mono text-xs cursor-help">
+                                {meta.current_page} / {meta.last_page || 1}
+                            </span>
+                        </Tooltip>
 
-                        <Button
-                            variant="secondary"
-                            size="sm"
-                            disabled={page >= meta.last_page}
-                            onClick={() => setPage((p) => p + 1)}
-                        >
-                            Następna
-                            <ChevronRight className="w-3.5 h-3.5 ml-1" />
-                        </Button>
+                        <Tooltip content="Przejdź do następnej strony wyników">
+                            <Button
+                                variant="secondary"
+                                size="sm"
+                                disabled={page >= meta.last_page}
+                                onClick={() => setPage((p) => p + 1)}
+                                aria-label="Następna strona"
+                            >
+                                Następna
+                                <ChevronRight className="w-3.5 h-3.5 ml-1" />
+                            </Button>
+                        </Tooltip>
                     </div>
                 </div>
             </div>

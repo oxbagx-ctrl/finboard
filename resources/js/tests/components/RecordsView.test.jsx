@@ -1209,5 +1209,79 @@ describe('RecordsView - CSV Export Payload and Canonical Domain Types', () => {
     });
 });
 
+describe('RecordsView - Accessible Tooltips and InfoTooltips Integration (Phase 56 Commit 275)', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+        apiClient.get.mockImplementation((url) => {
+            if (url === '/finance/categories') {
+                return Promise.resolve({ data: { data: mockCategories } });
+            }
+            if (url.startsWith('/finance/records')) {
+                return Promise.resolve({
+                    data: {
+                        data: mockRecords,
+                        meta: {
+                            current_page: 1,
+                            last_page: 1,
+                            per_page: 25,
+                            total: 2,
+                            from: 1,
+                            to: 2,
+                        },
+                    },
+                });
+            }
+            return Promise.resolve({ data: {} });
+        });
+    });
+
+    it('renders accessible Tooltips and InfoTooltips across Księga Transakcji Finansowych view', async () => {
+        renderWithProviders(<RecordsView />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Płatność za maszyny produkcyjne')).toBeInTheDocument();
+        });
+
+        // 1. Top Ribbon & InfoTooltip
+        expect(screen.getByText('Księga Operacji Finansowych (General Ledger)')).toBeInTheDocument();
+        const infoButtons = screen.getAllByRole('button', { name: /Więcej informacji/i });
+        expect(infoButtons.length).toBeGreaterThanOrEqual(4);
+
+        // 2. Action buttons have accessible names
+        expect(screen.getByRole('button', { name: /Eksportuj CSV/i })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Nowy Zapis Księgowy/i })).toBeInTheDocument();
+
+        // 3. Quick metrics summary cards have InfoTooltips
+        expect(screen.getByTestId('summary-card-total')).toBeInTheDocument();
+        expect(screen.getByTestId('summary-card-income')).toBeInTheDocument();
+        expect(screen.getByTestId('summary-card-expense')).toBeInTheDocument();
+        expect(screen.getByTestId('summary-card-balance')).toBeInTheDocument();
+
+        // 4. Filter bar inputs have accessible labels
+        expect(screen.getByLabelText(/Szukaj po opisie, kontrahencie, fakturze/i)).toBeInTheDocument();
+        expect(screen.getByLabelText(/Filtruj według typu transakcji/i)).toBeInTheDocument();
+        expect(screen.getByLabelText(/Filtruj według kategorii analitycznej/i)).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Reset Filtrów/i })).toBeInTheDocument();
+        expect(screen.getByLabelText(/Początkowa data księgowania/i)).toBeInTheDocument();
+        expect(screen.getByLabelText(/Końcowa data księgowania/i)).toBeInTheDocument();
+
+        // 5. Table headers and master checkbox
+        expect(screen.getByTestId('batch-master-checkbox')).toBeInTheDocument();
+        expect(screen.getByText('Tytuł / Opis Transakcji')).toBeInTheDocument();
+        expect(screen.getByText('Typ')).toBeInTheDocument();
+        expect(screen.getByText(/Kwota \(PLN\)/i)).toBeInTheDocument();
+
+        // 6. Action buttons on row
+        expect(screen.getByRole('button', { name: /Edytuj zapis: Płatność za maszyny produkcyjne/i })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Usuń zapis: Płatność za maszyny produkcyjne/i })).toBeInTheDocument();
+
+        // 7. Pagination controls
+        expect(screen.getByLabelText(/Liczba transakcji na stronie/i)).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Poprzednia strona/i })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Następna strona/i })).toBeInTheDocument();
+    });
+});
+
+
 
 

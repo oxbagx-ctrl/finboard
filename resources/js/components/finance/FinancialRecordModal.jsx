@@ -4,6 +4,7 @@ import { useNotification } from '../../context/NotificationContext';
 import { useDeal } from '../../context/DealContext';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
+import { Tooltip, InfoTooltip } from '../ui/Tooltip';
 import {
     X,
     FileText,
@@ -139,22 +140,28 @@ export const FinancialRecordModal = ({
                             </p>
                         </div>
                     </div>
-                    <button
-                        onClick={onClose}
-                        className="p-1 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors"
-                    >
-                        <X className="w-4 h-4" />
-                    </button>
+                    <Tooltip content="Zamknij formularz zapisu">
+                        <button
+                            onClick={onClose}
+                            className="p-1 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors"
+                            aria-label="Zamknij formularz zapisu"
+                        >
+                            <X className="w-4 h-4" />
+                        </button>
+                    </Tooltip>
                 </div>
 
                 {/* Form Body */}
                 <form onSubmit={handleSubmit} className="p-5 space-y-4">
                     {/* Category Selection */}
                     <div>
-                        <label className="block text-[10px] uppercase font-semibold text-zinc-400 mb-1 flex items-center gap-1.5">
-                            <Tag className="w-3 h-3 text-zinc-500" />
-                            Kategoria Finansowa
-                        </label>
+                        <div className="flex items-center justify-between mb-1">
+                            <label className="text-[10px] uppercase font-semibold text-zinc-400 flex items-center gap-1.5">
+                                <Tag className="w-3 h-3 text-zinc-500" />
+                                Kategoria Finansowa
+                            </label>
+                            <InfoTooltip size="xs" content="Przyporządkowanie analityczne do pozycji planu kont P&L lub bilansu" />
+                        </div>
                         <select
                             value={categoryId}
                             onChange={(e) => setCategoryId(e.target.value)}
@@ -181,10 +188,13 @@ export const FinancialRecordModal = ({
                     {/* Amount and Currency */}
                     <div className="grid grid-cols-3 gap-3">
                         <div className="col-span-2">
-                            <label className="block text-[10px] uppercase font-semibold text-zinc-400 mb-1 flex items-center gap-1.5">
-                                <DollarSign className="w-3 h-3 text-zinc-500" />
-                                Kwota Transakcji
-                            </label>
+                            <div className="flex items-center justify-between mb-1">
+                                <label className="text-[10px] uppercase font-semibold text-zinc-400 flex items-center gap-1.5">
+                                    <DollarSign className="w-3 h-3 text-zinc-500" />
+                                    Kwota Transakcji
+                                </label>
+                                <InfoTooltip size="xs" content="Nominalna wartość operacji gospodarczej w wybranej walucie" />
+                            </div>
                             <input
                                 type="number"
                                 step="0.01"
@@ -204,9 +214,12 @@ export const FinancialRecordModal = ({
                         </div>
 
                         <div>
-                            <label className="block text-[10px] uppercase font-semibold text-zinc-400 mb-1">
-                                Waluta
-                            </label>
+                            <div className="flex items-center justify-between mb-1">
+                                <label className="text-[10px] uppercase font-semibold text-zinc-400">
+                                    Waluta
+                                </label>
+                                <InfoTooltip size="xs" content="Waluta pierwotna transakcji" />
+                            </div>
                             <select
                                 value={currency}
                                 onChange={(e) => setCurrency(e.target.value)}
@@ -222,10 +235,13 @@ export const FinancialRecordModal = ({
 
                     {/* Date */}
                     <div>
-                        <label className="block text-[10px] uppercase font-semibold text-zinc-400 mb-1 flex items-center gap-1.5">
-                            <Calendar className="w-3 h-3 text-zinc-500" />
-                            Data Księgowania (YYYY-MM-DD)
-                        </label>
+                        <div className="flex items-center justify-between mb-1">
+                            <label className="text-[10px] uppercase font-semibold text-zinc-400 flex items-center gap-1.5">
+                                <Calendar className="w-3 h-3 text-zinc-500" />
+                                Data Księgowania (YYYY-MM-DD)
+                            </label>
+                            <InfoTooltip size="xs" content="Data ujęcia memoriałowego operacji w księdze głównej" />
+                        </div>
                         <input
                             type="date"
                             required
@@ -243,9 +259,12 @@ export const FinancialRecordModal = ({
 
                     {/* Description */}
                     <div>
-                        <label className="block text-[10px] uppercase font-semibold text-zinc-400 mb-1">
-                            Tytuł / Opis Operacji (Kontrahent, Faktura, Ref.)
-                        </label>
+                        <div className="flex items-center justify-between mb-1">
+                            <label className="text-[10px] uppercase font-semibold text-zinc-400">
+                                Tytuł / Opis Operacji (Kontrahent, Faktura, Ref.)
+                            </label>
+                            <InfoTooltip size="xs" content="Szczegółowy tytuł operacji, numer dokumentu źródłowego lub kontrahent" />
+                        </div>
                         <textarea
                             rows={3}
                             required
@@ -263,9 +282,11 @@ export const FinancialRecordModal = ({
                     </div>
 
                     {/* Audit Notice */}
-                    <div className="p-2.5 bg-zinc-950 border border-zinc-800 rounded text-[10px] text-zinc-500 font-mono">
-                        Zapis zostanie trwale zarejestrowany w dzienniku zdarzeń audytowych z podpisem operatora.
-                    </div>
+                    <Tooltip content="Wszystkie mutacje zapisów księgowych są nieodwracalnie utrwalane w rejestrze audytowym WORM">
+                        <div className="p-2.5 bg-zinc-950 border border-zinc-800 rounded text-[10px] text-zinc-500 font-mono cursor-help">
+                            Zapis zostanie trwale zarejestrowany w dzienniku zdarzeń audytowych z podpisem operatora.
+                        </div>
+                    </Tooltip>
 
                     {/* Action Buttons */}
                     <div className="pt-2 border-t border-zinc-800 flex items-center justify-end gap-2">

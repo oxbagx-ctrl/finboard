@@ -899,6 +899,14 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Wdrożenie `tooltipContent` w 4 głównych kartach KPI (Przychody, EBITDA, EBIT, Zysk Netto) oraz `<InfoTooltip size="xs" />` w nagłówkach wykresów i tabel marżowych.
     - Dodanie dymków metodologicznych dla wskaźników płynności (Current Ratio, Quick Ratio, NWC), statusów ewaluacji, wykresu dekompozycji oraz matrycy celów M&A.
     - Weryfikacja testowa: `AnalyticsView.test.jsx` (6/6), `CostBreakdownChart.test.jsx` (4/4), 100% PASS w pełnym zestawie 60 plików Vitest (562 testy) i bezbłędny build Vite.
+  - [x] Wdrożenie dostępnych podpowiedzi Tooltip i InfoTooltip w widoku Księgi Transakcji Finansowych (RecordsView).
+    - Refaktoryzacja bazowego komponentu `Button.jsx` z obsługą `React.forwardRef` do bezkolizyjnej integracji z `@floating-ui/react`.
+    - Eliminacja natywnych atrybutów `title="..."` z przycisków akcji wiersza (Edytuj/Usuń zapis), przycisku eksportu CSV oraz modali transakcyjnych (`BatchDeleteConfirmationModal`, `DeleteRecordConfirmationModal`, `FinancialRecordModal`).
+    - Wzbogacenie nagłówka modułu `RecordsView.jsx`: `<Tooltip>` dla ikony modułu, kodu podmiotu, przycisku eksportu CSV i nowego zapisu oraz `<InfoTooltip size="xs">` dla tytułu księgi głównej.
+    - Dodanie dymków objaśniających `<InfoTooltip size="xs">` do 4 kart szybkiego podsumowania: Łącznie Pozycji, Przychody, Koszty OPEX i Saldo Operacji Netto.
+    - Dostępne podpowiedzi dla paska filtrów: wyszukiwarka, selektor typu transakcji, selektor kategorii, przycisk resetu filtrów oraz filtry zakresu dat z pełnymi etykietami `aria-label`.
+    - Dostępne nagłówki kolumn tabeli, master checkbox, checkboxy wierszy, kody kategorii, odznaki klasyfikacji (`getTypeBadge`) oraz dymki paginacji.
+    - Weryfikacja testowa: `RecordsView.test.jsx` (22/22), `FinancialRecordModal.test.jsx` (7/7), `BatchDeleteConfirmationModal.test.jsx` (6/6), `BatchActionBar.test.jsx` (5/5), 100% PASS w 60 plikach Vitest (563 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
 ---
 
