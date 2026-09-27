@@ -165,6 +165,12 @@ final class DocumentsApiTest extends TestCase
         $downloadResponse->assertStatus(200);
         $this->assertSame('SLIDES INVESTOR PRESENTATION', $downloadResponse->getContent());
 
+        // Verify RFC 5987 / RFC 6266 Content-Disposition header
+        $disposition = $downloadResponse->headers->get('Content-Disposition');
+        $this->assertNotNull($disposition);
+        $this->assertStringContainsString('attachment;', $disposition);
+        $this->assertStringContainsString('filename=prezentacja.pdf', $disposition);
+
         // Verify download counter incremented
         $doc = Document::findOrFail($docId);
         $this->assertSame(1, $doc->download_count);
@@ -175,6 +181,21 @@ final class DocumentsApiTest extends TestCase
             'user_id' => $this->clientUser->id,
             'action' => 'download',
         ]);
+    }
+
+    public function test_upload_rejects_disallowed_mime_types(): void
+    {
+        Sanctum::actingAs($this->clientUser);
+
+        $file = UploadedFile::fake()->create('script.sh', 50, 'application/x-sh');
+        $response = $this->postJson('/api/v1/documents', [
+            'file' => $file,
+            'title' => 'Skrypt powłoki',
+            'type' => 'other',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['file']);
     }
 
     public function test_update_document_metadata(): void

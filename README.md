@@ -746,6 +746,10 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Zabezpieczenie pełnego cyklu życia pliku: automatyczna rejestracja zdarzeń `update` oraz `destroy` w `DocumentController`.
     - Utrwalanie tożsamości użytkownika, adresu IP, User-Agent oraz snapshotu metadanych pliku przed fizycznym usunięciem.
     - Rozszerzenie frontendowej palety akcji audytowych `AuditActionBadge` oraz filtrów VDR `VDR_ACTION_FILTERS` w widoku `AuditLogsView`.
+  - [x] Synchronizacja limitów uploadu (50 MB), walidacja MIME i standard RFC 5987 / RFC 6266 (Commit 252).
+    - Podniesienie limitu wielkości pliku w `UploadDocumentRequest` do `max:51200` (50 MB) usuwające rozbieżność z interfejsem React.
+    - Ścisła walidacja rozszerzeń i typów MIME (`pdf`, `xlsx`, `xls`, `doc`, `docx`, `zip`) zabezpieczająca przed złośliwymi skryptami.
+    - Implementacja kodowania znaków UTF-8 (np. polskich znaków diakrytycznych) w nagłówku `Content-Disposition` z wykorzystaniem `HeaderUtils::makeDisposition` i bezpiecznym fallbackiem ASCII.
 
 ---
 

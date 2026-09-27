@@ -49,6 +49,14 @@ export const DocumentUploadModal = ({
             return;
         }
 
+        // Allowed extensions check
+        const allowedExtensions = ['pdf', 'xlsx', 'xls', 'doc', 'docx', 'zip'];
+        const ext = selectedFile.name.split('.').pop()?.toLowerCase();
+        if (!ext || !allowedExtensions.includes(ext)) {
+            setErrors(prev => ({ ...prev, file: 'Dozwolone są wyłącznie pliki w formatach: PDF, XLSX, XLS, DOC, DOCX, ZIP.' }));
+            return;
+        }
+
         setFile(selectedFile);
         setErrors(prev => ({ ...prev, file: null }));
 
@@ -180,7 +188,7 @@ export const DocumentUploadModal = ({
                                     type="file"
                                     onChange={(e) => handleFileSelect(e.target.files?.[0])}
                                     className="hidden"
-                                    accept=".pdf,.xlsx,.xls,.doc,.docx,.pptx,.ppt,.csv,.txt,.zip,.rar"
+                                    accept=".pdf,.xlsx,.xls,.doc,.docx,.zip"
                                 />
                                 <UploadCloud className="w-8 h-8 mx-auto text-zinc-400 mb-2 opacity-80" />
                                 <div className="text-xs font-bold text-zinc-200">

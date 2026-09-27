@@ -22,6 +22,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response as HttpResponse;
+use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -179,10 +181,19 @@ final class DocumentController
             companyId: $domainDoc->companyId()
         );
 
+        $originalName = $domainDoc->fileMetadata()->originalName();
+        $fallbackName = Str::ascii($originalName);
+        $fallbackName = preg_replace('/[^\x20-\x7e]/', '', $fallbackName) ?: 'document';
+        $disposition = HeaderUtils::makeDisposition(
+            HeaderUtils::DISPOSITION_ATTACHMENT,
+            $originalName,
+            $fallbackName
+        );
+
         return response($fileContent, Response::HTTP_OK, [
             'Content-Type' => $domainDoc->fileMetadata()->mimeType(),
             'Content-Length' => (string) strlen($fileContent),
-            'Content-Disposition' => sprintf('attachment; filename="%s"', addslashes($domainDoc->fileMetadata()->originalName())),
+            'Content-Disposition' => $disposition,
         ]);
     }
 

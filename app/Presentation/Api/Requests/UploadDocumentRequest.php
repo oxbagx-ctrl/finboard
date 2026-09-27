@@ -19,10 +19,28 @@ final class UploadDocumentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'file' => ['required', 'file', 'max:25600'],
+            'file' => [
+                'required',
+                'file',
+                'max:51200',
+                'mimes:pdf,xlsx,xls,doc,docx,zip',
+            ],
             'title' => ['required', 'string', 'max:255'],
             'type' => ['required', 'string', 'in:financial_report,contract,tax_declaration,audit_report,presentation,other'],
             'company_id' => ['nullable', 'uuid', 'exists:companies,id'],
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'file.required' => 'Plik dokumentu jest wymagany.',
+            'file.file' => 'Przesłany zasób musi być poprawnym plikiem.',
+            'file.max' => 'Rozmiar pliku nie może przekraczać 50 MB.',
+            'file.mimes' => 'Dozwolone są wyłącznie pliki w formatach: PDF, XLSX, XLS, DOC, DOCX, ZIP.',
         ];
     }
 }
