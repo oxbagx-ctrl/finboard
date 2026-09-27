@@ -207,6 +207,11 @@ npm test
 - `GET /api/v1/documents/folders/{id}` – Szczegóły folderu wraz z folderami podrzędnymi i liczbą dokumentów
 - `PUT /api/v1/documents/folders/{id}` – Aktualizacja nazwy, opisu, sortowania lub indeksu Dewey folderu
 - `DELETE /api/v1/documents/folders/{id}` – Usunięcie folderu (z zachowaniem dokumentów – `ON DELETE SET NULL`)
+- `GET /api/v1/documents/permissions/matrix` – Pobranie pełnej matrycy uprawnień VDR dla aktywnej spółki
+- `GET /api/v1/documents/permissions/effective` – Wyznaczenie efektywnych uprawnień użytkownika do folderu lub dokumentu
+- `POST /api/v1/documents/permissions/folders/{folderId}` – Konfiguracja grantu uprawnienia dla folderu transakcyjnego
+- `POST /api/v1/documents/permissions/documents/{documentId}` – Konfiguracja bezpośredniego nadpisania uprawnień dla dokumentu
+- `DELETE /api/v1/documents/permissions/{type}/{id}` – Odwołanie uprawnienia dla wskazanego folderu lub dokumentu
 
 ### Planowanie Inwestycyjne & Wycena DCF (Deal Advisory & Project Finance)
 - `GET /api/v1/investment-projects` – Lista projektów inwestycyjnych przypisanych do aktywnej spółki
@@ -834,6 +839,12 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Migracja bazy danych `2026_03_30_100000_create_vdr_permissions_tables.php` tworząca tabele `vdr_folder_permissions` oraz `vdr_document_permissions` z indeksami unikalnymi i kaskadami kluczy obcych.
     - Modele Eloquent `VdrFolderPermission` i `VdrDocumentPermission` oraz repozytorium `EloquentVdrPermissionRepository` powiązane z `VdrPermissionRepositoryInterface`.
     - Pakiet testów jednostkowych i integracyjnych: `PermissionLevelTest`, `VdrPermissionMatrixTest`, `VdrPermissionRepositoryDatabaseTest` (18 testów, 115 asercji), 100% PASS w pełnym zestawie 680 testów PHPUnit (8584 asercje).
+  - [x] Komendy/zapytania CQRS i punkty końcowe REST API dla Matrycy Uprawnień VDR (Commit 265).
+    - Komendy CQRS: `SetVdrFolderPermissionCommand` i `SetVdrFolderPermissionHandler`, `SetVdrDocumentPermissionCommand` i `SetVdrDocumentPermissionHandler`, `RevokeVdrPermissionCommand` i `RevokeVdrPermissionHandler`.
+    - Zapytania CQRS: `GetVdrPermissionMatrixQuery` i `GetVdrPermissionMatrixHandler` (pełna matryca z nazwami folderów, indeksami Dewey, tytułami dokumentów i etykietami), `GetEffectiveVdrPermissionQuery` i `GetEffectiveVdrPermissionHandler` (hierarchiczne wyznaczanie uprawnień efektywnych).
+    - Warstwa REST API: `VdrPermissionController`, `SetVdrPermissionRequest`, trasy `api.documents.permissions.*` (`GET matrix`, `GET effective`, `POST folders/{folderId}`, `POST documents/{documentId}`, `DELETE {type}/{id}`).
+    - Bezpieczeństwo i autoryzacja: restrykcja modyfikacji wyłącznie dla doradców (`advisor`) i administratorów (`super_admin`), ścisła izolacja multi-tenant.
+    - Pakiety testów: jednostkowe CQRS `VdrPermissionCqrsHandlersTest` (8 testów, 42 asercje), funkcjonalne REST API `VdrPermissionApiTest` (10 testów, 58 asercji), 100% PASS w pełnym zestawie 698 testów PHPUnit (8684 asercje) oraz 515 testów Vitest.
 
 ---
 

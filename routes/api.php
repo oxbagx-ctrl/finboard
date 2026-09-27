@@ -18,6 +18,7 @@ use App\Presentation\Api\Controllers\InvestmentProject\InvestmentStatementContro
 use App\Presentation\Api\Controllers\InvitationController;
 use App\Presentation\Api\Controllers\KpiController;
 use App\Presentation\Api\Controllers\TransactionFolderController;
+use App\Presentation\Api\Controllers\VdrPermissionController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -166,6 +167,15 @@ Route::prefix('v1')->group(function () {
                 Route::get('/{id}', [TransactionFolderController::class, 'show'])->name('api.documents.folders.show');
                 Route::put('/{id}', [TransactionFolderController::class, 'update'])->name('api.documents.folders.update');
                 Route::delete('/{id}', [TransactionFolderController::class, 'destroy'])->name('api.documents.folders.destroy');
+            });
+
+            // VDR Permission Matrix
+            Route::prefix('permissions')->group(function () {
+                Route::get('/matrix', [VdrPermissionController::class, 'matrix'])->name('api.documents.permissions.matrix');
+                Route::get('/effective', [VdrPermissionController::class, 'effective'])->name('api.documents.permissions.effective');
+                Route::post('/folders/{folderId}', [VdrPermissionController::class, 'setFolderPermission'])->name('api.documents.permissions.folders.set');
+                Route::post('/documents/{documentId}', [VdrPermissionController::class, 'setDocumentPermission'])->name('api.documents.permissions.documents.set');
+                Route::delete('/{type}/{id}', [VdrPermissionController::class, 'revoke'])->name('api.documents.permissions.revoke');
             });
 
             Route::get('/audit-logs', [DocumentController::class, 'allAuditLogs']
