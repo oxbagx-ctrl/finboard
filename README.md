@@ -754,7 +754,7 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Zestaw testów w `tests/Feature/DocumentManagement/VdrHardeningSecurityRegressionTest.php` weryfikujący dostęp doradców transakcyjnych (`advisor`), administratorów (`super_admin`), blokadę 403 dla obcych spółek, WORM audit retention przy soft delete, walidację limitu 50MB i typów MIME oraz nagłówek RFC 5987.
     - 100% PASS w pełnym pakiecie testów: 614 testów PHPUnit (8119 asercji) oraz 500 testów Vitest (53 pliki testowe).
 
-- [ ] **Faza 53: CQRS, Storage Rollback & Server-side Audit Filtering (Commity 254–258)**
+- [x] **Faza 53: CQRS, Storage Rollback & Server-side Audit Filtering (Commity 254–258)**
   - [x] Transakcyjny menedżer pamięci masowej (Transactional Storage Manager) z rollbackiem plików (Commit 254).
     - Zapobieganie powstawaniu osieroconych plików (orphan files) na dysku w przypadku błędu transakcji bazodanowej lub wyjątku SQL.
     - Implementacja interfejsu domenowego `TransactionalStorageManagerInterface` oraz klasy infrastruktury `TransactionalStorageManager`.
@@ -779,6 +779,12 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Implementacja komend: `UploadDocumentCommand` & `UploadDocumentHandler` (transakcyjny storage manager, wyliczenie SHA-256, audyt uploadu), `UpdateDocumentCommand` & `UpdateDocumentHandler`, `ArchiveDocumentCommand` & `ArchiveDocumentHandler`, `DeleteDocumentCommand` & `DeleteDocumentHandler` (soft-delete + odroczone usuwanie z dysku `stageDeletion`), `DownloadDocumentCommand` & `DownloadDocumentHandler` (inkrementacja pobrań, obsługa `FileNotFoundInStorageException`).
     - Przekształcenie `DocumentController` w cienki kontroler HTTP delegujący wszystkie operacje bezpośrednio do handlerów CQRS przy zachowaniu harmonizacji autoryzacji multi-tenant.
     - Dedykowany pakiet testów jednostkowych w `DocumentCqrsHandlersTest.php` (7 testów, 25 asercji) ze 100% PASS w testach jednostkowych, integracyjnych i regresyjnych.
+  - [x] Testy integracyjne rollbacku storage i serwerowej paginacji audytu VDR (Commit 258).
+    - Opracowanie zaawansowanego pakietu testów integracyjnych w `tests/Feature/DocumentManagement/VdrStorageRollbackAndAuditPaginationIntegrationTest.php` (5 testów, 159 asercji).
+    - Weryfikacja automatycznego usuwania fizycznych plików z dysku w przypadku zakleszczenia lub błędu transakcji bazy danych (eliminacja orphan files).
+    - Weryfikacja odroczenia i anulowania usunięcia pliku z dysku przy błędzie DB w trakcie kasowania oraz pomyślnego usunięcia po commit.
+    - Weryfikacja wielostronicowej paginacji audytu VDR, filtracji po pojedynczej lub wielu akcjach (`action=upload,download`), wyszukiwania frazowego (`search`) oraz szczelnej izolacji multi-tenant.
+    - Zapewnienie 100% zielonego wyniku testów: 636 testów PHPUnit (8369 asercji) oraz 502 testy Vitest (53 pliki testowe).
 
 ---
 
