@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const Badge = ({ children, variant = 'default', size = 'md', className = '' }) => {
+export const Badge = React.forwardRef(({ children, variant = 'default', size = 'md', className = '', ...props }, ref) => {
     const sizeClasses = {
         sm: 'px-1.5 py-0.5 text-[10px]',
         md: 'px-2 py-0.5 text-[11px]',
@@ -18,9 +18,13 @@ export const Badge = ({ children, variant = 'default', size = 'md', className = 
 
     return (
         <span
+            ref={ref}
             className={`inline-flex items-center font-mono font-medium rounded border ${sizeClasses[size]} ${variantClasses[variant]} ${className}`}
+            {...props}
         >
             {children}
         </span>
     );
-};
+});
+
+Badge.displayName = 'Badge';

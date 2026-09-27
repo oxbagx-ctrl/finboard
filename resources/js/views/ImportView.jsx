@@ -8,6 +8,7 @@ import { ImportJobProgress } from '../components/import/ImportJobProgress';
 import { ImportHistoryTable } from '../components/import/ImportHistoryTable';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
+import { Tooltip, InfoTooltip } from '../components/ui/Tooltip';
 import {
     FileSpreadsheet,
     Server,
@@ -118,14 +119,7 @@ export const ImportView = () => {
 
     // Download sample template
     const handleDownloadTemplate = () => {
-        const sampleCsv = `kategoria,kwota,data,waluta,opis
-cat-revenue,54200.00,2026-06-01,PLN,Przychody z kontraktu doradczego
-cat-payroll,18500.00,2026-06-05,PLN,Wynagrodzenia zespołu inżynierskiego
-cat-office,3200.00,2026-06-10,PLN,Wynajem powierzchni biurowej
-cat-marketing,4500.00,2026-06-12,PLN,Kampania digital performance marketing
-cat-it,2800.00,2026-06-15,PLN,Infrastruktura chmurowa AWS i licencje SaaS
-cat-cogs,12000.00,2026-06-18,PLN,Zakup surowców i podzespołów
-cat-financial,1450.00,2026-06-20,PLN,Obsługa zadłużenia bankowego (odsetki)`;
+        const sampleCsv = `kategoria,kwota,data,waluta,opis\ncat-revenue,54200.00,2026-06-01,PLN,Przychody z kontraktu doradczego\ncat-payroll,18500.00,2026-06-05,PLN,Wynagrodzenia zespołu inżynierskiego\ncat-office,3200.00,2026-06-10,PLN,Wynajem powierzchni biurowej\ncat-marketing,4500.00,2026-06-12,PLN,Kampania digital performance marketing\ncat-it,2800.00,2026-06-15,PLN,Infrastruktura chmurowa AWS i licencje SaaS\ncat-cogs,12000.00,2026-06-18,PLN,Zakup surowców i podzespołów\ncat-financial,1450.00,2026-06-20,PLN,Obsługa zadłużenia bankowego (odsetki)`;
 
         const blob = new Blob([sampleCsv], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
@@ -148,13 +142,25 @@ cat-financial,1450.00,2026-06-20,PLN,Obsługa zadłużenia bankowego (odsetki)`;
             {/* Header Strip */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-zinc-900 border border-zinc-800 rounded-lg p-3">
                 <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded bg-zinc-850 border border-zinc-750 flex items-center justify-center text-zinc-300">
-                        <FileSpreadsheet className="w-4 h-4" />
-                    </div>
+                    <Tooltip content="Moduł wsadowego importu wyciągów bankowych i zbiorów danych CSV">
+                        <div className="w-8 h-8 rounded bg-zinc-850 border border-zinc-750 flex items-center justify-center text-zinc-300 cursor-help">
+                            <FileSpreadsheet className="w-4 h-4" />
+                        </div>
+                    </Tooltip>
                     <div>
                         <div className="text-xs font-bold text-zinc-100 flex items-center gap-2">
                             <span>Asynchroniczny Import Danych CSV</span>
-                            <Badge variant="default" size="sm">{activeCompany?.code || 'PODMIOT'}</Badge>
+                            <Tooltip content={`Podmiot docelowy importu: ${activeCompany?.name || 'Spółka portfelowa'} (${activeCompany?.code || 'PODMIOT'})`}>
+                                <span>
+                                    <Badge variant="default" size="sm">{activeCompany?.code || 'PODMIOT'}</Badge>
+                                </span>
+                            </Tooltip>
+                            <InfoTooltip
+                                size="xs"
+                                title="Asynchroniczny Import Danych CSV"
+                                ariaLabel="Więcej informacji o module importu CSV"
+                                content="Moduł umożliwia bezpieczne masowe ładowanie wyciągów bankowych i zestawień operacji. Dane podlegają weryfikacji Dry-Run, po czym przetwarzane są w tle przez asynchroniczną kolejkę Redis Worker."
+                            />
                         </div>
                         <p className="text-[10px] text-zinc-500 mt-0.5">
                             Kolejkowanie asynchroniczne Redis (financial-imports) | Podmiot docelowy: {activeCompany?.name}
@@ -163,15 +169,19 @@ cat-financial,1450.00,2026-06-20,PLN,Obsługa zadłużenia bankowego (odsetki)`;
                 </div>
 
                 <div className="flex items-center gap-2 text-xs text-zinc-400">
-                    <span className="flex items-center gap-1">
-                        <Server className="w-3.5 h-3.5 text-emerald-400" />
-                        Worker: Aktywny
-                    </span>
+                    <Tooltip content="Kolejka asynchroniczna Redis Worker (financial-imports) jest aktywna i gotowa do przetwarzania wsadowego">
+                        <span className="flex items-center gap-1 cursor-help">
+                            <Server className="w-3.5 h-3.5 text-emerald-400" />
+                            Worker: Aktywny
+                        </span>
+                    </Tooltip>
                     <span>•</span>
-                    <span className="flex items-center gap-1">
-                        <ShieldCheck className="w-3.5 h-3.5 text-sky-400" />
-                        Walidacja Dry-Run
-                    </span>
+                    <Tooltip content="Każdy plik CSV jest wstępnie weryfikowany bez modyfikacji bazy danych pod kątem poprawności nagłówków, kwot i kategorii">
+                        <span className="flex items-center gap-1 cursor-help">
+                            <ShieldCheck className="w-3.5 h-3.5 text-sky-400" />
+                            Walidacja Dry-Run
+                        </span>
+                    </Tooltip>
                 </div>
             </div>
 
@@ -196,8 +206,14 @@ cat-financial,1450.00,2026-06-20,PLN,Obsługa zadłużenia bankowego (odsetki)`;
                     {validating && (
                         <div className="p-8 bg-zinc-900 border border-zinc-800 rounded-lg text-center space-y-2">
                             <div className="w-6 h-6 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin mx-auto" />
-                            <div className="text-xs font-bold text-zinc-200">
-                                Weryfikacja struktury pliku CSV (Dry-Run Preview)...
+                            <div className="text-xs font-bold text-zinc-200 flex items-center justify-center gap-1.5">
+                                <span>Weryfikacja struktury pliku CSV (Dry-Run Preview)...</span>
+                                <InfoTooltip
+                                    size="xs"
+                                    title="Weryfikacja Dry-Run"
+                                    ariaLabel="Informacje o weryfikacji Dry-Run"
+                                    content="Proces symulacyjny testuje integralność danych, mapowanie kolumn, formaty numeryczne i istnienie kategorii w planie kont przed zaksięgowaniem."
+                                />
                             </div>
                             <p className="text-[10px] text-zinc-500">
                                 Parsowanie nagłówków, formatów walutowych oraz poprawności identyfikatorów kategorii

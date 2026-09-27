@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import apiClient from '../../api/client';
 import { Button } from '../ui/Button';
+import { Tooltip, InfoTooltip } from '../ui/Tooltip';
 import {
     Clock,
     Cpu,
@@ -103,49 +104,67 @@ export const ImportJobProgress = ({
             {/* Status Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-800">
                 <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded bg-zinc-850 border border-zinc-750 flex items-center justify-center text-zinc-300">
-                        <FileSpreadsheet className="w-4 h-4" />
-                    </div>
+                    <Tooltip content="Aktywne zadanie asynchronicznego importu w kolejce Redis">
+                        <div className="w-8 h-8 rounded bg-zinc-850 border border-zinc-750 flex items-center justify-center text-zinc-300 cursor-help">
+                            <FileSpreadsheet className="w-4 h-4" />
+                        </div>
+                    </Tooltip>
                     <div>
                         <div className="text-xs font-bold text-zinc-100 flex items-center gap-2">
                             <span>Zadanie Importu:</span>
-                            <code className="text-[11px] text-zinc-400">{file_name}</code>
+                            <Tooltip content={`Nazwa przetwarzanego pliku: ${file_name}`}>
+                                <code className="text-[11px] text-zinc-400 cursor-help">{file_name}</code>
+                            </Tooltip>
                         </div>
-                        <div className="text-[10px] text-zinc-500 mt-0.5">
-                            ID KOLEJKI: {id}
-                        </div>
+                        <Tooltip content={`Identyfikator zadania w kolejce Redis: ${id}`}>
+                            <div className="text-[10px] text-zinc-500 mt-0.5 cursor-help">
+                                ID KOLEJKI: {id}
+                            </div>
+                        </Tooltip>
                     </div>
                 </div>
 
-                <div className={`px-2.5 py-1 rounded border text-[10px] font-bold tracking-wider flex items-center gap-1.5 ${header.badgeClass}`}>
-                    <HeaderIcon className={`w-3.5 h-3.5 ${isPolling ? 'animate-spin' : ''}`} />
-                    <span>{header.label}</span>
-                </div>
+                <Tooltip content={`Status asynchroniczny: ${header.label}`}>
+                    <div className={`px-2.5 py-1 rounded border text-[10px] font-bold tracking-wider flex items-center gap-1.5 cursor-help ${header.badgeClass}`}>
+                        <HeaderIcon className={`w-3.5 h-3.5 ${isPolling ? 'animate-spin' : ''}`} />
+                        <span>{header.label}</span>
+                    </div>
+                </Tooltip>
             </div>
 
             {/* Progress Bar & Indicators */}
             <div className="space-y-2">
                 <div className="flex justify-between text-xs">
-                    <span className="text-zinc-400 text-[11px]">
-                        Postęp zaksięgowania transakcji:
+                    <span className="text-zinc-400 text-[11px] flex items-center gap-1">
+                        <span>Postęp zaksięgowania transakcji:</span>
+                        <InfoTooltip
+                            size="xs"
+                            title="Postęp Przetwarzania Asynchronicznego"
+                            ariaLabel="Informacje o postępie importu"
+                            content="Wskaźnik postępu prezentuje liczbę wierszy pomyślnie przetworzonych i zapisanych w bazie danych przez proces Worker."
+                        />
                     </span>
-                    <span className="text-zinc-100 font-bold tabular-nums">
-                        {imported_rows} / {total_rows || '?'} wierszy ({percent}%)
-                    </span>
+                    <Tooltip content={`Zaksięgowano ${imported_rows} z ${total_rows || '?'} wierszy`}>
+                        <span className="text-zinc-100 font-bold tabular-nums cursor-help">
+                            {imported_rows} / {total_rows || '?'} wierszy ({percent}%)
+                        </span>
+                    </Tooltip>
                 </div>
 
-                <div className="w-full bg-zinc-950 rounded h-2.5 overflow-hidden border border-zinc-800">
-                    <div
-                        className={`h-full transition-all duration-300 ${
-                            status === 'failed'
-                                ? 'bg-rose-600'
-                                : status === 'completed'
-                                ? 'bg-emerald-500'
-                                : 'bg-sky-500 animate-pulse'
-                        }`}
-                        style={{ width: `${percent}%` }}
-                    />
-                </div>
+                <Tooltip content={`Stopień zaawansowania operacji: ${percent}%`}>
+                    <div className="w-full bg-zinc-950 rounded h-2.5 overflow-hidden border border-zinc-800 cursor-help">
+                        <div
+                            className={`h-full transition-all duration-300 ${
+                                status === 'failed'
+                                    ? 'bg-rose-600'
+                                    : status === 'completed'
+                                    ? 'bg-emerald-500'
+                                    : 'bg-sky-500 animate-pulse'
+                            }`}
+                            style={{ width: `${percent}%` }}
+                        />
+                    </div>
+                </Tooltip>
             </div>
 
             {/* Error box if failed */}
@@ -153,7 +172,13 @@ export const ImportJobProgress = ({
                 <div className="p-3 bg-rose-950/40 border border-rose-900 rounded text-xs space-y-1 text-rose-300">
                     <div className="font-bold flex items-center gap-1">
                         <AlertCircle className="w-3.5 h-3.5 text-rose-400" />
-                        Szczegóły zgłoszonych błędów:
+                        <span>Szczegóły zgłoszonych błędów:</span>
+                        <InfoTooltip
+                            size="xs"
+                            title="Błędy Przetwarzania Zadaniowego"
+                            ariaLabel="Informacje o błędach zadania"
+                            content="Błędy zgłoszone przez proces roboczy Worker podczas asynchronicznego przetwarzania pliku CSV."
+                        />
                     </div>
                     {errors.map((e, idx) => (
                         <div key={idx} className="text-[11px] text-rose-300/90 pl-4">
@@ -166,18 +191,28 @@ export const ImportJobProgress = ({
             {/* Actions on Completion */}
             {(status === 'completed' || status === 'failed') && (
                 <div className="pt-2 border-t border-zinc-800 flex items-center justify-end gap-2">
-                    <Button variant="secondary" size="sm" onClick={onReset}>
-                        Importuj Kolejny Plik
-                    </Button>
-                    {status === 'completed' && (
+                    <Tooltip content="Zresetuj stan widoku i załaduj kolejny plik CSV">
                         <Button
-                            variant="primary"
+                            variant="secondary"
                             size="sm"
-                            icon={ArrowRight}
-                            onClick={onNavigateRecords}
+                            onClick={onReset}
+                            aria-label="Importuj Kolejny Plik"
                         >
-                            Przejdź do Księgi Operacji
+                            Importuj Kolejny Plik
                         </Button>
+                    </Tooltip>
+                    {status === 'completed' && (
+                        <Tooltip content="Przejdź do Księgi Transakcji Finansowych, aby zweryfikować zaimportowane zapisy">
+                            <Button
+                                variant="primary"
+                                size="sm"
+                                icon={ArrowRight}
+                                onClick={onNavigateRecords}
+                                aria-label="Przejdź do Księgi Operacji"
+                            >
+                                Przejdź do Księgi Operacji
+                            </Button>
+                        </Tooltip>
                     )}
                 </div>
             )}

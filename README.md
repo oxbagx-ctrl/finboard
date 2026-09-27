@@ -907,6 +907,14 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Dostępne podpowiedzi dla paska filtrów: wyszukiwarka, selektor typu transakcji, selektor kategorii, przycisk resetu filtrów oraz filtry zakresu dat z pełnymi etykietami `aria-label`.
     - Dostępne nagłówki kolumn tabeli, master checkbox, checkboxy wierszy, kody kategorii, odznaki klasyfikacji (`getTypeBadge`) oraz dymki paginacji.
     - Weryfikacja testowa: `RecordsView.test.jsx` (22/22), `FinancialRecordModal.test.jsx` (7/7), `BatchDeleteConfirmationModal.test.jsx` (6/6), `BatchActionBar.test.jsx` (5/5), 100% PASS w 60 plikach Vitest (563 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
+  - [x] Wdrożenie dostępnych podpowiedzi Tooltip i InfoTooltip w widoku Importu Wyciągów i Zbiorów CSV (ImportView).
+    - Refaktoryzacja komponentu `Badge.jsx` z obsługą `React.forwardRef` do bezkolizyjnego montowania dymków Floating UI na odznakach.
+    - Eliminacja natywnych atrybutów `title="..."` z przycisku pobierania szablonu CSV i przycisku zmiany wybranego pliku.
+    - Wzbogacenie nagłówka modułu `ImportView.jsx`: `<Tooltip>` dla ikony modułu, odznaki spółki portfelowej, wskaźnika workera Redis, tarczy Dry-Run oraz `<InfoTooltip size="xs">` dla asynchronicznej kolejki importu.
+    - Dostępne podpowiedzi w strefie upuszczania `CsvDropzone.jsx`: dymek specyfikacji kolumn formatu CSV, dostępny trigger klawiaturowy (`role="button"`) oraz szczegóły wybranego pliku (rozmiar KB, data modyfikacji).
+    - Dostępne podpowiedzi w tabeli weryfikacji wstępnej `CsvPreviewTable.jsx`: baner walidacji Dry-Run, rejestr błędów wierszy, przyciski akcji (Rozpocznij Import / Anuluj), nagłówki kolumn tabeli i komórki próbki rekordów.
+    - Integracja dymków w monitorze postępu `ImportJobProgress.jsx` (identyfikator zadania kolejki Redis, odznaki statusu, pasek postępu, przyciski nawigacyjne) oraz w dzienniku audytowym `ImportHistoryTable.jsx` (nagłówki kolumn, odznaki statusów, przycisk odświeżania z `aria-label`).
+    - Weryfikacja testowa: `ImportView.test.jsx` (7/7), `CsvPreviewTable.test.jsx` (4/4), 100% PASS w pełnym zestawie 61 plików Vitest (570 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
 ---
 
