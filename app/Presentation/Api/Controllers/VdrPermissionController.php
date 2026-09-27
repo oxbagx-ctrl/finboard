@@ -21,6 +21,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 final class VdrPermissionController
 {
@@ -56,14 +57,18 @@ final class VdrPermissionController
         $companyId = $this->resolveCompanyId($request);
         $this->ensureCanManageVdr($request->user(), $companyId);
 
-        $permission = $this->setFolderPermissionHandler->handle(new SetVdrFolderPermissionCommand(
-            companyId: $companyId,
-            folderId: $folderId,
-            subjectType: (string) $request->input('subject_type'),
-            subjectId: (string) $request->input('subject_id'),
-            permissionLevel: (string) $request->input('permission_level'),
-            watermarkRequired: $request->boolean('watermark_required', false)
-        ));
+        try {
+            $permission = $this->setFolderPermissionHandler->handle(new SetVdrFolderPermissionCommand(
+                companyId: $companyId,
+                folderId: $folderId,
+                subjectType: (string) $request->input('subject_type'),
+                subjectId: (string) $request->input('subject_id'),
+                permissionLevel: (string) $request->input('permission_level'),
+                watermarkRequired: $request->boolean('watermark_required', false)
+            ));
+        } catch (\InvalidArgumentException $e) {
+            throw new NotFoundHttpException($e->getMessage(), $e);
+        }
 
         return new JsonResponse([
             'message' => 'Uprawnienie folderu transakcyjnego zostało zaktualizowane.',
@@ -86,14 +91,18 @@ final class VdrPermissionController
         $companyId = $this->resolveCompanyId($request);
         $this->ensureCanManageVdr($request->user(), $companyId);
 
-        $permission = $this->setDocumentPermissionHandler->handle(new SetVdrDocumentPermissionCommand(
-            companyId: $companyId,
-            documentId: $documentId,
-            subjectType: (string) $request->input('subject_type'),
-            subjectId: (string) $request->input('subject_id'),
-            permissionLevel: (string) $request->input('permission_level'),
-            watermarkRequired: $request->boolean('watermark_required', false)
-        ));
+        try {
+            $permission = $this->setDocumentPermissionHandler->handle(new SetVdrDocumentPermissionCommand(
+                companyId: $companyId,
+                documentId: $documentId,
+                subjectType: (string) $request->input('subject_type'),
+                subjectId: (string) $request->input('subject_id'),
+                permissionLevel: (string) $request->input('permission_level'),
+                watermarkRequired: $request->boolean('watermark_required', false)
+            ));
+        } catch (\InvalidArgumentException $e) {
+            throw new NotFoundHttpException($e->getMessage(), $e);
+        }
 
         return new JsonResponse([
             'message' => 'Uprawnienie dokumentu transakcyjnego zostało zaktualizowane.',

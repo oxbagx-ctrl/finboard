@@ -832,7 +832,7 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Poprawka renderowania błędów walidacji po stronie klienta w `CreateFolderModal.jsx`.
     - 100% PASS w pełnym pakiecie 515 testów Vitest (55 plików testowych) oraz 662 testów PHPUnit (8469 asercji).
 
-- [ ] **Faza 55: Permission Matrix, Dynamic PDF Watermarking & Final VDR Security (Commity 264–268)**
+- [x] **Faza 55: Permission Matrix, Dynamic PDF Watermarking & Final VDR Security**
   - [x] Agregat domenowy Matrycy Uprawnień VDR, obiekty wartości i migracje bazy danych.
     - Obiekty wartości: `PermissionLevel` (`none`, `view`, `download`, `manage`), `AccessSubject` (role transakcyjne `role:{name}` oraz konkretni użytkownicy `user:{uuid}`), `VdrPermissionId`, `EffectivePermission` ze śledzeniem źródła grantu.
     - Korzenie agregatu i zdarzenia domenowe: `VdrFolderPermission` (`VdrFolderPermissionGranted`, `VdrFolderPermissionRevoked`), `VdrDocumentPermission` (`VdrDocumentPermissionGranted`, `VdrDocumentPermissionRevoked`).
@@ -852,12 +852,17 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Serwis domenowy: `FpdiPdfWatermarkService` implementujący `PdfWatermarkServiceInterface` ze skalowaniem do oryginalnej geometrii stron (A4/Letter, pion/poziom) oraz odpornym fallbackiem przy plikach nie-PDF.
     - Integracja pobierania i podglądu: rozszerzenie `DownloadDocumentCommand` i `DownloadDocumentHandler`, aktualizacja `DocumentController::download` z wymuszeniem znaku wodnego wg uprawnienia efektywnego (`watermarkRequired()`) oraz nowy endpoint podglądu w przeglądarce `GET /api/v1/documents/{id}/preview` (`inline`).
     - Pakiety testów: `WatermarkOptionsTest` (5 testów, 23 asercje), `PdfWatermarkServiceTest` (4 testy, 22 asercje), `PdfWatermarkIntegrationTest` (6 testów, 22 asercje), 100% PASS w pełnym zestawie 713 testów PHPUnit (8751 asercji) oraz 515 testów Vitest.
-  - [x] Interfejs zarządzania matrycą uprawnień VDR, odznaka znaku wodnego i strażnik dostępu (Commit 267).
+  - [x] Interfejs zarządzania matrycą uprawnień VDR, odznaka znaku wodnego i strażnik dostępu.
     - Komponenty etykiet: `VdrPermissionBadge` (wizualizacja poziomów `none`, `view`, `download`, `manage` ze specjalną paletą kolorów i ikonami) oraz `WatermarkBadge` (bursztynowa odznaka `ZNAK WODNY` z tarczą ostrzegawczą dla dokumentów chronionych).
     - Modal zarządzania matrycą uprawnień: `VdrPermissionMatrixModal` dostępny dla doradców i administratorów (`canManagePermissions`) z dwoma zakładkami (`📁 Foldery M&A`, `📄 Nadpisania Plików`), tabelą grantów, formularzem konfiguracji ról/użytkowników oraz akcją natychmiastowego odwoływania (`DELETE /documents/permissions/:type/:id`).
     - Bezpieczny podgląd dokumentów: `DocumentPreviewModal` z osadzonym zabezpieczonym PDF w ramce `<iframe>`, metadanymi, kodem Dewey, sumą SHA-256, banerem ostrzegawczym `POUFNY PODGLĄD VDR` oraz blokadą pobierania przy braku uprawnień.
     - Tabela dokumentów i DataRoomView: przycisk `Matryca Uprawnień` w nagłówku, przycisk natychmiastowego podglądu dokumentu `onPreview` (ikona oka), blokada przycisku pobierania (`can_download === false`) z etykietą tooltip oraz odznaka `WatermarkBadge` przy plikach PDF.
     - Pakiety testów: `VdrPermissionBadge.test.jsx` (6 testów), `DocumentPreviewModal.test.jsx` (6 testów), `VdrPermissionMatrixModal.test.jsx` (7 testów), rozszerzony `DataRoom.test.jsx` (14 testów), 100% PASS w 58 plikach testowych Vitest (537 testów) oraz 713 testach PHPUnit (8751 asercji).
+  - [x] Audyt bezpieczeństwa VDR, testy penetracyjno-regresyjne i finalne zamknięcie Fazy 55.
+    - Kompleksowy pakiet testów penetracyjnych i regresyjnych: `VdrSecurityPenetrationRegressionTest.php` (10 testów, 31 asercji).
+    - Weryfikacja 10 kluczowych wektorów ataków: eskalacja uprawnień klienta (403), brak uwierzytelnienia (401), izolacja wielodostępowa doradców między spółkami (403), bezpieczne blokowanie cross-tenant resource spoofing (404), hierarchiczne pierwszeństwo restrykcji dokumentu nad folderem (`none`), nadpisywanie ról przez granty konkretnych użytkowników (UUID), uniemożliwienie pobrania czystego oryginału w trybie View-Only z wymuszeniem stempla tożsamości w podglądzie inline, odporność na próby ominięcia znaku wodnego w parametrach żądania, rekurencyjne dziedziczenie uprawnień w taksonomii Dewey oraz integralność nienaruszalnego rejestru audytowego WORM (`document_access_logs`).
+    - Uodpornienie kontrolera `VdrPermissionController`: obsługa wyjątków `\InvalidArgumentException` z mapowaniem na czyste kody HTTP 404 (`NotFoundHttpException`).
+    - 100% PASS w pełnym zestawie 723 testów PHPUnit (8782 asercje) oraz 58 plikach testowych Vitest (537 testów).
 
 ---
 
