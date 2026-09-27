@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { AnalyticsView } from '../../views/AnalyticsView';
 import { NotificationProvider } from '../../context/NotificationContext';
 import { AuthContext } from '../../context/AuthContext';
@@ -270,6 +270,66 @@ describe('AnalyticsView Component', () => {
 
         await waitFor(() => {
             expect(apiClient.get).toHaveBeenCalledTimes(10);
+        });
+    });
+
+    it('renders accessible Tooltips and InfoTooltips across Analityka P&L, Marże i Wskaźniki Płynności view (Phase 56 Commit 274)', async () => {
+        renderWithProviders(<AnalyticsView />);
+
+        await waitFor(() => {
+            expect(apiClient.get).toHaveBeenCalledWith('/finance/analytics/metrics', expect.any(Object));
+        });
+
+        // 1. Overview tab: Check InfoTooltips on MetricCards and Chart Headers
+        expect(screen.getByRole('button', { name: /Informacje o: Przychody ze Sprzedaży/i })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Informacje o: Wynik EBITDA/i })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Informacje o: Zysk Operacyjny \(EBIT\)/i })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Informacje o: Zysk Netto \(EAT\)/i })).toBeInTheDocument();
+
+        // Chart header InfoTooltip
+        expect(screen.getByRole('button', { name: /Informacje o wykresie trendu wynikowego P&L/i })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Informacje o strukturze kosztów operacyjnych/i })).toBeInTheDocument();
+
+        // 2. Switch to Rentowność i Marże tab
+        fireEvent.click(screen.getByText('Rentowność i Marże'));
+        expect(screen.getByText('Marża Brutto ze Sprzedaży')).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Więcej o marży brutto ze sprzedaży/i })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Więcej o marży operacyjnej EBITDA/i })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Więcej o marży operacyjnej EBIT$/i })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Więcej o marży zysku netto/i })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Więcej o dzienniku rentowności M&A/i })).toBeInTheDocument();
+
+        // 3. Switch to Płynność i Wskaźniki tab
+        act(() => {
+            fireEvent.click(screen.getByText('Płynność i Wskaźniki'));
+        });
+        await waitFor(() => {
+            expect(screen.getByRole('button', { name: /Definicja wskaźnika Current Ratio/i })).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: /Definicja wskaźnika Quick Ratio/i })).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: /Definicja kapitału obrotowego netto/i })).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: /Więcej o wykresie ewolucji płynności/i })).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: /Więcej o ocenie solwencji i zadłużenia/i })).toBeInTheDocument();
+        });
+
+        // 4. Switch to Dekompozycja Przychodów / Kosztów tab
+        act(() => {
+            fireEvent.click(screen.getByText(/Dekompozycja Przychodów \/ Kosztów/i));
+        });
+        await waitFor(() => {
+            expect(screen.getByRole('button', { name: /Więcej o wykresie udziału procentowego/i })).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: /Więcej o tabeli pozycji analitycznych/i })).toBeInTheDocument();
+        });
+
+        // 5. Switch to Cele i Benchmarki (M&A) tab
+        act(() => {
+            fireEvent.click(screen.getByText(/Cele i Benchmarki \(M&A\)/i));
+        });
+        await waitFor(() => {
+            expect(screen.getByRole('button', { name: /Więcej o Health Score/i })).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: /Więcej o spełnionych celach/i })).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: /Więcej o progach ostrzegawczych/i })).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: /Więcej o przekroczeniach krytycznych/i })).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: /Więcej o macierzy celów M&A/i })).toBeInTheDocument();
         });
     });
 });

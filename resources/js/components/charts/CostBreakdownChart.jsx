@@ -7,6 +7,7 @@ import {
     Tooltip
 } from "recharts";
 import { CustomChartTooltip } from "./CustomChartTooltip";
+import { Tooltip as UiTooltip } from "../ui/Tooltip";
 import { PercentageBadge } from "../ui/PercentageBadge";
 import { formatCurrency, formatDelta } from "../../utils/formatters";
 
@@ -122,9 +123,11 @@ export const CostBreakdownChart = ({
                                 className="w-2 h-2 rounded-xs shrink-0"
                                 style={{ backgroundColor: item.color }}
                             />
-                            <span className="text-zinc-300 truncate" title={item.name}>
-                                {item.name}
-                            </span>
+                            <UiTooltip content={`${item.name}${item.category_code ? ` [${item.category_code}]` : ''}`} delay={{ open: 200, close: 100 }}>
+                                <span className="text-zinc-300 truncate cursor-default">
+                                    {item.name}
+                                </span>
+                            </UiTooltip>
                             {item.category_code && (
                                 <span className="text-[9px] text-zinc-600 shrink-0">
                                     [{item.category_code}]

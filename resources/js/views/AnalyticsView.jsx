@@ -7,6 +7,7 @@ import { MetricCard } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { FinancialMultiplesStrip } from '../components/ui/FinancialMultiplesStrip';
+import { Tooltip, InfoTooltip } from '../components/ui/Tooltip';
 import { evaluateStatusChip } from '../components/benchmarks/BenchmarkConfigModal';
 import { PnlTrendChart } from '../components/charts/PnlTrendChart';
 import { CostBreakdownChart } from '../components/charts/CostBreakdownChart';
@@ -386,92 +387,117 @@ export const AnalyticsView = () => {
                     <div>
                         <div className="text-xs font-bold text-zinc-100 flex items-center gap-2 font-mono">
                             <span>{activeCompany?.name || 'Spółka Portfelowa'}</span>
-                            <Badge variant="default" size="sm">{activeCompany?.code || 'PODMIOT'}</Badge>
+                            <Tooltip content="Kod identyfikacyjny podmiotu w portfelu Deal Advisory">
+                                <span className="inline-flex">
+                                    <Badge variant="default" size="sm">{activeCompany?.code || 'PODMIOT'}</Badge>
+                                </span>
+                            </Tooltip>
                             <span className="text-zinc-600 font-normal">|</span>
-                            <span className="text-zinc-400 font-normal text-[11px]">NIP: {activeCompany?.tax_id || '525-00-11-222'}</span>
+                            <Tooltip content="Numer Identyfikacji Podatkowej podmiotu zarejestrowany w KRS">
+                                <span className="text-zinc-400 font-normal text-[11px] cursor-help">
+                                    NIP: {activeCompany?.tax_id || '525-00-11-222'}
+                                </span>
+                            </Tooltip>
                         </div>
-                        <div className="text-[10px] text-zinc-500 flex items-center gap-1.5 mt-0.5 font-mono">
-                            <Calendar className="w-3 h-3 text-zinc-600" />
-                            <span>ANALIZA FINANSOWA & TRENDY: {dateRange?.label?.toUpperCase() || 'CAŁA HISTORIA'}</span>
-                        </div>
+                        <Tooltip content="Zakres dat i horyzont czasowy dla skonsolidowanych danych analitycznych">
+                            <div className="text-[10px] text-zinc-500 flex items-center gap-1.5 mt-0.5 font-mono cursor-help">
+                                <Calendar className="w-3 h-3 text-zinc-600" />
+                                <span>ANALIZA FINANSOWA & TRENDY: {dateRange?.label?.toUpperCase() || 'CAŁA HISTORIA'}</span>
+                            </div>
+                        </Tooltip>
                     </div>
                 </div>
 
                 <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-1.5 text-[11px] font-mono text-zinc-400">
-                        <Coins className="w-3.5 h-3.5 text-zinc-500" />
-                        <span className="text-zinc-300 text-[10px]">WALUTA: {currency}</span>
-                    </div>
-                    <Button
-                        variant="secondary"
-                        size="sm"
-                        onClick={fetchData}
-                        loading={loading}
-                        className="text-xs font-mono"
-                    >
-                        <RefreshCw className="w-3 h-3 mr-1" />
-                        Odśwież
-                    </Button>
+                    <Tooltip content="Waluta sprawozdawcza analityki P&L i wskaźników (przeliczana w locie)">
+                        <div className="flex items-center gap-1.5 text-[11px] font-mono text-zinc-400 cursor-help">
+                            <Coins className="w-3.5 h-3.5 text-zinc-500" />
+                            <span className="text-zinc-300 text-[10px]">WALUTA: {currency}</span>
+                        </div>
+                    </Tooltip>
+                    <Tooltip content="Wymuś ponowne pobranie wskaźników, trendów i dekompozycji z bazy danych">
+                        <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={fetchData}
+                            loading={loading}
+                            className="text-xs font-mono"
+                            aria-label="Odśwież dane analityczne"
+                        >
+                            <RefreshCw className="w-3 h-3 mr-1" />
+                            Odśwież
+                        </Button>
+                    </Tooltip>
                 </div>
             </div>
 
             {/* View Mode Navigation Tabs */}
             <div className="flex border-b border-zinc-800 bg-zinc-900/60 rounded-t-lg px-2 pt-2 gap-1 overflow-x-auto font-mono text-xs">
-                <button
-                    onClick={() => setActiveTab('overview')}
-                    className={`px-3.5 py-2 border-b-2 font-semibold transition-colors whitespace-nowrap flex items-center gap-2 ${
-                        activeTab === 'overview'
-                            ? 'border-emerald-400 text-zinc-100 bg-zinc-850/50'
-                            : 'border-transparent text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/30'
-                    }`}
-                >
-                    <BarChart3 className="w-3.5 h-3.5 text-zinc-400" />
-                    Przegląd Kompleksowy
-                </button>
-                <button
-                    onClick={() => setActiveTab('profitability')}
-                    className={`px-3.5 py-2 border-b-2 font-semibold transition-colors whitespace-nowrap flex items-center gap-2 ${
-                        activeTab === 'profitability'
-                            ? 'border-emerald-400 text-zinc-100 bg-zinc-850/50'
-                            : 'border-transparent text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/30'
-                    }`}
-                >
-                    <Percent className="w-3.5 h-3.5 text-zinc-400" />
-                    Rentowność i Marże
-                </button>
-                <button
-                    onClick={() => setActiveTab('liquidity')}
-                    className={`px-3.5 py-2 border-b-2 font-semibold transition-colors whitespace-nowrap flex items-center gap-2 ${
-                        activeTab === 'liquidity'
-                            ? 'border-emerald-400 text-zinc-100 bg-zinc-850/50'
-                            : 'border-transparent text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/30'
-                    }`}
-                >
-                    <ShieldAlert className="w-3.5 h-3.5 text-zinc-400" />
-                    Płynność i Wskaźniki
-                </button>
-                <button
-                    onClick={() => setActiveTab('breakdown')}
-                    className={`px-3.5 py-2 border-b-2 font-semibold transition-colors whitespace-nowrap flex items-center gap-2 ${
-                        activeTab === 'breakdown'
-                            ? 'border-emerald-400 text-zinc-100 bg-zinc-850/50'
-                            : 'border-transparent text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/30'
-                    }`}
-                >
-                    <Layers className="w-3.5 h-3.5 text-zinc-400" />
-                    Dekompozycja Przychodów / Kosztów
-                </button>
-                <button
-                    onClick={() => setActiveTab('benchmarks')}
-                    className={`px-3.5 py-2 border-b-2 font-semibold transition-colors whitespace-nowrap flex items-center gap-2 ${
-                        activeTab === 'benchmarks'
-                            ? 'border-emerald-400 text-zinc-100 bg-zinc-850/50'
-                            : 'border-transparent text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/30'
-                    }`}
-                >
-                    <Sliders className="w-3.5 h-3.5 text-emerald-400" />
-                    Cele i Benchmarki (M&A)
-                </button>
+                <Tooltip content="Syntetyczny pulpit kluczowych wskaźników KPI, mnożników oraz wielowymiarowych trendów P&L" placement="bottom">
+                    <button
+                        onClick={() => setActiveTab('overview')}
+                        className={`px-3.5 py-2 border-b-2 font-semibold transition-colors whitespace-nowrap flex items-center gap-2 ${
+                            activeTab === 'overview'
+                                ? 'border-emerald-400 text-zinc-100 bg-zinc-850/50'
+                                : 'border-transparent text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/30'
+                        }`}
+                    >
+                        <BarChart3 className="w-3.5 h-3.5 text-zinc-400" />
+                        Przegląd Kompleksowy
+                    </button>
+                </Tooltip>
+                <Tooltip content="Analiza marż brutto, EBITDA, EBIT i netto wraz z chronologicznym szeregiem czasowym" placement="bottom">
+                    <button
+                        onClick={() => setActiveTab('profitability')}
+                        className={`px-3.5 py-2 border-b-2 font-semibold transition-colors whitespace-nowrap flex items-center gap-2 ${
+                            activeTab === 'profitability'
+                                ? 'border-emerald-400 text-zinc-100 bg-zinc-850/50'
+                                : 'border-transparent text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/30'
+                        }`}
+                    >
+                        <Percent className="w-3.5 h-3.5 text-zinc-400" />
+                        Rentowność i Marże
+                    </button>
+                </Tooltip>
+                <Tooltip content="Wskaźniki płynności bieżącej (CR), szybkiej (QR), kapitał obrotowy netto (NWC) oraz analiza wypłacalności" placement="bottom">
+                    <button
+                        onClick={() => setActiveTab('liquidity')}
+                        className={`px-3.5 py-2 border-b-2 font-semibold transition-colors whitespace-nowrap flex items-center gap-2 ${
+                            activeTab === 'liquidity'
+                                ? 'border-emerald-400 text-zinc-100 bg-zinc-850/50'
+                                : 'border-transparent text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/30'
+                        }`}
+                    >
+                        <ShieldAlert className="w-3.5 h-3.5 text-zinc-400" />
+                        Płynność i Wskaźniki
+                    </button>
+                </Tooltip>
+                <Tooltip content="Szczegółowy podział struktury kosztów operacyjnych (OPEX) oraz strumieni przychodowych (REV)" placement="bottom">
+                    <button
+                        onClick={() => setActiveTab('breakdown')}
+                        className={`px-3.5 py-2 border-b-2 font-semibold transition-colors whitespace-nowrap flex items-center gap-2 ${
+                            activeTab === 'breakdown'
+                                ? 'border-emerald-400 text-zinc-100 bg-zinc-850/50'
+                                : 'border-transparent text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/30'
+                        }`}
+                    >
+                        <Layers className="w-3.5 h-3.5 text-zinc-400" />
+                        Dekompozycja Przychodów / Kosztów
+                    </button>
+                </Tooltip>
+                <Tooltip content="Macierz celów finansowych, wskaźniki rynkowe i progi ostrzegawcze z ewaluacją semaforową" placement="bottom">
+                    <button
+                        onClick={() => setActiveTab('benchmarks')}
+                        className={`px-3.5 py-2 border-b-2 font-semibold transition-colors whitespace-nowrap flex items-center gap-2 ${
+                            activeTab === 'benchmarks'
+                                ? 'border-emerald-400 text-zinc-100 bg-zinc-850/50'
+                                : 'border-transparent text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/30'
+                        }`}
+                    >
+                        <Sliders className="w-3.5 h-3.5 text-emerald-400" />
+                        Cele i Benchmarki (M&A)
+                    </button>
+                </Tooltip>
             </div>
 
             {/* TAB 1: OVERVIEW */}
@@ -486,6 +512,7 @@ export const AnalyticsView = () => {
                             icon={DollarSign}
                             change={yoyRevenueGrowth}
                             subtitle={yoyRevenueGrowth != null ? `DYNAMIKA R/R (${yoyRevenueGrowth > 0 ? '+' : ''}${yoyRevenueGrowth.toFixed(1)}%)` : 'DYNAMIKA R/R'}
+                            tooltipContent="Łączne przychody netto ze sprzedaży towarów, wyrobów i usług po wyłączeniu rabatów i podatku VAT."
                         />
                         <MetricCard
                             title="Wynik EBITDA"
@@ -494,6 +521,7 @@ export const AnalyticsView = () => {
                             icon={TrendingUp}
                             change={yoyEbitdaGrowth}
                             subtitle={`MARŻA: ${(ebitdaMargin * 100).toFixed(1)}%`}
+                            tooltipContent="Zysk operacyjny przed potrąceniem odsetek, podatków i amortyzacji (D&A). Kluczowa miara gotówkowego wyniku operacyjnego spółki."
                         />
                         <MetricCard
                             title="Zysk Operacyjny (EBIT)"
@@ -502,6 +530,7 @@ export const AnalyticsView = () => {
                             icon={Activity}
                             change={yoyEbitGrowth}
                             subtitle={`MARŻA: ${(operatingMargin * 100).toFixed(1)}%`}
+                            tooltipContent="Wynik z działalności operacyjnej po uwzględnieniu odpisów amortyzacyjnych, przed kosztami finansowymi i podatkiem CIT."
                         />
                         <MetricCard
                             title="Zysk Netto (EAT)"
@@ -510,6 +539,7 @@ export const AnalyticsView = () => {
                             icon={Wallet}
                             change={yoyNetProfitGrowth}
                             subtitle={`MARŻA: ${(netMargin * 100).toFixed(1)}%`}
+                            tooltipContent="Końcowy wynik finansowy netto (Earnings After Taxes) po uwzględnieniu podatku dochodowego i kosztów obsługi zadłużenia."
                         />
                     </div>
 
@@ -530,14 +560,22 @@ export const AnalyticsView = () => {
                     {/* Main Overview Charts */}
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                         <div className="lg:col-span-2 bg-zinc-900 border border-zinc-800 rounded-lg p-4 flex flex-col">
-                            <div className="border-b border-zinc-800 pb-3 mb-3">
-                                <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-100 flex items-center gap-2">
-                                    <BarChart3 className="w-3.5 h-3.5 text-zinc-400" />
-                                    Wielowymiarowy Trend Wynikowy P&L
-                                </h3>
-                                <p className="text-[10px] font-mono text-zinc-500 mt-0.5">
-                                    Porównanie miesięczne: Przychody vs Koszty Operacyjne vs Wynik EBITDA i Netto
-                                </p>
+                            <div className="border-b border-zinc-800 pb-3 mb-3 flex items-center justify-between">
+                                <div>
+                                    <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-100 flex items-center gap-2">
+                                        <BarChart3 className="w-3.5 h-3.5 text-zinc-400" />
+                                        Wielowymiarowy Trend Wynikowy P&L
+                                    </h3>
+                                    <p className="text-[10px] font-mono text-zinc-500 mt-0.5">
+                                        Porównanie miesięczne: Przychody vs Koszty Operacyjne vs Wynik EBITDA i Netto
+                                    </p>
+                                </div>
+                                <InfoTooltip
+                                    title="Wielowymiarowy Trend P&L"
+                                    content="Wizualizacja miesięcznych przepływów wynikowych: relacja przychodów do kosztów operacyjnych (OPEX) oraz dynamiki generowania zysku EBITDA i wyniku netto."
+                                    size="xs"
+                                    ariaLabel="Informacje o wykresie trendu wynikowego P&L"
+                                />
                             </div>
                             <div className="flex-1 min-h-[300px]">
                                 <PnlTrendChart
@@ -548,14 +586,22 @@ export const AnalyticsView = () => {
                         </div>
 
                         <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 flex flex-col">
-                            <div className="border-b border-zinc-800 pb-3 mb-3">
-                                <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-100 flex items-center gap-2">
-                                    <Activity className="w-3.5 h-3.5 text-zinc-400" />
-                                    Struktura Kosztów Operacyjnych
-                                </h3>
-                                <p className="text-[10px] font-mono text-zinc-500 mt-0.5">
-                                    Rozbicie według kategorii OPEX
-                                </p>
+                            <div className="border-b border-zinc-800 pb-3 mb-3 flex items-center justify-between">
+                                <div>
+                                    <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-100 flex items-center gap-2">
+                                        <Activity className="w-3.5 h-3.5 text-zinc-400" />
+                                        Struktura Kosztów Operacyjnych
+                                    </h3>
+                                    <p className="text-[10px] font-mono text-zinc-500 mt-0.5">
+                                        Rozbicie według kategorii OPEX
+                                    </p>
+                                </div>
+                                <InfoTooltip
+                                    title="Struktura OPEX"
+                                    content="Dekompozycja struktury kosztów operacyjnych według kategorii analitycznych. Pozwala zidentyfikować główne centra kosztowe spółki."
+                                    size="xs"
+                                    ariaLabel="Informacje o strukturze kosztów operacyjnych"
+                                />
                             </div>
                             <div className="flex-1 min-h-[300px]">
                                 <CostBreakdownChart
@@ -574,7 +620,15 @@ export const AnalyticsView = () => {
                     {/* Margins Summary Grid */}
                     <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
                         <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3.5 font-mono">
-                            <div className="text-[10px] uppercase text-zinc-500">Marża Brutto ze Sprzedaży</div>
+                            <div className="flex items-center justify-between">
+                                <div className="text-[10px] uppercase text-zinc-500">Marża Brutto ze Sprzedaży</div>
+                                <InfoTooltip
+                                    title="Marża Brutto (Gross Margin)"
+                                    content="Stosunek zysku brutto ze sprzedaży (Przychody minus bezpośrednie koszty wytworzenia/COGS) do łącznych przychodów ze sprzedaży."
+                                    size="xs"
+                                    ariaLabel="Więcej o marży brutto ze sprzedaży"
+                                />
+                            </div>
                             <div className="text-2xl font-bold text-zinc-100 mt-1 tabular-nums">
                                 {(grossMargin * 100).toFixed(1)}%
                             </div>
@@ -584,7 +638,15 @@ export const AnalyticsView = () => {
                         </div>
 
                         <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3.5 font-mono">
-                            <div className="text-[10px] uppercase text-zinc-500">Marża Operacyjna EBITDA</div>
+                            <div className="flex items-center justify-between">
+                                <div className="text-[10px] uppercase text-zinc-500">Marża Operacyjna EBITDA</div>
+                                <InfoTooltip
+                                    title="Marża EBITDA"
+                                    content="Udział gotówkowego zysku operacyjnego EBITDA w przychodach netto ze sprzedaży. Kluczowy wskaźnik efektywności operacyjnej w transakcjach M&A."
+                                    size="xs"
+                                    ariaLabel="Więcej o marży operacyjnej EBITDA"
+                                />
+                            </div>
                             <div className="text-2xl font-bold text-emerald-400 mt-1 tabular-nums">
                                 {(ebitdaMargin * 100).toFixed(1)}%
                             </div>
@@ -594,7 +656,15 @@ export const AnalyticsView = () => {
                         </div>
 
                         <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3.5 font-mono">
-                            <div className="text-[10px] uppercase text-zinc-500">Marża Operacyjna EBIT</div>
+                            <div className="flex items-center justify-between">
+                                <div className="text-[10px] uppercase text-zinc-500">Marża Operacyjna EBIT</div>
+                                <InfoTooltip
+                                    title="Marża Operacyjna EBIT"
+                                    content="Stosunek zysku operacyjnego EBIT do przychodów. Obrazuje rentowność operacyjną z uwzględnieniem zużycia majątku trwałego (amortyzacji)."
+                                    size="xs"
+                                    ariaLabel="Więcej o marży operacyjnej EBIT"
+                                />
+                            </div>
                             <div className="text-2xl font-bold text-sky-400 mt-1 tabular-nums">
                                 {(operatingMargin * 100).toFixed(1)}%
                             </div>
@@ -604,7 +674,15 @@ export const AnalyticsView = () => {
                         </div>
 
                         <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3.5 font-mono">
-                            <div className="text-[10px] uppercase text-zinc-500">Marża Zysku Netto</div>
+                            <div className="flex items-center justify-between">
+                                <div className="text-[10px] uppercase text-zinc-500">Marża Zysku Netto</div>
+                                <InfoTooltip
+                                    title="Marża Zysku Netto (Net Margin)"
+                                    content="Końcowa rentowność netto (Bottom-Line Margin). Wskazuje jaki procent przychodów pozostaje w spółce jako czysty zysk po opodatkowaniu."
+                                    size="xs"
+                                    ariaLabel="Więcej o marży zysku netto"
+                                />
+                            </div>
                             <div className="text-2xl font-bold text-purple-400 mt-1 tabular-nums">
                                 {(netMargin * 100).toFixed(1)}%
                             </div>
@@ -616,14 +694,22 @@ export const AnalyticsView = () => {
 
                     {/* Margins Data Table */}
                     <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 flex flex-col font-mono">
-                        <div className="border-b border-zinc-800 pb-3 mb-3">
-                            <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-100 flex items-center gap-2">
-                                <TrendingUp className="w-3.5 h-3.5 text-zinc-400" />
-                                Dziennik Rentowności M&A – Szereg Czasowy
-                            </h3>
-                            <p className="text-[10px] text-zinc-500 mt-0.5">
-                                Ewolucja rentowności na poszczególnych poziomach rachunku wyników
-                            </p>
+                        <div className="border-b border-zinc-800 pb-3 mb-3 flex items-center justify-between">
+                            <div>
+                                <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-100 flex items-center gap-2">
+                                    <TrendingUp className="w-3.5 h-3.5 text-zinc-400" />
+                                    Dziennik Rentowności M&A – Szereg Czasowy
+                                </h3>
+                                <p className="text-[10px] text-zinc-500 mt-0.5">
+                                    Ewolucja rentowności na poszczególnych poziomach rachunku wyników
+                                </p>
+                            </div>
+                            <InfoTooltip
+                                title="Dziennik Rentowności M&A"
+                                content="Miesięczna ewolucja wyników i poziomów marżowości, umożliwiająca identyfikację sezonowości i anomalii rentowności w procesie Due Diligence."
+                                size="xs"
+                                ariaLabel="Więcej o dzienniku rentowności M&A"
+                            />
                         </div>
 
                         <div className="overflow-x-auto border border-zinc-800 rounded">
@@ -631,12 +717,36 @@ export const AnalyticsView = () => {
                                 <thead className="bg-zinc-950 text-[10px] uppercase text-zinc-400 border-b border-zinc-800">
                                     <tr>
                                         <th className="py-2.5 px-3">Okres (Miesiąc)</th>
-                                        <th className="py-2.5 px-3 text-right">Przychody</th>
-                                        <th className="py-2.5 px-3 text-right">Koszty OPEX</th>
-                                        <th className="py-2.5 px-3 text-right">EBITDA</th>
-                                        <th className="py-2.5 px-3 text-right">Marża EBITDA</th>
-                                        <th className="py-2.5 px-3 text-right">Zysk Netto</th>
-                                        <th className="py-2.5 px-3 text-right">Marża Netto</th>
+                                        <th className="py-2.5 px-3 text-right">
+                                            <Tooltip content="Przychody netto ze sprzedaży w danym miesiącu">
+                                                <span className="cursor-help">Przychody</span>
+                                            </Tooltip>
+                                        </th>
+                                        <th className="py-2.5 px-3 text-right">
+                                            <Tooltip content="Koszty operacyjne bieżącej działalności z wyłączeniem amortyzacji">
+                                                <span className="cursor-help">Koszty OPEX</span>
+                                            </Tooltip>
+                                        </th>
+                                        <th className="py-2.5 px-3 text-right">
+                                            <Tooltip content="Zysk operacyjny powiększony o amortyzację (EBITDA)">
+                                                <span className="cursor-help">EBITDA</span>
+                                            </Tooltip>
+                                        </th>
+                                        <th className="py-2.5 px-3 text-right">
+                                            <Tooltip content="Stosunek EBITDA do przychodów ze sprzedaży w danym miesiącu">
+                                                <span className="cursor-help">Marża EBITDA</span>
+                                            </Tooltip>
+                                        </th>
+                                        <th className="py-2.5 px-3 text-right">
+                                            <Tooltip content="Zysk netto po opodatkowaniu i kosztach finansowych">
+                                                <span className="cursor-help">Zysk Netto</span>
+                                            </Tooltip>
+                                        </th>
+                                        <th className="py-2.5 px-3 text-right">
+                                            <Tooltip content="Rentowność netto sprzedaży (Zysk Netto / Przychody)">
+                                                <span className="cursor-help">Marża Netto</span>
+                                            </Tooltip>
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-zinc-850">
@@ -685,13 +795,25 @@ export const AnalyticsView = () => {
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
                             <div className="flex items-center justify-between">
-                                <span className="text-[11px] font-mono uppercase text-zinc-400">Current Ratio (Wskaźnik Bieżący)</span>
-                                <Badge
-                                    variant={crBench?.status === 'OPT' || (!crBench && currentRatio >= 1.2) ? 'success' : (crBench?.status === 'CRIT' ? 'danger' : 'warning')}
-                                    size="sm"
-                                >
-                                    {crBench?.status_label || (currentRatio >= 1.2 ? 'OPTYMALNA' : 'PODWYŻSZONE RYZYKO')}
-                                </Badge>
+                                <div className="flex items-center gap-1">
+                                    <span className="text-[11px] font-mono uppercase text-zinc-400">Current Ratio (Wskaźnik Bieżący)</span>
+                                    <InfoTooltip
+                                        title="Current Ratio (Wskaźnik Płynności Bieżącej)"
+                                        content="Aktywa obrotowe podzielone przez zobowiązania krótkoterminowe. Wskazuje zdolność spółki do spłaty bieżących długów majątkiem obrotowym. Norma rynkowa: min. 1.20x."
+                                        size="xs"
+                                        ariaLabel="Definicja wskaźnika Current Ratio"
+                                    />
+                                </div>
+                                <Tooltip content={crBench?.status === 'OPT' || (!crBench && currentRatio >= 1.2) ? 'Wskaźnik na poziomie bezpiecznym (powyżej normy 1.20x)' : 'Wskaźnik poniżej progu ostrożnościowego - ryzyko zachwiania płynności'}>
+                                    <span className="inline-block cursor-help">
+                                        <Badge
+                                            variant={crBench?.status === 'OPT' || (!crBench && currentRatio >= 1.2) ? 'success' : (crBench?.status === 'CRIT' ? 'danger' : 'warning')}
+                                            size="sm"
+                                        >
+                                            {crBench?.status_label || (currentRatio >= 1.2 ? 'OPTYMALNA' : 'PODWYŻSZONE RYZYKO')}
+                                        </Badge>
+                                    </span>
+                                </Tooltip>
                             </div>
                             <div className="text-3xl font-bold font-mono text-zinc-100 mt-2 tabular-nums">
                                 {currentRatio > 0 ? `${currentRatio.toFixed(2)}x` : '—'}
@@ -703,13 +825,25 @@ export const AnalyticsView = () => {
 
                         <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
                             <div className="flex items-center justify-between">
-                                <span className="text-[11px] font-mono uppercase text-zinc-400">Quick Ratio (Wskaźnik Szybki)</span>
-                                <Badge
-                                    variant={qrBench?.status === 'OPT' || (!qrBench && quickRatio >= 1.0) ? 'success' : (qrBench?.status === 'CRIT' ? 'danger' : 'warning')}
-                                    size="sm"
-                                >
-                                    {qrBench?.status_label || (quickRatio >= 1.0 ? 'OPTYMALNA' : 'UWAGA')}
-                                </Badge>
+                                <div className="flex items-center gap-1">
+                                    <span className="text-[11px] font-mono uppercase text-zinc-400">Quick Ratio (Wskaźnik Szybki)</span>
+                                    <InfoTooltip
+                                        title="Quick Ratio (Wskaźnik Płynności Szybkiej)"
+                                        content="Aktywa obrotowe po wyłączeniu najmniej płynnych zapasów, odniesione do zobowiązań krótkoterminowych. Norma ostrożnościowa: min. 1.00x."
+                                        size="xs"
+                                        ariaLabel="Definicja wskaźnika Quick Ratio"
+                                    />
+                                </div>
+                                <Tooltip content={qrBench?.status === 'OPT' || (!qrBench && quickRatio >= 1.0) ? 'Optymalne pokrycie zobowiązań płynnymi aktywami bez konieczności wyprzedaży zapasów' : 'Zwiększone ryzyko płynnościowe przy spowolnieniu rotacji zapasów'}>
+                                    <span className="inline-block cursor-help">
+                                        <Badge
+                                            variant={qrBench?.status === 'OPT' || (!qrBench && quickRatio >= 1.0) ? 'success' : (qrBench?.status === 'CRIT' ? 'danger' : 'warning')}
+                                            size="sm"
+                                        >
+                                            {qrBench?.status_label || (quickRatio >= 1.0 ? 'OPTYMALNA' : 'UWAGA')}
+                                        </Badge>
+                                    </span>
+                                </Tooltip>
                             </div>
                             <div className="text-3xl font-bold font-mono text-amber-400 mt-2 tabular-nums">
                                 {quickRatio > 0 ? `${quickRatio.toFixed(2)}x` : '—'}
@@ -721,10 +855,22 @@ export const AnalyticsView = () => {
 
                         <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
                             <div className="flex items-center justify-between">
-                                <span className="text-[11px] font-mono uppercase text-zinc-400">Kapitał Obrotowy Netto (NWC)</span>
-                                <Badge variant={workingCapitalVal >= 0 ? 'success' : 'danger'} size="sm">
-                                    {workingCapitalVal >= 0 ? 'DODATNI' : 'UJEMNY'}
-                                </Badge>
+                                <div className="flex items-center gap-1">
+                                    <span className="text-[11px] font-mono uppercase text-zinc-400">Kapitał Obrotowy Netto (NWC)</span>
+                                    <InfoTooltip
+                                        title="Kapitał Obrotowy Netto (NWC)"
+                                        content="Różnica między aktywami obrotowymi a zobowiązaniami bieżącymi (Net Working Capital). Dodatnia wartość stanowi bufor bezpieczeństwa finansujący bieżącą działalność operacyjną."
+                                        size="xs"
+                                        ariaLabel="Definicja kapitału obrotowego netto"
+                                    />
+                                </div>
+                                <Tooltip content={workingCapitalVal >= 0 ? 'Dodatni kapitał obrotowy netto - stabilne finansowanie majątku obrotowego kapitałem stałym' : 'Ujemny kapitał obrotowy netto - majątek obrotowy finansowany krótkoterminowymi zobowiązaniami'}>
+                                    <span className="inline-block cursor-help">
+                                        <Badge variant={workingCapitalVal >= 0 ? 'success' : 'danger'} size="sm">
+                                            {workingCapitalVal >= 0 ? 'DODATNI' : 'UJEMNY'}
+                                        </Badge>
+                                    </span>
+                                </Tooltip>
                             </div>
                             <div className="text-3xl font-bold font-mono text-emerald-400 mt-2 tabular-nums">
                                 {formatCurrency(workingCapitalVal, currency)}
@@ -737,14 +883,22 @@ export const AnalyticsView = () => {
 
                     {/* Liquidity Trend Chart */}
                     <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 flex flex-col">
-                        <div className="border-b border-zinc-800 pb-3 mb-3">
-                            <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-100 flex items-center gap-2">
-                                <ShieldAlert className="w-3.5 h-3.5 text-zinc-400" />
-                                Ewolucja Płynności Finansowej (CR / QR)
-                            </h3>
-                            <p className="text-[10px] font-mono text-zinc-500 mt-0.5">
-                                Kształtowanie się relacji płynności bieżącej i szybkiej w czasie
-                            </p>
+                        <div className="border-b border-zinc-800 pb-3 mb-3 flex items-center justify-between">
+                            <div>
+                                <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-100 flex items-center gap-2">
+                                    <ShieldAlert className="w-3.5 h-3.5 text-zinc-400" />
+                                    Ewolucja Płynności Finansowej (CR / QR)
+                                </h3>
+                                <p className="text-[10px] font-mono text-zinc-500 mt-0.5">
+                                    Kształtowanie się relacji płynności bieżącej i szybkiej w czasie
+                                </p>
+                            </div>
+                            <InfoTooltip
+                                title="Ewolucja Płynności Finansowej"
+                                content="Analiza trajektorii wskaźników płynności bieżącej (Current Ratio) i szybkiej (Quick Ratio) z odniesieniem do linii referencyjnych kowenantów (1.20x oraz 1.00x)."
+                                size="xs"
+                                ariaLabel="Więcej o wykresie ewolucji płynności"
+                            />
                         </div>
                         <div className="h-[320px]">
                             <LiquidityTrendChart data={liquidityTrends} />
@@ -754,13 +908,23 @@ export const AnalyticsView = () => {
                     {/* Solvency & Commentary */}
                     <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 font-mono text-xs">
                         <div className="flex items-center justify-between border-b border-zinc-800 pb-2 mb-3">
-                            <span className="font-bold text-zinc-200 uppercase">Komentarz Analityka M&A</span>
-                            <span className={debtRatio <= 0.6 ? 'text-emerald-400 font-semibold' : 'text-amber-400 font-semibold'}>
-                                {benchSummary?.overall_status_label || (debtRatio <= 0.6 ? 'STABILNY / LOW RISK' : 'PODWYŻSZONE ZADŁUŻENIE')}
-                            </span>
+                            <div className="flex items-center gap-1.5">
+                                <span className="font-bold text-zinc-200 uppercase">Komentarz Analityka M&A</span>
+                                <InfoTooltip
+                                    title="Ocena Solwencji i Zadłużenia"
+                                    content="Ewaluacja struktury kapitałowej, dźwigni finansowej oraz zdolności obsługi zadłużenia oparta na wskaźniku Debt-to-Assets i benchmarkach rynkowych."
+                                    size="xs"
+                                    ariaLabel="Więcej o ocenie solwencji i zadłużenia"
+                                />
+                            </div>
+                            <Tooltip content="Syntetyczny status ryzyka finansowego na podstawie wskaźnika ogólnego zadłużenia">
+                                <span className={`cursor-help ${debtRatio <= 0.6 ? 'text-emerald-400 font-semibold' : 'text-amber-400 font-semibold'}`}>
+                                    {benchSummary?.overall_status_label || (debtRatio <= 0.6 ? 'STABILNY / LOW RISK' : 'PODWYŻSZONE ZADŁUŻENIE')}
+                                </span>
+                            </Tooltip>
                         </div>
                         <p className="text-zinc-400 leading-relaxed text-[11px]">
-                            Wskaźnik ogólnego zadłużenia (Debt-to-Assets) wynosi <strong className="text-zinc-200">{debtRatio > 0 ? debtRatio.toFixed(2) : '0.38'}x</strong>,
+                            Wskaźnik ogólnego zadłużenia (Debt-to-Assets) wynosi <Tooltip content="Wskaźnik Ogólnego Zadłużenia (Debt-to-Assets): Zobowiązania ogółem / Aktywa ogółem. Wartość poniżej 0.50x oznacza konserwatywną strukturę finansowania."><strong className="text-zinc-200 cursor-help underline decoration-dotted decoration-zinc-600">{debtRatio > 0 ? debtRatio.toFixed(2) : '0.38'}x</strong></Tooltip>,
                             co wskazuje na {debtRatio <= 0.50 ? 'konserwatywną strukturę finansowania i wysoki bufor bezpieczeństwa kredytowego.' : 'umiarkowaną dźwignię finansową.'}
                             Wskaźniki płynności {currentRatio >= 1.2 ? 'utrzymują się powyżej progów ostrzegawczych, gwarantując pełną obsługę zobowiązań krótkoterminowych.' : 'wymagają monitorowania rotacji należności i poziomu zapasów.'}
                         </p>
@@ -776,26 +940,30 @@ export const AnalyticsView = () => {
                         <div className="flex items-center gap-2">
                             <span className="text-xs font-mono uppercase text-zinc-400 font-semibold">Kierunek Przepływów:</span>
                             <div className="inline-flex rounded-md border border-zinc-800 bg-zinc-950 p-0.5 text-xs font-mono">
-                                <button
-                                    onClick={() => setBreakdownType('EXPENSE')}
-                                    className={`px-3 py-1 rounded transition-colors ${
-                                        breakdownType === 'EXPENSE'
-                                            ? 'bg-rose-950/60 text-rose-300 font-bold border border-rose-800/60'
-                                            : 'text-zinc-500 hover:text-zinc-300'
-                                    }`}
-                                >
-                                    Koszty Operacyjne (OPEX)
-                                </button>
-                                <button
-                                    onClick={() => setBreakdownType('REVENUE')}
-                                    className={`px-3 py-1 rounded transition-colors ${
-                                        breakdownType === 'REVENUE'
-                                            ? 'bg-emerald-950/60 text-emerald-300 font-bold border border-emerald-800/60'
-                                            : 'text-zinc-500 hover:text-zinc-300'
-                                    }`}
-                                >
-                                    Przychody ze Sprzedaży (REV)
-                                </button>
+                                <Tooltip content="Przełącz na dekompozycję kosztów operacyjnych (OPEX) według kategorii analitycznych">
+                                    <button
+                                        onClick={() => setBreakdownType('EXPENSE')}
+                                        className={`px-3 py-1 rounded transition-colors ${
+                                            breakdownType === 'EXPENSE'
+                                                ? 'bg-rose-950/60 text-rose-300 font-bold border border-rose-800/60'
+                                                : 'text-zinc-500 hover:text-zinc-300'
+                                        }`}
+                                    >
+                                        Koszty Operacyjne (OPEX)
+                                    </button>
+                                </Tooltip>
+                                <Tooltip content="Przełącz na dekompozycję przychodów ze sprzedaży (REV) według linii biznesowych i produktów">
+                                    <button
+                                        onClick={() => setBreakdownType('REVENUE')}
+                                        className={`px-3 py-1 rounded transition-colors ${
+                                            breakdownType === 'REVENUE'
+                                                ? 'bg-emerald-950/60 text-emerald-300 font-bold border border-emerald-800/60'
+                                                : 'text-zinc-500 hover:text-zinc-300'
+                                        }`}
+                                    >
+                                        Przychody ze Sprzedaży (REV)
+                                    </button>
+                                </Tooltip>
                             </div>
                         </div>
 
@@ -807,14 +975,22 @@ export const AnalyticsView = () => {
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                         {/* Donut Chart */}
                         <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 flex flex-col">
-                            <div className="border-b border-zinc-800 pb-3 mb-3">
-                                <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-100 flex items-center gap-2">
-                                    <PieChart className="w-3.5 h-3.5 text-zinc-400" />
-                                    Wykres Udziału Procentowego
-                                </h3>
-                                <p className="text-[10px] font-mono text-zinc-500 mt-0.5">
-                                    Dystrybucja według kategorii w horyzoncie analitycznym
-                                </p>
+                            <div className="border-b border-zinc-800 pb-3 mb-3 flex items-center justify-between">
+                                <div>
+                                    <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-100 flex items-center gap-2">
+                                        <PieChart className="w-3.5 h-3.5 text-zinc-400" />
+                                        Wykres Udziału Procentowego
+                                    </h3>
+                                    <p className="text-[10px] font-mono text-zinc-500 mt-0.5">
+                                        Dystrybucja według kategorii w horyzoncie analitycznym
+                                    </p>
+                                </div>
+                                <InfoTooltip
+                                    title="Dystrybucja Kategorii"
+                                    content="Wykres kołowy przedstawiający udział poszczególnych pozycji analitycznych w zagregowanej sumie wybranego typu przepływów (OPEX lub REV)."
+                                    size="xs"
+                                    ariaLabel="Więcej o wykresie udziału procentowego"
+                                />
                             </div>
                             <div className="flex-1 min-h-[300px]">
                                 <CostBreakdownChart
@@ -826,14 +1002,22 @@ export const AnalyticsView = () => {
 
                         {/* High-Density Breakdown Table */}
                         <div className="lg:col-span-2 bg-zinc-900 border border-zinc-800 rounded-lg p-4 flex flex-col">
-                            <div className="border-b border-zinc-800 pb-3 mb-3">
-                                <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-100 flex items-center gap-2">
-                                    <Layers className="w-3.5 h-3.5 text-zinc-400" />
-                                    Tabela Pozycji Analitycznych
-                                </h3>
-                                <p className="text-[10px] font-mono text-zinc-500 mt-0.5">
-                                    Zestawienie sumaryczne w walucie {currency} z udziałem w sumie
-                                </p>
+                            <div className="border-b border-zinc-800 pb-3 mb-3 flex items-center justify-between">
+                                <div>
+                                    <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-100 flex items-center gap-2">
+                                        <Layers className="w-3.5 h-3.5 text-zinc-400" />
+                                        Tabela Pozycji Analitycznych
+                                    </h3>
+                                    <p className="text-[10px] font-mono text-zinc-500 mt-0.5">
+                                        Zestawienie sumaryczne w walucie {currency} z udziałem w sumie
+                                    </p>
+                                </div>
+                                <InfoTooltip
+                                    title="Pozycje Analityczne"
+                                    content="Szczegółowe zestawienie kont analitycznych z kodem kategorii, zagregowaną kwotą oraz relatywnym udziałem procentowym."
+                                    size="xs"
+                                    ariaLabel="Więcej o tabeli pozycji analitycznych"
+                                />
                             </div>
 
                             <div className="overflow-x-auto border border-zinc-800 rounded flex-1">
@@ -887,7 +1071,15 @@ export const AnalyticsView = () => {
                     {/* Top Summary Cards */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                         <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3.5">
-                            <div className="text-[10px] uppercase text-zinc-500">Ocena Zdrowia Spółki (Health Score)</div>
+                            <div className="flex items-center justify-between">
+                                <div className="text-[10px] uppercase text-zinc-500">Ocena Zdrowia Spółki (Health Score)</div>
+                                <InfoTooltip
+                                    title="Health Score"
+                                    content="Syntetyczny indeks kondycji finansowej spółki (0-100%) wyliczany na podstawie liczby spełnionych benchmarków rynkowych i wag poszczególnych wskaźników."
+                                    size="xs"
+                                    ariaLabel="Więcej o Health Score"
+                                />
+                            </div>
                             <div className="text-2xl font-bold text-emerald-400 mt-1 tabular-nums">
                                 {benchSummary?.health_score != null ? `${benchSummary.health_score}%` : '85.7%'}
                             </div>
@@ -897,7 +1089,15 @@ export const AnalyticsView = () => {
                         </div>
 
                         <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3.5">
-                            <div className="text-[10px] uppercase text-zinc-500">Cele Spełnione (Optymalne)</div>
+                            <div className="flex items-center justify-between">
+                                <div className="text-[10px] uppercase text-zinc-500">Cele Spełnione (Optymalne)</div>
+                                <InfoTooltip
+                                    title="Status OPT"
+                                    content="Liczba wskaźników finansowych znajdujących się w przedziale optymalnym, zgodnym z założeniami doradcy M&A lub normami branżowymi."
+                                    size="xs"
+                                    ariaLabel="Więcej o spełnionych celach"
+                                />
+                            </div>
                             <div className="text-2xl font-bold text-emerald-400 mt-1 tabular-nums">
                                 {benchSummary?.optimal_count != null ? benchSummary.optimal_count : 6} / {benchSummary?.total_evaluated != null ? benchSummary.total_evaluated : 7}
                             </div>
@@ -907,7 +1107,15 @@ export const AnalyticsView = () => {
                         </div>
 
                         <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3.5">
-                            <div className="text-[10px] uppercase text-zinc-500">Próg Ostrzegawczy (Warning)</div>
+                            <div className="flex items-center justify-between">
+                                <div className="text-[10px] uppercase text-zinc-500">Próg Ostrzegawczy (Warning)</div>
+                                <InfoTooltip
+                                    title="Status WARN"
+                                    content="Wskaźniki, które przekroczyły próg ostrożnościowy, lecz nie naruszają jeszcze krytycznych kowenantów. Wskazują na konieczność monitorowania trendu."
+                                    size="xs"
+                                    ariaLabel="Więcej o progach ostrzegawczych"
+                                />
+                            </div>
                             <div className="text-2xl font-bold text-amber-400 mt-1 tabular-nums">
                                 {benchSummary?.warning_count != null ? benchSummary.warning_count : 1}
                             </div>
@@ -917,7 +1125,15 @@ export const AnalyticsView = () => {
                         </div>
 
                         <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3.5">
-                            <div className="text-[10px] uppercase text-zinc-500">Przekroczenia Krytyczne</div>
+                            <div className="flex items-center justify-between">
+                                <div className="text-[10px] uppercase text-zinc-500">Przekroczenia Krytyczne</div>
+                                <InfoTooltip
+                                    title="Status CRIT"
+                                    content="Wskaźniki naruszające twarde minima lub maksima kowenantowe. Wymagają natychmiastowych działań restrukturyzacyjnych lub notyfikacji instytucji finansujących."
+                                    size="xs"
+                                    ariaLabel="Więcej o przekroczeniach krytycznych"
+                                />
+                            </div>
                             <div className="text-2xl font-bold text-rose-400 mt-1 tabular-nums">
                                 {benchSummary?.critical_count != null ? benchSummary.critical_count : 0}
                             </div>
@@ -934,6 +1150,12 @@ export const AnalyticsView = () => {
                                 <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-100 flex items-center gap-2">
                                     <Target className="w-4 h-4 text-emerald-400" />
                                     Macierz Celów i Benchmarków Finansowych (M&A Target Matrix)
+                                    <InfoTooltip
+                                        title="M&A Target Matrix"
+                                        content="Centralna matryca benchmarków finansowych umożliwiająca doradcy M&A definiowanie progów docelowych, ostrzegawczych i krytycznych dla spółki portfelowej."
+                                        size="xs"
+                                        ariaLabel="Więcej o macierzy celów M&A"
+                                    />
                                 </h3>
                                 <p className="text-[10px] text-zinc-500 mt-0.5">
                                     {canEditBenchmarks
@@ -944,26 +1166,32 @@ export const AnalyticsView = () => {
 
                             {canEditBenchmarks && (
                                 <div className="flex items-center gap-2">
-                                    <Button
-                                        variant="secondary"
-                                        size="sm"
-                                        onClick={handleResetBenchmarks}
-                                        disabled={resettingBenchmarks || savingBenchmarks}
-                                        className="text-xs"
-                                    >
-                                        <RotateCcw className="w-3 h-3 mr-1.5" />
-                                        Resetuj do Rynkowych
-                                    </Button>
-                                    <Button
-                                        variant="primary"
-                                        size="sm"
-                                        onClick={handleSaveAllBenchmarks}
-                                        loading={savingBenchmarks}
-                                        className="text-xs font-semibold"
-                                    >
-                                        <Save className="w-3.5 h-3.5 mr-1.5" />
-                                        Zapisz Wszystkie Cele
-                                    </Button>
+                                    <Tooltip content="Przywróć domyślne, powszechnie stosowane progi rynkowe dla wskaźników płynności, marż i zadłużenia">
+                                        <Button
+                                            variant="secondary"
+                                            size="sm"
+                                            onClick={handleResetBenchmarks}
+                                            disabled={resettingBenchmarks || savingBenchmarks}
+                                            className="text-xs"
+                                            aria-label="Resetuj progi do rynkowych"
+                                        >
+                                            <RotateCcw className="w-3 h-3 mr-1.5" />
+                                            Resetuj do Rynkowych
+                                        </Button>
+                                    </Tooltip>
+                                    <Tooltip content="Zapisz zaktualizowane progi docelowe i ostrzegawcze w bazie danych dla aktywnej spółki">
+                                        <Button
+                                            variant="primary"
+                                            size="sm"
+                                            onClick={handleSaveAllBenchmarks}
+                                            loading={savingBenchmarks}
+                                            className="text-xs font-semibold"
+                                            aria-label="Zapisz wszystkie cele benchmarkowe"
+                                        >
+                                            <Save className="w-3.5 h-3.5 mr-1.5" />
+                                            Zapisz Wszystkie Cele
+                                        </Button>
+                                    </Tooltip>
                                 </div>
                             )}
                         </div>
@@ -974,13 +1202,37 @@ export const AnalyticsView = () => {
                                 <thead className="bg-zinc-950 text-[10px] uppercase text-zinc-400 border-b border-zinc-800">
                                     <tr>
                                         <th className="py-2.5 px-3">Wskaźnik Finansowy</th>
-                                        <th className="py-2.5 px-3">Relacja</th>
+                                        <th className="py-2.5 px-3">
+                                            <Tooltip content="Kierunek pożądany dla wskaźnika (Większy >= lub Mniejszy <= oznacza lepszą kondycję)">
+                                                <span className="cursor-help">Relacja</span>
+                                            </Tooltip>
+                                        </th>
                                         <th className="py-2.5 px-3 text-right">Wartość Bieżąca</th>
-                                        <th className="py-2.5 px-3 text-center w-32">Cel Docelowy</th>
-                                        <th className="py-2.5 px-3 text-center w-32">Próg Ostrzegawczy</th>
-                                        <th className="py-2.5 px-3 text-center w-32">Próg Krytyczny</th>
-                                        <th className="py-2.5 px-3 text-center">Status & Semafor</th>
-                                        <th className="py-2.5 px-3 text-center">Źródło</th>
+                                        <th className="py-2.5 px-3 text-center w-32">
+                                            <Tooltip content="Wartość docelowa oczekiwana przez doradcę M&A (Status OPT)">
+                                                <span className="cursor-help">Cel Docelowy</span>
+                                            </Tooltip>
+                                        </th>
+                                        <th className="py-2.5 px-3 text-center w-32">
+                                            <Tooltip content="Próg wejścia w strefę ostrzegawczą (Status WARN)">
+                                                <span className="cursor-help">Próg Ostrzegawczy</span>
+                                            </Tooltip>
+                                        </th>
+                                        <th className="py-2.5 px-3 text-center w-32">
+                                            <Tooltip content="Próg naruszenia krytycznego (Status CRIT)">
+                                                <span className="cursor-help">Próg Krytyczny</span>
+                                            </Tooltip>
+                                        </th>
+                                        <th className="py-2.5 px-3 text-center">
+                                            <Tooltip content="Bieżący stan wskaźnika wyliczony automatycznie na podstawie aktualnych wyników spółki">
+                                                <span className="cursor-help">Status & Semafor</span>
+                                            </Tooltip>
+                                        </th>
+                                        <th className="py-2.5 px-3 text-center">
+                                            <Tooltip content="Pochodzenie progu: STANDARD (norma rynkowa) lub CEL DORADCY (indywidualna konfiguracja)">
+                                                <span className="cursor-help">Źródło</span>
+                                            </Tooltip>
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-zinc-850">
@@ -1086,13 +1338,17 @@ export const AnalyticsView = () => {
                                                 </td>
                                                 <td className="py-3 px-3 text-center">
                                                     {item.is_custom ? (
-                                                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-sky-950/60 border border-sky-800/60 text-sky-400 font-bold uppercase">
-                                                            CEL DORADCY
-                                                        </span>
+                                                        <Tooltip content="Próg zmodyfikowany i sparametryzowany indywidualnie przez Doradcę M&A dla tej transakcji">
+                                                            <span className="text-[9px] px-1.5 py-0.5 rounded bg-sky-950/60 border border-sky-800/60 text-sky-400 font-bold uppercase cursor-help">
+                                                                CEL DORADCY
+                                                            </span>
+                                                        </Tooltip>
                                                     ) : (
-                                                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-zinc-850 border border-zinc-750 text-zinc-400 font-bold uppercase">
-                                                            STANDARD
-                                                        </span>
+                                                        <Tooltip content="Domyślna norma rynkowa stosowana w analizie instytucjonalnej">
+                                                            <span className="text-[9px] px-1.5 py-0.5 rounded bg-zinc-850 border border-zinc-750 text-zinc-400 font-bold uppercase cursor-help">
+                                                                STANDARD
+                                                            </span>
+                                                        </Tooltip>
                                                     )}
                                                 </td>
                                             </tr>

@@ -892,6 +892,13 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Zastąpienie natywnego `title="..."` na przycisku celów benchmarkowych M&A oraz dodanie podpowiedzi dla odznaki spółki, NIP, filtru zakresu, waluty i silnika CQRS/DDD.
     - Wzbogacenie nagłówków i przełączników wykresów (`TREND P&L` / `PŁYNNOŚĆ CR/QR`) oraz dziennika audytowego WORM (`AuditTrailSnippet`) o interaktywne dymki.
     - Weryfikacja testowa: `MetricCard.test.jsx` (4/4), `DashboardView.test.jsx` (9/9), `dashboardViewE2EWorkflow.test.jsx` (6/6).
+  - [x] Wdrożenie dostępnych podpowiedzi Tooltip i InfoTooltip w widoku Analityki P&L, Marż i Wskaźników Płynności.
+    - Eliminacja natywnych atrybutów `title="..."` z etykiet legendy w `CostBreakdownChart.jsx` z aliasowaniem `UiTooltip` zapobiegającym kolizji z Recharts `<Tooltip />`.
+    - Wzbogacenie nagłówka kontekstowego `AnalyticsView.jsx`: podpowiedzi dla odznaki spółki, NIP, filtru dat, waluty oraz przycisku odświeżania z etykietą `aria-label`.
+    - Dostępne podpowiedzi nawigacyjne na wszystkich 5 zakładkach: Podsumowanie P&L, Rentowność i Marże, Płynność i Zadłużenie, Dekompozycja Pozycji oraz Cele Benchmarkowe.
+    - Wdrożenie `tooltipContent` w 4 głównych kartach KPI (Przychody, EBITDA, EBIT, Zysk Netto) oraz `<InfoTooltip size="xs" />` w nagłówkach wykresów i tabel marżowych.
+    - Dodanie dymków metodologicznych dla wskaźników płynności (Current Ratio, Quick Ratio, NWC), statusów ewaluacji, wykresu dekompozycji oraz matrycy celów M&A.
+    - Weryfikacja testowa: `AnalyticsView.test.jsx` (6/6), `CostBreakdownChart.test.jsx` (4/4), 100% PASS w pełnym zestawie 60 plików Vitest (562 testy) i bezbłędny build Vite.
 
 ---
 
