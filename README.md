@@ -1088,6 +1088,12 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
         - Eliminacja twardo zakodowanych klas barwnych i wdrożenie adaptacyjnych tokenów (`bg-white dark:bg-zinc-900`, `border-zinc-200 dark:border-zinc-800`, `text-zinc-900 dark:text-zinc-100`) w 51 plikach widoków i komponentów w modułach: Advisors & Permissions, Dataroom (VDR), Investment Planning & Financial Modeling, Finance, Records & Audit, Import & Benchmarks oraz Reports.
         - Zachowanie 100% zgodności selektorów DOM i klas asercyjnych dla testów automatycznych (`div.bg-zinc-900` w `DashboardView`, `text-zinc-100` i `text-rose-400` w `RecordsView`).
         - Weryfikacja testowa: 100% PASS w pełnym zestawie 74 plików Vitest (670 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
+    - [x] Poprawka motywu karty i wykresu rozbicia kosztów operacyjnych oraz kolejności hooków React (Commit 304).
+        - `resources/js/views/DashboardView.jsx`: usunięcie nadmiarowej, niepoprzedzonej prefiksem klasy `bg-zinc-900` nadpisującej `bg-white` w motywie jasnym, wdrożenie czystej pary tokenów `bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800` oraz dodanie jednoznacznego atrybutu `data-testid="cost-breakdown-card"`.
+        - `resources/js/components/charts/CostBreakdownChart.jsx`: przeniesienie hooków `useMemo` (`total` i `sortedData`) bezwarunkowo przed instrukcję wczesnego wyjścia `if (!data || data.length === 0)`, eliminujące ostrzeżenie naruszenia React Rules of Hooks przy przejściach stanu danych.
+        - `resources/js/tests/integration/dashboardViewE2EWorkflow.test.jsx`: refaktoryzacja selektora w teście integracyjnym E2E z kruchego `.closest("div.bg-zinc-900")` na stabilny `screen.getByTestId("cost-breakdown-card")`.
+        - `resources/js/tests/components/CostBreakdownChart.test.jsx`: rozszerzenie zestawu testów jednostkowych o weryfikację odporności cyklu życia hooków podczas rerenderowania pustej/pełnej kolekcji danych oraz renderowanie w motywie jasnym (`THEMES.LIGHT`) pod `ThemeProvider`.
+        - Weryfikacja testowa: 100% PASS w pełnym zestawie 74 plików Vitest (672 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
 ---
 

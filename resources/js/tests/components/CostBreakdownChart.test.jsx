@@ -2,6 +2,7 @@ import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { CostBreakdownChart } from '../../components/charts/CostBreakdownChart';
+import { ThemeProvider, THEMES } from '../../context/ThemeContext';
 
 vi.mock('recharts', async () => {
     const original = await vi.importActual('recharts');
@@ -16,6 +17,25 @@ describe('CostBreakdownChart Component', () => {
         render(<CostBreakdownChart data={[]} />);
 
         expect(screen.getByText(/Brak danych struktury kosztów operacyjnych/i)).toBeInTheDocument();
+    });
+
+    it('handles transition from empty data to populated data without React hook order violations', () => {
+        const { rerender } = render(<CostBreakdownChart data={[]} />);
+        expect(screen.getByText(/Brak danych struktury kosztów operacyjnych/i)).toBeInTheDocument();
+
+        const mockData = [
+            {
+                category_name: 'Wynagrodzenia i świadczenia',
+                category_code: 'OPEX-SAL',
+                amount: 150000,
+                percentage: 100.0,
+            },
+        ];
+
+        // Rerender with data must not throw Hook order mismatch
+        rerender(<CostBreakdownChart data={mockData} />);
+        expect(screen.getByText('Wynagrodzenia i świadczenia')).toBeInTheDocument();
+        expect(screen.getByText('100.0%')).toBeInTheDocument();
     });
 
     it('renders OPEX categories and percentages in the legend', () => {
@@ -42,6 +62,7 @@ describe('CostBreakdownChart Component', () => {
         expect(screen.getByText('40.0%')).toBeInTheDocument();
         expect(screen.getByText('SUMA KOSZTÓW')).toBeInTheDocument();
     });
+
     it('verifies diverse multi-category OPEX distribution instead of single 100% entry', () => {
         const mockGranularOpex = [
             { category_id: 'cat-opex-payroll', category_name: 'Wynagrodzenia i świadczenia', category_code: 'PAYROLL', amount: 46000, percentage: 46.0 },
@@ -149,5 +170,26 @@ describe('CostBreakdownChart Component', () => {
         expect(cloudBadge).toHaveTextContent("+50.0%");
         expect(cloudBadge.className).toContain("text-rose-300");
         expect(cloudBadge).toHaveAttribute("title", expect.stringContaining("Poprzednio:"));
+    });
+
+    it('renders cleanly in Light mode under ThemeProvider', () => {
+        const mockData = [
+            {
+                category_name: 'Usługi doradcze',
+                category_code: 'OPEX-ADV',
+                amount: 50000,
+                percentage: 100.0,
+            },
+        ];
+
+        render(
+            <ThemeProvider defaultTheme={THEMES.LIGHT}>
+                <CostBreakdownChart data={mockData} currency="PLN" />
+            </ThemeProvider>
+        );
+
+        expect(screen.getByText('Usługi doradcze')).toBeInTheDocument();
+        expect(screen.getByText('[OPEX-ADV]')).toBeInTheDocument();
+        expect(screen.getByText('SUMA KOSZTÓW')).toBeInTheDocument();
     });
 });

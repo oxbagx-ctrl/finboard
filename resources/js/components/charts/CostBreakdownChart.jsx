@@ -37,21 +37,14 @@ export const CostBreakdownChart = ({
     const { isDark } = useTheme();
     const pieStroke = isDark ? '#09090b' : '#ffffff';
 
-    if (!data || data.length === 0) {
-        return (
-            <div className="h-72 flex items-center justify-center text-xs font-mono text-zinc-400 dark:text-zinc-500">
-                Brak danych struktury kosztów operacyjnych (OPEX) dla wybranego okresu.
-            </div>
-        );
-    }
-
     const total = useMemo(
-        () => data.reduce((sum, item) => sum + Number(item.amount || 0), 0),
+        () => (data || []).reduce((sum, item) => sum + Number(item.amount || 0), 0),
         [data]
     );
 
     // Sort items descending by amount to provide a clean institutional financial breakdown
     const sortedData = useMemo(() => {
+        if (!data || data.length === 0) return [];
         return [...data]
             .sort((a, b) => Number(b.amount || 0) - Number(a.amount || 0))
             .map((item, idx) => {
@@ -76,6 +69,14 @@ export const CostBreakdownChart = ({
                 };
             });
     }, [data, currency]);
+
+    if (!data || data.length === 0) {
+        return (
+            <div className="h-72 flex items-center justify-center text-xs font-mono text-zinc-400 dark:text-zinc-500">
+                Brak danych struktury kosztów operacyjnych (OPEX) dla wybranego okresu.
+            </div>
+        );
+    }
 
     return (
         <div className={`flex flex-col h-80 ${className}`}>

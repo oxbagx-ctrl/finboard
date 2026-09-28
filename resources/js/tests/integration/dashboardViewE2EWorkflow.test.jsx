@@ -443,7 +443,7 @@ describe('E2E DashboardView Integration: Analytics, FX, P&L Hierarchy & Reactive
             expect(screen.getByText("Licencje Enterprise SaaS")).toBeInTheDocument();
         });
 
-        const pnlTable = screen.getByText("Rachunek Zysków i Strat (P&L Konsolidowany)").closest("div.bg-zinc-900");
+        const pnlTable = screen.getByText("Rachunek Zysków i Strat (P&L Konsolidowany)").closest("div.rounded-lg");
         expect(pnlTable).toBeInTheDocument();
 
         // 1. Verify revenue sub-rows are strictly categorized under Revenue and NOT under OPEX
@@ -495,7 +495,7 @@ describe('E2E DashboardView Integration: Analytics, FX, P&L Hierarchy & Reactive
         expect(opexCloudBadge.className).toContain("text-emerald-300");
 
         // 3. Verify that Revenue items are NOT present inside the Cost Breakdown Donut Chart
-        const costChartContainer = screen.getByText("Struktura Kosztów Operacyjnych").closest("div.bg-zinc-900");
+        const costChartContainer = screen.getByTestId("cost-breakdown-card");
         expect(costChartContainer).toBeInTheDocument();
         expect(costChartContainer).toHaveTextContent("Wynagrodzenia zespołu inżynierskiego");
         expect(costChartContainer).toHaveTextContent("Usługi Cloud & DevOps AWS");

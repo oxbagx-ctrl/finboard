@@ -559,7 +559,7 @@ export const DashboardView = () => {
                 </div>
 
                 {/* Cost Breakdown Donut Chart (1 Col on lg) */}
-                <div className="bg-zinc-900 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-4 flex flex-col shadow-sm">
+                <div data-testid="cost-breakdown-card" className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-4 flex flex-col shadow-sm">
                     <div className="border-b border-zinc-200 dark:border-zinc-800 pb-3 mb-3">
                         <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
                             <Activity className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" />
