@@ -28,11 +28,11 @@ export const FinancialValue = ({
         center: 'text-center justify-center',
     };
 
-    let textColor = 'text-zinc-100';
+    let textColor = 'text-zinc-900 dark:text-zinc-100';
     if (color === 'profit' || (color === 'auto' && num > 0)) {
-        textColor = 'text-emerald-400';
+        textColor = 'text-emerald-600 dark:text-emerald-400';
     } else if (color === 'loss' || (color === 'auto' && num < 0)) {
-        textColor = 'text-rose-400';
+        textColor = 'text-rose-600 dark:text-rose-400';
     }
 
     const shouldUseBracket = bracketNegative || (isDeduction && num > 0);
@@ -53,7 +53,7 @@ export const FinancialValue = ({
             className={`inline-flex items-baseline font-mono tabular-nums tracking-tight whitespace-nowrap ${sizeClasses[size]} ${textColor} ${alignClasses[align]} ${className}`}
         >
             <span className="font-mono tabular-nums">{valuePart}</span>
-            <span className="ml-1 text-[0.8em] font-mono font-normal text-zinc-500 tracking-normal uppercase shrink-0">
+            <span className="ml-1 text-[0.8em] font-mono font-normal text-zinc-500 dark:text-zinc-400 tracking-normal uppercase shrink-0">
                 {currencyPart}
             </span>
         </span>

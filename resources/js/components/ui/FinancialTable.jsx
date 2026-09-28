@@ -27,19 +27,19 @@ export const FinancialTable = ({
     };
 
     return (
-        <div className={`bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden shadow-sm ${className}`}>
+        <div className={`bg-zinc-900 !bg-white dark:!bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden shadow-sm transition-colors duration-150 ${className}`}>
             {/* Table Header / Action Bar */}
-            <div className="px-4 py-3 border-b border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-zinc-900/90">
+            <div className="px-4 py-3 border-b border-zinc-200 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-zinc-50/90 dark:bg-zinc-900/90">
                 <div>
-                    <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-100 flex items-center gap-2">
-                        <span className="w-2 h-2 bg-zinc-400 rounded-xs"></span>
+                    <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                        <span className="w-2 h-2 bg-zinc-400 dark:bg-zinc-500 rounded-xs"></span>
                         {title}
                     </h3>
                     {subtitle && <p className="text-[11px] font-mono text-zinc-500 mt-0.5">{subtitle}</p>}
                 </div>
-                <div className="flex items-center gap-3 text-[10px] font-mono text-zinc-400">
-                    <span className="px-1.5 py-0.5 rounded bg-zinc-950 border border-zinc-800">WALUTA: {currency}</span>
-                    <span className="px-1.5 py-0.5 rounded bg-zinc-950 border border-zinc-800">TRYB: KONSOLIDOWANY</span>
+                <div className="flex items-center gap-3 text-[10px] font-mono text-zinc-600 dark:text-zinc-400">
+                    <span className="px-1.5 py-0.5 rounded bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 shadow-xs">WALUTA: {currency}</span>
+                    <span className="px-1.5 py-0.5 rounded bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 shadow-xs">TRYB: KONSOLIDOWANY</span>
                 </div>
             </div>
 
@@ -47,7 +47,7 @@ export const FinancialTable = ({
             <div className="overflow-x-auto">
                 <table className="w-full text-left font-mono text-xs border-collapse">
                     <thead>
-                        <tr className="bg-zinc-950/80 border-b border-zinc-800 text-[10px] text-zinc-500 uppercase tracking-wider">
+                        <tr className="bg-zinc-100/80 dark:bg-zinc-950/80 border-b border-zinc-200 dark:border-zinc-800 text-[10px] text-zinc-600 dark:text-zinc-400 uppercase tracking-wider">
                             <th className="py-2.5 px-4 font-semibold w-1/2">Pozycja Finansowa / Kategoria</th>
                             <th className="py-2.5 px-3 font-semibold text-right">Kwota ({currency})</th>
                             <th className="py-2.5 px-3 font-semibold text-right">% Przych.</th>
@@ -55,7 +55,7 @@ export const FinancialTable = ({
                             <th className="py-2.5 px-4 font-semibold text-center w-28">Status</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-zinc-850">
+                    <tbody className="divide-y divide-zinc-200 dark:divide-zinc-850">
                         {data.map((row) => {
                             const hasChildren = Array.isArray(row.children) && row.children.length > 0;
                             // A row is expandable only if it has more than 1 child.
@@ -77,22 +77,22 @@ export const FinancialTable = ({
                                     <tr
                                         className={`transition-colors duration-100 ${
                                             isFinalResult
-                                                ? 'bg-zinc-850/80 font-bold border-t-2 border-b-4 border-double border-zinc-600 text-zinc-100'
+                                                ? 'bg-zinc-100/90 dark:bg-zinc-850/80 font-bold border-t-2 border-b-4 border-double border-zinc-400 dark:border-zinc-600 text-zinc-900 dark:text-zinc-100'
                                                 : isSummary
-                                                ? 'bg-zinc-850/40 font-bold border-t border-b border-zinc-750 text-zinc-100'
+                                                ? 'bg-zinc-50 dark:bg-zinc-850/40 font-bold border-t border-b border-zinc-300 dark:border-zinc-750 text-zinc-900 dark:text-zinc-100'
                                                 : isExpandable
-                                                ? 'bg-zinc-950/40 font-semibold cursor-pointer hover:bg-zinc-800/40 text-zinc-200'
+                                                ? 'bg-zinc-50/60 dark:bg-zinc-950/40 font-semibold cursor-pointer hover:bg-zinc-100/80 dark:hover:bg-zinc-800/40 text-zinc-800 dark:text-zinc-200'
                                                 : row.isGroup
-                                                ? 'bg-zinc-950/30 font-semibold text-zinc-200'
-                                                : 'hover:bg-zinc-850/50 text-zinc-300'
+                                                ? 'bg-zinc-50/40 dark:bg-zinc-950/30 font-semibold text-zinc-800 dark:text-zinc-200'
+                                                : 'hover:bg-zinc-50/80 dark:hover:bg-zinc-850/50 text-zinc-700 dark:text-zinc-300'
                                         }`}
                                         onClick={isExpandable ? () => toggleGroup(row.id) : undefined}
                                     >
                                         <td className={`py-2 px-4 flex items-center gap-2 ${
-                                            isSubItem ? 'pl-8 text-zinc-400' : 'text-zinc-200'
+                                            isSubItem ? 'pl-8 text-zinc-500 dark:text-zinc-400' : 'text-zinc-800 dark:text-zinc-200'
                                         }`}>
                                             {isExpandable ? (
-                                                <span className="w-3.5 h-3.5 inline-flex items-center justify-center shrink-0 text-zinc-500 hover:text-zinc-300 transition-colors">
+                                                <span className="w-3.5 h-3.5 inline-flex items-center justify-center shrink-0 text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors">
                                                     {isExpanded ? (
                                                         <ChevronDown className="w-3.5 h-3.5" />
                                                     ) : (
@@ -100,11 +100,11 @@ export const FinancialTable = ({
                                                     )}
                                                 </span>
                                             ) : isSubItem ? (
-                                                <span className="w-1.5 h-1.5 rounded-full bg-zinc-700 mr-1 shrink-0"></span>
+                                                <span className="w-1.5 h-1.5 rounded-full bg-zinc-400 dark:bg-zinc-700 mr-1 shrink-0"></span>
                                             ) : (
                                                 <span className="w-3.5 h-3.5 inline-flex shrink-0" aria-hidden="true" />
                                             )}
-                                            <span className={isFinalResult ? 'text-zinc-100 font-bold text-[13px] tracking-tight' : isSummary ? 'text-zinc-100 tracking-tight' : ''}>
+                                            <span className={isFinalResult ? 'text-zinc-900 dark:text-zinc-100 font-bold text-[13px] tracking-tight' : isSummary ? 'text-zinc-900 dark:text-zinc-100 tracking-tight' : ''}>
                                                 {row.label}
                                             </span>
                                             {((isDeduction && !row.isGroup && !isSummary) || row.code) && (
@@ -129,7 +129,7 @@ export const FinancialTable = ({
                                                 </span>
                                             )}
                                             {hasChildren && (
-                                                <span className="ml-1 px-1.5 py-0.2 rounded text-[9px] font-mono bg-zinc-800/80 text-zinc-400 border border-zinc-700/60">
+                                                <span className="ml-1 px-1.5 py-0.2 rounded text-[9px] font-mono bg-zinc-100 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700/60">
                                                     {row.children.length} {row.children.length === 1 ? 'poz.' : 'kat.'}
                                                 </span>
                                             )}
@@ -144,7 +144,7 @@ export const FinancialTable = ({
                                             />
                                         </td>
 
-                                        <td className="py-2 px-3 text-right text-zinc-400 tabular-nums">
+                                        <td className="py-2 px-3 text-right text-zinc-600 dark:text-zinc-400 tabular-nums">
                                             {revShare !== null ? `${revShare.toFixed(1)}%` : '—'}
                                         </td>
 
@@ -161,8 +161,8 @@ export const FinancialTable = ({
                                         <td className="py-2 px-4 text-center">
                                             <span className={`inline-block px-1.5 py-0.5 rounded text-[9px] font-mono uppercase border ${
                                                 isFinalResult
-                                                    ? 'bg-emerald-950/30 border-emerald-800/60 text-emerald-400 font-semibold'
-                                                    : 'bg-zinc-950 border-zinc-800 text-zinc-400'
+                                                    ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800/60 text-emerald-700 dark:text-emerald-400 font-semibold'
+                                                    : 'bg-zinc-100 dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400'
                                             }`}>
                                                 {row.auditStatus || (isFinalResult ? 'WYNIK KOŃCOWY' : 'AUDYT: OK')}
                                             </span>
@@ -176,9 +176,9 @@ export const FinancialTable = ({
                                             : null;
 
                                         return (
-                                            <tr key={child.id} className="hover:bg-zinc-850/40 bg-zinc-950/25 text-zinc-400 border-b border-zinc-850/60 transition-colors">
-                                                <td className="py-1.5 px-4 pl-10 flex items-center gap-2 text-zinc-400">
-                                                    <span className="text-zinc-600 font-mono select-none">↳</span>
+                                            <tr key={child.id} className="hover:bg-zinc-100/60 dark:hover:bg-zinc-850/40 bg-zinc-50/40 dark:bg-zinc-950/25 text-zinc-600 dark:text-zinc-400 border-b border-zinc-100 dark:border-zinc-850/60 transition-colors">
+                                                <td className="py-1.5 px-4 pl-10 flex items-center gap-2 text-zinc-600 dark:text-zinc-400">
+                                                    <span className="text-zinc-400 dark:text-zinc-600 font-mono select-none">↳</span>
                                                     <span className="truncate">{child.label}</span>
                                                     {child.code && (
                                                         <Tooltip content={`Kod kategorii: ${child.code}`}>
@@ -211,7 +211,7 @@ export const FinancialTable = ({
                                                 </td>
 
                                                 <td className="py-1.5 px-4 text-center">
-                                                    <span className="inline-block px-1.5 py-0.2 rounded text-[8px] font-mono uppercase bg-zinc-950/80 border border-zinc-850 text-zinc-500">
+                                                    <span className="inline-block px-1.5 py-0.2 rounded text-[8px] font-mono uppercase bg-zinc-100 dark:bg-zinc-950/80 border border-zinc-200 dark:border-zinc-850 text-zinc-500">
                                                         {child.auditStatus || 'ZWERYFIKOWANY'}
                                                     </span>
                                                 </td>
@@ -226,7 +226,7 @@ export const FinancialTable = ({
             </div>
 
             {/* Table Footer with Summary Note */}
-            <div className="px-4 py-2 bg-zinc-950 border-t border-zinc-850 flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[10px] font-mono text-zinc-500">
+            <div className="px-4 py-2 bg-zinc-50 dark:bg-zinc-950 border-t border-zinc-200 dark:border-zinc-850 flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[10px] font-mono text-zinc-500">
                 <span>STANDARD: POLSKIE STANDARDY RACHUNKOWOŚCI (PSR) / MSR 1</span>
                 <span>DOKŁADNOŚĆ: KALKULATOR DOMENOWY BCMATH (SCALE 4)</span>
             </div>

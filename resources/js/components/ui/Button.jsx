@@ -21,12 +21,12 @@ export const Button = React.forwardRef(({
     };
 
     const variantClasses = {
-        primary: 'bg-zinc-100 hover:bg-white text-zinc-950 font-semibold border border-zinc-200',
-        secondary: 'bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700/80',
-        outline: 'bg-transparent hover:bg-zinc-800 text-zinc-300 border border-zinc-750',
-        danger: 'bg-rose-950 hover:bg-rose-900 text-rose-200 border border-rose-800/80',
-        success: 'bg-emerald-950 hover:bg-emerald-900 text-emerald-200 border border-emerald-800/80',
-        ghost: 'bg-transparent hover:bg-zinc-800/70 text-zinc-400 hover:text-zinc-200',
+        primary: 'bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-white dark:text-zinc-950 font-semibold border border-zinc-900 dark:border-zinc-200 shadow-xs',
+        secondary: 'bg-white hover:bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:text-zinc-200 border border-zinc-300 dark:border-zinc-700/80 shadow-xs dark:shadow-none',
+        outline: 'bg-transparent hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-300 dark:border-zinc-750',
+        danger: 'bg-rose-50 hover:bg-rose-100 text-rose-700 dark:bg-rose-950 dark:hover:bg-rose-900 dark:text-rose-200 border border-rose-200 dark:border-rose-800/80',
+        success: 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:hover:bg-emerald-900 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-800/80',
+        ghost: 'bg-transparent hover:bg-zinc-100 dark:hover:bg-zinc-800/70 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200',
     };
 
     return (

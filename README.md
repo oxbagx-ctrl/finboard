@@ -1060,6 +1060,15 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
         - `resources/js/components/layout/Sidebar.jsx`: pełne wsparcie dla jasnego motywu (`bg-white dark:bg-zinc-950`), adaptacja sygnetu FB, aktywnego stanu linków `NavLink` i boksu spółki z zachowaniem pełnej zgodności testowej.
         - `resources/js/components/layout/DealContextBar.jsx` & `CompanySwitcherModal.jsx`: dostosowanie kontrastu tła, przełączników walutowych, selektorów okresów fiskalnych oraz listy spółek portfelowych.
         - Weryfikacja testowa: 100% PASS w pełnym zestawie 72 plików Vitest (653 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
+    - [x] Dostosowanie komponentów bazowych UI (`Card`, `FinancialTable`, `Button`, `Badge`, `Tooltip`, `FinancialValue`, `PercentageBadge`, `UserProfileModal`) do motywu jasnego i ciemnego.
+        - `resources/js/components/ui/Card.jsx` & `MetricCard`: wyeliminowanie sztywnego ciemnego tła, wdrożenie adaptacyjnych tokenów barwnych (`bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100`) oraz wariantów trendów KPI o wysokim kontraście.
+        - `resources/js/components/ui/FinancialTable.jsx`: dostosowanie nagłówka tabeli `thead`, wierszy danych z `hover`, linii podziału `divide-zinc-200 dark:divide-zinc-850`, wierszy podsumowań PSR/MSR oraz wierszy zagnieżdżonych.
+        - `resources/js/components/ui/Button.jsx`: zaktualizowanie stylizacji wszystkich wariantów przycisków (`primary`, `secondary`, `outline`, `ghost`, `danger`, `success`).
+        - `resources/js/components/ui/Badge.jsx` & `PercentageBadge`: adaptacja etykiet statusowych oraz wskaźników zmian procentowych (wzrost, spadek, neutralne 0.0%, brak danych) do standardu WCAG 2.1 AA.
+        - `resources/js/components/ui/Tooltip.jsx` & `InfoTooltip`: adaptacja dymków pływających i strzałek Floating UI do jasnego i ciemnego motywu.
+        - `resources/js/components/ui/FinancialValue.jsx`: czytelna typografia kwot walutowych (`text-zinc-900 dark:text-zinc-100`, `text-emerald-600 dark:text-emerald-400`, `text-rose-600 dark:text-rose-400`).
+        - `resources/js/components/auth/UserProfileModal.jsx`: dostosowanie okna modalnego profilu, pól formularzy tożsamości i haseł oraz sekcji audytu Sanctum.
+        - Weryfikacja testowa: 100% PASS w pełnym zestawie 72 plików Vitest (653 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
 ---
 

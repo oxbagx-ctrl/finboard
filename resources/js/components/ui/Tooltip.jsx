@@ -34,7 +34,7 @@ export function Tooltip({
     touchable = true,
     disabled = false,
     className = '',
-    arrowClassName = 'fill-zinc-950 stroke-zinc-750',
+    arrowClassName = 'fill-white dark:fill-zinc-950 stroke-zinc-300 dark:stroke-zinc-750',
     asChild = true,
     portal = true,
     open: controlledOpen,
@@ -160,7 +160,7 @@ export function Tooltip({
                         data-testid={testId || 'floating-tooltip'}
                         className={clsx(
                             'z-50 max-w-xs sm:max-w-sm rounded-md px-2.5 py-1.5 text-xs font-mono tracking-tight',
-                            'bg-zinc-950 text-zinc-100 border border-zinc-750 shadow-xl',
+                            'bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-750 shadow-xl',
                             'animate-in fade-in-0 zoom-in-95 duration-100 select-text',
                             className
                         )}
@@ -224,10 +224,10 @@ export function InfoTooltip({
 
     const tooltipBody = title ? (
         <div className="space-y-1">
-            <div className="font-semibold text-zinc-200 border-b border-zinc-800/80 pb-0.5">
+            <div className="font-semibold text-zinc-900 dark:text-zinc-200 border-b border-zinc-200 dark:border-zinc-800/80 pb-0.5">
                 {title}
             </div>
-            <div className="text-zinc-300 leading-relaxed font-sans text-xs">
+            <div className="text-zinc-600 dark:text-zinc-300 leading-relaxed font-sans text-xs">
                 {content}
             </div>
         </div>
@@ -247,7 +247,7 @@ export function InfoTooltip({
                 type="button"
                 aria-label={ariaLabel}
                 className={clsx(
-                    'inline-flex items-center justify-center text-zinc-500 hover:text-zinc-200',
+                    'inline-flex items-center justify-center text-zinc-400 hover:text-zinc-700 dark:text-zinc-500 dark:hover:text-zinc-200',
                     'focus:outline-none focus-visible:ring-1 focus-visible:ring-brand-500 rounded p-0.5',
                     'transition-colors cursor-help shrink-0 align-middle leading-none',
                     className

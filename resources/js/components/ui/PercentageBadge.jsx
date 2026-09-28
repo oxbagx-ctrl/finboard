@@ -33,7 +33,7 @@ export const PercentageBadge = ({
         return (
             <span
                 data-testid="percentage-badge-fallback"
-                className={`inline-flex items-center justify-center font-mono text-[11px] font-medium px-1.5 py-0.5 rounded border tabular-nums bg-zinc-850/60 text-zinc-500 border-zinc-800 ${className}`}
+                className={`inline-flex items-center justify-center font-mono text-[11px] font-medium px-1.5 py-0.5 rounded border tabular-nums bg-zinc-100 text-zinc-500 border-zinc-200 dark:bg-zinc-850/60 dark:text-zinc-500 dark:border-zinc-800 ${className}`}
                 title={title || "Brak danych porównawczych"}
             >
                 <span>{fallback}</span>
@@ -52,12 +52,12 @@ export const PercentageBadge = ({
         isGood = isNegative;
     }
 
-    let colorClasses = 'bg-zinc-850 text-zinc-400 border-zinc-750';
+    let colorClasses = 'bg-zinc-100 text-zinc-600 border-zinc-200 dark:bg-zinc-850 dark:text-zinc-400 dark:border-zinc-750';
     if (!isZero) {
         if (isGood) {
-            colorClasses = 'bg-emerald-950/60 text-emerald-300 border-emerald-800/80';
+            colorClasses = 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/80';
         } else {
-            colorClasses = 'bg-rose-950/60 text-rose-300 border-rose-800/80';
+            colorClasses = 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800/80';
         }
     }
 
@@ -71,7 +71,7 @@ export const PercentageBadge = ({
                 <>
                     {isPositive && <ArrowUpRight className="w-3 h-3 shrink-0" data-testid="badge-arrow-up" />}
                     {isNegative && <ArrowDownRight className="w-3 h-3 shrink-0" data-testid="badge-arrow-down" />}
-                    {isZero && <Minus className="w-3 h-3 shrink-0 text-zinc-500" data-testid="badge-minus" />}
+                    {isZero && <Minus className="w-3 h-3 shrink-0 text-zinc-400 dark:text-zinc-500" data-testid="badge-minus" />}
                 </>
             )}
             <span>{formatPercent(num, decimals, !isZero)}</span>
