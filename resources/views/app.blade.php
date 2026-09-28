@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pl" class="h-full bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 transition-colors duration-150">
+<html lang="pl" class="min-h-full bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 transition-colors duration-150">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -17,11 +17,14 @@
                 var supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
                 if (theme === 'dark' || ((!theme || theme === 'system') && supportDarkMode)) {
                     document.documentElement.classList.add('dark');
+                    document.documentElement.style.colorScheme = 'dark';
                 } else {
                     document.documentElement.classList.remove('dark');
+                    document.documentElement.style.colorScheme = 'light';
                 }
             } catch (e) {
                 document.documentElement.classList.add('dark');
+                document.documentElement.style.colorScheme = 'dark';
             }
         })();
     </script>
@@ -29,7 +32,7 @@
     @viteReactRefresh
     @vite(['resources/css/app.css', 'resources/js/app.jsx'])
 </head>
-<body class="h-full antialiased font-sans bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 selection:bg-zinc-700 selection:text-white">
-    <div id="root" class="h-full flex flex-col"></div>
+<body class="min-h-full flex flex-col antialiased font-sans bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 selection:bg-zinc-700 selection:text-white">
+    <div id="root" class="min-h-full flex flex-col flex-1"></div>
 </body>
 </html>

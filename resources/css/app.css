@@ -2,6 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+    html {
+        background-color: #fafafa;
+        color-scheme: light;
+    }
+
+    html.dark {
+        background-color: #09090b;
+        color-scheme: dark;
+    }
+}
+
 @media print {
     @page {
         size: A4 portrait;

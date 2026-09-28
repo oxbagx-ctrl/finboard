@@ -17,6 +17,7 @@ describe('ThemeContext & useTheme Hook', () => {
         matchMediaMatches = true;
         localStorage.clear();
         document.documentElement.classList.remove('dark');
+        document.documentElement.style.colorScheme = '';
 
         // Mock window.matchMedia
         window.matchMedia = vi.fn().mockImplementation((query) => ({
@@ -43,6 +44,7 @@ describe('ThemeContext & useTheme Hook', () => {
         vi.restoreAllMocks();
         localStorage.clear();
         document.documentElement.classList.remove('dark');
+        document.documentElement.style.colorScheme = '';
     });
 
     const wrapper = ({ children }) => <ThemeProvider>{children}</ThemeProvider>;
@@ -55,6 +57,7 @@ describe('ThemeContext & useTheme Hook', () => {
         expect(result.current.resolvedTheme).toBe(THEMES.DARK);
         expect(result.current.isDark).toBe(true);
         expect(document.documentElement.classList.contains('dark')).toBe(true);
+        expect(document.documentElement.style.colorScheme).toBe('dark');
     });
 
     it('initializes with default system theme and resolves to light when OS prefers light', () => {
@@ -65,6 +68,7 @@ describe('ThemeContext & useTheme Hook', () => {
         expect(result.current.resolvedTheme).toBe(THEMES.LIGHT);
         expect(result.current.isDark).toBe(false);
         expect(document.documentElement.classList.contains('dark')).toBe(false);
+        expect(document.documentElement.style.colorScheme).toBe('light');
     });
 
     it('reads and respects stored theme from localStorage on initial load', () => {
@@ -76,6 +80,7 @@ describe('ThemeContext & useTheme Hook', () => {
         expect(result.current.resolvedTheme).toBe(THEMES.LIGHT);
         expect(result.current.isDark).toBe(false);
         expect(document.documentElement.classList.contains('dark')).toBe(false);
+        expect(document.documentElement.style.colorScheme).toBe('light');
     });
 
     it('falls back to default system theme when localStorage contains an invalid value', () => {
@@ -86,7 +91,7 @@ describe('ThemeContext & useTheme Hook', () => {
         expect(result.current.theme).toBe(THEMES.SYSTEM);
     });
 
-    it('explicitly switches theme to light, persists in localStorage, and updates document classes', () => {
+    it('explicitly switches theme to light, persists in localStorage, and updates document classes and colorScheme', () => {
         const { result } = renderHook(() => useTheme(), { wrapper });
 
         act(() => {
@@ -98,9 +103,10 @@ describe('ThemeContext & useTheme Hook', () => {
         expect(result.current.isDark).toBe(false);
         expect(localStorage.getItem(THEME_STORAGE_KEY)).toBe(THEMES.LIGHT);
         expect(document.documentElement.classList.contains('dark')).toBe(false);
+        expect(document.documentElement.style.colorScheme).toBe('light');
     });
 
-    it('explicitly switches theme to dark, persists in localStorage, and adds .dark class', () => {
+    it('explicitly switches theme to dark, persists in localStorage, and adds .dark class and dark colorScheme', () => {
         localStorage.setItem(THEME_STORAGE_KEY, THEMES.LIGHT);
         const { result } = renderHook(() => useTheme(), { wrapper });
 
@@ -113,6 +119,7 @@ describe('ThemeContext & useTheme Hook', () => {
         expect(result.current.isDark).toBe(true);
         expect(localStorage.getItem(THEME_STORAGE_KEY)).toBe(THEMES.DARK);
         expect(document.documentElement.classList.contains('dark')).toBe(true);
+        expect(document.documentElement.style.colorScheme).toBe('dark');
     });
 
     it('reacts dynamically to OS system color scheme changes when in system mode', () => {
@@ -121,6 +128,7 @@ describe('ThemeContext & useTheme Hook', () => {
 
         expect(result.current.resolvedTheme).toBe(THEMES.DARK);
         expect(document.documentElement.classList.contains('dark')).toBe(true);
+        expect(document.documentElement.style.colorScheme).toBe('dark');
 
         // Simulate OS switching to light mode
         act(() => {
@@ -130,6 +138,7 @@ describe('ThemeContext & useTheme Hook', () => {
         expect(result.current.resolvedTheme).toBe(THEMES.LIGHT);
         expect(result.current.isDark).toBe(false);
         expect(document.documentElement.classList.contains('dark')).toBe(false);
+        expect(document.documentElement.style.colorScheme).toBe('light');
 
         // Simulate OS switching back to dark mode
         act(() => {
@@ -139,6 +148,7 @@ describe('ThemeContext & useTheme Hook', () => {
         expect(result.current.resolvedTheme).toBe(THEMES.DARK);
         expect(result.current.isDark).toBe(true);
         expect(document.documentElement.classList.contains('dark')).toBe(true);
+        expect(document.documentElement.style.colorScheme).toBe('dark');
     });
 
     it('ignores OS color scheme changes when user has set an explicit theme', () => {
@@ -158,6 +168,7 @@ describe('ThemeContext & useTheme Hook', () => {
         expect(result.current.resolvedTheme).toBe(THEMES.DARK);
         expect(result.current.isDark).toBe(true);
         expect(document.documentElement.classList.contains('dark')).toBe(true);
+        expect(document.documentElement.style.colorScheme).toBe('dark');
     });
 
     it('provides safe fallback object when useTheme is called outside ThemeProvider', () => {

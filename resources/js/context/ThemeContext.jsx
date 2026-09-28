@@ -37,15 +37,21 @@ const getInitialTheme = (fallback = THEMES.SYSTEM) => {
 };
 
 /**
- * Applies or removes the .dark class on documentElement.
+ * Applies or removes the .dark class and configures colorScheme on documentElement.
  */
 const applyThemeClass = (resolved) => {
     if (typeof document === 'undefined') return;
     const root = document.documentElement;
     if (resolved === THEMES.DARK) {
         root.classList.add('dark');
+        if (root?.style) {
+            root.style.colorScheme = 'dark';
+        }
     } else {
         root.classList.remove('dark');
+        if (root?.style) {
+            root.style.colorScheme = 'light';
+        }
     }
 };
 

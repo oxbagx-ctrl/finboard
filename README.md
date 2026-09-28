@@ -1104,6 +1104,13 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
         - `resources/js/components/reports/ExecutivePdfReport.jsx`: refaktoryzacja ekranowego arkusza podglądu memorandum (`#executive-pdf-report`) do semantycznej palety `bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200 shadow-sm dark:shadow-xl`; pełna adaptacja kart KPI Scorecard, tabeli P&L (RZiS), wskaźników płynności (CR, QR, NWC/Cash Ratio), dekompozycji kosztów OPEX, opinii doradcy oraz certyfikatu SHA-256 z podpisami, z nienaruszonymi wektorowymi regułami wydruku (`print:...`).
         - `resources/js/tests/components/ExecutiveReports.test.jsx`: rozszerzenie zestawu testów jednostkowych o weryfikację poprawnego montowania i obecności klas adaptacyjnych w trybach `THEMES.LIGHT` i `THEMES.DARK` pod `<ThemeProvider>`.
         - Weryfikacja testowa: 100% PASS w pełnym zestawie 74 plików Vitest (676 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
+    - [x] Eliminacja przecieku jasnego tła pod oknem przeglądarki, synchronizacja color-scheme i elastyczna wysokość korzenia.
+        - `resources/css/app.css`: dodanie bazowych reguł CSS `@layer base` definiujących `html { background-color: #fafafa; color-scheme: light; }` oraz `html.dark { background-color: #09090b; color-scheme: dark; }`, gwarantujących, że canvas przeglądarki i natywne paski przewijania natychmiast synchronizują się z aktywnym motywem, omijając ograniczenie selektora potomków Tailwind CSS `:is(.dark *)` dla znacznika `<html>`.
+        - `resources/views/app.blade.php`: zamiana sztywnego `h-full` (`height: 100%`) na elastyczne `min-h-full` na tagach `<html>`, `<body>` oraz `<div id="root">`, co eliminuje obcinanie wysokości tła kontenera aplikacji na granicy początkowego viewportu (100vh / ~955px) i umożliwia naturalne rozciąganie tła wraz z rozbudowaną treścią pulpitu (1800+ px).
+        - `resources/js/context/ThemeContext.jsx`: rozszerzenie funkcji `applyThemeClass` o synchroniczne ustawianie `document.documentElement.style.colorScheme` (`dark` / `light`) przy każdej zmianie motywu.
+        - `resources/js/components/layout/AppLayout.jsx`: dodanie `flex-1` do głównego kontenera układu oraz jednoznacznego tła `bg-zinc-50 dark:bg-zinc-950` dla kolumny treści głównej.
+        - `resources/js/tests/unit/ThemeContext.test.jsx`: aktualizacja asercji weryfikujących poprawność ustawiania właściwości `style.colorScheme` na `document.documentElement`.
+        - Weryfikacja testowa: 100% PASS w pełnym zestawie 74 plików Vitest (676 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
 ---
 
