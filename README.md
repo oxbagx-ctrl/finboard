@@ -1076,6 +1076,10 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
         - `resources/js/components/charts/CostBreakdownChart.jsx`: dynamiczny obrys wycinków `pieStroke` (`#ffffff` vs `#09090b`), plakietka sumy kosztów oraz adaptacyjna mikro-legenda z dynamiką YoY.
         - `resources/js/components/investments/SensitivityCockpitView.jsx` & `ReinvestmentManager.jsx`: pełna spójność kolorystyczna siatek i osi wykresów symulacyjnych i odtworzeniowych CAPEX.
         - Weryfikacja testowa: 100% PASS w pełnym zestawie 72 plików Vitest (653 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
+    - [x] Implementacja testów jednostkowych i integracyjnych dla ThemeContext i ThemeToggle.
+        - `resources/js/tests/unit/ThemeContext.test.jsx`: 10 kompleksowych testów weryfikujących inicjalizację z `prefers-color-scheme`, trwałość w `localStorage`, przełączanie trybów `light`, `dark` i `system`, dynamiczne nasłuchiwanie zdarzeń systemowych `matchMedia`, bezpieczny fallback poza providerem oraz walidację danych wejściowych.
+        - `resources/js/tests/components/ThemeToggle.test.jsx`: 7 testów komponentowych sprawdzających renderowanie przycisku, atrybuty WAI-ARIA (`role="menu"`, `role="menuitemradio"`, `aria-checked`), otwieranie/zamykanie menu, interakcję wyboru motywu z powrotem fokusu oraz pełną obsługę klawiatury (`ArrowDown`, `ArrowUp`, `Escape`) i outside click.
+        - Weryfikacja testowa: 100% PASS w pełnym zestawie 74 plików Vitest (670 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
 ---
 
