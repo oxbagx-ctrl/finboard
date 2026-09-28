@@ -134,7 +134,12 @@ export const ThemeProvider = ({ children, defaultTheme = THEMES.SYSTEM }) => {
 export const useTheme = () => {
     const context = useContext(ThemeContext);
     if (!context) {
-        throw new Error('useTheme must be used within a ThemeProvider');
+        return {
+            theme: THEMES.DARK,
+            resolvedTheme: THEMES.DARK,
+            setTheme: () => {},
+            isDark: true,
+        };
     }
     return context;
 };

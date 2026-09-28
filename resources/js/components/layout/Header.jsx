@@ -4,6 +4,7 @@ import { useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { Badge } from '../ui/Badge';
 import { Tooltip } from '../ui/Tooltip';
+import { ThemeToggle } from '../ui/ThemeToggle';
 import { UserProfileModal } from '../auth/UserProfileModal';
 import { CompanySwitcherModal } from './CompanySwitcherModal';
 import { ROUTES, ROUTE_TITLES } from '../../constants/routes';
@@ -91,6 +92,9 @@ export const Header = ({ currentRoute, onToggleSidebar, onRefreshData, refreshin
                             </button>
                         </Tooltip>
                     )}
+
+                    {/* Theme Toggle Trigger */}
+                    <ThemeToggle />
 
                     {/* Company Switcher Trigger */}
                     {isAdmin ? (

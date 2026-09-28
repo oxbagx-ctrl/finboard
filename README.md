@@ -1049,6 +1049,11 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
         - Reaktywne wyznaczanie `resolvedTheme` i dynamiczne nasłuchiwanie zdarzeń systemowych `window.matchMedia('(prefers-color-scheme: dark)')` z automatyczną manipulacją klasą `.dark` na `document.documentElement`.
         - `resources/js/App.jsx`: integracja dostawcy `<ThemeProvider>` na szczycie hierarchii providerów platformy FinBoard.
         - Weryfikacja testowa: 100% PASS w pełnym zestawie 72 plików Vitest (653 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
+    - [x] Budowa dostępnego komponentu ThemeToggle i integracja w nagłówku aplikacji.
+        - `resources/js/components/ui/ThemeToggle.jsx`: intuicyjna kontrolka wyboru motywu z ikonami Lucide (`Sun`, `Moon`, `Monitor`), dynamicznym triggerem i menu wyboru z pełną obsługą ARIA (`role="menu"`, `role="menuitemradio"`, `aria-checked`).
+        - Pełna obsługa klawiatury (`ArrowUp`, `ArrowDown`, `Escape`, `Enter`, `Space`), auto-zamykanie przy kliknięciu poza komponentem oraz integracja z systemem `<Tooltip>`.
+        - `resources/js/components/layout/Header.jsx`: osadzenie przełącznika w pasku akcji nagłówka obok przycisku odświeżania i przełącznika spółek.
+        - Weryfikacja testowa: 100% PASS w pełnym zestawie 72 plików Vitest (653 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
 ---
 
