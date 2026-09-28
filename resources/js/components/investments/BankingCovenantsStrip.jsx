@@ -118,58 +118,39 @@ export function BankingCovenantsStrip({
     // Component State
     const [isExpanded, setIsExpanded] = useState(defaultExpanded);
     const [activeTab, setActiveTab] = useState('matrix'); // 'matrix' | 'config' | 'headroom'
-    const [filter, setFilter] = useState('all'); // 'all' | 'debt_only' | 'breaches_only'
     const [activePreset, setActivePreset] = useState('standard');
-    const [scale, setScale] = useState('thousands'); // 'full' | 'thousands' | 'millions'
-
-    // Thresholds State
     const [thresholds, setThresholds] = useState(COVENANT_PRESETS.standard.thresholds);
+    const [scale, setScale] = useState('thousands'); // 'thousands' | 'millions' | 'full'
+    const [filter, setFilter] = useState('all'); // 'all' | 'debt_only' | 'breaches_only'
 
-    const currency = activeProject?.currency || 'PLN';
-
-    // Covenants Calculation
-    const covenantsResult = useMemo(() => {
-        if (!activeSimulationData?.annualPeriods?.length) return null;
-
-        return calculateBankingCovenants(
-            activeSimulationData.annualPeriods,
-            thresholds,
-            currency
-        );
-    }, [activeSimulationData, thresholds, currency]);
-
-    // Handle Preset Switch
+    // Apply Preset Thresholds
     const applyPreset = useCallback((presetKey) => {
-        if (COVENANT_PRESETS[presetKey]) {
+        const preset = COVENANT_PRESETS[presetKey];
+        if (preset) {
+            setThresholds({ ...preset.thresholds });
             setActivePreset(presetKey);
-            setThresholds(COVENANT_PRESETS[presetKey].thresholds);
         }
     }, []);
 
-    // Custom threshold change
-    const updateThreshold = useCallback((field, value) => {
-        setActivePreset('custom');
+    // Custom threshold modifier
+    const updateThreshold = useCallback((key, value) => {
         setThresholds(prev => ({
             ...prev,
-            [field]: Number(value)
+            [key]: parseFloat(value) || 0
         }));
+        setActivePreset('custom');
     }, []);
 
-    // Currency Formatter
-    const formatAmount = useCallback((val, isRatio = false, isPercent = false) => {
-        if (val === null || val === undefined || isNaN(Number(val))) {
-            return '—';
-        }
-        const num = Number(val);
-        if (isRatio) {
-            return `${num.toFixed(2)}x`;
-        }
-        if (isPercent) {
-            return `${num >= 0 ? '+' : ''}${num.toFixed(1)}%`;
-        }
+    // Currency
+    const currency = activeProject?.currency || 'PLN';
 
+    // Format currency amount based on scale
+    const formatAmount = useCallback((val) => {
+        if (val === null || val === undefined || isNaN(Number(val))) return '—';
+        const num = Number(val);
         let scaled = num;
         let suffix = '';
+
         if (scale === 'thousands') {
             scaled = num / 1_000;
             suffix = ' tys.';
@@ -180,7 +161,7 @@ export function BankingCovenantsStrip({
 
         const formatted = new Intl.NumberFormat('pl-PL', {
             minimumFractionDigits: scale === 'full' ? 0 : 1,
-            maximumFractionDigits: scale === 'full' ? 0 : 1,
+            maximumFractionDigits: scale === 'full' ? 0 : 2,
         }).format(scaled);
 
         return `${formatted}${suffix} ${currency}`;
@@ -194,7 +175,18 @@ export function BankingCovenantsStrip({
         );
     }
 
-    // Continue rendering shell while worker simulates in background
+    // Calculate Covenants in Real Time
+    const covenantsResult = useMemo(() => {
+        if (!activeSimulationData?.annualPeriods?.length) return null;
+
+        const waccPercent = activeSimulationData?.appraisal?.waccPercent ?? 8.50;
+
+        return calculateBankingCovenants(
+            activeSimulationData.annualPeriods,
+            thresholds,
+            waccPercent
+        );
+    }, [activeSimulationData, thresholds]);
 
     const summary = covenantsResult?.summary;
     const yearlyMetrics = covenantsResult?.yearlyMetrics || [];
@@ -211,25 +203,31 @@ export function BankingCovenantsStrip({
         if (!summary) return null;
         if (summary.bankabilityStatus === 'compliant') {
             return (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[11px] font-bold tracking-wider">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                    PROJEKT BANKOWALNY (LMA)
-                </span>
+                <Tooltip content="Projekt w pełni bankowalny – wszystkie roczne okresy spłaty spełniają wymagane kowenanty LMA.">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[11px] font-bold tracking-wider cursor-help">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                        PROJEKT BANKOWALNY (LMA)
+                    </span>
+                </Tooltip>
             );
         }
         if (summary.bankabilityStatus === 'warning') {
             return (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[11px] font-bold tracking-wider">
-                    <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
-                    TIGHT MARGIN (BUFOR &lt; 10%)
-                </span>
+                <Tooltip content="Ostrzeżenie płynnościowe: bufor bezpieczeństwa wskaźnika DSCR w roku wąskiego gardła wynosi poniżej 10%.">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[11px] font-bold tracking-wider cursor-help">
+                        <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
+                        TIGHT MARGIN (BUFOR &lt; 10%)
+                    </span>
+                </Tooltip>
             );
         }
         return (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-rose-500/10 border border-rose-500/30 text-rose-400 text-[11px] font-bold tracking-wider">
-                <XCircle className="w-3.5 h-3.5 text-rose-400" />
-                NARUSZENIE KOWENANTU ({summary.totalBreachesCount})
-            </span>
+            <Tooltip content={`Wykryto ${summary.totalBreachesCount} naruszeń wskaźników bankowych w horyzoncie spłaty – wymagana restrukturyzacja zadłużenia lub dopłata kapitałowa (Equity Cure).`}>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-rose-500/10 border border-rose-500/30 text-rose-400 text-[11px] font-bold tracking-wider cursor-help">
+                    <XCircle className="w-3.5 h-3.5 text-rose-400" />
+                    NARUSZENIE KOWENANTU ({summary.totalBreachesCount})
+                </span>
+            </Tooltip>
         );
     };
 
@@ -238,15 +236,17 @@ export function BankingCovenantsStrip({
             {/* Header Strip Bar */}
             <div className="p-4 bg-zinc-950/60 border-b border-zinc-800 flex flex-wrap items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center border ${
-                        summary?.bankabilityStatus === 'compliant'
-                            ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
-                            : summary?.bankabilityStatus === 'warning'
-                            ? 'bg-amber-500/10 border-amber-500/30 text-amber-400'
-                            : 'bg-rose-500/10 border-rose-500/30 text-rose-400'
-                    }`}>
-                        <Landmark className="w-4 h-4" />
-                    </div>
+                    <Tooltip content="Audyt bankowalności i wskaźników ostrożnościowych LMA (Loan Market Association) w 15-letnim horyzoncie długu">
+                        <div className={`w-9 h-9 rounded-lg flex items-center justify-center border cursor-help ${
+                            summary?.bankabilityStatus === 'compliant'
+                                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+                                : summary?.bankabilityStatus === 'warning'
+                                ? 'bg-amber-500/10 border-amber-500/30 text-amber-400'
+                                : 'bg-rose-500/10 border-rose-500/30 text-rose-400'
+                        }`}>
+                            <Landmark className="w-4 h-4" />
+                        </div>
+                    </Tooltip>
                     <div>
                         <div className="flex items-center gap-2">
                             <span className="font-bold text-sm tracking-wide text-zinc-100 uppercase">
@@ -266,79 +266,94 @@ export function BankingCovenantsStrip({
                 <div className="flex items-center gap-2">
                     {/* Preset Switcher */}
                     <div className="flex items-center bg-zinc-900 border border-zinc-800 rounded-lg p-0.5 text-[11px]">
-                        <button
-                            type="button"
-                            onClick={() => applyPreset('standard')}
-                            className={`px-2.5 py-1 rounded transition-colors ${
-                                activePreset === 'standard'
-                                    ? 'bg-zinc-800 text-emerald-400 font-semibold shadow-sm'
-                                    : 'text-zinc-400 hover:text-zinc-200'
-                            }`}
-                        >
-                            Standard (1.20x)
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => applyPreset('conservative')}
-                            className={`px-2.5 py-1 rounded transition-colors ${
-                                activePreset === 'conservative'
-                                    ? 'bg-zinc-800 text-amber-400 font-semibold shadow-sm'
-                                    : 'text-zinc-400 hover:text-zinc-200'
-                            }`}
-                        >
-                            Konserwatywny (1.30x)
-                        </button>
+                        <Tooltip content="Standardowe wytyczne rynkowe LMA dla długu Senior Debt (DSCR 1.20x, ICR 2.50x, Leverage 3.50x)">
+                            <button
+                                type="button"
+                                onClick={() => applyPreset('standard')}
+                                className={`px-2.5 py-1 rounded transition-colors cursor-pointer ${
+                                    activePreset === 'standard'
+                                        ? 'bg-zinc-800 text-emerald-400 font-semibold shadow-sm'
+                                        : 'text-zinc-400 hover:text-zinc-200'
+                                }`}
+                            >
+                                Standard (1.20x)
+                            </button>
+                        </Tooltip>
+                        <Tooltip content="Zaostrzone wymogi komitetu ryzyka dla projektów infrastrukturalnych (DSCR 1.30x, ICR 3.00x, Leverage 3.00x)">
+                            <button
+                                type="button"
+                                onClick={() => applyPreset('conservative')}
+                                className={`px-2.5 py-1 rounded transition-colors cursor-pointer ${
+                                    activePreset === 'conservative'
+                                        ? 'bg-zinc-800 text-amber-400 font-semibold shadow-sm'
+                                        : 'text-zinc-400 hover:text-zinc-200'
+                                }`}
+                            >
+                                Konserwatywny (1.30x)
+                            </button>
+                        </Tooltip>
                         {activePreset === 'custom' && (
-                            <span className="px-2 py-1 text-cyan-400 font-semibold">
-                                Indywidualny
-                            </span>
+                            <Tooltip content="Niestandardowe progi ostrożnościowe zdefiniowane w konfiguratorze testów warunków skrajnych">
+                                <span className="px-2 py-1 text-cyan-400 font-semibold cursor-help">
+                                    Indywidualny
+                                </span>
+                            </Tooltip>
                         )}
                     </div>
 
                     {/* Scale switcher */}
                     <div className="flex items-center bg-zinc-900 border border-zinc-800 rounded-lg p-0.5 text-[11px]">
-                        <button
-                            type="button"
-                            onClick={() => setScale('thousands')}
-                            className={`px-2 py-1 rounded ${scale === 'thousands' ? 'bg-zinc-800 text-zinc-100 font-semibold' : 'text-zinc-400'}`}
-                        >
-                            tys.
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setScale('millions')}
-                            className={`px-2 py-1 rounded ${scale === 'millions' ? 'bg-zinc-800 text-zinc-100 font-semibold' : 'text-zinc-400'}`}
-                        >
-                            mln
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setScale('full')}
-                            className={`px-2 py-1 rounded ${scale === 'full' ? 'bg-zinc-800 text-zinc-100 font-semibold' : 'text-zinc-400'}`}
-                        >
-                            pełne
-                        </button>
+                        <Tooltip content="Prezentuj kwoty w tysiącach">
+                            <button
+                                type="button"
+                                onClick={() => setScale('thousands')}
+                                className={`px-2 py-1 rounded cursor-pointer ${scale === 'thousands' ? 'bg-zinc-800 text-zinc-100 font-semibold' : 'text-zinc-400'}`}
+                            >
+                                tys.
+                            </button>
+                        </Tooltip>
+                        <Tooltip content="Prezentuj kwoty w milionach">
+                            <button
+                                type="button"
+                                onClick={() => setScale('millions')}
+                                className={`px-2 py-1 rounded cursor-pointer ${scale === 'millions' ? 'bg-zinc-800 text-zinc-100 font-semibold' : 'text-zinc-400'}`}
+                            >
+                                mln
+                            </button>
+                        </Tooltip>
+                        <Tooltip content="Prezentuj pełne kwoty jednostkowe">
+                            <button
+                                type="button"
+                                onClick={() => setScale('full')}
+                                className={`px-2 py-1 rounded cursor-pointer ${scale === 'full' ? 'bg-zinc-800 text-zinc-100 font-semibold' : 'text-zinc-400'}`}
+                            >
+                                pełne
+                            </button>
+                        </Tooltip>
                     </div>
 
                     {/* Toggle expand/collapse button */}
-                    <Button
-                        variant="secondary"
-                        size="sm"
-                        onClick={() => setIsExpanded(!isExpanded)}
-                        className="text-xs flex items-center gap-1.5 border-zinc-700 bg-zinc-800/80 hover:bg-zinc-700"
-                    >
-                        {isExpanded ? (
-                            <>
-                                <span>Ukryj audyt</span>
-                                <ChevronUp className="w-3.5 h-3.5" />
-                            </>
-                        ) : (
-                            <>
-                                <span>Szczegóły kowenantów (15L)</span>
-                                <ChevronDown className="w-3.5 h-3.5" />
-                            </>
-                        )}
-                    </Button>
+                    <Tooltip content={isExpanded ? "Zwiń audyt kowenantów bankowych" : "Rozwiń 15-letni audyt kowenantów i matrycę wskaźników"}>
+                        <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => setIsExpanded(!isExpanded)}
+                            aria-expanded={isExpanded}
+                            className="text-xs flex items-center gap-1.5 border-zinc-700 bg-zinc-800/80 hover:bg-zinc-700"
+                        >
+                            {isExpanded ? (
+                                <>
+                                    <span>Ukryj audyt</span>
+                                    <ChevronUp className="w-3.5 h-3.5" />
+                                </>
+                            ) : (
+                                <>
+                                    <span>Szczegóły kowenantów (15L)</span>
+                                    <ChevronDown className="w-3.5 h-3.5" />
+                                </>
+                            )}
+                        </Button>
+                    </Tooltip>
                 </div>
             </div>
 
@@ -653,41 +668,47 @@ export function BankingCovenantsStrip({
             {isExpanded && (
                 <div className="border-t border-zinc-800 p-4 space-y-4 bg-zinc-950/40">
                     {/* Navigation Sub-Tabs */}
-                    <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
+                    <div className="flex items-center justify-between border-b border-zinc-800 pb-3 flex-wrap gap-2">
                         <div className="flex items-center gap-2">
-                            <button
-                                type="button"
-                                onClick={() => setActiveTab('matrix')}
-                                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
-                                    activeTab === 'matrix'
-                                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
-                                        : 'text-zinc-400 hover:text-zinc-200'
-                                }`}
-                            >
-                                1. Roczna Matryca Kowenantów (15L)
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setActiveTab('config')}
-                                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
-                                    activeTab === 'config'
-                                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
-                                        : 'text-zinc-400 hover:text-zinc-200'
-                                }`}
-                            >
-                                2. Konfigurator Wymogów Banku (Stress)
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setActiveTab('headroom')}
-                                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
-                                    activeTab === 'headroom'
-                                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
-                                        : 'text-zinc-400 hover:text-zinc-200'
-                                }`}
-                            >
-                                3. Wąskie Gardło & Analiza Buforu
-                            </button>
+                            <Tooltip content="Roczna 15-letnia matryca kowenantów z oznaczeniem wąskich gardeł i statusów">
+                                <button
+                                    type="button"
+                                    onClick={() => setActiveTab('matrix')}
+                                    className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
+                                        activeTab === 'matrix'
+                                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                                            : 'text-zinc-400 hover:text-zinc-200'
+                                    }`}
+                                >
+                                    1. Roczna Matryca Kowenantów (15L)
+                                </button>
+                            </Tooltip>
+                            <Tooltip content="Konfiguracja progów ostrożnościowych dla symulacji warunków skrajnych">
+                                <button
+                                    type="button"
+                                    onClick={() => setActiveTab('config')}
+                                    className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
+                                        activeTab === 'config'
+                                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                                            : 'text-zinc-400 hover:text-zinc-200'
+                                    }`}
+                                >
+                                    2. Konfigurator Wymogów Banku (Stress)
+                                </button>
+                            </Tooltip>
+                            <Tooltip content="Szczegółowa analiza buforu bezpieczeństwa oraz symulacja pakietu dokapitalizowania naprawczego">
+                                <button
+                                    type="button"
+                                    onClick={() => setActiveTab('headroom')}
+                                    className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
+                                        activeTab === 'headroom'
+                                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                                            : 'text-zinc-400 hover:text-zinc-200'
+                                    }`}
+                                >
+                                    3. Wąskie Gardło & Analiza Buforu
+                                </button>
+                            </Tooltip>
                         </div>
 
                         {activeTab === 'matrix' && (
@@ -695,27 +716,33 @@ export function BankingCovenantsStrip({
                                 <span className="text-zinc-500 px-2 flex items-center gap-1">
                                     <Filter className="w-3 h-3" /> Filtr:
                                 </span>
-                                <button
-                                    type="button"
-                                    onClick={() => setFilter('all')}
-                                    className={`px-2 py-0.5 rounded ${filter === 'all' ? 'bg-zinc-800 text-zinc-100 font-semibold' : 'text-zinc-400'}`}
-                                >
-                                    Wszystkie (15L)
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => setFilter('debt_only')}
-                                    className={`px-2 py-0.5 rounded ${filter === 'debt_only' ? 'bg-zinc-800 text-zinc-100 font-semibold' : 'text-zinc-400'}`}
-                                >
-                                    Lata z długiem
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => setFilter('breaches_only')}
-                                    className={`px-2 py-0.5 rounded ${filter === 'breaches_only' ? 'bg-zinc-800 text-rose-400 font-semibold' : 'text-zinc-400'}`}
-                                >
-                                    Ryzyko / Naruszenia
-                                </button>
+                                <Tooltip content="Wyświetl wszystkie 15 lat horyzontu planowania">
+                                    <button
+                                        type="button"
+                                        onClick={() => setFilter('all')}
+                                        className={`px-2 py-0.5 rounded cursor-pointer ${filter === 'all' ? 'bg-zinc-800 text-zinc-100 font-semibold' : 'text-zinc-400'}`}
+                                    >
+                                        Wszystkie (15L)
+                                    </button>
+                                </Tooltip>
+                                <Tooltip content="Filtruj wyłącznie lata z aktywną obsługą długu kredytowego">
+                                    <button
+                                        type="button"
+                                        onClick={() => setFilter('debt_only')}
+                                        className={`px-2 py-0.5 rounded cursor-pointer ${filter === 'debt_only' ? 'bg-zinc-800 text-zinc-100 font-semibold' : 'text-zinc-400'}`}
+                                    >
+                                        Lata z długiem
+                                    </button>
+                                </Tooltip>
+                                <Tooltip content="Wyświetl wyłącznie lata z naruszeniem lub ostrzeżeniem wskaźników bankowych">
+                                    <button
+                                        type="button"
+                                        onClick={() => setFilter('breaches_only')}
+                                        className={`px-2 py-0.5 rounded cursor-pointer ${filter === 'breaches_only' ? 'bg-zinc-800 text-rose-400 font-semibold' : 'text-zinc-400'}`}
+                                    >
+                                        Ryzyko / Naruszenia
+                                    </button>
+                                </Tooltip>
                             </div>
                         )}
                     </div>
@@ -727,17 +754,61 @@ export function BankingCovenantsStrip({
                                 <table className="w-full text-xs font-mono text-left">
                                     <thead className="bg-zinc-900/90 text-zinc-400 border-b border-zinc-800 text-[11px] uppercase tracking-wider">
                                         <tr>
-                                            <th className="py-2.5 px-3">Okres</th>
-                                            <th className="py-2.5 px-3 text-right">EBITDA</th>
-                                            <th className="py-2.5 px-3 text-right">CFADS</th>
-                                            <th className="py-2.5 px-3 text-right">Obsługa Długu</th>
-                                            <th className="py-2.5 px-3 text-center">DSCR (≥ {thresholds.minDscr.toFixed(2)}x)</th>
-                                            <th className="py-2.5 px-3 text-center">LLCR (≥ {(thresholds.minLlcr ?? 1.35).toFixed(2)}x)</th>
-                                            <th className="py-2.5 px-3 text-center">ICR (≥ {thresholds.minIcr.toFixed(2)}x)</th>
-                                            <th className="py-2.5 px-3 text-center">CR (Płynność)</th>
-                                            <th className="py-2.5 px-3 text-center">Dźwignia Net Debt</th>
-                                            <th className="py-2.5 px-3 text-center">DSRF (m.)</th>
-                                            <th className="py-2.5 px-3 text-center">Zgodność</th>
+                                            <th className="py-2.5 px-3">
+                                                <Tooltip content="Kolejny rok 15-letniego horyzontu inwestycji">
+                                                    <span className="cursor-help">Okres</span>
+                                                </Tooltip>
+                                            </th>
+                                            <th className="py-2.5 px-3 text-right">
+                                                <Tooltip content="Zysk operacyjny powiększony o amortyzację (EBITDA)">
+                                                    <span className="cursor-help">EBITDA</span>
+                                                </Tooltip>
+                                            </th>
+                                            <th className="py-2.5 px-3 text-right">
+                                                <Tooltip content="Przepływy pieniężne operacyjne dostępne na obsługę długu bankowego (Cash Flow Available for Debt Service)">
+                                                    <span className="cursor-help">CFADS</span>
+                                                </Tooltip>
+                                            </th>
+                                            <th className="py-2.5 px-3 text-right">
+                                                <Tooltip content="Łączna roczna suma spłaty raty kapitałowej i odsetek kredytowych">
+                                                    <span className="cursor-help">Obsługa Długu</span>
+                                                </Tooltip>
+                                            </th>
+                                            <th className="py-2.5 px-3 text-center">
+                                                <Tooltip content={`Wskaźnik Pokrycia Obsługi Długu (CFADS / Obsługa Długu). Wymóg LMA: ≥ ${thresholds.minDscr.toFixed(2)}x`}>
+                                                    <span className="cursor-help">DSCR (≥ {thresholds.minDscr.toFixed(2)}x)</span>
+                                                </Tooltip>
+                                            </th>
+                                            <th className="py-2.5 px-3 text-center">
+                                                <Tooltip content={`Wskaźnik Pokrycia Długu w Całym Okresie (NPV CFADS / Saldo Długu). Wymóg LMA: ≥ ${(thresholds.minLlcr ?? 1.35).toFixed(2)}x`}>
+                                                    <span className="cursor-help">LLCR (≥ {(thresholds.minLlcr ?? 1.35).toFixed(2)}x)</span>
+                                                </Tooltip>
+                                            </th>
+                                            <th className="py-2.5 px-3 text-center">
+                                                <Tooltip content={`Wskaźnik Pokrycia Odsetek (EBIT / Odsetki). Wymóg LMA: ≥ ${thresholds.minIcr.toFixed(2)}x`}>
+                                                    <span className="cursor-help">ICR (≥ {thresholds.minIcr.toFixed(2)}x)</span>
+                                                </Tooltip>
+                                            </th>
+                                            <th className="py-2.5 px-3 text-center">
+                                                <Tooltip content={`Wskaźnik Płynności Bieżącej (Aktywa Obrotowe / Zobowiązania Krótkoterminowe). Wymóg LMA: ≥ ${thresholds.minCurrentRatio.toFixed(2)}x`}>
+                                                    <span className="cursor-help">CR (Płynność)</span>
+                                                </Tooltip>
+                                            </th>
+                                            <th className="py-2.5 px-3 text-center">
+                                                <Tooltip content={`Wskaźnik Dźwigni Finansowej (Dług Netto / EBITDA). Limit: ≤ ${thresholds.maxLeverage.toFixed(2)}x`}>
+                                                    <span className="cursor-help">Dźwignia Net Debt</span>
+                                                </Tooltip>
+                                            </th>
+                                            <th className="py-2.5 px-3 text-center">
+                                                <Tooltip content={`Rezerwa Obsługi Długu na rachunku DSRA w miesiącach. Wymóg LMA: ≥ ${thresholds.minDsrfMonths} mies.`}>
+                                                    <span className="cursor-help">DSRF (m.)</span>
+                                                </Tooltip>
+                                            </th>
+                                            <th className="py-2.5 px-3 text-center">
+                                                <Tooltip content="Łączna zgodność ze wszystkimi kowenantami bankowymi w danym roku">
+                                                    <span className="cursor-help">Zgodność</span>
+                                                </Tooltip>
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-zinc-800/60 bg-zinc-950/40">
@@ -754,9 +825,11 @@ export function BankingCovenantsStrip({
                                                         <div className="flex items-center gap-1.5">
                                                             <span>Rok {m.year}</span>
                                                             {isPinch && (
-                                                                <span className="text-[9px] px-1 rounded bg-amber-500/20 text-amber-300 font-sans font-bold">
-                                                                    WĄSKIE GARDŁO
-                                                                </span>
+                                                                <Tooltip content="Rok o najniższym buforze pokrycia obsługi długu (Pinch Year) w całym 15-letnim modelu">
+                                                                    <span className="text-[9px] px-1 rounded bg-amber-500/20 text-amber-300 font-sans font-bold cursor-help">
+                                                                        WĄSKIE GARDŁO
+                                                                    </span>
+                                                                </Tooltip>
                                                             )}
                                                         </div>
                                                     </td>
@@ -772,16 +845,18 @@ export function BankingCovenantsStrip({
 
                                                     {/* DSCR */}
                                                     <td className="py-2 px-3 text-center">
-                                                        {m.dscr !== null ? (
-                                                            <span className={`inline-block px-2 py-0.5 rounded text-[11px] font-bold ${
-                                                                m.dscrStatus === 'compliant'
-                                                                    ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
-                                                                    : m.dscrStatus === 'warning'
-                                                                    ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
-                                                                    : 'bg-rose-500/10 text-rose-400 border border-rose-500/30'
-                                                            }`}>
-                                                                {m.dscr.toFixed(2)}x
-                                                            </span>
+                                                        {m.dscr != null ? (
+                                                            <Tooltip content={`DSCR: ${m.dscr.toFixed(2)}x (Wymóg: ≥ ${(thresholds?.minDscr ?? 1.20).toFixed(2)}x) • ${m.dscrStatus === 'compliant' ? 'Bufor bezpieczny' : m.dscrStatus === 'warning' ? 'Wąski bufor <10%' : 'Naruszenie kowenantu'}`}>
+                                                                <span className={`inline-block px-2 py-0.5 rounded text-[11px] font-bold cursor-help ${
+                                                                    m.dscrStatus === 'compliant'
+                                                                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                                                                        : m.dscrStatus === 'warning'
+                                                                        ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
+                                                                        : 'bg-rose-500/10 text-rose-400 border border-rose-500/30'
+                                                                }`}>
+                                                                    {m.dscr.toFixed(2)}x
+                                                                </span>
+                                                            </Tooltip>
                                                         ) : (
                                                             <span className="text-zinc-600">—</span>
                                                         )}
@@ -789,16 +864,18 @@ export function BankingCovenantsStrip({
 
                                                     {/* LLCR */}
                                                     <td className="py-2 px-3 text-center">
-                                                        {m.llcr !== null ? (
-                                                            <span className={`inline-block px-2 py-0.5 rounded text-[11px] font-bold ${
-                                                                m.llcrStatus === 'compliant'
-                                                                    ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
-                                                                    : m.llcrStatus === 'warning'
-                                                                    ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
-                                                                    : 'bg-rose-500/10 text-rose-400 border border-rose-500/30'
-                                                            }`}>
-                                                                {m.llcr < 0 ? '0.00x' : `${m.llcr.toFixed(2)}x`}
-                                                            </span>
+                                                        {m.llcr != null ? (
+                                                            <Tooltip content={`LLCR: ${m.llcr.toFixed(2)}x (Wymóg: ≥ ${(thresholds.minLlcr ?? 1.35).toFixed(2)}x)`}>
+                                                                <span className={`inline-block px-2 py-0.5 rounded text-[11px] font-bold cursor-help ${
+                                                                    m.llcrStatus === 'compliant'
+                                                                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                                                                        : m.llcrStatus === 'warning'
+                                                                        ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
+                                                                        : 'bg-rose-500/10 text-rose-400 border border-rose-500/30'
+                                                                }`}>
+                                                                    {m.llcr < 0 ? '0.00x' : `${m.llcr.toFixed(2)}x`}
+                                                                </span>
+                                                            </Tooltip>
                                                         ) : (
                                                             <span className="text-zinc-600">—</span>
                                                         )}
@@ -806,16 +883,18 @@ export function BankingCovenantsStrip({
 
                                                     {/* ICR */}
                                                     <td className="py-2 px-3 text-center">
-                                                        {m.icr !== null ? (
-                                                            <span className={`inline-block px-2 py-0.5 rounded text-[11px] font-bold ${
-                                                                m.icrStatus === 'compliant'
-                                                                    ? 'text-emerald-400'
-                                                                    : m.icrStatus === 'warning'
-                                                                    ? 'text-amber-400'
-                                                                    : 'text-rose-400'
-                                                            }`}>
-                                                                {m.icr.toFixed(2)}x
-                                                            </span>
+                                                        {m.icr != null ? (
+                                                            <Tooltip content={`ICR: ${m.icr.toFixed(2)}x (Wymóg: ≥ ${(thresholds?.minIcr ?? 2.50).toFixed(2)}x)`}>
+                                                                <span className={`inline-block px-2 py-0.5 rounded text-[11px] font-bold cursor-help ${
+                                                                    m.icrStatus === 'compliant'
+                                                                        ? 'text-emerald-400'
+                                                                        : m.icrStatus === 'warning'
+                                                                        ? 'text-amber-400'
+                                                                        : 'text-rose-400'
+                                                                }`}>
+                                                                    {m.icr.toFixed(2)}x
+                                                                </span>
+                                                            </Tooltip>
                                                         ) : (
                                                             <span className="text-zinc-600">—</span>
                                                         )}
@@ -823,25 +902,31 @@ export function BankingCovenantsStrip({
 
                                                     {/* Current Ratio */}
                                                     <td className="py-2 px-3 text-center text-zinc-300 tabular-nums">
-                                                        {m.currentRatio !== null ? (
-                                                            m.currentRatio < 0 ? (
-                                                                <span className="text-rose-400 font-semibold">0.00x</span>
-                                                            ) : (
-                                                                `${m.currentRatio.toFixed(2)}x`
-                                                            )
+                                                        {m.currentRatio != null ? (
+                                                            <Tooltip content={`Current Ratio: ${m.currentRatio.toFixed(2)}x (Wymóg: ≥ ${(thresholds?.minCurrentRatio ?? 1.10).toFixed(2)}x)`}>
+                                                                <span className="cursor-help">
+                                                                    {m.currentRatio < 0 ? (
+                                                                        <span className="text-rose-400 font-semibold">0.00x</span>
+                                                                    ) : (
+                                                                        `${m.currentRatio.toFixed(2)}x`
+                                                                    )}
+                                                                </span>
+                                                            </Tooltip>
                                                         ) : '—'}
                                                     </td>
 
                                                     {/* Net Debt / EBITDA */}
                                                     <td className="py-2 px-3 text-center">
-                                                        {m.leverageRatio !== null ? (
-                                                            <span className={`tabular-nums ${
-                                                                m.leverageRatio > thresholds.maxLeverage
-                                                                    ? 'text-rose-400 font-bold'
-                                                                    : 'text-zinc-300'
-                                                            }`}>
-                                                                {m.leverageRatio.toFixed(2)}x
-                                                            </span>
+                                                        {m.leverageRatio != null ? (
+                                                            <Tooltip content={`Dźwignia Net Debt/EBITDA: ${m.leverageRatio.toFixed(2)}x (Limit: ≤ ${(thresholds?.maxLeverage ?? 3.50).toFixed(2)}x)`}>
+                                                                <span className={`tabular-nums cursor-help ${
+                                                                    m.leverageRatio > thresholds.maxLeverage
+                                                                        ? 'text-rose-400 font-bold'
+                                                                        : 'text-zinc-300'
+                                                                }`}>
+                                                                    {m.leverageRatio.toFixed(2)}x
+                                                                </span>
+                                                            </Tooltip>
                                                         ) : (
                                                             <span className="text-zinc-600">—</span>
                                                         )}
@@ -849,14 +934,16 @@ export function BankingCovenantsStrip({
 
                                                     {/* DSRF Months */}
                                                     <td className="py-2 px-3 text-center">
-                                                        {m.dsrfMonths !== null ? (
-                                                            <span className={`tabular-nums ${
-                                                                m.dsrfMonths < thresholds.minDsrfMonths
-                                                                    ? 'text-rose-400 font-bold'
-                                                                    : 'text-emerald-400'
-                                                            }`}>
-                                                                {m.dsrfMonths < 0 ? '0.0 m.' : `${m.dsrfMonths.toFixed(1)} m.`}
-                                                            </span>
+                                                        {m.dsrfMonths != null ? (
+                                                            <Tooltip content={`Rezerwa DSRF: ${m.dsrfMonths.toFixed(1)} mies. (Wymóg: ≥ ${thresholds.minDsrfMonths} mies.)`}>
+                                                                <span className={`tabular-nums cursor-help ${
+                                                                    m.dsrfMonths < thresholds.minDsrfMonths
+                                                                        ? 'text-rose-400 font-bold'
+                                                                        : 'text-emerald-400'
+                                                                }`}>
+                                                                    {m.dsrfMonths < 0 ? '0.0 m.' : `${m.dsrfMonths.toFixed(1)} m.`}
+                                                                </span>
+                                                            </Tooltip>
                                                         ) : (
                                                             <span className="text-zinc-600">—</span>
                                                         )}
@@ -866,16 +953,22 @@ export function BankingCovenantsStrip({
                                                     <td className="py-2 px-3 text-center">
                                                         {m.hasDebtService ? (
                                                             m.isCompliant ? (
-                                                                <span className="inline-flex items-center gap-1 text-emerald-400 font-sans font-semibold text-[10px]">
-                                                                    <CheckCircle2 className="w-3 h-3" /> Zgodny
-                                                                </span>
+                                                                <Tooltip content="Wszystkie kowenanty bankowe w tym roku są w pełni spełnione (Status Zgodny)">
+                                                                    <span className="inline-flex items-center gap-1 text-emerald-400 font-sans font-semibold text-[10px] cursor-help">
+                                                                        <CheckCircle2 className="w-3 h-3" /> Zgodny
+                                                                    </span>
+                                                                </Tooltip>
                                                             ) : (
-                                                                <span className="inline-flex items-center gap-1 text-rose-400 font-sans font-bold text-[10px]" title={m.breaches.join(', ')}>
-                                                                    <XCircle className="w-3 h-3" /> Naruszenie
-                                                                </span>
+                                                                <Tooltip content={`Wykryte naruszenia: ${m.breaches.join(', ')}`}>
+                                                                    <span className="inline-flex items-center gap-1 text-rose-400 font-sans font-bold text-[10px] cursor-help">
+                                                                        <XCircle className="w-3 h-3" /> Naruszenie
+                                                                    </span>
+                                                                </Tooltip>
                                                             )
                                                         ) : (
-                                                            <span className="text-zinc-500 font-sans text-[10px]">—</span>
+                                                            <Tooltip content="Brak obsługi długu kredytowego w tym roku (okres pre-debt lub po całkowitej spłacie)">
+                                                                <span className="text-zinc-500 font-sans text-[10px] cursor-help">—</span>
+                                                            </Tooltip>
                                                         )}
                                                     </td>
                                                 </tr>
@@ -895,14 +988,16 @@ export function BankingCovenantsStrip({
                                     <span className="text-xs font-bold text-zinc-200 uppercase tracking-wide">
                                         Progi Ostrożnościowe Komitetu Kredytowego
                                     </span>
-                                    <Button
-                                        variant="secondary"
-                                        size="xs"
-                                        onClick={() => applyPreset('standard')}
-                                        className="text-[10px]"
-                                    >
-                                        Przywróć standardy LMA
-                                    </Button>
+                                    <Tooltip content="Przywróć domyślne progi ostrożnościowe Loan Market Association">
+                                        <Button
+                                            variant="secondary"
+                                            size="xs"
+                                            onClick={() => applyPreset('standard')}
+                                            className="text-[10px]"
+                                        >
+                                            Przywróć standardy LMA
+                                        </Button>
+                                    </Tooltip>
                                 </div>
 
                                 {/* Slider 1: Min DSCR */}
@@ -918,6 +1013,7 @@ export function BankingCovenantsStrip({
                                         step="0.05"
                                         value={thresholds.minDscr}
                                         onChange={(e) => updateThreshold('minDscr', e.target.value)}
+                                        aria-label="Minimalny Wymóg DSCR"
                                         className="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-emerald-500"
                                     />
                                     <div className="flex justify-between text-[10px] text-zinc-500 font-mono">
@@ -940,6 +1036,7 @@ export function BankingCovenantsStrip({
                                         step="0.05"
                                         value={thresholds.minLlcr ?? 1.35}
                                         onChange={(e) => updateThreshold('minLlcr', e.target.value)}
+                                        aria-label="Minimalne Pokrycie Całego Długu LLCR"
                                         className="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-emerald-500"
                                     />
                                     <div className="flex justify-between text-[10px] text-zinc-500 font-mono">
@@ -962,6 +1059,7 @@ export function BankingCovenantsStrip({
                                         step="0.25"
                                         value={thresholds.minIcr}
                                         onChange={(e) => updateThreshold('minIcr', e.target.value)}
+                                        aria-label="Minimalne Pokrycie Odsetek ICR"
                                         className="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-emerald-500"
                                     />
                                 </div>
@@ -979,6 +1077,7 @@ export function BankingCovenantsStrip({
                                         step="0.25"
                                         value={thresholds.maxLeverage}
                                         onChange={(e) => updateThreshold('maxLeverage', e.target.value)}
+                                        aria-label="Maksymalna Dopuszczalna Dźwignia Net Debt do EBITDA"
                                         className="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-emerald-500"
                                     />
                                 </div>
@@ -1002,6 +1101,7 @@ export function BankingCovenantsStrip({
                                         step="0.05"
                                         value={thresholds.minCurrentRatio}
                                         onChange={(e) => updateThreshold('minCurrentRatio', e.target.value)}
+                                        aria-label="Minimalny Wskaźnik Płynności Bieżącej Current Ratio"
                                         className="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-emerald-500"
                                     />
                                 </div>
@@ -1019,6 +1119,7 @@ export function BankingCovenantsStrip({
                                         step="1"
                                         value={thresholds.minDsrfMonths}
                                         onChange={(e) => updateThreshold('minDsrfMonths', e.target.value)}
+                                        aria-label="Wymagana Rezerwa Obsługi Długu DSRF w miesiącach"
                                         className="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-emerald-500"
                                     />
                                     <div className="flex justify-between text-[10px] text-zinc-500 font-mono">

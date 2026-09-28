@@ -23,6 +23,7 @@ import { getInvestmentWorkerClient } from '../../workers/InvestmentWorkerClient'
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
+import { Tooltip, InfoTooltip } from '../ui/Tooltip';
 
 export const ThreeStatementGrid = ({
     project = null,
@@ -374,57 +375,65 @@ export const ThreeStatementGrid = ({
             <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3 sm:p-4 shadow-sm flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
                 {/* Statement Type Segmented Control */}
                 <div className="flex flex-wrap items-center gap-1.5 bg-zinc-950 p-1.5 rounded-lg border border-zinc-800">
-                    <button
-                        type="button"
-                        onClick={() => setStatementType('pnl')}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 text-xs rounded transition-all cursor-pointer ${
-                            statementType === 'pnl'
-                                ? 'bg-zinc-800 text-zinc-100 border border-zinc-700 shadow-xs font-bold'
-                                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900 border border-transparent'
-                        }`}
-                    >
-                        <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />
-                        <span>RZiS (P&L)</span>
-                    </button>
+                    <Tooltip content="Rachunek Zysków i Strat (P&L): Przychody, EBITDA, EBIT, EBT, Zysk Netto">
+                        <button
+                            type="button"
+                            onClick={() => setStatementType('pnl')}
+                            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs rounded transition-all cursor-pointer ${
+                                statementType === 'pnl'
+                                    ? 'bg-zinc-800 text-zinc-100 border border-zinc-700 shadow-xs font-bold'
+                                    : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900 border border-transparent'
+                            }`}
+                        >
+                            <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />
+                            <span>RZiS (P&L)</span>
+                        </button>
+                    </Tooltip>
 
-                    <button
-                        type="button"
-                        onClick={() => setStatementType('balancesheet')}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 text-xs rounded transition-all cursor-pointer ${
-                            statementType === 'balancesheet'
-                                ? 'bg-zinc-800 text-zinc-100 border border-zinc-700 shadow-xs font-bold'
-                                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900 border border-transparent'
-                        }`}
-                    >
-                        <Building2 className="w-3.5 h-3.5 text-blue-400" />
-                        <span>Bilans</span>
-                    </button>
+                    <Tooltip content="Bilans: Aktywa trwałe, obrotowe, kapitał własny i pasywa obce">
+                        <button
+                            type="button"
+                            onClick={() => setStatementType('balancesheet')}
+                            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs rounded transition-all cursor-pointer ${
+                                statementType === 'balancesheet'
+                                    ? 'bg-zinc-800 text-zinc-100 border border-zinc-700 shadow-xs font-bold'
+                                    : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900 border border-transparent'
+                            }`}
+                        >
+                            <Building2 className="w-3.5 h-3.5 text-blue-400" />
+                            <span>Bilans</span>
+                        </button>
+                    </Tooltip>
 
-                    <button
-                        type="button"
-                        onClick={() => setStatementType('cashflow')}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 text-xs rounded transition-all cursor-pointer ${
-                            statementType === 'cashflow'
-                                ? 'bg-zinc-800 text-zinc-100 border border-zinc-700 shadow-xs font-bold'
-                                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900 border border-transparent'
-                        }`}
-                    >
-                        <Coins className="w-3.5 h-3.5 text-amber-400" />
-                        <span>Cash Flow</span>
-                    </button>
+                    <Tooltip content="Rachunek Przepływów Pieniężnych: Przepływy operacyjne, inwestycyjne i finansowe">
+                        <button
+                            type="button"
+                            onClick={() => setStatementType('cashflow')}
+                            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs rounded transition-all cursor-pointer ${
+                                statementType === 'cashflow'
+                                    ? 'bg-zinc-800 text-zinc-100 border border-zinc-700 shadow-xs font-bold'
+                                    : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900 border border-transparent'
+                            }`}
+                        >
+                            <Coins className="w-3.5 h-3.5 text-amber-400" />
+                            <span>Cash Flow</span>
+                        </button>
+                    </Tooltip>
 
-                    <button
-                        type="button"
-                        onClick={() => setStatementType('all')}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 text-xs rounded transition-all cursor-pointer ${
-                            statementType === 'all'
-                                ? 'bg-zinc-800 text-zinc-100 border border-zinc-700 shadow-xs font-bold'
-                                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900 border border-transparent'
-                        }`}
-                    >
-                        <Layers className="w-3.5 h-3.5 text-purple-400" />
-                        <span>Wszystkie (Zbiorczy)</span>
-                    </button>
+                    <Tooltip content="Widok skonsolidowany 3-Statement ze zintegrowanymi sprawozdaniami">
+                        <button
+                            type="button"
+                            onClick={() => setStatementType('all')}
+                            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs rounded transition-all cursor-pointer ${
+                                statementType === 'all'
+                                    ? 'bg-zinc-800 text-zinc-100 border border-zinc-700 shadow-xs font-bold'
+                                    : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900 border border-transparent'
+                            }`}
+                        >
+                            <Layers className="w-3.5 h-3.5 text-purple-400" />
+                            <span>Wszystkie (Zbiorczy)</span>
+                        </button>
+                    </Tooltip>
                 </div>
 
                 {/* Granularity & Secondary Controls */}
@@ -482,16 +491,18 @@ export const ThreeStatementGrid = ({
                     </div>
 
                     {/* CSV Export Button */}
-                    <Button
-                        type="button"
-                        variant="secondary"
-                        size="sm"
-                        onClick={exportToCsv}
-                        className="gap-1.5 text-xs shrink-0"
-                    >
-                        <Download className="w-3.5 h-3.5" />
-                        <span>Eksportuj CSV</span>
-                    </Button>
+                    <Tooltip content="Eksportuj kompletne sprawozdania finansowe do pliku CSV">
+                        <Button
+                            type="button"
+                            variant="secondary"
+                            size="sm"
+                            onClick={exportToCsv}
+                            className="gap-1.5 text-xs shrink-0"
+                        >
+                            <Download className="w-3.5 h-3.5" />
+                            <span>Eksportuj CSV</span>
+                        </Button>
+                    </Tooltip>
                 </div>
             </div>
 
@@ -551,15 +562,15 @@ export const ThreeStatementGrid = ({
                     </div>
 
                     {/* Zero-Variance Balance Indicator */}
-                    <div
-                        data-testid="balance-integrity-badge"
-                        className={`flex items-center gap-1.5 px-2.5 py-1 rounded border text-[11px] font-semibold ${
-                            isModelGloballyBalanced
-                                ? 'bg-emerald-950/40 text-emerald-300 border-emerald-800/60'
-                                : 'bg-rose-950/40 text-rose-300 border-rose-800/60'
-                        }`}
-                        title="Zasada podwójnego zapisu: Aktywa = Pasywa (Zero Variance)"
-                    >
+                    <Tooltip content="Zasada podwójnego zapisu: Aktywa = Pasywa (Zero Variance) we wszystkich 15 okresach rocznych">
+                        <div
+                            data-testid="balance-integrity-badge"
+                            className={`flex items-center gap-1.5 px-2.5 py-1 rounded border text-[11px] font-semibold cursor-help ${
+                                isModelGloballyBalanced
+                                    ? 'bg-emerald-950/40 text-emerald-300 border-emerald-800/60'
+                                    : 'bg-rose-950/40 text-rose-300 border-rose-800/60'
+                            }`}
+                        >
                         {isModelGloballyBalanced ? (
                             <>
                                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
@@ -571,7 +582,8 @@ export const ThreeStatementGrid = ({
                                 <span>ODCHYLENIE BILANSU (Δ ≠ 0)</span>
                             </>
                         )}
-                    </div>
+                        </div>
+                    </Tooltip>
                 </div>
             </div>
 
@@ -807,19 +819,20 @@ export const ThreeStatementGrid = ({
                                         <tr className="hover:bg-zinc-850/50">
                                             <td className="py-2 px-4 sticky left-0 z-10 bg-zinc-900 text-zinc-400 flex items-center justify-between border-r border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
                                                 <span>(-) Podatek Dochodowy CIT (Tarcza Strat)</span>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => toggleSection('tax_breakdown')}
-                                                    className="p-1 hover:text-zinc-100 text-zinc-400"
-                                                    title="Rozwiń rozliczenie podatkowe CIT"
-                                                    aria-label="Rozwiń rozliczenie podatkowe CIT"
-                                                >
+                                                <Tooltip content={expandedSections.tax_breakdown ? "Zwiń rozliczenie podatkowe CIT" : "Rozwiń rozliczenie podatkowe CIT (straty i tarcza)"}>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => toggleSection('tax_breakdown')}
+                                                        className="p-1 hover:text-zinc-100 text-zinc-400"
+                                                        aria-label="Rozwiń rozliczenie podatkowe CIT"
+                                                    >
                                                     {expandedSections.tax_breakdown ? (
                                                         <ChevronDown className="w-3.5 h-3.5" />
                                                     ) : (
                                                         <ChevronRight className="w-3.5 h-3.5" />
                                                     )}
-                                                </button>
+                                                    </button>
+                                                </Tooltip>
                                             </td>
                                             {columns.map((c) => (
                                                 <td key={c.id} className="py-2 px-3 text-right text-rose-400/80 border-r border-zinc-850 font-mono">

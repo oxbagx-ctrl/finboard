@@ -26,6 +26,7 @@ import { getInvestmentWorkerClient } from '../../workers/InvestmentWorkerClient'
 import { calculateExitWaterfall } from '../../workers/financialCalculations';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
+import { Tooltip, InfoTooltip } from '../ui/Tooltip';
 
 export const WATERFALL_EXIT_PRESETS = [
     { year: 3, label: 'Rok 3 (Early Exit)' },
@@ -157,9 +158,11 @@ export function ExitWaterfallVisualizer({ project: propProject, defaultOpen = tr
             {/* Header */}
             <div className="p-4 sm:p-5 border-b border-zinc-800 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-zinc-950/60 rounded-t-lg">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-md bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 shrink-0">
-                        <Layers className="w-5 h-5" />
-                    </div>
+                    <Tooltip content="Wizualizator podziału wpływów transakcyjnych i dystrybucji zysków między inwestorów">
+                        <div className="w-10 h-10 rounded-md bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 shrink-0 cursor-help">
+                            <Layers className="w-5 h-5" />
+                        </div>
+                    </Tooltip>
                     <div>
                         <div className="flex items-center gap-2 mb-0.5 flex-wrap">
                             <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
@@ -181,60 +184,80 @@ export function ExitWaterfallVisualizer({ project: propProject, defaultOpen = tr
                     {/* Header Summary Badges */}
                     {waterfallResult && (
                         <div className="hidden lg:flex items-center gap-2 text-xs bg-zinc-900 border border-zinc-800 rounded px-2.5 py-1">
-                            <span className="text-zinc-400">Sponsor MoIC:</span>
-                            <span className="text-emerald-400 font-bold">{waterfallResult.investor1.moic.toFixed(2)}x</span>
+                            <Tooltip content="Zwrot Sponsora: Wielokrotność zysku z zainwestowanego kapitału własnego GP">
+                                <span className="flex items-center gap-1 cursor-help">
+                                    <span className="text-zinc-400">Sponsor MoIC:</span>
+                                    <span className="text-emerald-400 font-bold">{waterfallResult.investor1.moic.toFixed(2)}x</span>
+                                </span>
+                            </Tooltip>
                             <span className="text-zinc-600">|</span>
-                            <span className="text-zinc-400">Partner MoIC:</span>
-                            <span className="text-purple-400 font-bold">{waterfallResult.investor2.moic.toFixed(2)}x</span>
+                            <Tooltip content="Zwrot Partnera Finansowego (LP): Wielokrotność zwrotu z wkładu kapitałowego">
+                                <span className="flex items-center gap-1 cursor-help">
+                                    <span className="text-zinc-400">Partner MoIC:</span>
+                                    <span className="text-purple-400 font-bold">{waterfallResult.investor2.moic.toFixed(2)}x</span>
+                                </span>
+                            </Tooltip>
                             <span className="text-zinc-600">|</span>
-                            <span className="text-zinc-400">Total EqV:</span>
-                            <span className="text-zinc-100 font-bold">{formatValue(waterfallResult.exitEquityValue)}</span>
+                            <Tooltip content="Łączna wartość kapitału własnego (Equity Value) dystrybuowana w kaskadzie">
+                                <span className="flex items-center gap-1 cursor-help">
+                                    <span className="text-zinc-400">Total EqV:</span>
+                                    <span className="text-zinc-100 font-bold">{formatValue(waterfallResult.exitEquityValue)}</span>
+                                </span>
+                            </Tooltip>
                         </div>
                     )}
 
                     {/* Scale switcher */}
                     <div className="flex items-center bg-zinc-950 border border-zinc-800 rounded p-0.5 text-[11px]">
-                        <button
-                            type="button"
-                            onClick={() => setScale('millions')}
-                            className={`px-2 py-0.5 rounded transition-all cursor-pointer ${
-                                scale === 'millions' ? 'bg-zinc-800 text-emerald-400 font-bold' : 'text-zinc-400 hover:text-zinc-200'
-                            }`}
-                        >
-                            mln
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setScale('thousands')}
-                            className={`px-2 py-0.5 rounded transition-all cursor-pointer ${
-                                scale === 'thousands' ? 'bg-zinc-800 text-emerald-400 font-bold' : 'text-zinc-400 hover:text-zinc-200'
-                            }`}
-                        >
-                            tys.
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setScale('full')}
-                            className={`px-2 py-0.5 rounded transition-all cursor-pointer ${
-                                scale === 'full' ? 'bg-zinc-800 text-emerald-400 font-bold' : 'text-zinc-400 hover:text-zinc-200'
-                            }`}
-                        >
-                            PLN
-                        </button>
+                        <Tooltip content="Prezentuj kwoty w milionach">
+                            <button
+                                type="button"
+                                onClick={() => setScale('millions')}
+                                className={`px-2 py-0.5 rounded transition-all cursor-pointer ${
+                                    scale === 'millions' ? 'bg-zinc-800 text-emerald-400 font-bold' : 'text-zinc-400 hover:text-zinc-200'
+                                }`}
+                            >
+                                mln
+                            </button>
+                        </Tooltip>
+                        <Tooltip content="Prezentuj kwoty w tysiącach">
+                            <button
+                                type="button"
+                                onClick={() => setScale('thousands')}
+                                className={`px-2 py-0.5 rounded transition-all cursor-pointer ${
+                                    scale === 'thousands' ? 'bg-zinc-800 text-emerald-400 font-bold' : 'text-zinc-400 hover:text-zinc-200'
+                                }`}
+                            >
+                                tys.
+                            </button>
+                        </Tooltip>
+                        <Tooltip content="Prezentuj pełne kwoty w PLN">
+                            <button
+                                type="button"
+                                onClick={() => setScale('full')}
+                                className={`px-2 py-0.5 rounded transition-all cursor-pointer ${
+                                    scale === 'full' ? 'bg-zinc-800 text-emerald-400 font-bold' : 'text-zinc-400 hover:text-zinc-200'
+                                }`}
+                            >
+                                PLN
+                            </button>
+                        </Tooltip>
                     </div>
 
                     {/* Toggle button */}
-                    <Button
-                        variant="secondary"
-                        size="sm"
-                        onClick={() => setIsOpen(!isOpen)}
-                        className="gap-1.5 text-xs font-semibold"
-                        aria-expanded={isOpen}
-                        data-testid="toggle-waterfall-visualizer"
-                    >
-                        <span>{isOpen ? 'Zwiń Kaskadę' : 'Rozwiń Kaskadę'}</span>
-                        {isOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-                    </Button>
+                    <Tooltip content={isOpen ? "Zwiń sekcję kaskady wyjścia" : "Rozwiń wizualizator kaskady wyjścia"}>
+                        <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => setIsOpen(!isOpen)}
+                            className="gap-1.5 text-xs font-semibold"
+                            aria-expanded={isOpen}
+                            data-testid="toggle-waterfall-visualizer"
+                        >
+                            <span>{isOpen ? 'Zwiń Kaskadę' : 'Rozwiń Kaskadę'}</span>
+                            {isOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                        </Button>
+                    </Tooltip>
                 </div>
             </div>
 
@@ -249,6 +272,12 @@ export function ExitWaterfallVisualizer({ project: propProject, defaultOpen = tr
                                 <label className="text-xs font-bold text-zinc-300 flex items-center gap-1.5 uppercase">
                                     <Calendar className="w-3.5 h-3.5 text-purple-400" />
                                     <span>Rok Wyjścia:</span>
+                                    <InfoTooltip
+                                        title="Rok Wyjścia z Inwestycji"
+                                        content="Moment zakończenia inwestycji kapitałowej i wypłaty wpływów transakcyjnych ze sprzedaży przedsiębiorstwa."
+                                        ariaLabel="Objaśnienie roku wyjścia"
+                                        size={12}
+                                    />
                                 </label>
                                 <span className="text-xs font-bold text-purple-400" data-testid="waterfall-exit-year-display">
                                     Rok {exitYear}
@@ -267,18 +296,19 @@ export function ExitWaterfallVisualizer({ project: propProject, defaultOpen = tr
                             />
                             <div className="flex items-center gap-1 flex-wrap pt-0.5">
                                 {WATERFALL_EXIT_PRESETS.filter(p => p.year <= horizonYears).map((preset) => (
-                                    <button
-                                        key={preset.year}
-                                        type="button"
-                                        onClick={() => setExitYear(preset.year)}
-                                        className={`px-1.5 py-0.5 text-[9px] rounded border transition-all cursor-pointer ${
-                                            exitYear === preset.year
-                                                ? 'bg-purple-950/70 border-purple-500 text-purple-300 font-bold'
-                                                : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-zinc-200'
-                                        }`}
-                                    >
-                                        Y{preset.year}
-                                    </button>
+                                    <Tooltip key={preset.year} content={`Ustaw horyzont wyjścia na: ${preset.label}`}>
+                                        <button
+                                            type="button"
+                                            onClick={() => setExitYear(preset.year)}
+                                            className={`px-1.5 py-0.5 text-[9px] rounded border transition-all cursor-pointer ${
+                                                exitYear === preset.year
+                                                    ? 'bg-purple-950/70 border-purple-500 text-purple-300 font-bold'
+                                                    : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-zinc-200'
+                                            }`}
+                                        >
+                                            Y{preset.year}
+                                        </button>
+                                    </Tooltip>
                                 ))}
                             </div>
                         </div>
@@ -289,6 +319,12 @@ export function ExitWaterfallVisualizer({ project: propProject, defaultOpen = tr
                                 <label className="text-xs font-bold text-zinc-300 flex items-center gap-1.5 uppercase">
                                     <Sliders className="w-3.5 h-3.5 text-cyan-400" />
                                     <span>Mnożnik EV:</span>
+                                    <InfoTooltip
+                                        title="Mnożnik Transakcyjny EV/EBITDA"
+                                        content="Mnożnik wyceny całego przedsiębiorstwa stosowany przy kalkulacji ceny sprzedaży."
+                                        ariaLabel="Objaśnienie mnożnika EV"
+                                        size={12}
+                                    />
                                 </label>
                                 <span className="text-xs font-bold text-cyan-400" data-testid="waterfall-multiple-display">
                                     {exitMultiple.toFixed(1)}x
@@ -318,18 +354,26 @@ export function ExitWaterfallVisualizer({ project: propProject, defaultOpen = tr
                                 <label className="text-xs font-bold text-zinc-300 flex items-center gap-1.5 uppercase">
                                     <Divide className="w-3.5 h-3.5 text-emerald-400" />
                                     <span>Struktura Podziału:</span>
+                                    <InfoTooltip
+                                        title="Struktura Kaskady (Waterfall)"
+                                        content="Model podziału zysków: Pari Passu (proporcjonalnie do udziałów kapitałowych) lub Two-Tier Hurdle (z premią carried interest dla Sponsora po przekroczeniu stopy progowej hurdle rate)."
+                                        ariaLabel="Objaśnienie struktury kaskady"
+                                        size={12}
+                                    />
                                 </label>
                             </div>
-                            <select
-                                value={structure}
-                                onChange={(e) => setStructure(e.target.value)}
-                                aria-label="Wybierz strukturę kaskady"
-                                data-testid="waterfall-structure-select"
-                                className="w-full bg-zinc-900 border border-zinc-700 text-zinc-100 text-xs rounded p-1.5 focus:outline-none cursor-pointer"
-                            >
-                                <option value="pari_passu">Pari Passu (Pro-Rata)</option>
-                                <option value="two_tier_hurdle">Two-Tier Hurdle (Carry)</option>
-                            </select>
+                            <Tooltip content="Wybierz formułę podziału wpływów transakcyjnych (Pari Passu lub Two-Tier Hurdle)">
+                                <select
+                                    value={structure}
+                                    onChange={(e) => setStructure(e.target.value)}
+                                    aria-label="Wybierz strukturę kaskady"
+                                    data-testid="waterfall-structure-select"
+                                    className="w-full bg-zinc-900 border border-zinc-700 text-zinc-100 text-xs rounded p-1.5 focus:outline-none cursor-pointer"
+                                >
+                                    <option value="pari_passu">Pari Passu (Pro-Rata)</option>
+                                    <option value="two_tier_hurdle">Two-Tier Hurdle (Carry)</option>
+                                </select>
+                            </Tooltip>
                             {structure === 'two_tier_hurdle' ? (
                                 <div className="flex items-center justify-between text-[10px] text-zinc-400 pt-0.5">
                                     <span>Hurdle: {hurdleRate.toFixed(1)}%</span>
@@ -348,6 +392,12 @@ export function ExitWaterfallVisualizer({ project: propProject, defaultOpen = tr
                                 <label className="text-xs font-bold text-zinc-300 flex items-center gap-1.5 uppercase">
                                     <Users className="w-3.5 h-3.5 text-amber-400" />
                                     <span>Udział Sponsora / LP:</span>
+                                    <InfoTooltip
+                                        title="Podział Kapitałowy Sponsora i Partnera"
+                                        content="Początkowy udział kapitałowy Sponsora (GP) oraz Partnera Finansowego (LP) we wkładzie własnym."
+                                        ariaLabel="Objaśnienie udziałów kapitałowych"
+                                        size={12}
+                                    />
                                 </label>
                                 <span className="text-xs font-bold text-amber-400" data-testid="waterfall-share-display">
                                     {sponsorShare}% / {100 - sponsorShare}%
@@ -372,40 +422,46 @@ export function ExitWaterfallVisualizer({ project: propProject, defaultOpen = tr
                     </div>
 
                     {/* Sub-tab Navigation */}
-                    <div className="border-b border-zinc-800 flex items-center gap-2">
-                        <button
-                            type="button"
-                            onClick={() => setActiveTab('visualizer')}
-                            className={`px-3.5 py-2 text-xs font-semibold uppercase tracking-wider border-b-2 transition-all cursor-pointer ${
-                                activeTab === 'visualizer'
-                                    ? 'border-purple-400 text-zinc-100 bg-zinc-900/60'
-                                    : 'border-transparent text-zinc-400 hover:text-zinc-200'
-                            }`}
-                        >
-                            1. Wykres Kaskady (Waterfall Bridge)
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setActiveTab('comparison')}
-                            className={`px-3.5 py-2 text-xs font-semibold uppercase tracking-wider border-b-2 transition-all cursor-pointer ${
-                                activeTab === 'comparison'
-                                    ? 'border-purple-400 text-zinc-100 bg-zinc-900/60'
-                                    : 'border-transparent text-zinc-400 hover:text-zinc-200'
-                            }`}
-                        >
-                            2. Zwroty Inwestorów (Sponsor vs LP)
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setActiveTab('schedule')}
-                            className={`px-3.5 py-2 text-xs font-semibold uppercase tracking-wider border-b-2 transition-all cursor-pointer ${
-                                activeTab === 'schedule'
-                                    ? 'border-purple-400 text-zinc-100 bg-zinc-900/60'
-                                    : 'border-transparent text-zinc-400 hover:text-zinc-200'
-                            }`}
-                        >
-                            3. Harmonogram Wypłat Kaskadowych
-                        </button>
+                    <div className="border-b border-zinc-800 flex items-center gap-2 flex-wrap">
+                        <Tooltip content="Wykres mostu kaskadowego od Enterprise Value przez spłatę długu do wypłat inwestorów">
+                            <button
+                                type="button"
+                                onClick={() => setActiveTab('visualizer')}
+                                className={`px-3.5 py-2 text-xs font-semibold uppercase tracking-wider border-b-2 transition-all cursor-pointer ${
+                                    activeTab === 'visualizer'
+                                        ? 'border-purple-400 text-zinc-100 bg-zinc-900/60'
+                                        : 'border-transparent text-zinc-400 hover:text-zinc-200'
+                                }`}
+                            >
+                                1. Wykres Kaskady (Waterfall Bridge)
+                            </button>
+                        </Tooltip>
+                        <Tooltip content="Porównanie stóp zwrotu MoIC i IRR oraz zysków netto Sponsora i Partnera LP">
+                            <button
+                                type="button"
+                                onClick={() => setActiveTab('comparison')}
+                                className={`px-3.5 py-2 text-xs font-semibold uppercase tracking-wider border-b-2 transition-all cursor-pointer ${
+                                    activeTab === 'comparison'
+                                        ? 'border-purple-400 text-zinc-100 bg-zinc-900/60'
+                                        : 'border-transparent text-zinc-400 hover:text-zinc-200'
+                                }`}
+                            >
+                                2. Zwroty Inwestorów (Sponsor vs LP)
+                            </button>
+                        </Tooltip>
+                        <Tooltip content="Szczegółowy harmonogram wypłat dywidend operacyjnych i wpływów ze sprzedaży w kolejnych latach">
+                            <button
+                                type="button"
+                                onClick={() => setActiveTab('schedule')}
+                                className={`px-3.5 py-2 text-xs font-semibold uppercase tracking-wider border-b-2 transition-all cursor-pointer ${
+                                    activeTab === 'schedule'
+                                        ? 'border-purple-400 text-zinc-100 bg-zinc-900/60'
+                                        : 'border-transparent text-zinc-400 hover:text-zinc-200'
+                                }`}
+                            >
+                                3. Harmonogram Wypłat Kaskadowych
+                            </button>
+                        </Tooltip>
                     </div>
 
                     {/* Tab 1: Kaskada Wizualna (Waterfall Bridge) */}
@@ -413,7 +469,7 @@ export function ExitWaterfallVisualizer({ project: propProject, defaultOpen = tr
                         <div className="space-y-4">
                             {/* Summary strip */}
                             <div className="p-4 bg-zinc-950 border border-zinc-800 rounded-lg">
-                                <h3 className="text-xs font-bold text-zinc-200 uppercase mb-4 flex items-center justify-between">
+                                <h3 className="text-xs font-bold text-zinc-200 uppercase mb-4 flex items-center justify-between flex-wrap gap-2">
                                     <span className="flex items-center gap-2">
                                         <Layers className="w-4 h-4 text-purple-400" />
                                         <span>Kaskada Przejścia: Wycena EV &rarr; Spłata Długu Netto &rarr; Wpływy dla Inwestorów</span>
@@ -460,30 +516,32 @@ export function ExitWaterfallVisualizer({ project: propProject, defaultOpen = tr
                                         }
 
                                         return (
-                                            <div key={step.id} className="space-y-1">
-                                                <div className="flex items-center justify-between text-xs">
-                                                    <span className="font-semibold text-zinc-300 flex items-center gap-1.5">
-                                                        <span className={`text-[11px] font-bold ${textColorClass}`}>{signPrefix}</span>
-                                                        <span>{step.label}</span>
-                                                    </span>
-                                                    <div className="flex items-center gap-3">
-                                                        <span className={`font-bold ${textColorClass}`}>
-                                                            {formatValue(step.amount)}
+                                            <Tooltip key={step.id} content={`${step.label}: ${formatValue(step.amount)} (Saldo po operacji: ${formatValue(step.runningBalance)})`}>
+                                                <div className="space-y-1 cursor-help">
+                                                    <div className="flex items-center justify-between text-xs">
+                                                        <span className="font-semibold text-zinc-300 flex items-center gap-1.5">
+                                                            <span className={`text-[11px] font-bold ${textColorClass}`}>{signPrefix}</span>
+                                                            <span>{step.label}</span>
                                                         </span>
-                                                        <span className="text-[10px] text-zinc-500">
-                                                            (Saldo: {formatValue(step.runningBalance)})
-                                                        </span>
+                                                        <div className="flex items-center gap-3">
+                                                            <span className={`font-bold ${textColorClass}`}>
+                                                                {formatValue(step.amount)}
+                                                            </span>
+                                                            <span className="text-[10px] text-zinc-500">
+                                                                (Saldo: {formatValue(step.runningBalance)})
+                                                            </span>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Bar */}
+                                                    <div className="h-3 w-full bg-zinc-900 rounded overflow-hidden">
+                                                        <div
+                                                            className={`h-full rounded transition-all duration-300 ${barColorClass}`}
+                                                            style={{ width: `${widthPercent}%` }}
+                                                        />
                                                     </div>
                                                 </div>
-
-                                                {/* Bar */}
-                                                <div className="h-3 w-full bg-zinc-900 rounded overflow-hidden">
-                                                    <div
-                                                        className={`h-full rounded transition-all duration-300 ${barColorClass}`}
-                                                        style={{ width: `${widthPercent}%` }}
-                                                    />
-                                                </div>
-                                            </div>
+                                            </Tooltip>
                                         );
                                     })}
                                 </div>
@@ -508,46 +566,58 @@ export function ExitWaterfallVisualizer({ project: propProject, defaultOpen = tr
                                     </div>
 
                                     <div className="grid grid-cols-2 gap-2 text-xs">
-                                        <div className="p-2.5 bg-zinc-900/60 rounded border border-zinc-800/80">
-                                            <span className="text-[10px] text-zinc-400 uppercase">Wkład Własny (Equity)</span>
-                                            <div className="text-sm font-bold text-zinc-100 mt-0.5">
-                                                {formatValue(waterfallResult.investor1.initialEquity)}
+                                        <Tooltip content="Wartość początkowego wkładu kapitałowego wniesionego przez Sponsora">
+                                            <div className="p-2.5 bg-zinc-900/60 rounded border border-zinc-800/80 cursor-help">
+                                                <span className="text-[10px] text-zinc-400 uppercase">Wkład Własny (Equity)</span>
+                                                <div className="text-sm font-bold text-zinc-100 mt-0.5">
+                                                    {formatValue(waterfallResult.investor1.initialEquity)}
+                                                </div>
                                             </div>
-                                        </div>
+                                        </Tooltip>
 
-                                        <div className="p-2.5 bg-zinc-900/60 rounded border border-zinc-800/80">
-                                            <span className="text-[10px] text-zinc-400 uppercase">Wpływy ze Sprzedaży (Exit)</span>
-                                            <div className="text-sm font-bold text-emerald-400 mt-0.5" data-testid="sponsor-exit-proceeds">
-                                                {formatValue(waterfallResult.investor1.exitProceeds)}
+                                        <Tooltip content="Wpływy ze sprzedaży przedsiębiorstwa w roku wyjścia przypadające Sponsorowi">
+                                            <div className="p-2.5 bg-zinc-900/60 rounded border border-zinc-800/80 cursor-help">
+                                                <span className="text-[10px] text-zinc-400 uppercase">Wpływy ze Sprzedaży (Exit)</span>
+                                                <div className="text-sm font-bold text-emerald-400 mt-0.5" data-testid="sponsor-exit-proceeds">
+                                                    {formatValue(waterfallResult.investor1.exitProceeds)}
+                                                </div>
                                             </div>
-                                        </div>
+                                        </Tooltip>
 
-                                        <div className="p-2.5 bg-zinc-900/60 rounded border border-zinc-800/80">
-                                            <span className="text-[10px] text-zinc-400 uppercase">Wypłaty Operacyjne (Pre-Exit)</span>
-                                            <div className="text-sm font-bold text-zinc-300 mt-0.5">
-                                                {formatValue(waterfallResult.investor1.preExitDistributions)}
+                                        <Tooltip content="Skumulowane dywidendy i wypłaty operacyjne otrzymane przed momentem sprzedaży">
+                                            <div className="p-2.5 bg-zinc-900/60 rounded border border-zinc-800/80 cursor-help">
+                                                <span className="text-[10px] text-zinc-400 uppercase">Wypłaty Operacyjne (Pre-Exit)</span>
+                                                <div className="text-sm font-bold text-zinc-300 mt-0.5">
+                                                    {formatValue(waterfallResult.investor1.preExitDistributions)}
+                                                </div>
                                             </div>
-                                        </div>
+                                        </Tooltip>
 
-                                        <div className="p-2.5 bg-zinc-900/60 rounded border border-zinc-800/80">
-                                            <span className="text-[10px] text-zinc-400 uppercase">Łączne Wpływy (Total)</span>
-                                            <div className="text-sm font-bold text-zinc-100 mt-0.5">
-                                                {formatValue(waterfallResult.investor1.totalProceeds)}
+                                        <Tooltip content="Całkowita suma przepływów pieniężnych uzyskanych przez Sponsora z inwestycji">
+                                            <div className="p-2.5 bg-zinc-900/60 rounded border border-zinc-800/80 cursor-help">
+                                                <span className="text-[10px] text-zinc-400 uppercase">Łączne Wpływy (Total)</span>
+                                                <div className="text-sm font-bold text-zinc-100 mt-0.5">
+                                                    {formatValue(waterfallResult.investor1.totalProceeds)}
+                                                </div>
                                             </div>
-                                        </div>
+                                        </Tooltip>
                                     </div>
 
                                     <div className="p-3 bg-emerald-950/30 border border-emerald-500/30 rounded-lg flex items-center justify-between text-xs">
                                         <div>
                                             <span className="text-[10px] text-zinc-400 uppercase">Wskaźniki Zwrotu Sponsora</span>
                                             <div className="flex items-center gap-2 mt-0.5">
-                                                <span className="text-base font-bold text-emerald-400" data-testid="sponsor-moic">
-                                                    {waterfallResult.investor1.moic.toFixed(2)}x MoIC
-                                                </span>
+                                                <Tooltip content="Mnożnik zwrotu z wkładu własnego (Total Proceeds / Initial Equity)">
+                                                    <span className="text-base font-bold text-emerald-400 cursor-help" data-testid="sponsor-moic">
+                                                        {waterfallResult.investor1.moic.toFixed(2)}x MoIC
+                                                    </span>
+                                                </Tooltip>
                                                 <span className="text-zinc-600">//</span>
-                                                <span className="text-sm font-bold text-cyan-400" data-testid="sponsor-irr">
-                                                    {waterfallResult.investor1.irrPercent !== null ? `${waterfallResult.investor1.irrPercent.toFixed(1)}% IRR` : '—'}
-                                                </span>
+                                                <Tooltip content="Roczna stopa zwrotu (Internal Rate of Return) z uwzględnieniem harmonogramu przepływów">
+                                                    <span className="text-sm font-bold text-cyan-400 cursor-help" data-testid="sponsor-irr">
+                                                        {waterfallResult.investor1.irrPercent !== null ? `${waterfallResult.investor1.irrPercent.toFixed(1)}% IRR` : '—'}
+                                                    </span>
+                                                </Tooltip>
                                             </div>
                                         </div>
                                         <div className="text-right">
@@ -572,46 +642,58 @@ export function ExitWaterfallVisualizer({ project: propProject, defaultOpen = tr
                                     </div>
 
                                     <div className="grid grid-cols-2 gap-2 text-xs">
-                                        <div className="p-2.5 bg-zinc-900/60 rounded border border-zinc-800/80">
-                                            <span className="text-[10px] text-zinc-400 uppercase">Wkład Własny (Equity)</span>
-                                            <div className="text-sm font-bold text-zinc-100 mt-0.5">
-                                                {formatValue(waterfallResult.investor2.initialEquity)}
+                                        <Tooltip content="Wartość początkowego wkładu kapitałowego wniesionego przez Partnera Finansowego (LP)">
+                                            <div className="p-2.5 bg-zinc-900/60 rounded border border-zinc-800/80 cursor-help">
+                                                <span className="text-[10px] text-zinc-400 uppercase">Wkład Własny (Equity)</span>
+                                                <div className="text-sm font-bold text-zinc-100 mt-0.5">
+                                                    {formatValue(waterfallResult.investor2.initialEquity)}
+                                                </div>
                                             </div>
-                                        </div>
+                                        </Tooltip>
 
-                                        <div className="p-2.5 bg-zinc-900/60 rounded border border-zinc-800/80">
-                                            <span className="text-[10px] text-zinc-400 uppercase">Wpływy ze Sprzedaży (Exit)</span>
-                                            <div className="text-sm font-bold text-purple-400" data-testid="partner-exit-proceeds">
-                                                {formatValue(waterfallResult.investor2.exitProceeds)}
+                                        <Tooltip content="Wpływy ze sprzedaży przedsiębiorstwa w roku wyjścia przypadające Partnerowi Finansowemu">
+                                            <div className="p-2.5 bg-zinc-900/60 rounded border border-zinc-800/80 cursor-help">
+                                                <span className="text-[10px] text-zinc-400 uppercase">Wpływy ze Sprzedaży (Exit)</span>
+                                                <div className="text-sm font-bold text-purple-400 mt-0.5" data-testid="partner-exit-proceeds">
+                                                    {formatValue(waterfallResult.investor2.exitProceeds)}
+                                                </div>
                                             </div>
-                                        </div>
+                                        </Tooltip>
 
-                                        <div className="p-2.5 bg-zinc-900/60 rounded border border-zinc-800/80">
-                                            <span className="text-[10px] text-zinc-400 uppercase">Wypłaty Operacyjne (Pre-Exit)</span>
-                                            <div className="text-sm font-bold text-zinc-300 mt-0.5">
-                                                {formatValue(waterfallResult.investor2.preExitDistributions)}
+                                        <Tooltip content="Skumulowane dywidendy i wypłaty operacyjne otrzymane przez Partnera Finansowego">
+                                            <div className="p-2.5 bg-zinc-900/60 rounded border border-zinc-800/80 cursor-help">
+                                                <span className="text-[10px] text-zinc-400 uppercase">Wypłaty Operacyjne (Pre-Exit)</span>
+                                                <div className="text-sm font-bold text-zinc-300 mt-0.5">
+                                                    {formatValue(waterfallResult.investor2.preExitDistributions)}
+                                                </div>
                                             </div>
-                                        </div>
+                                        </Tooltip>
 
-                                        <div className="p-2.5 bg-zinc-900/60 rounded border border-zinc-800/80">
-                                            <span className="text-[10px] text-zinc-400 uppercase">Łączne Wpływy (Total)</span>
-                                            <div className="text-sm font-bold text-zinc-100 mt-0.5">
-                                                {formatValue(waterfallResult.investor2.totalProceeds)}
+                                        <Tooltip content="Całkowita suma przepływów pieniężnych uzyskanych przez Partnera Finansowego z inwestycji">
+                                            <div className="p-2.5 bg-zinc-900/60 rounded border border-zinc-800/80 cursor-help">
+                                                <span className="text-[10px] text-zinc-400 uppercase">Łączne Wpływy (Total)</span>
+                                                <div className="text-sm font-bold text-zinc-100 mt-0.5">
+                                                    {formatValue(waterfallResult.investor2.totalProceeds)}
+                                                </div>
                                             </div>
-                                        </div>
+                                        </Tooltip>
                                     </div>
 
                                     <div className="p-3 bg-purple-950/30 border border-purple-500/30 rounded-lg flex items-center justify-between text-xs">
                                         <div>
                                             <span className="text-[10px] text-zinc-400 uppercase">Wskaźniki Zwrotu Partnera</span>
                                             <div className="flex items-center gap-2 mt-0.5">
-                                                <span className="text-base font-bold text-purple-400" data-testid="partner-moic">
-                                                    {waterfallResult.investor2.moic.toFixed(2)}x MoIC
-                                                </span>
+                                                <Tooltip content="Mnożnik zwrotu z wkładu kapitałowego Partnera Finansowego LP">
+                                                    <span className="text-base font-bold text-purple-400 cursor-help" data-testid="partner-moic">
+                                                        {waterfallResult.investor2.moic.toFixed(2)}x MoIC
+                                                    </span>
+                                                </Tooltip>
                                                 <span className="text-zinc-600">//</span>
-                                                <span className="text-sm font-bold text-cyan-400" data-testid="partner-irr">
-                                                    {waterfallResult.investor2.irrPercent !== null ? `${waterfallResult.investor2.irrPercent.toFixed(1)}% IRR` : '—'}
-                                                </span>
+                                                <Tooltip content="Roczna stopa zwrotu (IRR) Partnera Finansowego">
+                                                    <span className="text-sm font-bold text-cyan-400 cursor-help" data-testid="partner-irr">
+                                                        {waterfallResult.investor2.irrPercent !== null ? `${waterfallResult.investor2.irrPercent.toFixed(1)}% IRR` : '—'}
+                                                    </span>
+                                                </Tooltip>
                                             </div>
                                         </div>
                                         <div className="text-right">
@@ -638,11 +720,31 @@ export function ExitWaterfallVisualizer({ project: propProject, defaultOpen = tr
                                 <table className="w-full text-xs text-left border-collapse" data-testid="waterfall-schedule-table">
                                     <thead>
                                         <tr className="border-b border-zinc-800 text-[11px] text-zinc-400 bg-zinc-900/80">
-                                            <th className="p-2.5 font-bold uppercase">Okres</th>
-                                            <th className="p-2.5 text-right font-bold uppercase">Sponsor (Inv 1)</th>
-                                            <th className="p-2.5 text-right font-bold uppercase">Partner (Inv 2)</th>
-                                            <th className="p-2.5 text-right font-bold uppercase">Łącznie Dystrybucja</th>
-                                            <th className="p-2.5 text-center font-bold uppercase">Typ Przepływu</th>
+                                            <th className="p-2.5 font-bold uppercase">
+                                                <Tooltip content="Kolejny rok inwestycji lub moment wkładu początkowego">
+                                                    <span className="cursor-help">Okres</span>
+                                                </Tooltip>
+                                            </th>
+                                            <th className="p-2.5 text-right font-bold uppercase">
+                                                <Tooltip content="Przepływy pieniężne przypadające Sponsorowi (GP)">
+                                                    <span className="cursor-help">Sponsor (Inv 1)</span>
+                                                </Tooltip>
+                                            </th>
+                                            <th className="p-2.5 text-right font-bold uppercase">
+                                                <Tooltip content="Przepływy pieniężne przypadające Partnerowi Finansowemu (LP)">
+                                                    <span className="cursor-help">Partner (Inv 2)</span>
+                                                </Tooltip>
+                                            </th>
+                                            <th className="p-2.5 text-right font-bold uppercase">
+                                                <Tooltip content="Łączna roczna suma dystrybucji do wszystkich wspólników">
+                                                    <span className="cursor-help">Łącznie Dystrybucja</span>
+                                                </Tooltip>
+                                            </th>
+                                            <th className="p-2.5 text-center font-bold uppercase">
+                                                <Tooltip content="Charakter przepływu: wkład kapitałowy, dywidenda bieżąca lub dezinwestycja">
+                                                    <span className="cursor-help">Typ Przepływu</span>
+                                                </Tooltip>
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-zinc-800/60">
