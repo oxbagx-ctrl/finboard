@@ -1,9 +1,17 @@
 import React, { useState } from 'react';
+import { Outlet } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import { DealContextBar } from './DealContextBar';
 
-export const AppLayout = ({ currentRoute, onRouteChange, onRefreshData, refreshing, children }) => {
+export const AppLayout = ({
+    currentRoute,
+    onRouteChange,
+    onRefreshData,
+    refreshing = false,
+    refreshKey = 0,
+    children,
+}) => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     return (
@@ -29,9 +37,10 @@ export const AppLayout = ({ currentRoute, onRouteChange, onRefreshData, refreshi
                 <DealContextBar />
 
                 <main className="flex-1 p-4 sm:p-6 max-w-7xl w-full mx-auto space-y-6 print:p-0 print:max-w-full print:space-y-0">
-                    {children}
+                    {children ? children : <Outlet context={{ onRefreshData, refreshing, refreshKey }} />}
                 </main>
             </div>
         </div>
     );
 };
+

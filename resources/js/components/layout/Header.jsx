@@ -1,17 +1,26 @@
 import React, { useState } from 'react';
 import { Menu, Building2, RefreshCw, Lock, ChevronDown, User } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { Badge } from '../ui/Badge';
 import { Tooltip } from '../ui/Tooltip';
 import { UserProfileModal } from '../auth/UserProfileModal';
 import { CompanySwitcherModal } from './CompanySwitcherModal';
+import { ROUTES, ROUTE_TITLES } from '../../constants/routes';
 
 export const Header = ({ currentRoute, onToggleSidebar, onRefreshData, refreshing = false }) => {
     const { user, activeCompany, isAdmin } = useAuth();
     const [profileModalOpen, setProfileModalOpen] = useState(false);
     const [switcherModalOpen, setSwitcherModalOpen] = useState(false);
 
-    const titles = {
+    let location = null;
+    try {
+        location = useLocation();
+    } catch {
+        location = null;
+    }
+
+    const legacyTitles = {
         'dashboard': 'Pulpit Zarządczy (Executive Overview)',
         'analytics': 'Analityka P&L, Marże i Wskaźniki Płynności',
         'records': 'Księga Transakcji Finansowych',
@@ -20,6 +29,29 @@ export const Header = ({ currentRoute, onToggleSidebar, onRefreshData, refreshin
         'data-room': 'Virtual Data Room (VDR) – Dokumentacja Transakcyjna',
         'reports': 'Raporty Zarządcze & Generator PDF',
         'audit-logs': 'Rejestr Nadzoru i Ścieżka Audytowa',
+        'advisors': 'Doradcy & Przypisania / Uprawnienia',
+    };
+
+    const resolveTitle = () => {
+        // 1. Direct path lookup from ROUTE_TITLES (e.g. '/dashboard', '/records', '/advisors')
+        if (location?.pathname && ROUTE_TITLES[location.pathname]) {
+            return ROUTE_TITLES[location.pathname];
+        }
+        // 2. Base root path '/'
+        if (location?.pathname === '/' || location?.pathname === '') {
+            return ROUTE_TITLES[ROUTES.DASHBOARD] || legacyTitles.dashboard;
+        }
+        // 3. Fallback to currentRoute prop if supplied
+        if (currentRoute) {
+            const matchedByRoute = ROUTE_TITLES[`/${currentRoute}`] || legacyTitles[currentRoute];
+            if (matchedByRoute) return matchedByRoute;
+        }
+        // 4. Fallback matching without leading slash
+        const pathKey = location?.pathname?.replace(/^\//, '');
+        if (pathKey && legacyTitles[pathKey]) {
+            return legacyTitles[pathKey];
+        }
+        return 'FinBoard';
     };
 
     return (
@@ -34,7 +66,7 @@ export const Header = ({ currentRoute, onToggleSidebar, onRefreshData, refreshin
                     </button>
                     <div className="flex items-center gap-3">
                         <h1 className="text-xs sm:text-sm font-semibold text-zinc-100 uppercase tracking-wide">
-                            {titles[currentRoute] || 'FinBoard'}
+                            {resolveTitle()}
                         </h1>
                     </div>
                 </div>

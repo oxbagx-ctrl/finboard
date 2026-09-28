@@ -206,6 +206,7 @@ describe('AuditLogsView Tooltips & Ergonomics Suite', () => {
 
         await waitFor(() => {
             expect(screen.getByTestId('audit-stat-total')).toBeInTheDocument();
+            expect(screen.getByText('3 MASOWE')).toBeInTheDocument();
         });
 
         // 1. Total events info tooltip

@@ -21,14 +21,14 @@ import { AdvisorsManagementView } from './views/AdvisorsManagementView';
 
 /**
  * ProtectedLayout Shell
- * Connects router location with legacy AppLayout navigation props during the transition phase.
+ * Hosts AppLayout outlet architecture and propagates refresh triggers to nested views.
  */
 const ProtectedLayout = () => {
     const [refreshKey, setRefreshKey] = useState(0);
     const location = useLocation();
     const navigate = useNavigate();
 
-    // Map current pathname to route identifier for Header and Sidebar
+    // Current route identifier for legacy Sidebar navigation until Commit 290
     const currentRoute = location.pathname === '/' || location.pathname === ROUTES.DASHBOARD
         ? 'dashboard'
         : location.pathname.replace(/^\//, '');
@@ -42,10 +42,9 @@ const ProtectedLayout = () => {
         <AppLayout
             currentRoute={currentRoute}
             onRouteChange={handleRouteChange}
+            refreshKey={refreshKey}
             onRefreshData={() => setRefreshKey((prev) => prev + 1)}
-        >
-            <Outlet context={{ refreshKey, onRefreshData: () => setRefreshKey((prev) => prev + 1) }} />
-        </AppLayout>
+        />
     );
 };
 

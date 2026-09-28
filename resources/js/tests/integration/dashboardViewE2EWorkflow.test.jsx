@@ -440,6 +440,7 @@ describe('E2E DashboardView Integration: Analytics, FX, P&L Hierarchy & Reactive
 
         await waitFor(() => {
             expect(screen.getByText("Rachunek Zysków i Strat (P&L Konsolidowany)")).toBeInTheDocument();
+            expect(screen.getByText("Licencje Enterprise SaaS")).toBeInTheDocument();
         });
 
         const pnlTable = screen.getByText("Rachunek Zysków i Strat (P&L Konsolidowany)").closest("div.bg-zinc-900");

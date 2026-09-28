@@ -1001,7 +1001,11 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Weryfikacja testowa: 100% PASS w pełnym zestawie 69 plików Vitest (627 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
 - [ ] **Faza 58: Integracja Układu Aplikacji i Semantycznej Nawigacji (Commity 289–291)**
-  - [ ] Przekształcenie AppLayout w układ oparty na gnieździe Outlet z dynamiczną rezolucją nagłówka.
+  - [x] Przekształcenie AppLayout w układ oparty na gnieździe Outlet z dynamiczną rezolucją nagłówka.
+    - `AppLayout.jsx`: wdrożenie komponentu `<Outlet context={{ onRefreshData, refreshing, refreshKey }} />` wewnątrz kontenera `<main>` z zachowaniem wsparcia dla propa `children` dla pełnej kompatybilności wstecznej.
+    - `Header.jsx`: wdrożenie bezpiecznej rezolucji `useLocation()`, integracja stałych `ROUTE_TITLES` oraz hierarchicznego fallbacku tytułu ekranu (ścieżka URL -> strona główna -> parametry wsteczne -> domyślna nazwa 'FinBoard').
+    - `App.jsx`: uproszczenie powłoki `ProtectedLayout` do natywnego użycia samonawigującego `<AppLayout />` i propagacji kontekstu odświeżania do `RouteView`.
+    - Weryfikacja testowa: 100% PASS w pełnym zestawie 69 plików Vitest (627 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
   - [ ] Migracja nawigacji w Sidebarze na komponenty NavLink z dynamicznymi stanami aktywności.
   - [ ] Eliminacja przestarzałej nawigacji hash i dedykowany widok błędu 404 Not Found.
 
