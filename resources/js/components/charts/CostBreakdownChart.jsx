@@ -10,6 +10,7 @@ import { CustomChartTooltip } from "./CustomChartTooltip";
 import { Tooltip as UiTooltip } from "../ui/Tooltip";
 import { PercentageBadge } from "../ui/PercentageBadge";
 import { formatCurrency, formatDelta } from "../../utils/formatters";
+import { useTheme } from "../../context/ThemeContext";
 
 const EXTENDED_PALETTE = [
     "#38bdf8", // sky-400
@@ -33,9 +34,12 @@ export const CostBreakdownChart = ({
     className = "",
     reverseChange = true,
 }) => {
+    const { isDark } = useTheme();
+    const pieStroke = isDark ? '#09090b' : '#ffffff';
+
     if (!data || data.length === 0) {
         return (
-            <div className="h-72 flex items-center justify-center text-xs font-mono text-zinc-500">
+            <div className="h-72 flex items-center justify-center text-xs font-mono text-zinc-400 dark:text-zinc-500">
                 Brak danych struktury kosztów operacyjnych (OPEX) dla wybranego okresu.
             </div>
         );
@@ -87,7 +91,7 @@ export const CostBreakdownChart = ({
                             outerRadius={76}
                             paddingAngle={2}
                             dataKey="value"
-                            stroke="#09090b"
+                            stroke={pieStroke}
                             strokeWidth={2}
                         >
                             {sortedData.map((entry, index) => (
@@ -102,10 +106,10 @@ export const CostBreakdownChart = ({
 
                 {/* Center Value Badge */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                    <span className="text-[9px] font-mono uppercase text-zinc-500 tracking-wider">
+                    <span className="text-[9px] font-mono uppercase text-zinc-500 dark:text-zinc-400 tracking-wider">
                         {title}
                     </span>
-                    <span className="text-xs font-bold font-mono text-zinc-100 tabular-nums mt-0.5">
+                    <span className="text-xs font-bold font-mono text-zinc-900 dark:text-zinc-100 tabular-nums mt-0.5">
                         {formatCurrency(total, currency)}
                     </span>
                 </div>
@@ -116,7 +120,7 @@ export const CostBreakdownChart = ({
                 {sortedData.map((item, idx) => (
                     <div
                         key={item.category_id || idx}
-                        className="flex items-center justify-between p-1 rounded hover:bg-zinc-850/50 transition-colors gap-2"
+                        className="flex items-center justify-between p-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-850/50 transition-colors gap-2"
                     >
                         <div className="flex items-center gap-2 truncate pr-1">
                             <span
@@ -124,21 +128,21 @@ export const CostBreakdownChart = ({
                                 style={{ backgroundColor: item.color }}
                             />
                             <UiTooltip content={`${item.name}${item.category_code ? ` [${item.category_code}]` : ''}`} delay={{ open: 200, close: 100 }}>
-                                <span className="text-zinc-300 truncate cursor-default">
+                                <span className="text-zinc-700 dark:text-zinc-300 truncate cursor-default">
                                     {item.name}
                                 </span>
                             </UiTooltip>
                             {item.category_code && (
-                                <span className="text-[9px] text-zinc-600 shrink-0">
+                                <span className="text-[9px] text-zinc-400 dark:text-zinc-600 shrink-0">
                                     [{item.category_code}]
                                 </span>
                             )}
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
-                            <span className="text-zinc-100 font-bold tabular-nums">
+                            <span className="text-zinc-900 dark:text-zinc-100 font-bold tabular-nums">
                                 {formatCurrency(item.value, currency)}
                             </span>
-                            <span className="text-zinc-500 tabular-nums w-10 text-right">
+                            <span className="text-zinc-500 dark:text-zinc-400 tabular-nums w-10 text-right">
                                 {Number(item.percentage || 0).toFixed(1)}%
                             </span>
                             <PercentageBadge

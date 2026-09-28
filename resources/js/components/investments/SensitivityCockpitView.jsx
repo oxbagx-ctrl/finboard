@@ -40,8 +40,14 @@ import { ReinvestmentManager } from './ReinvestmentManager';
 import { ScenarioPresetSelector, SCENARIO_PRESETS } from './ScenarioPresetSelector';
 import { DebtRepaymentModeSwitcher } from './DebtRepaymentModeSwitcher';
 import { InfoTooltip, Tooltip as UiTooltip } from '../ui/Tooltip';
+import { useTheme } from '../../context/ThemeContext';
 
 export const SensitivityCockpitView = () => {
+    const { isDark } = useTheme();
+    const gridStroke = isDark ? '#27272a' : '#e4e4e7';
+    const axisLineStroke = isDark ? '#3f3f46' : '#d4d4d8';
+    const chartCursorFill = isDark ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.04)';
+
     const { selectedProject } = useInvestmentProject();
 
     // What-If Sliders State (Percentage Deltas)
@@ -1039,14 +1045,14 @@ export const SensitivityCockpitView = () => {
                             data={chartData}
                             margin={{ top: 10, right: 10, left: -5, bottom: 0 }}
                         >
-                            <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
+                            <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} vertical={false} />
                             <XAxis
                                 dataKey="label"
                                 stroke="#71717a"
                                 fontSize={10}
                                 fontFamily="JetBrains Mono, monospace"
                                 tickLine={false}
-                                axisLine={{ stroke: '#3f3f46' }}
+                                axisLine={{ stroke: axisLineStroke }}
                             />
                             <YAxis
                                 stroke="#71717a"
@@ -1058,7 +1064,7 @@ export const SensitivityCockpitView = () => {
                             />
                             <Tooltip
                                 content={<CustomChartTooltip currency={selectedProject.currency || 'PLN'} />}
-                                cursor={{ fill: 'rgba(255, 255, 255, 0.04)' }}
+                                cursor={{ fill: chartCursorFill }}
                             />
                             {chartMode === 'nominal' ? (
                                 <>

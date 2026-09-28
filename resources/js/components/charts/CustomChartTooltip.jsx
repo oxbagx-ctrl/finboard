@@ -7,10 +7,10 @@ export const CustomChartTooltip = ({ active, payload, label, currency = 'PLN', i
     }
 
     return (
-        <div className="bg-zinc-950/95 border border-zinc-750 rounded p-2.5 shadow-2xl font-mono text-xs max-w-xs z-50 backdrop-blur-xs">
-            <div className="text-[10px] uppercase text-zinc-500 font-semibold border-b border-zinc-800 pb-1 mb-1.5 flex items-center justify-between">
+        <div className="bg-white/95 dark:bg-zinc-950/95 border border-zinc-200 dark:border-zinc-750 rounded p-2.5 shadow-2xl font-mono text-xs max-w-xs z-50 backdrop-blur-xs">
+            <div className="text-[10px] uppercase text-zinc-500 dark:text-zinc-400 font-semibold border-b border-zinc-200 dark:border-zinc-800 pb-1 mb-1.5 flex items-center justify-between">
                 <span>OKRES: {label}</span>
-                <span className="text-zinc-600 font-mono">AUDYT: PSR</span>
+                <span className="text-zinc-400 dark:text-zinc-600 font-mono">AUDYT: PSR</span>
             </div>
 
             <div className="space-y-1">
@@ -29,14 +29,14 @@ export const CustomChartTooltip = ({ active, payload, label, currency = 'PLN', i
 
                     return (
                         <div key={`item-${index}`} className="flex items-center justify-between gap-3 text-[11px]">
-                            <div className="flex items-center gap-1.5 text-zinc-400">
+                            <div className="flex items-center gap-1.5 text-zinc-600 dark:text-zinc-400">
                                 <span
                                     className="w-2 h-2 rounded-xs shrink-0"
                                     style={{ backgroundColor: entry.color || entry.fill }}
                                 />
                                 <span className="truncate max-w-[130px]">{entry.name}</span>
                             </div>
-                            <span className="font-bold text-zinc-100 tabular-nums">
+                            <span className="font-bold text-zinc-900 dark:text-zinc-100 tabular-nums">
                                 {formattedValue}
                             </span>
                         </div>

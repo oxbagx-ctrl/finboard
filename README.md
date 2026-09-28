@@ -1069,6 +1069,13 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
         - `resources/js/components/ui/FinancialValue.jsx`: czytelna typografia kwot walutowych (`text-zinc-900 dark:text-zinc-100`, `text-emerald-600 dark:text-emerald-400`, `text-rose-600 dark:text-rose-400`).
         - `resources/js/components/auth/UserProfileModal.jsx`: dostosowanie okna modalnego profilu, pól formularzy tożsamości i haseł oraz sekcji audytu Sanctum.
         - Weryfikacja testowa: 100% PASS w pełnym zestawie 72 plików Vitest (653 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
+    - [x] Adaptacja wykresów analitycznych Recharts i tooltipów do motywu jasnego i ciemnego.
+        - `resources/js/components/charts/CustomChartTooltip.jsx` & `ReinvestmentManager.jsx`: adaptacja kontenera tooltipa wykresu (`bg-white/95 dark:bg-zinc-950/95 border-zinc-200 dark:border-zinc-750`), etykiet serii i wartości.
+        - `resources/js/components/charts/LiquidityTrendChart.jsx`: dynamiczne tokeny siatki `CartesianGrid` (`#27272a` vs `#e4e4e7`), osi i punktów `dot` wyznaczane przez `useTheme()`; formatter etykiet legendy.
+        - `resources/js/components/charts/PnlTrendChart.jsx`: adaptacja siatki, osi, obrysów linii EBITDA i zysku netto oraz wskaźnika podświetlenia kursora (`cursorFill`).
+        - `resources/js/components/charts/CostBreakdownChart.jsx`: dynamiczny obrys wycinków `pieStroke` (`#ffffff` vs `#09090b`), plakietka sumy kosztów oraz adaptacyjna mikro-legenda z dynamiką YoY.
+        - `resources/js/components/investments/SensitivityCockpitView.jsx` & `ReinvestmentManager.jsx`: pełna spójność kolorystyczna siatek i osi wykresów symulacyjnych i odtworzeniowych CAPEX.
+        - Weryfikacja testowa: 100% PASS w pełnym zestawie 72 plików Vitest (653 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
 ---
 

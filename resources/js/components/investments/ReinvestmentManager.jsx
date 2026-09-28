@@ -38,6 +38,7 @@ import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { Card } from '../ui/Card';
 import { Tooltip as UiTooltip, InfoTooltip } from '../ui/Tooltip';
+import { useTheme } from '../../context/ThemeContext';
 import { KST_CLASSIFICATIONS, getKstByCode } from '../../constants/kstClassifications';
 
 export const DEFAULT_REINVESTMENT_PROGRAMS = [
@@ -92,10 +93,10 @@ const ReinvestmentChartTooltip = ({ active, payload, label, currency = 'PLN', fo
     const cumulative = dataPoint.cumulativeCapex || 0;
 
     return (
-        <div className="bg-zinc-950/95 border border-zinc-750 rounded p-3 shadow-2xl font-mono text-xs max-w-xs z-50 backdrop-blur-md">
-            <div className="text-[10px] uppercase text-zinc-400 font-semibold border-b border-zinc-800 pb-1.5 mb-2 flex items-center justify-between">
-                <span className="text-zinc-200">OKRES: {label} (Rok {dataPoint.yearNum})</span>
-                <span className="text-emerald-400 font-bold">
+        <div className="bg-white/95 dark:bg-zinc-950/95 border border-zinc-200 dark:border-zinc-750 rounded p-3 shadow-2xl font-mono text-xs max-w-xs z-50 backdrop-blur-md">
+            <div className="text-[10px] uppercase text-zinc-500 dark:text-zinc-400 font-semibold border-b border-zinc-200 dark:border-zinc-800 pb-1.5 mb-2 flex items-center justify-between">
+                <span className="text-zinc-800 dark:text-zinc-200">OKRES: {label} (Rok {dataPoint.yearNum})</span>
+                <span className="text-emerald-600 dark:text-emerald-400 font-bold">
                     {formatShortMoney ? formatShortMoney(yearTotal) : `${yearTotal} ${currency}`}
                 </span>
             </div>
@@ -107,12 +108,12 @@ const ReinvestmentChartTooltip = ({ active, payload, label, currency = 'PLN', fo
                         const dotClass = h.color === 'cyan' ? 'bg-cyan-400' : h.color === 'emerald' ? 'bg-emerald-400' : 'bg-purple-400';
                         return (
                             <div key={idx} className="flex items-center justify-between gap-3 text-[11px]">
-                                <div className="flex items-center gap-1.5 text-zinc-300 truncate max-w-[150px]">
+                                <div className="flex items-center gap-1.5 text-zinc-700 dark:text-zinc-300 truncate max-w-[150px]">
                                     <span className={`w-2 h-2 rounded-full shrink-0 ${dotClass}`} />
                                     <span className="truncate">{h.name}</span>
                                 </div>
                                 <div className="flex items-center gap-1.5 shrink-0">
-                                    <span className="font-bold text-zinc-100 tabular-nums">
+                                    <span className="font-bold text-zinc-900 dark:text-zinc-100 tabular-nums">
                                         {formatShortMoney ? formatShortMoney(h.amount) : `${h.amount} ${currency}`}
                                     </span>
                                     <span className="text-[9px] text-zinc-500 font-normal">({share}%)</span>
@@ -127,9 +128,9 @@ const ReinvestmentChartTooltip = ({ active, payload, label, currency = 'PLN', fo
                 </div>
             )}
 
-            <div className="border-t border-zinc-800/80 pt-1.5 flex items-center justify-between text-[10px] text-zinc-400">
+            <div className="border-t border-zinc-200 dark:border-zinc-800/80 pt-1.5 flex items-center justify-between text-[10px] text-zinc-500 dark:text-zinc-400">
                 <span>Skumulowany CAPEX:</span>
-                <span className="font-bold text-amber-400 tabular-nums">
+                <span className="font-bold text-amber-600 dark:text-amber-400 tabular-nums">
                     {formatShortMoney ? formatShortMoney(cumulative) : `${cumulative} ${currency}`}
                 </span>
             </div>
@@ -143,6 +144,10 @@ export const ReinvestmentManager = ({
     initialEnabled = true,
     compact = false
 }) => {
+    const { isDark } = useTheme();
+    const gridStroke = isDark ? '#27272a' : '#e4e4e7';
+    const axisLineStroke = isDark ? '#3f3f46' : '#d4d4d8';
+
     const { selectedProject, loadProjectDetails } = useInvestmentProject();
 
     const [programs, setPrograms] = useState(DEFAULT_REINVESTMENT_PROGRAMS);
@@ -1001,14 +1006,14 @@ export const ReinvestmentManager = ({
                                 data={chartData}
                                 margin={{ top: 15, right: 15, left: -5, bottom: 0 }}
                             >
-                                <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
+                                <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} vertical={false} />
                                 <XAxis
                                     dataKey="year"
                                     stroke="#71717a"
                                     fontSize={10}
                                     fontFamily="JetBrains Mono, monospace"
                                     tickLine={false}
-                                    axisLine={{ stroke: '#3f3f46' }}
+                                    axisLine={{ stroke: axisLineStroke }}
                                 />
                                 <YAxis
                                     stroke="#71717a"
@@ -1061,14 +1066,14 @@ export const ReinvestmentManager = ({
                                 data={chartData}
                                 margin={{ top: 15, right: 20, left: -5, bottom: 0 }}
                             >
-                                <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
+                                <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} vertical={false} />
                                 <XAxis
                                     dataKey="year"
                                     stroke="#71717a"
                                     fontSize={10}
                                     fontFamily="JetBrains Mono, monospace"
                                     tickLine={false}
-                                    axisLine={{ stroke: '#3f3f46' }}
+                                    axisLine={{ stroke: axisLineStroke }}
                                 />
                                 <YAxis
                                     yAxisId="left"
