@@ -1,7 +1,6 @@
 # Laravel & Composer
 /vendor
 composer.phar
-composer.lock
 .env
 .env.backup
 .env.*.php
