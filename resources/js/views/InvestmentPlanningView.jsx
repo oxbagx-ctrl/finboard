@@ -21,6 +21,7 @@ import { useInvestmentProject } from '../context/InvestmentProjectContext';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { Card, MetricCard } from '../components/ui/Card';
+import { Tooltip, InfoTooltip } from '../components/ui/Tooltip';
 import { CreateProjectModal } from '../components/investments/CreateProjectModal';
 import { CapexScheduleManager } from '../components/investments/CapexScheduleManager';
 import { ReinvestmentManager } from '../components/investments/ReinvestmentManager';
@@ -53,16 +54,36 @@ export const InvestmentPlanningView = () => {
     const getStatusBadge = (status) => {
         switch (status) {
             case 'approved':
-                return <Badge variant="brand">ZATWIERDZONY</Badge>;
+                return (
+                    <Tooltip content="Projekt zweryfikowany i zatwierdzony przez komitet inwestycyjny">
+                        <Badge variant="brand">ZATWIERDZONY</Badge>
+                    </Tooltip>
+                );
             case 'active':
-                return <Badge variant="success">W REALIZACJI</Badge>;
+                return (
+                    <Tooltip content="Projekt w fazie aktywnej realizacji i finansowania CAPEX">
+                        <Badge variant="success">W REALIZACJI</Badge>
+                    </Tooltip>
+                );
             case 'completed':
-                return <Badge variant="default">ZAKOŃCZONY</Badge>;
+                return (
+                    <Tooltip content="Projekt zrealizowany, rozliczony i przekazany do eksploatacji">
+                        <Badge variant="default">ZAKOŃCZONY</Badge>
+                    </Tooltip>
+                );
             case 'under_review':
-                return <Badge variant="purple">W RECENZJI</Badge>;
+                return (
+                    <Tooltip content="Projekt w trakcie oceny ryzyk, analizy due diligence lub audytu">
+                        <Badge variant="purple">W RECENZJI</Badge>
+                    </Tooltip>
+                );
             case 'draft':
             default:
-                return <Badge variant="warning">SZKIC (DRAFT)</Badge>;
+                return (
+                    <Tooltip content="Wstępna wersja robocza założeń projektowych i montażu dłużnego">
+                        <Badge variant="warning">SZKIC (DRAFT)</Badge>
+                    </Tooltip>
+                );
         }
     };
 
@@ -127,17 +148,29 @@ export const InvestmentPlanningView = () => {
             <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
                 <div>
                     <div className="flex items-center gap-2 mb-1">
-                        <span className="text-[10px] font-semibold tracking-wider text-zinc-500 uppercase">
-                            MODUŁ DEAL ADVISORY & PROJECT FINANCE
-                        </span>
+                        <Tooltip content="Moduł doradztwa transakcyjnego, modelowania nakładów CAPEX i project finance">
+                            <span className="text-[10px] font-semibold tracking-wider text-zinc-500 uppercase cursor-help">
+                                MODUŁ DEAL ADVISORY & PROJECT FINANCE
+                            </span>
+                        </Tooltip>
                         <span className="text-zinc-600">//</span>
-                        <span className="text-[10px] text-emerald-400 font-semibold uppercase">
-                            {activeCompany?.code || 'PODMIOT'}
-                        </span>
+                        <Tooltip content={`Aktywny profil podmiotu gospodarczego: ${activeCompany?.name || 'Spółka domyślna'}`}>
+                            <span className="text-[10px] text-emerald-400 font-semibold uppercase cursor-help">
+                                {activeCompany?.code || 'PODMIOT'}
+                            </span>
+                        </Tooltip>
                     </div>
                     <h1 className="text-base sm:text-lg font-bold text-zinc-100 tracking-tight flex items-center gap-2.5">
-                        <Calculator className="w-5 h-5 text-emerald-400" />
+                        <Tooltip content="Silnik wyceny i inżynierii finansowej CAPEX">
+                            <span className="inline-flex">
+                                <Calculator className="w-5 h-5 text-emerald-400" />
+                            </span>
+                        </Tooltip>
                         <span>Planowanie Inwestycji i Montaż Finansowy</span>
+                        <InfoTooltip
+                            content="Kompleksowy moduł inżynierii finansowej Project Finance: wieloletnie harmonogramowanie nakładów CAPEX (zgodnie z KŚT), optymalizacja struktury długu (DSCR, LLCR, wskaźniki bankowe), 15-letni model 3-Statement (RZiS, Bilans, Cash Flow) oraz wycena DCF/WACC."
+                            size="sm"
+                        />
                     </h1>
                     <p className="text-xs text-zinc-400 mt-0.5">
                         Modelowanie 15-letnich nakładów CAPEX, amortyzacji KŚT, długu bankowego i wyceny DCF
@@ -149,30 +182,34 @@ export const InvestmentPlanningView = () => {
                     {projects.length > 0 && (
                         <div className="flex items-center gap-2 bg-zinc-950 border border-zinc-800 rounded-md px-3 py-1.5">
                             <span className="text-[11px] text-zinc-400 uppercase font-semibold">PROJEKT:</span>
-                            <select
-                                value={selectedProjectId || ''}
-                                onChange={(e) => selectProject(e.target.value)}
-                                aria-label="Wybierz projekt"
-                                data-testid="project-selector"
-                                className="bg-transparent text-xs text-zinc-100 font-semibold focus:outline-none cursor-pointer max-w-[200px] truncate"
-                            >
-                                {projects.map((p) => (
-                                    <option key={p.id} value={p.id} className="bg-zinc-900 text-zinc-100">
-                                        {p.name}
-                                    </option>
-                                ))}
-                            </select>
+                            <Tooltip content="Wybierz aktywny projekt inwestycyjny do analizy i edycji założeń">
+                                <select
+                                    value={selectedProjectId || ''}
+                                    onChange={(e) => selectProject(e.target.value)}
+                                    aria-label="Wybierz projekt"
+                                    data-testid="project-selector"
+                                    className="bg-transparent text-xs text-zinc-100 font-semibold focus:outline-none cursor-pointer max-w-[200px] truncate"
+                                >
+                                    {projects.map((p) => (
+                                        <option key={p.id} value={p.id} className="bg-zinc-900 text-zinc-100">
+                                            {p.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </Tooltip>
                             {selectedProject && getStatusBadge(selectedProject.status)}
                         </div>
                     )}
 
-                    <Button
-                        variant="primary"
-                        icon={Plus}
-                        onClick={() => setIsCreateModalOpen(true)}
-                    >
-                        Nowy Projekt
-                    </Button>
+                    <Tooltip content="Zainicjalizuj nowy projekt inwestycyjny z dedykowanym modelem CAPEX">
+                        <Button
+                            variant="primary"
+                            icon={Plus}
+                            onClick={() => setIsCreateModalOpen(true)}
+                        >
+                            Nowy Projekt
+                        </Button>
+                    </Tooltip>
                 </div>
             </div>
 
@@ -188,14 +225,16 @@ export const InvestmentPlanningView = () => {
                     <p className="text-xs text-zinc-400 max-w-md mx-auto mb-6 leading-relaxed">
                         Dla podmiotu <strong className="text-zinc-200">{activeCompany?.name || 'wybranej spółki'}</strong> nie skonfigurowano jeszcze żadnego projektu inwestycyjnego. Zainicjalizuj projekt, aby rozpocząć definiowanie etapów CAPEX, montażu długu i symulacji 15-letnich sprawozdań.
                     </p>
-                    <Button
-                        variant="primary"
-                        icon={Plus}
-                        size="lg"
-                        onClick={() => setIsCreateModalOpen(true)}
-                    >
-                        Zainicjalizuj Pierwszy Projekt
-                    </Button>
+                    <Tooltip content="Otwórz konfigurator i zdefiniuj pierwszy projekt inwestycyjny dla spółki">
+                        <Button
+                            variant="primary"
+                            icon={Plus}
+                            size="lg"
+                            onClick={() => setIsCreateModalOpen(true)}
+                        >
+                            Zainicjalizuj Pierwszy Projekt
+                        </Button>
+                    </Tooltip>
                 </div>
             )}
 
@@ -209,24 +248,28 @@ export const InvestmentPlanningView = () => {
                             value={formatCurrency(capexTotal, currency)}
                             subtitle={`${selectedProject.capex_stages?.length || 0} etapów inwestycji`}
                             icon={Landmark}
+                            tooltipContent="Łączna wartość nakładów inwestycyjnych (CAPEX netto) zdefiniowanych we wszystkich etapach harmonogramu realizacji projektu."
                         />
                         <MetricCard
                             title="WKŁAD WŁASNY (EQUITY)"
                             value={formatCurrency(equityTotal, currency)}
                             subtitle={capexTotal > 0 ? `${((equityTotal / capexTotal) * 100).toFixed(1)}% montażu` : '0.0%'}
                             icon={Coins}
+                            tooltipContent="Środki własne inwestora zaangażowane w montaż finansowy projektu, stanowiące bazę do kalkulacji stóp zwrotu Equity IRR i MOIC."
                         />
                         <MetricCard
                             title="KREDYT BANKOWY"
                             value={formatCurrency(debtTotal, currency)}
                             subtitle={capexTotal > 0 ? `${((debtTotal / capexTotal) * 100).toFixed(1)}% montażu` : '0.0%'}
                             icon={Building2}
+                            tooltipContent="Łączny wolumen długu uprzywilejowanego (senior debt) lub linii kredytowej zaciągniętej na sfinansowanie nakładów inwestycyjnych."
                         />
                         <MetricCard
                             title="DOTACJE & SUBSYDIA"
                             value={formatCurrency(grantTotal, currency)}
                             subtitle={capexTotal > 0 ? `${((grantTotal / capexTotal) * 100).toFixed(1)}% montażu` : '0.0%'}
                             icon={TrendingUp}
+                            tooltipContent="Bezzwrotne dofinansowanie publiczne (unijne/krajowe) obniżające zapotrzebowanie na kapitał własny i dług komercyjny."
                         />
                         <MetricCard
                             title="HORYZONT MODELU"
@@ -234,6 +277,7 @@ export const InvestmentPlanningView = () => {
                             subtitle={selectedProject.commercial_operation_date ? `COD: ${selectedProject.commercial_operation_date}` : 'Start: ' + (selectedProject.start_date || 'N/A')}
                             icon={Clock}
                             className="col-span-2 lg:col-span-1"
+                            tooltipContent="Wieloletni horyzont prognozy finansowej (typowo 10–15 lat) uwzględniający fazę budowy, rozruchu oraz pełnej komercyjnej eksploatacji (COD)."
                         />
                     </div>
 
@@ -244,18 +288,20 @@ export const InvestmentPlanningView = () => {
                                 const Icon = tab.icon;
                                 const isActive = activeTab === tab.id;
                                 return (
-                                    <button
-                                        key={tab.id}
-                                        onClick={() => setActiveTab(tab.id)}
-                                        className={`flex items-center gap-2.5 px-4 py-3 border-b-2 text-xs font-semibold uppercase tracking-wider transition-all whitespace-nowrap cursor-pointer ${
-                                            isActive
-                                                ? 'border-emerald-400 text-zinc-100 bg-zinc-900/40'
-                                                : 'border-transparent text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/20'
-                                        }`}
-                                    >
-                                        <Icon className={`w-4 h-4 ${isActive ? 'text-emerald-400' : 'text-zinc-500'}`} />
-                                        <span>{tab.label}</span>
-                                    </button>
+                                    <Tooltip key={tab.id} content={tab.sublabel} placement="bottom">
+                                        <button
+                                            onClick={() => setActiveTab(tab.id)}
+                                            aria-label={`${tab.label} - ${tab.sublabel}`}
+                                            className={`flex items-center gap-2.5 px-4 py-3 border-b-2 text-xs font-semibold uppercase tracking-wider transition-all whitespace-nowrap cursor-pointer ${
+                                                isActive
+                                                    ? 'border-emerald-400 text-zinc-100 bg-zinc-900/40'
+                                                    : 'border-transparent text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/20'
+                                            }`}
+                                        >
+                                            <Icon className={`w-4 h-4 ${isActive ? 'text-emerald-400' : 'text-zinc-500'}`} />
+                                            <span>{tab.label}</span>
+                                        </button>
+                                    </Tooltip>
                                 );
                             })}
                         </div>
@@ -267,19 +313,29 @@ export const InvestmentPlanningView = () => {
                             <div className="space-y-6">
                                 <div className="p-4 bg-zinc-900/70 border border-zinc-800 rounded-lg flex items-center justify-between text-xs">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded bg-zinc-800 flex items-center justify-center text-emerald-400">
-                                            <Sliders className="w-4 h-4" />
-                                        </div>
+                                        <Tooltip content="Konfiguracja założeń wejściowych">
+                                            <div className="w-8 h-8 rounded bg-zinc-800 flex items-center justify-center text-emerald-400">
+                                                <Sliders className="w-4 h-4" />
+                                            </div>
+                                        </Tooltip>
                                         <div>
-                                            <span className="font-bold text-zinc-100 uppercase">
-                                                Konfigurator Założeń Projektu Finance
-                                            </span>
+                                            <div className="flex items-center gap-2">
+                                                <span className="font-bold text-zinc-100 uppercase">
+                                                    Konfigurator Założeń Projektu Finance
+                                                </span>
+                                                <InfoTooltip
+                                                    content="Definiuj etapy wydatkowania nakładów CAPEX, metody amortyzacji podatkowej KŚT, strukturę kapitałową oraz dynamikę przychodów i kosztów operacyjnych."
+                                                    size="xs"
+                                                />
+                                            </div>
                                             <p className="text-zinc-400 text-[11px] mt-0.5">
                                                 Wprowadzaj etapy CAPEX z klasyfikacją KŚT, konfiguruj instrumenty dłużne i definiuj prognozy operacyjne.
                                             </p>
                                         </div>
                                     </div>
-                                    <Badge variant="neutral">PARAMETRY WEJŚCIOWE</Badge>
+                                    <Tooltip content="Sekcja definiowania parametrów bazowych przed uruchomieniem kalkulacji">
+                                        <Badge variant="neutral">PARAMETRY WEJŚCIOWE</Badge>
+                                    </Tooltip>
                                 </div>
 
                                 {/* Live CapexScheduleManager Component (Commit 208) */}

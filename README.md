@@ -134,7 +134,7 @@ docker compose exec app ./vendor/bin/phpunit
 ```
 
 ### Testy Frontendowe (Vitest)
-Pakiet ponad 485 testów jednostkowych i integracyjnych dla komponentów React, kontekstu transakcyjnego, walidacji danych, kalkulatorów walutowych, konfiguratora celów benchmarkowych, księgi operacji, diagnostyki poczty oraz przepływów integracyjnych E2E:
+Pakiet ponad 600 testów jednostkowych i integracyjnych dla komponentów React, kontekstu transakcyjnego, walidacji danych, kalkulatorów walutowych, konfiguratora celów benchmarkowych, księgi operacji, diagnostyki poczty oraz przepływów integracyjnych E2E:
 ```bash
 npm test
 ```
@@ -944,6 +944,16 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Wdrożenie dymków `<Tooltip>` i komponentów `<InfoTooltip>` w modalach operacyjnych: `AdvisorAssignmentModal.jsx` (przypisania spółek, masowe akcje, baner audytu WORM), `CreateCompanyModal.jsx` (izolacja podmiotu, nazwa, ticker, NIP, checklist doradców), `InviteUserModal.jsx` (standard Zero-Trust, email, role RBAC, ważność 48h) oraz `TestMailModal.jsx` (weryfikacja handshake SMTP, diagnostyka).
     - Integracja dostępnych dymków w komponencie telemetrii `SmtpStatusWidget.jsx` (kompaktowy i pełny widok, wskaźniki gniazda TCP, detekcja blokady portu 25 w OCI, karty konfiguracji i terminal powitalny kod 220).
     - Weryfikacja testowa: dedykowany zestaw testowy `AdvisorsTooltips.test.jsx` (8/8), `AdvisorsManagement.test.jsx` (15/15), `CreateCompanyModal.test.jsx` (8/8), `InviteUserModal.test.jsx` (9/9), `MailDiagnostics.test.jsx` (9/9), 100% PASS w pełnym zestawie 65 plików Vitest (601 testów) oraz bezbłędny build produkcyjny (`npm run build`).
+
+  - [x] Wdrożenie dostępnych podpowiedzi Tooltip i InfoTooltip w module Planowanie Inwestycji i Montaż Finansowy (InvestmentPlanningView, CreateProjectModal).
+    - Wzbogacenie paska nagłówka `InvestmentPlanningView.jsx`: `<Tooltip>` dla ikony kalkulatora inżynierii finansowej CAPEX, odznaki modułu Project Finance, aktywnego kodu podmiotu gospodarczego oraz `<InfoTooltip size="sm">` szczegółowo objaśniający wieloletnie modelowanie nakładów CAPEX (zgodnie z KŚT), optymalizację struktury długu (DSCR/LLCR), 15-letni model 3-Statement oraz wycenę DCF/WACC.
+    - Dostępny selektor projektu (`<select data-testid="project-selector">`) oraz dymki `<Tooltip>` zintegrowane w odznakach statusów projektu (`getStatusBadge` dla wariantów approved, active, completed, under_review, draft).
+    - Dymki `<Tooltip>` dla przycisków akcji nagłówka ("Nowy Projekt") oraz pustego stanu inicjalizacji ("Zainicjalizuj Pierwszy Projekt").
+    - Dostarczenie objaśnień metodologicznych we wszystkich 5 kartach KPI (`MetricCard` z `tooltipContent`): Sumaryczny CAPEX, Wkład Własny (Equity), Kredyt Bankowy (Dług Senior), Dotacje & Subcydia oraz Horyzont Modelu (15 lat / COD).
+    - Dostępna nawigacja zakładkowa z dymkami `<Tooltip content={tab.sublabel}>` i atrybutami `aria-label` dla 4 sub-modułów: 1. Założenia & CAPEX, 2. Symulator What-If, 3. Model 15-letni & Wycena, 4. Scoring & Dossier PDF.
+    - Podpowiedzi w nagłówku założeń projektowych: dymek na ikonie suwaków, `<InfoTooltip size="xs">` dla konfiguratora założeń oraz dymek dla odznaki parametrów wejściowych.
+    - Wdrożenie dymków `<Tooltip>` i komponentów `<InfoTooltip size="xs">` w formularzu tworzenia projektu `CreateProjectModal.jsx`: przycisk zamykania z `aria-label`, objaśnienia etykiet pól (nazwa projektu, data startu, horyzont planowania, waluta bazowa, equity, senior debt, opis strategiczny) oraz dymki dla przycisków w stopce ("Anuluj", "Utwórz Projekt").
+    - Weryfikacja testowa: dedykowany zestaw testowy `InvestmentPlanningTooltips.test.jsx` (6/6), `InvestmentPlanningView.test.jsx` (9/9), 100% PASS w pełnym zestawie 66 plików Vitest (607 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
 ---
 
