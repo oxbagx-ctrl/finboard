@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { ROUTES } from '../constants/routes';
 
 const apiClient = axios.create({
     baseURL: '/api/v1',
@@ -31,9 +32,11 @@ apiClient.interceptors.response.use(
         if (error.response && error.response.status === 401) {
             localStorage.removeItem('finboard_token');
             localStorage.removeItem('finboard_user');
+            localStorage.removeItem('finboard_active_company');
             localStorage.removeItem('finboard_active_company_id');
-            if (window.location.pathname !== '/login') {
-                window.location.href = '/login';
+            localStorage.removeItem('finboard_available_companies');
+            if (typeof window !== 'undefined' && window.location.pathname !== ROUTES.LOGIN) {
+                window.location.href = ROUTES.LOGIN;
             }
         }
         return Promise.reject(error);

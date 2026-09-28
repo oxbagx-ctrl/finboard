@@ -983,7 +983,7 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - `CustomReportBuilder.jsx`: bezkolizyjny import wykresów Recharts (`Tooltip as RechartsTooltip`), dymki nagłówka, badge 15-Year Horizon, przyciski „Dodaj Pozycję”, „Pokaż/Ukryj Wykres”, „Eksportuj CSV”, komponenty `<InfoTooltip>` dla szablonów, horyzontu (5L, 10L, 15L), skali kwot oraz nagłówków tabeli, dymki dla przełączników wykresów liniowych i słupkowych, akcji wierszy (widoczność, góra, dół, usuń) oraz modalu wyboru wskaźników finansowych z dostępnym `aria-label="Zamknij bibliotekę"`.
     - Weryfikacja testowa: dedykowany zestaw testowy `InvestmentScoringDossierTooltips.test.jsx` (6/6), `InvestmentDossierPdfGenerator.test.jsx` (11/11), `InvestmentReadinessScorecard.test.jsx` (12/12), `CustomReportBuilder.test.jsx` (8/8), 100% PASS we wszystkich 4 zestawach testowych zakładki 4 (37 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
-- [ ] **Faza 57: Fundament Architektury Routingu i Ochrona Tras (Commity 286–288)**
+- [x] **Faza 57: Fundament Architektury Routingu i Ochrona Tras (Commity 286–288)**
   - [x] Instalacja biblioteki react-router-dom oraz konfiguracja bazowej infrastruktury routingu.
     - Dodanie zależności `react-router-dom` (^7.18.4) w `package.json`.
     - Utworzenie centralnego rejestru tras `ROUTES` oraz słownika nagłówków widoków `ROUTE_TITLES` w `resources/js/constants/routes.js`.
@@ -993,7 +993,12 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Zbudowanie kompletnej deklaracji drzewa tras `<Routes>` w `resources/js/App.jsx` z powłoką `ProtectedLayout` i przekazywaniem kontekstu odświeżania (`Outlet context`).
     - Dedykowane zabezpieczenie trasy domenowej `/advisors` za pomocą `<RoleGuard allowedRoles={['super_admin', 'admin', 'advisor']}>`.
     - Weryfikacja testowa: 100% PASS w pełnym zestawie 69 plików Vitest (627 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
-  - [ ] Synchronizacja przepływów uwierzytelniania i autoryzacji z historią React Router.
+  - [x] Synchronizacja przepływów uwierzytelniania i autoryzacji z historią React Router.
+    - `LoginView.jsx`: integracja hooków `useNavigate` i `useLocation`, płynne przekierowanie na żądany pierwotnie adres (`location.state?.from?.pathname`) lub `/dashboard` po udanym logowaniu.
+    - `Sidebar.jsx`: implementacja asynchronicznego `handleLogout` z czyszczeniem sesji i nawigacją na `/login`.
+    - `client.js`: zsynchronizowanie interceptora HTTP 401 z adresem `ROUTES.LOGIN` oraz czyszczeniem pamięci podręcznej spółek.
+    - `AcceptInvitationView.jsx` & `App.jsx`: obsługa parametrów ścieżki i query params za pomocą `useParams` oraz `useSearchParams`, wsparcie dla wariantów `/accept-invitation/:token` i `/invitation/accept`.
+    - Weryfikacja testowa: 100% PASS w pełnym zestawie 69 plików Vitest (627 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
 - [ ] **Faza 58: Integracja Układu Aplikacji i Semantycznej Nawigacji (Commity 289–291)**
   - [ ] Przekształcenie AppLayout w układ oparty na gnieździe Outlet z dynamiczną rezolucją nagłówka.

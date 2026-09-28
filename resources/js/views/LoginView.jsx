@@ -1,13 +1,33 @@
 import React, { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
 import apiClient from '../api/client';
 import { Button } from '../components/ui/Button';
 import { Lock, Mail, KeyRound } from 'lucide-react';
+import { ROUTES } from '../constants/routes';
 
 export const LoginView = () => {
     const { login } = useAuth();
     const { success, error } = useNotification();
+
+    let navigate = null;
+    try {
+        navigate = useNavigate();
+    } catch {
+        navigate = (to) => {
+            if (typeof window !== 'undefined' && typeof to === 'string') {
+                window.location.href = to;
+            }
+        };
+    }
+
+    let location = null;
+    try {
+        location = useLocation();
+    } catch {
+        location = typeof window !== 'undefined' ? window.location : {};
+    }
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -29,6 +49,11 @@ export const LoginView = () => {
                 response.data.available_companies || []
             );
             success(`Zalogowano pomyślnie jako ${response.data.user.name}`);
+
+            const from = location?.state?.from?.pathname || ROUTES.DASHBOARD;
+            if (navigate) {
+                navigate(from, { replace: true });
+            }
         } catch (err) {
             const msg = err.response?.data?.message || 'Błąd uwierzytelniania. Nieprawidłowe poświadczenia.';
             error(msg);

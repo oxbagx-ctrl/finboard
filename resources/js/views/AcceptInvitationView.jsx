@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import apiClient from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
+import { ROUTES } from '../constants/routes';
 import {
     ShieldCheck,
     Lock,
@@ -24,9 +26,39 @@ export const AcceptInvitationView = ({ token: initialToken = null, onNavigateLog
     const { login } = useAuth();
     const { success, error } = useNotification();
 
-    // Resolve token from prop, query parameter (?token=...) or path
+    let navigate = null;
+    try {
+        navigate = useNavigate();
+    } catch {
+        navigate = (to) => {
+            if (typeof window !== 'undefined' && typeof to === 'string') {
+                window.location.href = to;
+            }
+        };
+    }
+
+    let routeParams = {};
+    try {
+        routeParams = useParams() || {};
+    } catch {
+        routeParams = {};
+    }
+
+    let searchParams = null;
+    try {
+        const [sp] = useSearchParams();
+        searchParams = sp;
+    } catch {
+        searchParams = null;
+    }
+
+    // Resolve token from prop, route params (:token), search params (?token=...) or fallback path
     const resolvedToken = useMemo(() => {
         if (initialToken) return initialToken;
+        if (routeParams?.token) return routeParams.token.trim();
+        const searchToken = searchParams?.get('token');
+        if (searchToken) return searchToken.trim();
+
         if (typeof window !== 'undefined') {
             const urlParams = new URLSearchParams(window.location.search);
             const tokenParam = urlParams.get('token');
@@ -39,7 +71,7 @@ export const AcceptInvitationView = ({ token: initialToken = null, onNavigateLog
             }
         }
         return '';
-    }, [initialToken]);
+    }, [initialToken, routeParams, searchParams]);
 
     const [verifying, setVerifying] = useState(true);
     const [verificationError, setVerificationError] = useState(null);
@@ -140,12 +172,14 @@ export const AcceptInvitationView = ({ token: initialToken = null, onNavigateLog
 
     const handleNavigateLogin = () => {
         if (typeof window !== 'undefined') {
-            window.history.replaceState({}, document.title, '/');
+            window.history.replaceState({}, document.title, ROUTES.LOGIN);
         }
         if (onNavigateLogin) {
             onNavigateLogin();
+        } else if (navigate) {
+            navigate(ROUTES.LOGIN, { replace: true });
         } else if (typeof window !== 'undefined') {
-            window.location.href = '/';
+            window.location.href = ROUTES.LOGIN;
         }
     };
 
@@ -198,12 +232,15 @@ export const AcceptInvitationView = ({ token: initialToken = null, onNavigateLog
 
             // Clean URL query parameters
             if (typeof window !== 'undefined') {
-                window.history.replaceState({}, document.title, '/');
+                window.history.replaceState({}, document.title, ROUTES.DASHBOARD);
             }
 
             // Automatically log in user and transition to main app
             setTimeout(() => {
                 login(data.token, data.user, data.available_companies || []);
+                if (navigate) {
+                    navigate(ROUTES.DASHBOARD, { replace: true });
+                }
             }, 800);
         } catch (err) {
             const resData = err.response?.data;

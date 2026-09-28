@@ -15,6 +15,8 @@ import {
     Calculator
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { ROUTES } from '../../constants/routes';
 import { UserProfileModal } from '../auth/UserProfileModal';
 import { CompanySwitcherModal } from './CompanySwitcherModal';
 import { Tooltip } from '../ui/Tooltip';
@@ -23,6 +25,29 @@ export const Sidebar = ({ currentRoute, onRouteChange, isOpen, onClose }) => {
     const { user, activeCompany, isAdmin, isSuperAdmin, isAdvisor, logout } = useAuth();
     const [profileModalOpen, setProfileModalOpen] = useState(false);
     const [switcherModalOpen, setSwitcherModalOpen] = useState(false);
+
+    let navigate = null;
+    try {
+        navigate = useNavigate();
+    } catch {
+        navigate = (to) => {
+            if (typeof window !== 'undefined' && typeof to === 'string') {
+                window.location.href = to;
+            }
+        };
+    }
+
+    const handleLogout = async () => {
+        try {
+            await logout();
+        } finally {
+            if (navigate) {
+                navigate(ROUTES.LOGIN, { replace: true });
+            } else if (typeof window !== 'undefined') {
+                window.location.href = ROUTES.LOGIN;
+            }
+        }
+    };
 
     const baseNavItems = [
         { id: 'dashboard', label: 'Executive Dashboard', code: 'DSH', icon: LayoutDashboard },
@@ -166,7 +191,7 @@ export const Sidebar = ({ currentRoute, onRouteChange, isOpen, onClose }) => {
                         </button>
                         <Tooltip content="Zakończ sesję">
                             <button
-                                onClick={logout}
+                                onClick={handleLogout}
                                 aria-label="Zakończ sesję"
                                 className="p-1.5 rounded text-zinc-500 hover:text-rose-400 hover:bg-zinc-900 transition-colors"
                             >

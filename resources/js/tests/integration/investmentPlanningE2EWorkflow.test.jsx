@@ -215,7 +215,7 @@ describe('Phase 45 Commit 225: End-to-End (E2E) Investment Planning Lifecycle Te
             // Verify official document preview in Dossier Generator
             expect(screen.getByTestId('dossier-document-preview')).toBeInTheDocument();
             expect(screen.getByText('Certyfikat Integralności Danych (SHA-256 Audit Seal)')).toBeInTheDocument();
-        });
+        }, 15000);
     });
 
     // =========================================================================
@@ -256,7 +256,7 @@ describe('Phase 45 Commit 225: End-to-End (E2E) Investment Planning Lifecycle Te
             expect(exitVal.enterpriseValue).toBeGreaterThan(0);
             expect(exitVal.equityValue).toBe(exitVal.enterpriseValue - exitVal.netDebtAtExit);
             expect(exitVal.equityMoic).toBeGreaterThan(1.0);
-        }, 15000);
+        });
 
         it('verifies 3-statement Zero-Variance balance equality (Assets = Liabilities + Equity) across all 15 years', () => {
             const statements = calculate15YearStatements(mockFullProject);

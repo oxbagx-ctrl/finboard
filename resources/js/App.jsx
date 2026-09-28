@@ -81,10 +81,37 @@ export const AppRoutes = () => {
                     </GuestRoute>
                 }
             />
-            {/* Backward-compatibility alias for invitation paths */}
+            <Route
+                path={`${ROUTES.ACCEPT_INVITATION}/:token`}
+                element={
+                    <GuestRoute>
+                        <AcceptInvitationView />
+                    </GuestRoute>
+                }
+            />
+            <Route
+                path="/invitation/accept"
+                element={
+                    <GuestRoute>
+                        <AcceptInvitationView />
+                    </GuestRoute>
+                }
+            />
+            <Route
+                path="/invitation/:token"
+                element={
+                    <GuestRoute>
+                        <AcceptInvitationView />
+                    </GuestRoute>
+                }
+            />
             <Route
                 path="/invitation"
-                element={<Navigate to={ROUTES.ACCEPT_INVITATION} replace />}
+                element={
+                    <GuestRoute>
+                        <AcceptInvitationView />
+                    </GuestRoute>
+                }
             />
 
             {/* Protected Application Routes */}
