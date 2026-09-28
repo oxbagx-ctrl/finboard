@@ -87,62 +87,62 @@ export const Sidebar = ({ currentRoute, onRouteChange, isOpen, onClose }) => {
             {isOpen && (
                 <div
                     onClick={onClose}
-                    className="fixed inset-0 z-40 bg-zinc-950/80 lg:hidden print:hidden"
+                    className="fixed inset-0 z-40 bg-zinc-900/50 dark:bg-zinc-950/80 backdrop-blur-sm lg:hidden print:hidden"
                 />
             )}
 
             <aside
-                className={`fixed top-0 left-0 bottom-0 z-50 w-64 bg-zinc-950 border-r border-zinc-800 flex flex-col transition-transform duration-200 ease-in-out lg:translate-x-0 print:hidden ${
+                className={`fixed top-0 left-0 bottom-0 z-50 w-64 bg-white dark:bg-zinc-950 border-r border-zinc-200 dark:border-zinc-800 flex flex-col transition-all duration-200 ease-in-out lg:translate-x-0 print:hidden ${
                     isOpen ? 'translate-x-0' : '-translate-x-full'
                 }`}
             >
                 {/* Institutional Header */}
-                <div className="h-14 flex items-center justify-between px-5 border-b border-zinc-800">
+                <div className="h-14 flex items-center justify-between px-5 border-b border-zinc-200 dark:border-zinc-800">
                     <div className="flex items-center gap-2.5">
-                        <div className="w-7 h-7 rounded bg-zinc-100 flex items-center justify-center text-zinc-950 font-black text-xs tracking-tighter">
+                        <div className="w-7 h-7 rounded bg-zinc-900 dark:bg-zinc-100 flex items-center justify-center text-white dark:text-zinc-950 font-black text-xs tracking-tighter shadow-sm">
                             FB
                         </div>
                         <div>
-                            <div className="font-bold text-xs tracking-wider uppercase text-zinc-100 font-mono">
+                            <div className="font-bold text-xs tracking-wider uppercase text-zinc-900 dark:text-zinc-100 font-mono">
                                 FinBoard
                             </div>
                             <div className="text-[10px] text-zinc-500 font-mono">HELVEST ADVISORY</div>
                         </div>
                     </div>
-                    <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-400">
+                    <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400">
                         ENTERPRISE
                     </span>
                 </div>
 
                 {/* Target Company Box (Interactive for Admin / Advisor) */}
-                <div className="p-3 border-b border-zinc-855 bg-zinc-900/30">
+                <div className="p-3 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50/70 dark:bg-zinc-900/30">
                     <button
                         type="button"
                         onClick={isAdmin || isAdvisor ? () => setSwitcherModalOpen(true) : undefined}
                         className={`w-full p-2.5 rounded-md text-left transition-all ${
                             isAdmin || isAdvisor
-                                ? 'bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 hover:border-zinc-700 cursor-pointer group'
-                                : 'bg-zinc-900 border border-zinc-800 cursor-default'
+                                ? 'bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-850 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 cursor-pointer group shadow-sm dark:shadow-none'
+                                : 'bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 cursor-default shadow-sm dark:shadow-none'
                         }`}
                     >
                         <div className="flex items-center justify-between text-[10px] font-mono text-zinc-500 uppercase mb-1">
                             <span>PODMIOT ANALIZOWANY</span>
-                            <span className="text-zinc-400">{activeCompany?.code || 'N/A'}</span>
+                            <span className="text-zinc-600 dark:text-zinc-400 font-semibold">{activeCompany?.code || 'N/A'}</span>
                         </div>
-                        <div className="text-xs font-semibold text-zinc-200 truncate flex items-center justify-between gap-1.5">
+                        <div className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 truncate flex items-center justify-between gap-1.5">
                             <div className="flex items-center gap-1.5 truncate">
                                 <Building2 className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
                                 <span className="truncate">{activeCompany?.name || 'Wybierz podmiot'}</span>
                             </div>
                             {(isAdmin || isAdvisor) && (
-                                <ChevronRight className="w-3.5 h-3.5 text-zinc-600 group-hover:text-zinc-300 shrink-0" />
+                                <ChevronRight className="w-3.5 h-3.5 text-zinc-400 group-hover:text-zinc-700 dark:group-hover:text-zinc-300 shrink-0 transition-colors" />
                             )}
                         </div>
                     </button>
                 </div>
 
                 {/* Navigation Items */}
-                <div className="px-3 pt-3 pb-1 text-[10px] font-mono font-semibold uppercase tracking-wider text-zinc-500">
+                <div className="px-3 pt-3 pb-1 text-[10px] font-mono font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                     MODUŁY ANALITYCZNE
                 </div>
                 <nav className="flex-1 px-2 space-y-0.5 overflow-y-auto">
@@ -162,8 +162,8 @@ export const Sidebar = ({ currentRoute, onRouteChange, isOpen, onClose }) => {
                                         const active = isActive || currentRoute === item.id;
                                         return `w-full flex items-center justify-between px-3 py-2 rounded-md text-xs font-medium transition-colors ${
                                             active
-                                                ? 'bg-zinc-850 text-zinc-100 font-semibold border-l-2 border-zinc-100'
-                                                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/60'
+                                                ? 'bg-zinc-100 dark:bg-zinc-850 text-zinc-900 dark:text-zinc-100 font-semibold border-l-2 border-zinc-900 dark:border-zinc-100'
+                                                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-100/70 dark:hover:bg-zinc-900/60'
                                         }`;
                                     }}
                                 >
@@ -172,10 +172,10 @@ export const Sidebar = ({ currentRoute, onRouteChange, isOpen, onClose }) => {
                                         return (
                                             <>
                                                 <div className="flex items-center gap-2.5">
-                                                    <Icon className={`w-4 h-4 ${active ? 'text-zinc-100' : 'text-zinc-500'}`} />
+                                                    <Icon className={`w-4 h-4 ${active ? 'text-zinc-900 dark:text-zinc-100' : 'text-zinc-400 dark:text-zinc-500'}`} />
                                                     <span>{item.label}</span>
                                                 </div>
-                                                <span className={`text-[10px] font-mono ${active ? 'text-zinc-300' : 'text-zinc-600'}`}>
+                                                <span className={`text-[10px] font-mono ${active ? 'text-zinc-700 dark:text-zinc-300 font-bold' : 'text-zinc-400 dark:text-zinc-600'}`}>
                                                     {item.code}
                                                 </span>
                                             </>
@@ -195,15 +195,15 @@ export const Sidebar = ({ currentRoute, onRouteChange, isOpen, onClose }) => {
                                 }}
                                 className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-xs font-medium transition-colors ${
                                     isActive
-                                        ? 'bg-zinc-850 text-zinc-100 font-semibold border-l-2 border-zinc-100'
-                                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/60'
+                                        ? 'bg-zinc-100 dark:bg-zinc-850 text-zinc-900 dark:text-zinc-100 font-semibold border-l-2 border-zinc-900 dark:border-zinc-100'
+                                        : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-100/70 dark:hover:bg-zinc-900/60'
                                 }`}
                             >
                                 <div className="flex items-center gap-2.5">
-                                    <Icon className={`w-4 h-4 ${isActive ? 'text-zinc-100' : 'text-zinc-500'}`} />
+                                    <Icon className={`w-4 h-4 ${isActive ? 'text-zinc-900 dark:text-zinc-100' : 'text-zinc-400 dark:text-zinc-500'}`} />
                                     <span>{item.label}</span>
                                 </div>
-                                <span className={`text-[10px] font-mono ${isActive ? 'text-zinc-300' : 'text-zinc-600'}`}>
+                                <span className={`text-[10px] font-mono ${isActive ? 'text-zinc-700 dark:text-zinc-300 font-bold' : 'text-zinc-400 dark:text-zinc-600'}`}>
                                     {item.code}
                                 </span>
                             </button>
@@ -212,14 +212,14 @@ export const Sidebar = ({ currentRoute, onRouteChange, isOpen, onClose }) => {
                 </nav>
 
                 {/* Bottom User Bar */}
-                <div className="p-3 border-t border-zinc-800 bg-zinc-950">
+                <div className="p-3 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-950">
                     <div className="flex items-center justify-between">
                         <button
                             type="button"
                             onClick={() => setProfileModalOpen(true)}
                             className="min-w-0 pr-2 text-left hover:opacity-80 transition-opacity"
                         >
-                            <div className="text-xs font-semibold text-zinc-200 truncate flex items-center gap-1.5">
+                            <div className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 truncate flex items-center gap-1.5">
                                 <User className="w-3 h-3 text-zinc-400 shrink-0" />
                                 <span className="truncate">{user?.name}</span>
                             </div>
@@ -231,7 +231,7 @@ export const Sidebar = ({ currentRoute, onRouteChange, isOpen, onClose }) => {
                             <button
                                 onClick={handleLogout}
                                 aria-label="Zakończ sesję"
-                                className="p-1.5 rounded text-zinc-500 hover:text-rose-400 hover:bg-zinc-900 transition-colors"
+                                className="p-1.5 rounded text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors"
                             >
                                 <LogOut className="w-3.5 h-3.5" />
                             </button>

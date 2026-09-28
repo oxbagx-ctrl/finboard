@@ -57,16 +57,16 @@ export const Header = ({ currentRoute, onToggleSidebar, onRefreshData, refreshin
 
     return (
         <>
-            <header className="h-14 bg-zinc-950 border-b border-zinc-800 sticky top-0 z-30 flex items-center justify-between px-4 sm:px-6 font-mono print:hidden">
+            <header className="h-14 bg-white/95 dark:bg-zinc-950/95 backdrop-blur border-b border-zinc-200 dark:border-zinc-800 sticky top-0 z-30 flex items-center justify-between px-4 sm:px-6 font-mono transition-colors duration-150 print:hidden">
                 <div className="flex items-center gap-3">
                     <button
                         onClick={onToggleSidebar}
-                        className="p-1.5 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900 lg:hidden"
+                        className="p-1.5 rounded text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-900 lg:hidden transition-colors"
                     >
                         <Menu className="w-5 h-5" />
                     </button>
                     <div className="flex items-center gap-3">
-                        <h1 className="text-xs sm:text-sm font-semibold text-zinc-100 uppercase tracking-wide">
+                        <h1 className="text-xs sm:text-sm font-semibold text-zinc-900 dark:text-zinc-100 uppercase tracking-wide">
                             {resolveTitle()}
                         </h1>
                     </div>
@@ -74,7 +74,7 @@ export const Header = ({ currentRoute, onToggleSidebar, onRefreshData, refreshin
 
                 <div className="flex items-center gap-2 sm:gap-3">
                     {/* Confidentiality indicator */}
-                    <div className="hidden md:flex items-center gap-1.5 px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-[10px] text-zinc-400">
+                    <div className="hidden md:flex items-center gap-1.5 px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-[10px] text-zinc-600 dark:text-zinc-400">
                         <Lock className="w-3 h-3 text-amber-500" />
                         <span>STRICTLY CONFIDENTIAL</span>
                     </div>
@@ -86,9 +86,9 @@ export const Header = ({ currentRoute, onToggleSidebar, onRefreshData, refreshin
                                 onClick={onRefreshData}
                                 disabled={refreshing}
                                 aria-label="Odśwież dane z serwera"
-                                className="p-1.5 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900 transition-colors disabled:opacity-50"
+                                className="p-1.5 rounded text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors disabled:opacity-50"
                             >
-                                <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin text-zinc-200' : ''}`} />
+                                <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin text-zinc-900 dark:text-zinc-200' : ''}`} />
                             </button>
                         </Tooltip>
                     )}
@@ -102,10 +102,10 @@ export const Header = ({ currentRoute, onToggleSidebar, onRefreshData, refreshin
                             <button
                                 onClick={() => setSwitcherModalOpen(true)}
                                 aria-label="Przełącz spółkę portfelową"
-                                className="flex items-center gap-2 bg-zinc-900 hover:bg-zinc-850 border border-zinc-750 hover:border-zinc-700 rounded px-2.5 py-1 text-xs text-zinc-200 transition-all"
+                                className="flex items-center gap-2 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-850 border border-zinc-200 dark:border-zinc-750 hover:border-zinc-300 dark:hover:border-zinc-700 rounded px-2.5 py-1 text-xs text-zinc-800 dark:text-zinc-200 transition-all shadow-sm dark:shadow-none"
                             >
                                 <Building2 className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
-                                <span className="font-bold text-[11px] text-zinc-100">{activeCompany?.code || 'PODMIOT'}</span>
+                                <span className="font-bold text-[11px] text-zinc-900 dark:text-zinc-100">{activeCompany?.code || 'PODMIOT'}</span>
                                 <span className="hidden sm:inline text-zinc-500 text-[10px] truncate max-w-[120px]">
                                     {activeCompany?.name}
                                 </span>
@@ -113,9 +113,9 @@ export const Header = ({ currentRoute, onToggleSidebar, onRefreshData, refreshin
                             </button>
                         </Tooltip>
                     ) : (
-                        <div className="hidden sm:flex items-center gap-1.5 bg-zinc-900 border border-zinc-800 rounded px-2.5 py-1">
+                        <div className="hidden sm:flex items-center gap-1.5 bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded px-2.5 py-1">
                             <Building2 className="w-3.5 h-3.5 text-zinc-500" />
-                            <span className="text-xs font-medium text-zinc-300">{activeCompany?.name}</span>
+                            <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300">{activeCompany?.name}</span>
                         </div>
                     )}
 
@@ -124,12 +124,12 @@ export const Header = ({ currentRoute, onToggleSidebar, onRefreshData, refreshin
                         <button
                             onClick={() => setProfileModalOpen(true)}
                             aria-label="Twój profil i ustawienia bezpieczeństwa"
-                            className="flex items-center gap-1.5 bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 hover:border-zinc-700 rounded px-2 py-1 transition-colors"
+                            className="flex items-center gap-1.5 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-850 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 rounded px-2 py-1 transition-colors shadow-sm dark:shadow-none"
                         >
-                            <div className="w-4 h-4 rounded bg-zinc-800 flex items-center justify-center text-zinc-300">
+                            <div className="w-4 h-4 rounded bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-600 dark:text-zinc-300">
                                 <User className="w-3 h-3" />
                             </div>
-                        <span className="hidden md:inline text-xs text-zinc-300 font-semibold max-w-[100px] truncate">
+                        <span className="hidden md:inline text-xs text-zinc-700 dark:text-zinc-300 font-semibold max-w-[100px] truncate">
                             {user?.name?.split(' ')[0] || 'Użytkownik'}
                         </span>
                         <Badge variant={isAdmin ? 'default' : 'brand'} size="sm">

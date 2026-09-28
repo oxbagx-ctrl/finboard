@@ -1054,6 +1054,12 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
         - Pełna obsługa klawiatury (`ArrowUp`, `ArrowDown`, `Escape`, `Enter`, `Space`), auto-zamykanie przy kliknięciu poza komponentem oraz integracja z systemem `<Tooltip>`.
         - `resources/js/components/layout/Header.jsx`: osadzenie przełącznika w pasku akcji nagłówka obok przycisku odświeżania i przełącznika spółek.
         - Weryfikacja testowa: 100% PASS w pełnym zestawie 72 plików Vitest (653 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
+    - [x] Adaptacja powłoki układu aplikacji i komponentów nawigacyjnych do motywu jasnego i ciemnego.
+        - `resources/js/components/layout/AppLayout.jsx`: przejście z ciemnego szkieletu na adaptacyjne `bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100` z płynną animacją `transition-colors duration-150`.
+        - `resources/js/components/layout/Header.jsx`: implementacja tła `bg-white/95 dark:bg-zinc-950/95` z rozmyciem `backdrop-blur`, obramowaniem `border-zinc-200 dark:border-zinc-800` i zbalansowanym kontrastem przycisków akcji.
+        - `resources/js/components/layout/Sidebar.jsx`: pełne wsparcie dla jasnego motywu (`bg-white dark:bg-zinc-950`), adaptacja sygnetu FB, aktywnego stanu linków `NavLink` i boksu spółki z zachowaniem pełnej zgodności testowej.
+        - `resources/js/components/layout/DealContextBar.jsx` & `CompanySwitcherModal.jsx`: dostosowanie kontrastu tła, przełączników walutowych, selektorów okresów fiskalnych oraz listy spółek portfelowych.
+        - Weryfikacja testowa: 100% PASS w pełnym zestawie 72 plików Vitest (653 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
 ---
 

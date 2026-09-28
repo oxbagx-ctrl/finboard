@@ -15,7 +15,7 @@ export const AppLayout = ({
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     return (
-        <div className="min-h-screen bg-zinc-950 text-zinc-100 flex font-sans antialiased selection:bg-zinc-700 selection:text-white print:bg-white print:text-black">
+        <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex font-sans antialiased selection:bg-brand-500/20 selection:text-brand-900 dark:selection:bg-zinc-700 dark:selection:text-white transition-colors duration-150 print:bg-white print:text-black">
             {/* Sidebar Navigation */}
             <Sidebar
                 currentRoute={currentRoute}
