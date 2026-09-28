@@ -15,7 +15,7 @@ import {
     Calculator
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, NavLink, useInRouterContext } from 'react-router-dom';
 import { ROUTES } from '../../constants/routes';
 import { UserProfileModal } from '../auth/UserProfileModal';
 import { CompanySwitcherModal } from './CompanySwitcherModal';
@@ -25,6 +25,7 @@ export const Sidebar = ({ currentRoute, onRouteChange, isOpen, onClose }) => {
     const { user, activeCompany, isAdmin, isSuperAdmin, isAdvisor, logout } = useAuth();
     const [profileModalOpen, setProfileModalOpen] = useState(false);
     const [switcherModalOpen, setSwitcherModalOpen] = useState(false);
+    const inRouter = useInRouterContext();
 
     let navigate = null;
     try {
@@ -50,14 +51,14 @@ export const Sidebar = ({ currentRoute, onRouteChange, isOpen, onClose }) => {
     };
 
     const baseNavItems = [
-        { id: 'dashboard', label: 'Executive Dashboard', code: 'DSH', icon: LayoutDashboard },
-        { id: 'analytics', label: 'Analiza P&L i Wskaźniki', code: 'ANL', icon: TrendingUp },
-        { id: 'records', label: 'Ewidencja Operacji', code: 'REC', icon: TableProperties },
-        { id: 'investments', label: 'Planowanie Inwestycji', code: 'PRJ', icon: Calculator },
-        { id: 'import', label: 'Import Danych Finansowych', code: 'IMP', icon: FileSpreadsheet },
-        { id: 'data-room', label: 'Virtual Data Room (VDR)', code: 'VDR', icon: FolderLock },
-        { id: 'reports', label: 'Raporty Zarządcze & PDF', code: 'REP', icon: FileText },
-        { id: 'audit-logs', label: 'Dziennik Nadzoru & Audyt', code: 'AUD', icon: ShieldCheck },
+        { id: 'dashboard', path: ROUTES.DASHBOARD, label: 'Executive Dashboard', code: 'DSH', icon: LayoutDashboard },
+        { id: 'analytics', path: ROUTES.ANALYTICS, label: 'Analiza P&L i Wskaźniki', code: 'ANL', icon: TrendingUp },
+        { id: 'records', path: ROUTES.RECORDS, label: 'Ewidencja Operacji', code: 'REC', icon: TableProperties },
+        { id: 'investments', path: ROUTES.INVESTMENTS, label: 'Planowanie Inwestycji', code: 'PRJ', icon: Calculator },
+        { id: 'import', path: ROUTES.IMPORT, label: 'Import Danych Finansowych', code: 'IMP', icon: FileSpreadsheet },
+        { id: 'data-room', path: ROUTES.DATA_ROOM, label: 'Virtual Data Room (VDR)', code: 'VDR', icon: FolderLock },
+        { id: 'reports', path: ROUTES.REPORTS, label: 'Raporty Zarządcze & PDF', code: 'REP', icon: FileText },
+        { id: 'audit-logs', path: ROUTES.AUDIT_LOGS, label: 'Dziennik Nadzoru & Audyt', code: 'AUD', icon: ShieldCheck },
     ];
 
     const canAccessUserManagement = isAdmin || isAdvisor;
@@ -65,6 +66,7 @@ export const Sidebar = ({ currentRoute, onRouteChange, isOpen, onClose }) => {
     const adminNavItems = canAccessUserManagement ? [
         {
             id: 'advisors',
+            path: ROUTES.ADVISORS,
             label: isAdvisor ? 'Zaproszenia Klientów' : 'Doradcy & Przypisania',
             code: isAdvisor ? 'INV' : 'ADV',
             icon: Users
@@ -146,13 +148,49 @@ export const Sidebar = ({ currentRoute, onRouteChange, isOpen, onClose }) => {
                 <nav className="flex-1 px-2 space-y-0.5 overflow-y-auto">
                     {navItems.map((item) => {
                         const Icon = item.icon;
-                        const isActive = currentRoute === item.id;
 
+                        if (inRouter) {
+                            return (
+                                <NavLink
+                                    key={item.id}
+                                    to={item.path}
+                                    onClick={() => {
+                                        if (onRouteChange) onRouteChange(item.id);
+                                        if (onClose) onClose();
+                                    }}
+                                    className={({ isActive }) => {
+                                        const active = isActive || currentRoute === item.id;
+                                        return `w-full flex items-center justify-between px-3 py-2 rounded-md text-xs font-medium transition-colors ${
+                                            active
+                                                ? 'bg-zinc-850 text-zinc-100 font-semibold border-l-2 border-zinc-100'
+                                                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/60'
+                                        }`;
+                                    }}
+                                >
+                                    {({ isActive }) => {
+                                        const active = isActive || currentRoute === item.id;
+                                        return (
+                                            <>
+                                                <div className="flex items-center gap-2.5">
+                                                    <Icon className={`w-4 h-4 ${active ? 'text-zinc-100' : 'text-zinc-500'}`} />
+                                                    <span>{item.label}</span>
+                                                </div>
+                                                <span className={`text-[10px] font-mono ${active ? 'text-zinc-300' : 'text-zinc-600'}`}>
+                                                    {item.code}
+                                                </span>
+                                            </>
+                                        );
+                                    }}
+                                </NavLink>
+                            );
+                        }
+
+                        const isActive = currentRoute === item.id;
                         return (
                             <button
                                 key={item.id}
                                 onClick={() => {
-                                    onRouteChange(item.id);
+                                    if (onRouteChange) onRouteChange(item.id);
                                     if (onClose) onClose();
                                 }}
                                 className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-xs font-medium transition-colors ${

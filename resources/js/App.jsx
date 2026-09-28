@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Routes, Route, Navigate, useLocation, useNavigate, useOutletContext, Outlet } from 'react-router-dom';
+import { Routes, Route, Navigate, useOutletContext } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
 import { DealProvider } from './context/DealContext';
@@ -25,23 +25,9 @@ import { AdvisorsManagementView } from './views/AdvisorsManagementView';
  */
 const ProtectedLayout = () => {
     const [refreshKey, setRefreshKey] = useState(0);
-    const location = useLocation();
-    const navigate = useNavigate();
-
-    // Current route identifier for legacy Sidebar navigation until Commit 290
-    const currentRoute = location.pathname === '/' || location.pathname === ROUTES.DASHBOARD
-        ? 'dashboard'
-        : location.pathname.replace(/^\//, '');
-
-    const handleRouteChange = (routeId) => {
-        const targetPath = routeId === 'dashboard' ? ROUTES.DASHBOARD : `/${routeId}`;
-        navigate(targetPath);
-    };
 
     return (
         <AppLayout
-            currentRoute={currentRoute}
-            onRouteChange={handleRouteChange}
             refreshKey={refreshKey}
             onRefreshData={() => setRefreshKey((prev) => prev + 1)}
         />

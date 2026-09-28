@@ -1006,7 +1006,10 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - `Header.jsx`: wdrożenie bezpiecznej rezolucji `useLocation()`, integracja stałych `ROUTE_TITLES` oraz hierarchicznego fallbacku tytułu ekranu (ścieżka URL -> strona główna -> parametry wsteczne -> domyślna nazwa 'FinBoard').
     - `App.jsx`: uproszczenie powłoki `ProtectedLayout` do natywnego użycia samonawigującego `<AppLayout />` i propagacji kontekstu odświeżania do `RouteView`.
     - Weryfikacja testowa: 100% PASS w pełnym zestawie 69 plików Vitest (627 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
-  - [ ] Migracja nawigacji w Sidebarze na komponenty NavLink z dynamicznymi stanami aktywności.
+  - [x] Migracja nawigacji w Sidebarze na komponenty NavLink z dynamicznymi stanami aktywności.
+    - `Sidebar.jsx`: powiązanie wszystkich modułów analitycznych i administracyjnych ze ścieżkami `ROUTES`, zastąpienie elementów `<button>` semantycznymi linkami `<NavLink to={item.path}>` z dynamicznym formatowaniem aktywnego modułu (`border-l-2 border-zinc-100`, kolory ikon i kodów modułów) oraz bezpiecznym fallbackiem `useInRouterContext()` dla odizolowanych testów jednostkowych.
+    - `App.jsx`: usunięcie manualnego sterowania trasą `currentRoute` i procedurą `onRouteChange` z `ProtectedLayout`, powierzając nawigację komponentom `<NavLink>` i gniazdu `<Outlet />`.
+    - Weryfikacja testowa: 100% PASS w pełnym zestawie 69 plików Vitest (627 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
   - [ ] Eliminacja przestarzałej nawigacji hash i dedykowany widok błędu 404 Not Found.
 
 - [ ] **Faza 59: Adaptacja Środowiska Testowego, Weryfikacja Regresji i Dokumentacja (Commity 292–294)**
