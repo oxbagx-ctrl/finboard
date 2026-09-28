@@ -55,8 +55,11 @@ FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakc
 - **Powiadomienia Transakcyjne i Integracja E-mail**:
     - Transakcyjne e-maile z zaproszeniami użytkowników z bezpiecznymi linkami aktywacyjnymi.
     - Zintegrowane środowisko Mailpit (Mailcatcher) do bezpiecznego podglądu wiadomości e-mail w fazie deweloperskiej.
-- **Nowoczesny Interfejs Użytkownika (SPA)**:
-    - Reaktywny frontend zbudowany w oparciu o React 18, Tailwind CSS i bibliotekę wykresów Recharts.
+- **Nowoczesny Interfejs Użytkownika (SPA) & Architektura Routingu URL**:
+    - Reaktywny frontend zbudowany w oparciu o React 19, bibliotekę nawigacyjną `react-router-dom` (v7), Tailwind CSS i bibliotekę wykresów Recharts.
+    - Pełna obsługa historii przeglądarki, przyjaznych adresów URL, głębokiego linkowania (deep linking) oraz eliminacja anomalii zamrożonego adresu URL.
+    - Architektura układu oparta na zagnieżdżonym gnieździe `<Outlet />` z dynamiczną rezolucją nagłówka i kontekstu odświeżania (`AppLayout`, `Header`).
+    - Hierarchia strażników tras z kontrolą uprawnień RBAC (`ProtectedRoute`, `GuestRoute`, `RoleGuard`) oraz dedykowany widok błędu 404 Not Found (`NotFoundView`) w stylistyce dark terminal.
     - Estetyka profesjonalnego terminala transakcyjnego Deal Advisory (Dark Theme, akcenty szmaragdowe/bursztynowe, typografia `font-mono` / `tabular-nums`).
     - Dedykowane widoki: Dashboard ze wskaźnikami KPI, Analityka P&L i Płynności, Księga Główna Transakcji, Wirtualny Pokój Danych (VDR), Raporty Wykonawcze PDF oraz Zarządzanie Doradcami i Klientami.
     - Zastąpienie statycznych wartości na Pulpicie Zarządczym (`DashboardView`) i w Analityce (`AnalyticsView`) dynamicznymi danymi z API w czasie rzeczywistym z kalkulacją dynamiki okresowej (YoY/MoM), ewaluacją benchmarków doradcy i semaforami statusu (`OPT`, `WARN`, `CRIT`).
@@ -76,7 +79,7 @@ FinBoard to platforma SaaS klasy Enterprise dedykowana firmom doradztwa transakc
 - **Backend**: PHP 8.2+, Laravel 11, Doctrine DBAL, spatie/laravel-data.
 - **Baza Danych i Cache**: PostgreSQL 16, Redis Alpine.
 - **Kolejki i Współbieżność**: Laravel Horizon / Redis Queue Workers.
-- **Frontend**: React 18, Tailwind CSS, Lucide Icons, Recharts, Axios, Vitest, React Testing Library.
+- **Frontend**: React 19, React Router (v7), Tailwind CSS, Lucide Icons, Recharts, Axios, Vitest, React Testing Library.
 - **Infrastruktura**: Docker & Docker Compose, Nginx, Mailpit (lokalny serwer SMTP).
 
 ---
@@ -1016,7 +1019,7 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - `routes.js` & `App.jsx`: rejestracja stałej `ROUTES.NOT_FOUND` (`/404`) oraz podpięcie `<NotFoundView />` pod jawną trasę `/404` i łapacz wszystkich nieznanych ścieżek (`*`).
     - Weryfikacja testowa: 100% PASS w pełnym zestawie 69 plików Vitest (627 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
-- [ ] **Faza 59: Adaptacja Środowiska Testowego, Weryfikacja Regresji i Dokumentacja (Commity 292–294)**
+- [x] **Faza 59: Adaptacja Środowiska Testowego, Weryfikacja Regresji i Dokumentacja (Commity 292–294)**
   - [x] Pomocnik testowy renderWithRouter oraz testy jednostkowe strażników tras i Sidebara.
     - `renderWithRouter.jsx`: implementacja uniwersalnego pomocnika testowego dostarczającego `MemoryRouter`, sparametryzowane wpisy historii oraz instytucjonalne mocki kontekstów autoryzacji (`AuthContext`) i powiadomień (`NotificationContext`).
     - `RouteGuards.test.jsx`: stworzenie zestawu 12 testów jednostkowych weryfikujących zachowanie strażników `ProtectedRoute`, `GuestRoute` oraz `RoleGuard` (stany ładowania, przekierowania z zachowaniem `state.from`, autoryzację ról RBAC, ostrzeżenia i renderowanie `<Outlet />`).
@@ -1031,7 +1034,10 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
       5. Obsługę nieznanych ścieżek URL przez dedykowany widok diagnostyczny 404 (`NotFoundView`) z powrotem do pulpitu.
       6. Pełną procedurę wylogowania użytkownika, zniszczenie tokena sesyjnego w `localStorage` i powrót na ekran logowania.
     - Weryfikacja testowa: 100% PASS w pełnym zestawie 72 plików Vitest (653 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
-  - [ ] Aktualizacja dokumentacji architektonicznej, README i changelogów.
+  - [x] Aktualizacja dokumentacji architektonicznej, README i changelogów.
+    - `docs/ROUTING_ARCHITECTURE.md`: opracowanie kompletnej, instytucjonalnej dokumentacji technicznej architektury nawigacji SPA, rejestru tras `ROUTES`, strażników tras (`ProtectedRoute`, `GuestRoute`, `RoleGuard`), powłoki `<Outlet />`, dynamicznej rezolucji nagłówka, semantycznego paska `Sidebar`, obsługi błędów 404, infrastruktury testowej `renderWithRouter` oraz wytycznych deweloperskich.
+    - `README.md` & `changelog/README.md`: aktualizacja spisu technologii, opisu interfejsu SPA i rejestru zmian dokumentująca pełną eliminację problemu zamrożonego adresu URL i wdrożenie nowoczesnego routingu w całej aplikacji.
+    - Weryfikacja testowa: 100% PASS w pełnym zestawie 72 plików Vitest (653 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
 ---
 
