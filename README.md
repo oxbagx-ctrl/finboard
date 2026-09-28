@@ -510,13 +510,13 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
   - Aktualizacja testów komponentu `ExecutivePdfReport` dla spójnej hierarchii wierszy P&L i czystej typografii.
   - Testy regresyjne E2E w `DashboardView.test.jsx` po przełączeniu roku i firmy.
   - Aktualizacja dokumentacji design systemu UI i changeloga pod kątem instytucjonalnych standardów tabelarycznych P&L.
-- [x] **Faza 26: Architektura Domenowa i Bezpieczne API Masowego Usuwania (Commity 126–130)**
+- [x] **Faza 26: Architektura Domenowa i Bezpieczne API Masowego Usuwania**
   - Wprowadzenie komendy CQRS `BatchDeleteFinancialRecordsCommand` i handlera domenowego z izolacją tenanta.
   - Rozszerzenie interfejsu `FinancialRecordRepositoryInterface` i implementacji Eloquent o usuwanie masowe.
   - Rejestracja zdarzenia domenowego `FinancialRecordsBatchDeleted` i listenera audytu `financial_audit_logs`.
   - Wystawienie endpointu `DELETE /api/v1/finance/records/batch` z walidacją `BatchDeleteFinancialRecordsRequest`.
   - Testy jednostkowe i integracyjne weryfikujące masowe usuwanie, izolację spółek i audyt.
-- [x] **Faza 27: Interfejs Zaznaczania i Pasek Akcji Masowych w Księdze (Commity 131–135)**
+- [x] **Faza 27: Interfejs Zaznaczania i Pasek Akcji Masowych w Księdze**
   - Stan zaznaczenia, checkboxy wierszy i master-checkbox w nagłówku tabeli `RecordsView`.
   - Pływający pasek akcji masowych `BatchActionBar` z sumowaniem kwot i liczbą zaznaczonych pozycji.
   - Dwuetapowy modal potwierdzenia `BatchDeleteConfirmationModal` z podsumowaniem i zabezpieczeniem "USUŃ".
@@ -801,7 +801,7 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Weryfikacja wielostronicowej paginacji audytu VDR, filtracji po pojedynczej lub wielu akcjach (`action=upload,download`), wyszukiwania frazowego (`search`) oraz szczelnej izolacji multi-tenant.
     - Zapewnienie 100% zielonego wyniku testów: 636 testów PHPUnit (8369 asercji) oraz 502 testy Vitest (53 pliki testowe).
 
-- [x] **Faza 54: Standard M&A Due Diligence – Hierarchia Folderów i Indeks Dziesiętny Dewey (Commity 259–263)**
+- [x] **Faza 54: Standard M&A Due Diligence – Hierarchia Folderów i Indeks Dziesiętny Dewey**
   - Agregat TransactionFolder oraz system indeksowania dziesiętnego Dewey.
     - Wdrożenie migracji tabeli `transaction_folders` (UUID, `company_id`, rekurencyjny `parent_id`, `index_code`, `name`, `description`, `sort_order`, klucz unikalny na parze firma-indeks).
     - Implementacja obiektów wartości `FolderId` oraz `DeweyIndexCode` (walidacja, normalizacja do formatu `01.00`, wyznaczanie poziomu hierarchii, kod rodzica, generowanie podkodów potomnych, sortowanie segmentowe).
@@ -986,7 +986,7 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - `CustomReportBuilder.jsx`: bezkolizyjny import wykresów Recharts (`Tooltip as RechartsTooltip`), dymki nagłówka, badge 15-Year Horizon, przyciski „Dodaj Pozycję”, „Pokaż/Ukryj Wykres”, „Eksportuj CSV”, komponenty `<InfoTooltip>` dla szablonów, horyzontu (5L, 10L, 15L), skali kwot oraz nagłówków tabeli, dymki dla przełączników wykresów liniowych i słupkowych, akcji wierszy (widoczność, góra, dół, usuń) oraz modalu wyboru wskaźników finansowych z dostępnym `aria-label="Zamknij bibliotekę"`.
     - Weryfikacja testowa: dedykowany zestaw testowy `InvestmentScoringDossierTooltips.test.jsx` (6/6), `InvestmentDossierPdfGenerator.test.jsx` (11/11), `InvestmentReadinessScorecard.test.jsx` (12/12), `CustomReportBuilder.test.jsx` (8/8), 100% PASS we wszystkich 4 zestawach testowych zakładki 4 (37 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
-- [x] **Faza 57: Fundament Architektury Routingu i Ochrona Tras (Commity 286–288)**
+- [x] **Faza 57: Fundament Architektury Routingu i Ochrona Tras**
   - Instalacja biblioteki react-router-dom oraz konfiguracja bazowej infrastruktury routingu.
     - Dodanie zależności `react-router-dom` (^7.18.4) w `package.json`.
     - Utworzenie centralnego rejestru tras `ROUTES` oraz słownika nagłówków widoków `ROUTE_TITLES` w `resources/js/constants/routes.js`.
@@ -1003,7 +1003,7 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - `AcceptInvitationView.jsx` & `App.jsx`: obsługa parametrów ścieżki i query params za pomocą `useParams` oraz `useSearchParams`, wsparcie dla wariantów `/accept-invitation/:token` i `/invitation/accept`.
     - Weryfikacja testowa: 100% PASS w pełnym zestawie 69 plików Vitest (627 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
-- [x] **Faza 58: Integracja Układu Aplikacji i Semantycznej Nawigacji (Commity 289–291)**
+- [x] **Faza 58: Integracja Układu Aplikacji i Semantycznej Nawigacji**
   - Przekształcenie AppLayout w układ oparty na gnieździe Outlet z dynamiczną rezolucją nagłówka.
     - `AppLayout.jsx`: wdrożenie komponentu `<Outlet context={{ onRefreshData, refreshing, refreshKey }} />` wewnątrz kontenera `<main>` z zachowaniem wsparcia dla propa `children` dla pełnej kompatybilności wstecznej.
     - `Header.jsx`: wdrożenie bezpiecznej rezolucji `useLocation()`, integracja stałych `ROUTE_TITLES` oraz hierarchicznego fallbacku tytułu ekranu (ścieżka URL -> strona główna -> parametry wsteczne -> domyślna nazwa 'FinBoard').
@@ -1019,13 +1019,13 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - `routes.js` & `App.jsx`: rejestracja stałej `ROUTES.NOT_FOUND` (`/404`) oraz podpięcie `<NotFoundView />` pod jawną trasę `/404` i łapacz wszystkich nieznanych ścieżek (`*`).
     - Weryfikacja testowa: 100% PASS w pełnym zestawie 69 plików Vitest (627 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
-- [x] **Faza 59: Adaptacja Środowiska Testowego, Weryfikacja Regresji i Dokumentacja (Commity 292–294)**
-  - [x] Pomocnik testowy renderWithRouter oraz testy jednostkowe strażników tras i Sidebara.
+- [x] **Faza 59: Adaptacja Środowiska Testowego, Weryfikacja Regresji i Dokumentacja**
+  - Pomocnik testowy renderWithRouter oraz testy jednostkowe strażników tras i Sidebara.
     - `renderWithRouter.jsx`: implementacja uniwersalnego pomocnika testowego dostarczającego `MemoryRouter`, sparametryzowane wpisy historii oraz instytucjonalne mocki kontekstów autoryzacji (`AuthContext`) i powiadomień (`NotificationContext`).
     - `RouteGuards.test.jsx`: stworzenie zestawu 12 testów jednostkowych weryfikujących zachowanie strażników `ProtectedRoute`, `GuestRoute` oraz `RoleGuard` (stany ładowania, przekierowania z zachowaniem `state.from`, autoryzację ról RBAC, ostrzeżenia i renderowanie `<Outlet />`).
     - `Sidebar.test.jsx`: stworzenie zestawu 8 testów jednostkowych weryfikujących atrybuty `href` linków `<NavLink>`, dynamiczne formatowanie aktywnej trasy, kontrolę dostępu do modułów doradczych oraz odporność na brak routera w trybie fallbacku przyciskowego.
     - Weryfikacja testowa: 100% PASS w pełnym zestawie 71 plików Vitest (647 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
-  - [x] Adaptacja istniejących zestawów testowych Vitest pod routing i weryfikacja zerowej regresji.
+  - Adaptacja istniejących zestawów testowych Vitest pod routing i weryfikacja zerowej regresji.
     - `spaRoutingNavigationWorkflow.test.jsx`: stworzenie zestawu 6 kompleksowych testów integracyjnych SPA weryfikujących w trybie end-to-end:
       1. Przekierowanie nieuwierzytelnionego użytkownika z `/dashboard` na `/login`.
       2. Zachowanie parametru docelowego deep-link (`/records`) w stanie lokalizacji i automatyczne przekierowanie po zalogowaniu.
@@ -1034,10 +1034,16 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
       5. Obsługę nieznanych ścieżek URL przez dedykowany widok diagnostyczny 404 (`NotFoundView`) z powrotem do pulpitu.
       6. Pełną procedurę wylogowania użytkownika, zniszczenie tokena sesyjnego w `localStorage` i powrót na ekran logowania.
     - Weryfikacja testowa: 100% PASS w pełnym zestawie 72 plików Vitest (653 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
-  - [x] Aktualizacja dokumentacji architektonicznej, README i changelogów.
+  - Aktualizacja dokumentacji architektonicznej, README i changelogów.
     - `docs/ROUTING_ARCHITECTURE.md`: opracowanie kompletnej, instytucjonalnej dokumentacji technicznej architektury nawigacji SPA, rejestru tras `ROUTES`, strażników tras (`ProtectedRoute`, `GuestRoute`, `RoleGuard`), powłoki `<Outlet />`, dynamicznej rezolucji nagłówka, semantycznego paska `Sidebar`, obsługi błędów 404, infrastruktury testowej `renderWithRouter` oraz wytycznych deweloperskich.
     - `README.md` & `changelog/README.md`: aktualizacja spisu technologii, opisu interfejsu SPA i rejestru zmian dokumentująca pełną eliminację problemu zamrożonego adresu URL i wdrożenie nowoczesnego routingu w całej aplikacji.
     - Weryfikacja testowa: 100% PASS w pełnym zestawie 72 plików Vitest (653 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
+- [ ] **Faza 60: Wielomotywowość (Light, Dark & System Theme Architecture) (Commity 295–302)**
+    - [x] Konfiguracja strategii Dark Mode w Tailwind CSS i eliminacja zjawiska FOUC za pomocą skryptu bootstrapowego.
+        - `tailwind.config.js`: aktywacja strategii `darkMode: 'class'` umożliwiającej warunkowe stosowanie stylów motywu ciemnego za pośrednictwem wariantów `dark:*` sterowanych klasą `.dark` na elemencie `<html>`.
+        - `resources/views/app.blade.php`: implementacja synchronicznego, odpornego na błędy skryptu bootstrapowego w sekcji `<head>`, natychmiast aplikującego klasę `dark` na podstawie `localStorage` (`finboard_theme`) lub preferencji systemowych `prefers-color-scheme: dark`, zapobiegając zjawisku FOUC.
+        - Adaptacja klas bazowych kontenera `<html>` i `<body>` do elastycznych barw `bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 transition-colors duration-150`.
+        - Weryfikacja testowa: 100% PASS w pełnym zestawie 72 plików Vitest (653 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
 ---
 
