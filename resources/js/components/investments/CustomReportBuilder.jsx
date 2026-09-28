@@ -43,6 +43,7 @@ import {
     Legend
 } from 'recharts';
 import { Tooltip, InfoTooltip } from '../ui/Tooltip';
+import { useTheme } from '../../context/ThemeContext';
 import { useInvestmentProject } from '../../context/InvestmentProjectContext';
 import { useNotification } from '../../context/NotificationContext';
 import { Button } from '../ui/Button';
@@ -700,6 +701,14 @@ export const CustomReportBuilder = ({
     const [pickerSearchQuery, setPickerSearchQuery] = useState('');
     const [pickerCategoryFilter, setPickerCategoryFilter] = useState('all');
 
+    // Theme hook for Recharts and styling
+    const { isDark } = useTheme();
+    const gridStroke = isDark ? "#27272a" : "#e4e4e7";
+    const axisStroke = isDark ? "#71717a" : "#a1a1aa";
+    const tooltipBg = isDark ? "#18181b" : "#ffffff";
+    const tooltipBorder = isDark ? "#27272a" : "#e4e4e7";
+    const tooltipColor = isDark ? "#f4f4f5" : "#18181b";
+
     // Run simulation if not supplied
     useEffect(() => {
         if (initialSimulationData) {
@@ -929,17 +938,17 @@ export const CustomReportBuilder = ({
     return (
         <div data-testid="custom-report-builder" className={`space-y-6 ${className}`}>
             {/* Header & Controls Panel */}
-            <div className="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-6 backdrop-blur-md shadow-xl">
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-700/60 pb-5">
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-sm">
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-zinc-200 dark:border-zinc-800 pb-5">
                     <div className="flex items-center space-x-3">
                         <Tooltip content="Kreator niestandardowych raportów finansowych z 15-letniego modelu">
-                            <div className="p-3 bg-gradient-to-tr from-cyan-600/30 to-blue-600/30 border border-cyan-500/40 rounded-xl text-cyan-400 shadow-inner cursor-help">
+                            <div className="p-3 bg-gradient-to-tr from-cyan-600/10 to-blue-600/10 dark:from-cyan-600/30 dark:to-blue-600/30 border border-cyan-500/20 dark:border-cyan-500/40 rounded-xl text-cyan-600 dark:text-cyan-400 shadow-inner cursor-help">
                                 <FileSpreadsheet className="w-6 h-6" />
                             </div>
                         </Tooltip>
                         <div>
                             <div className="flex items-center space-x-2">
-                                <h3 className="text-xl font-bold text-white tracking-wide">
+                                <h3 className="text-xl font-bold text-zinc-900 dark:text-white tracking-wide">
                                     Kreator Raportów Finansowych (Custom Report Builder)
                                 </h3>
                                 <InfoTooltip
@@ -955,7 +964,7 @@ export const CustomReportBuilder = ({
                                     </span>
                                 </Tooltip>
                             </div>
-                            <p className="text-xs text-slate-400 mt-1">
+                            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
                                 Elastyczna kompozycja pozycji z RZiS, Bilansu, Cash Flow, kowenantów bankowych i wyceny wyjścia z eksportem CSV
                             </p>
                         </div>
@@ -969,7 +978,7 @@ export const CustomReportBuilder = ({
                                 size="sm"
                                 onClick={() => setIsPickerOpen(true)}
                                 data-testid="open-metric-picker-button"
-                                className="bg-slate-700/80 hover:bg-slate-700 border-slate-600 text-slate-200"
+                                className="bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-200"
                             >
                                 <Plus className="w-4 h-4 mr-1.5 text-cyan-400" />
                                 <span>Dodaj Pozycję</span>
@@ -982,7 +991,7 @@ export const CustomReportBuilder = ({
                                 size="sm"
                                 onClick={() => setChartVisible(!chartVisible)}
                                 data-testid="toggle-chart-button"
-                                className={`border-slate-600 ${chartVisible ? 'bg-cyan-600/20 text-cyan-300 border-cyan-500/40' : 'bg-slate-700/80 text-slate-300'}`}
+                                className={`border-zinc-300 dark:border-zinc-700 ${chartVisible ? 'bg-cyan-50 dark:bg-cyan-950/40 text-cyan-700 dark:text-cyan-300 border-cyan-300 dark:border-cyan-500/40' : 'bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300'}`}
                             >
                                 {chartVisible ? <EyeOff className="w-4 h-4 mr-1.5" /> : <Eye className="w-4 h-4 mr-1.5" />}
                                 <span>{chartVisible ? 'Ukryj Wykres' : 'Pokaż Wykres'}</span>
@@ -995,7 +1004,7 @@ export const CustomReportBuilder = ({
                                 size="sm"
                                 onClick={handleExportCsv}
                                 data-testid="export-csv-button"
-                                className="bg-slate-700/80 hover:bg-slate-700 border-slate-600 text-slate-200"
+                                className="bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-200"
                             >
                                 <Download className="w-4 h-4 mr-1.5 text-emerald-400" />
                                 <span>Eksportuj CSV</span>
@@ -1008,7 +1017,7 @@ export const CustomReportBuilder = ({
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-5">
                     {/* Preset Selector */}
                     <div>
-                        <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center gap-1.5">
+                        <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5 flex items-center gap-1.5">
                             <Layers className="w-3.5 h-3.5 text-cyan-400" />
                             <span>Szablon Raportu (Preset)</span>
                             <InfoTooltip
@@ -1021,7 +1030,7 @@ export const CustomReportBuilder = ({
                             data-testid="preset-select"
                             value={activePresetId}
                             onChange={(e) => handlePresetChange(e.target.value)}
-                            className="w-full bg-slate-900/90 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+                            className="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-900 dark:text-zinc-200 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
                         >
                             {REPORT_PRESETS.map(preset => (
                                 <option key={preset.id} value={preset.id}>
@@ -1033,7 +1042,7 @@ export const CustomReportBuilder = ({
 
                     {/* Time Horizon Selector */}
                     <div>
-                        <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center gap-1.5">
+                        <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5 flex items-center gap-1.5">
                             <Calendar className="w-3.5 h-3.5 text-blue-400" />
                             <span>Horyzont Czasowy</span>
                             <InfoTooltip
@@ -1042,7 +1051,7 @@ export const CustomReportBuilder = ({
                                 ariaLabel="Objaśnienie horyzontu czasowego"
                             />
                         </label>
-                        <div className="flex bg-slate-900/90 p-1 rounded-xl border border-slate-700" data-testid="horizon-selector">
+                        <div className="flex bg-zinc-100 dark:bg-zinc-950 p-1 rounded-xl border border-zinc-200 dark:border-zinc-800" data-testid="horizon-selector">
                             {HORIZON_OPTIONS.map(opt => (
                                 <Tooltip key={opt.id} content={`Ustaw horyzont czasowy raportu na ${opt.id} lat`}>
                                     <button
@@ -1051,7 +1060,7 @@ export const CustomReportBuilder = ({
                                         className={`flex-1 py-1.5 px-2 text-xs font-medium rounded-lg transition-all ${
                                             horizonYears === opt.id
                                                 ? 'bg-blue-600 text-white shadow-sm'
-                                                : 'text-slate-400 hover:text-slate-200'
+                                                : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
                                         }`}
                                     >
                                         {opt.id}L
@@ -1063,7 +1072,7 @@ export const CustomReportBuilder = ({
 
                     {/* Scale Selector */}
                     <div>
-                        <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center gap-1.5">
+                        <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5 flex items-center gap-1.5">
                             <DollarSign className="w-3.5 h-3.5 text-emerald-400" />
                             <span>Skala Prezentacji Kwot</span>
                             <InfoTooltip
@@ -1072,7 +1081,7 @@ export const CustomReportBuilder = ({
                                 ariaLabel="Objaśnienie skali kwot"
                             />
                         </label>
-                        <div className="flex bg-slate-900/90 p-1 rounded-xl border border-slate-700" data-testid="scale-selector">
+                        <div className="flex bg-zinc-100 dark:bg-zinc-950 p-1 rounded-xl border border-zinc-200 dark:border-zinc-800" data-testid="scale-selector">
                             {SCALE_OPTIONS.map(opt => (
                                 <Tooltip key={opt.id} content={`Prezentuj kwoty w jednostkach: ${opt.label}`}>
                                     <button
@@ -1081,7 +1090,7 @@ export const CustomReportBuilder = ({
                                         className={`flex-1 py-1.5 px-2 text-xs font-medium rounded-lg transition-all ${
                                             scale === opt.id
                                                 ? 'bg-emerald-600 text-white shadow-sm'
-                                                : 'text-slate-400 hover:text-slate-200'
+                                                : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
                                         }`}
                                     >
                                         {opt.label}
@@ -1094,7 +1103,7 @@ export const CustomReportBuilder = ({
 
                 {/* Preset description bar */}
                 {REPORT_PRESETS.find(p => p.id === activePresetId)?.description && (
-                    <div className="mt-4 px-4 py-2.5 bg-slate-900/60 rounded-xl border border-slate-700/50 flex items-center gap-2 text-xs text-slate-400">
+                    <div className="mt-4 px-4 py-2.5 bg-zinc-50 dark:bg-zinc-950/60 rounded-xl border border-zinc-200 dark:border-zinc-800/50 flex items-center gap-2 text-xs text-zinc-600 dark:text-zinc-400">
                         <Sparkles className="w-4 h-4 text-cyan-400 shrink-0" />
                         <span>{REPORT_PRESETS.find(p => p.id === activePresetId).description}</span>
                     </div>
@@ -1103,24 +1112,24 @@ export const CustomReportBuilder = ({
 
             {/* Interactive Visual Chart (Recharts) */}
             {chartVisible && chartData.length > 0 && chartMetricIds.length > 0 && (
-                <div data-testid="report-chart-container" className="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-6 backdrop-blur-md shadow-xl">
+                <div data-testid="report-chart-container" className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-sm">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
                         <div>
-                            <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                            <h4 className="text-sm font-bold text-zinc-900 dark:text-white flex items-center gap-2">
                                 <TrendingUp className="w-4 h-4 text-cyan-400" />
                                 <span>Wizualizacja Trendów Wybranych Pozycji na Osi Czasu</span>
                             </h4>
-                            <p className="text-xs text-slate-400 mt-0.5">
+                            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
                                 Kliknij ikonę oka w tabeli poniżej, aby dodać lub usunąć serię z wykresu
                             </p>
                         </div>
-                        <div className="flex items-center gap-2 bg-slate-900/90 p-1 rounded-xl border border-slate-700">
+                        <div className="flex items-center gap-2 bg-zinc-100 dark:bg-zinc-950 p-1 rounded-xl border border-zinc-200 dark:border-zinc-800">
                             <Tooltip content="Przełącz na liniowy wykres trendu">
                                 <button
                                     type="button"
                                     data-testid="chart-type-line"
                                     onClick={() => setChartType('line')}
-                                    className={`p-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${chartType === 'line' ? 'bg-cyan-600 text-white' : 'text-slate-400 hover:text-slate-200'}`}
+                                    className={`p-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${chartType === 'line' ? 'bg-cyan-600 text-white' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'}`}
                                     title="Wykres liniowy"
                                     aria-label="Wykres liniowy"
                                 >
@@ -1132,7 +1141,7 @@ export const CustomReportBuilder = ({
                                     type="button"
                                     data-testid="chart-type-bar"
                                     onClick={() => setChartType('bar')}
-                                    className={`p-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${chartType === 'bar' ? 'bg-cyan-600 text-white' : 'text-slate-400 hover:text-slate-200'}`}
+                                    className={`p-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${chartType === 'bar' ? 'bg-cyan-600 text-white' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'}`}
                                     title="Wykres słupkowy"
                                     aria-label="Wykres słupkowy"
                                 >
@@ -1146,16 +1155,16 @@ export const CustomReportBuilder = ({
                         <ResponsiveContainer width="100%" height="100%">
                             {chartType === 'line' ? (
                                 <LineChart data={chartData} margin={{ top: 10, right: 30, left: 10, bottom: 0 }}>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.5} />
-                                    <XAxis dataKey="year" stroke="#94A3B8" fontSize={11} />
-                                    <YAxis stroke="#94A3B8" fontSize={11} />
+                                    <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} opacity={0.6} />
+                                    <XAxis dataKey="year" stroke={axisStroke} fontSize={11} />
+                                    <YAxis stroke={axisStroke} fontSize={11} />
                                     <RechartsTooltip
                                         contentStyle={{
-                                            backgroundColor: '#0F172A',
-                                            borderColor: '#334155',
+                                            backgroundColor: tooltipBg,
+                                            borderColor: tooltipBorder,
                                             borderRadius: '0.75rem',
                                             fontSize: '12px',
-                                            color: '#F8FAFC'
+                                            color: tooltipColor
                                         }}
                                     />
                                     <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
@@ -1178,16 +1187,16 @@ export const CustomReportBuilder = ({
                                 </LineChart>
                             ) : (
                                 <BarChart data={chartData} margin={{ top: 10, right: 30, left: 10, bottom: 0 }}>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.5} />
-                                    <XAxis dataKey="year" stroke="#94A3B8" fontSize={11} />
-                                    <YAxis stroke="#94A3B8" fontSize={11} />
+                                    <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} opacity={0.6} />
+                                    <XAxis dataKey="year" stroke={axisStroke} fontSize={11} />
+                                    <YAxis stroke={axisStroke} fontSize={11} />
                                     <RechartsTooltip
                                         contentStyle={{
-                                            backgroundColor: '#0F172A',
-                                            borderColor: '#334155',
+                                            backgroundColor: tooltipBg,
+                                            borderColor: tooltipBorder,
                                             borderRadius: '0.75rem',
                                             fontSize: '12px',
-                                            color: '#F8FAFC'
+                                            color: tooltipColor
                                         }}
                                     />
                                     <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
@@ -1212,15 +1221,15 @@ export const CustomReportBuilder = ({
             )}
 
             {/* Custom Report Table */}
-            <div className="bg-slate-800/80 border border-slate-700/80 rounded-2xl overflow-hidden backdrop-blur-md shadow-xl">
-                <div className="p-4 bg-slate-900/60 border-b border-slate-700 flex items-center justify-between">
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl overflow-hidden shadow-sm">
+                <div className="p-4 bg-zinc-50 dark:bg-zinc-950/60 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
                     <div className="flex items-center space-x-2">
                         <Table className="w-4 h-4 text-cyan-400" />
-                        <span className="text-sm font-semibold text-slate-200">
+                        <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-200">
                             Zestawienie Tabelaryczne ({activeMetrics.length} pozycji / {timelinePeriods.length} lat)
                         </span>
                     </div>
-                    <span className="text-xs text-slate-400 font-mono">
+                    <span className="text-xs text-zinc-500 dark:text-zinc-400 font-mono">
                         Wartości w: <span className="text-cyan-400 font-semibold">{activeScaleConfig.label}</span>
                     </span>
                 </div>
@@ -1228,7 +1237,7 @@ export const CustomReportBuilder = ({
                 <div className="overflow-x-auto">
                     <table data-testid="report-table" className="w-full text-left text-xs border-collapse">
                         <thead>
-                            <tr className="bg-slate-900/90 text-slate-300 font-semibold border-b border-slate-700 sticky top-0 z-10">
+                            <tr className="bg-zinc-100 dark:bg-zinc-950/90 text-zinc-700 dark:text-zinc-300 font-semibold border-b border-zinc-200 dark:border-zinc-800 sticky top-0 z-10">
                                 <th className="p-3 pl-4 min-w-[280px]">Pozycja Finansowa</th>
                                 <th className="p-3 w-16 text-center">Wykres</th>
                                 <th className="p-3 w-24 text-center">Kategoria</th>
@@ -1237,16 +1246,16 @@ export const CustomReportBuilder = ({
                                         Rok {idx + 1}
                                     </th>
                                 ))}
-                                <th className="p-3 pr-4 text-right min-w-[110px] font-mono bg-slate-900/95 border-l border-slate-700">
+                                <th className="p-3 pr-4 text-right min-w-[110px] font-mono bg-zinc-100/95 dark:bg-zinc-950 border-l border-zinc-200 dark:border-zinc-800">
                                     Podsumowanie
                                 </th>
                                 <th className="p-3 w-20 text-center">Akcje</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-700/60 text-slate-300">
+                        <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800/60 text-zinc-700 dark:text-zinc-300">
                             {activeMetrics.length === 0 ? (
                                 <tr>
-                                    <td colSpan={timelinePeriods.length + 5} className="p-8 text-center text-slate-500">
+                                    <td colSpan={timelinePeriods.length + 5} className="p-8 text-center text-zinc-400 dark:text-zinc-500">
                                         Brak wybranych pozycji. Kliknij "Dodaj Pozycję", aby skomponować raport.
                                     </td>
                                 </tr>
@@ -1259,18 +1268,18 @@ export const CustomReportBuilder = ({
                                         <tr
                                             key={metric.id}
                                             data-testid={`report-row-${metric.id}`}
-                                            className="hover:bg-slate-750/50 transition-colors"
+                                            className="hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
                                         >
                                             {/* Row Name & Description */}
                                             <td className="p-3 pl-4">
-                                                <div className="font-semibold text-slate-100 flex items-center gap-2">
+                                                <div className="font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
                                                     <span
                                                         className="w-2.5 h-2.5 rounded-full shrink-0"
                                                         style={{ backgroundColor: metric.color }}
                                                     />
                                                     <span>{metric.name}</span>
                                                 </div>
-                                                <div className="text-[10px] text-slate-400 ml-4.5 truncate max-w-xs">
+                                                <div className="text-[10px] text-zinc-500 dark:text-zinc-400 ml-4.5 truncate max-w-xs">
                                                     {metric.description}
                                                 </div>
                                             </td>
@@ -1285,7 +1294,7 @@ export const CustomReportBuilder = ({
                                                         className={`p-1 rounded-lg transition-colors cursor-pointer ${
                                                             isChartActive
                                                                 ? 'text-cyan-400 bg-cyan-500/10 hover:bg-cyan-500/20'
-                                                                : 'text-slate-500 hover:text-slate-300'
+                                                                : 'text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300'
                                                         }`}
                                                         title={isChartActive ? 'Usuń z wykresu' : 'Pokaż na wykresie'}
                                                         aria-label={isChartActive ? 'Usuń z wykresu' : 'Pokaż na wykresie'}
@@ -1317,7 +1326,7 @@ export const CustomReportBuilder = ({
                                                     <td
                                                         key={pIdx}
                                                         className={`p-3 text-right font-mono ${
-                                                            isNegative ? 'text-rose-400' : 'text-slate-200'
+                                                            isNegative ? 'text-rose-400' : 'text-zinc-800 dark:text-zinc-200'
                                                         }`}
                                                     >
                                                         {formatMetricValue(val, metric.unit)}
@@ -1326,7 +1335,7 @@ export const CustomReportBuilder = ({
                                             })}
 
                                             {/* Aggregation (Sum / Avg / Last) */}
-                                            <td className="p-3 pr-4 text-right font-mono font-bold bg-slate-900/40 border-l border-slate-700/80 text-cyan-300">
+                                            <td className="p-3 pr-4 text-right font-mono font-bold bg-zinc-50/60 dark:bg-zinc-950/40 border-l border-zinc-200 dark:border-zinc-800/80 text-cyan-600 dark:text-cyan-300">
                                                 {formatMetricValue(aggVal, metric.unit)}
                                             </td>
 
@@ -1338,7 +1347,7 @@ export const CustomReportBuilder = ({
                                                             type="button"
                                                             disabled={index === 0}
                                                             onClick={() => handleMoveMetric(index, -1)}
-                                                            className="p-1 text-slate-400 hover:text-slate-200 disabled:opacity-30 disabled:hover:text-slate-400 cursor-pointer"
+                                                            className="p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 disabled:opacity-30 disabled:hover:text-zinc-400 cursor-pointer"
                                                             title="Przesuń w górę"
                                                             aria-label="Przesuń w górę"
                                                         >
@@ -1350,7 +1359,7 @@ export const CustomReportBuilder = ({
                                                             type="button"
                                                             disabled={index === activeMetrics.length - 1}
                                                             onClick={() => handleMoveMetric(index, 1)}
-                                                            className="p-1 text-slate-400 hover:text-slate-200 disabled:opacity-30 disabled:hover:text-slate-400 cursor-pointer"
+                                                            className="p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 disabled:opacity-30 disabled:hover:text-zinc-400 cursor-pointer"
                                                             title="Przesuń w dół"
                                                             aria-label="Przesuń w dół"
                                                         >
@@ -1383,20 +1392,20 @@ export const CustomReportBuilder = ({
             {isPickerOpen && (
                 <div
                     data-testid="metric-picker-modal"
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4"
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4"
                 >
-                    <div className="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-3xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+                    <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl w-full max-w-3xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
                         {/* Modal Header */}
-                        <div className="p-5 border-b border-slate-700 flex items-center justify-between bg-slate-900/70">
+                        <div className="p-5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between bg-zinc-50 dark:bg-zinc-950/70">
                             <div className="flex items-center space-x-3">
                                 <div className="p-2.5 bg-cyan-500/20 border border-cyan-500/30 rounded-xl text-cyan-400">
                                     <Plus className="w-5 h-5" />
                                 </div>
                                 <div>
-                                    <h3 className="text-lg font-bold text-white">
+                                    <h3 className="text-lg font-bold text-zinc-900 dark:text-white">
                                         Biblioteka Pozycji Raportowych
                                     </h3>
-                                    <p className="text-xs text-slate-400">
+                                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
                                         Wybierz pozycje finansowe do dołączenia do aktywnego raportu
                                     </p>
                                 </div>
@@ -1405,7 +1414,7 @@ export const CustomReportBuilder = ({
                                 <button
                                     type="button"
                                     onClick={() => setIsPickerOpen(false)}
-                                    className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-700/60 transition-colors cursor-pointer"
+                                    className="p-1.5 text-zinc-400 hover:text-zinc-700 dark:hover:text-white rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
                                     aria-label="Zamknij bibliotekę"
                                 >
                                     <X className="w-5 h-5" />
@@ -1414,16 +1423,16 @@ export const CustomReportBuilder = ({
                         </div>
 
                         {/* Search & Filter Strip */}
-                        <div className="p-4 bg-slate-850 border-b border-slate-700/80 flex flex-col sm:flex-row gap-3">
+                        <div className="p-4 bg-zinc-50/70 dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800 flex flex-col sm:flex-row gap-3">
                             <div className="relative flex-1">
-                                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                                <Search className="w-4 h-4 text-zinc-400 absolute left-3 top-3" />
                                 <input
                                     type="text"
                                     data-testid="picker-search-input"
                                     placeholder="Szukaj pozycji (np. EBITDA, DSCR, Kapitał...)"
                                     value={pickerSearchQuery}
                                     onChange={(e) => setPickerSearchQuery(e.target.value)}
-                                    className="w-full bg-slate-900 border border-slate-700 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500"
+                                    className="w-full bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-xl pl-9 pr-3 py-2 text-xs text-zinc-900 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-cyan-500"
                                 />
                             </div>
                             <div className="flex items-center gap-1 overflow-x-auto pb-1 sm:pb-0" data-testid="picker-category-filters">
@@ -1442,7 +1451,7 @@ export const CustomReportBuilder = ({
                                             className={`px-2.5 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors cursor-pointer ${
                                                 pickerCategoryFilter === cat.id
                                                     ? 'bg-cyan-600 text-white'
-                                                    : 'text-slate-400 hover:bg-slate-700/60 hover:text-slate-200'
+                                                    : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-200'
                                             }`}
                                         >
                                             {cat.label}
@@ -1461,7 +1470,7 @@ export const CustomReportBuilder = ({
                                     <div
                                         key={metric.id}
                                         data-testid={`picker-item-${metric.id}`}
-                                        className="p-3 bg-slate-900/60 border border-slate-700/60 rounded-xl hover:border-slate-600 transition-colors flex items-center justify-between gap-4"
+                                        className="p-3 bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors flex items-center justify-between gap-4"
                                     >
                                         <div className="flex items-start space-x-3">
                                             <span
@@ -1470,14 +1479,14 @@ export const CustomReportBuilder = ({
                                             />
                                             <div>
                                                 <div className="flex items-center space-x-2">
-                                                    <span className="font-semibold text-slate-100 text-xs">
+                                                    <span className="font-semibold text-zinc-900 dark:text-zinc-100 text-xs">
                                                         {metric.name}
                                                     </span>
-                                                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700">
+                                                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700">
                                                         {metric.categoryName}
                                                     </span>
                                                 </div>
-                                                <p className="text-[11px] text-slate-400 mt-0.5">
+                                                <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">
                                                     {metric.description}
                                                 </p>
                                             </div>
@@ -1509,12 +1518,12 @@ export const CustomReportBuilder = ({
                         </div>
 
                         {/* Modal Footer */}
-                        <div className="p-4 bg-slate-900/70 border-t border-slate-700 flex justify-end">
+                        <div className="p-4 bg-zinc-50 dark:bg-zinc-950 border-t border-zinc-200 dark:border-zinc-800 flex justify-end">
                             <Button
                                 variant="secondary"
                                 size="sm"
                                 onClick={() => setIsPickerOpen(false)}
-                                className="bg-slate-700 hover:bg-slate-600 text-white"
+                                className="bg-zinc-200 hover:bg-zinc-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200"
                             >
                                 Zamknij
                             </Button>

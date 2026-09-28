@@ -1038,7 +1038,7 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - `docs/ROUTING_ARCHITECTURE.md`: opracowanie kompletnej, instytucjonalnej dokumentacji technicznej architektury nawigacji SPA, rejestru tras `ROUTES`, strażników tras (`ProtectedRoute`, `GuestRoute`, `RoleGuard`), powłoki `<Outlet />`, dynamicznej rezolucji nagłówka, semantycznego paska `Sidebar`, obsługi błędów 404, infrastruktury testowej `renderWithRouter` oraz wytycznych deweloperskich.
     - `README.md` & `changelog/README.md`: aktualizacja spisu technologii, opisu interfejsu SPA i rejestru zmian dokumentująca pełną eliminację problemu zamrożonego adresu URL i wdrożenie nowoczesnego routingu w całej aplikacji.
     - Weryfikacja testowa: 100% PASS w pełnym zestawie 72 plików Vitest (653 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
-- [x] **Faza 60: Wielomotywowość (Light, Dark & System Theme Architecture) (Commity 295–303)**
+- [x] **Faza 60: Wielomotywowość (Light, Dark & System Theme Architecture) (Commity 295–305)**
     - [x] Konfiguracja strategii Dark Mode w Tailwind CSS i eliminacja zjawiska FOUC za pomocą skryptu bootstrapowego.
         - `tailwind.config.js`: aktywacja strategii `darkMode: 'class'` umożliwiającej warunkowe stosowanie stylów motywu ciemnego za pośrednictwem wariantów `dark:*` sterowanych klasą `.dark` na elemencie `<html>`.
         - `resources/views/app.blade.php`: implementacja synchronicznego, odpornego na błędy skryptu bootstrapowego w sekcji `<head>`, natychmiast aplikującego klasę `dark` na podstawie `localStorage` (`finboard_theme`) lub preferencji systemowych `prefers-color-scheme: dark`, zapobiegając zjawisku FOUC.
@@ -1094,6 +1094,11 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
         - `resources/js/tests/integration/dashboardViewE2EWorkflow.test.jsx`: refaktoryzacja selektora w teście integracyjnym E2E z kruchego `.closest("div.bg-zinc-900")` na stabilny `screen.getByTestId("cost-breakdown-card")`.
         - `resources/js/tests/components/CostBreakdownChart.test.jsx`: rozszerzenie zestawu testów jednostkowych o weryfikację odporności cyklu życia hooków podczas rerenderowania pustej/pełnej kolekcji danych oraz renderowanie w motywie jasnym (`THEMES.LIGHT`) pod `ThemeProvider`.
         - Weryfikacja testowa: 100% PASS w pełnym zestawie 74 plików Vitest (672 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
+    - [x] Dostosowanie generatora dossier inwestycyjnego (LMA PDF) oraz kreatora raportów do motywu jasnego i ciemnego (Commit 305).
+        - `resources/js/components/investments/InvestmentDossierPdfGenerator.jsx`: wstrzyknięcie hooka `useTheme()`, dynamiczne style siatki i etykiet Recharts, refaktoryzacja panelu konfiguratora, selektorów skali/znaku wodnego, notatek oraz arkusza podglądu A4 (`#investment-dossier-pdf`) do semantycznych par Tailwind (`bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800`), z pełnym zachowaniem stylów wydruku wektorowego (`print:...`).
+        - `resources/js/components/investments/CustomReportBuilder.jsx`: wstrzyknięcie hooka `useTheme()`, dynamiczne motywy wykresu trendów (Recharts), pełna adaptacja tabeli 15-letniej, paska sterowania presetami i horyzontem oraz modala biblioteki pozycji (`metric-picker-modal`).
+        - `resources/js/tests/components/InvestmentDossierPdfGenerator.test.jsx` & `resources/js/tests/components/CustomReportBuilder.test.jsx`: rozszerzenie zestawów testów o weryfikację poprawnego montowania i klas semantycznych w trybach `THEMES.LIGHT` i `THEMES.DARK`.
+        - Weryfikacja testowa: 100% PASS w pełnym zestawie 74 plików Vitest (674 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
 ---
 

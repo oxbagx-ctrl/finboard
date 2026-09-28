@@ -5,6 +5,7 @@ import { InvestmentDossierPdfGenerator, computeDossierSha256 } from '../../compo
 import { InvestmentProjectContext } from '../../context/InvestmentProjectContext';
 import { NotificationContext } from '../../context/NotificationContext';
 import { AuthContext } from '../../context/AuthContext';
+import { ThemeProvider, THEMES } from '../../context/ThemeContext';
 
 // Mock Recharts ResponsiveContainer to prevent size observer warnings
 vi.mock('recharts', async () => {
@@ -365,5 +366,54 @@ describe('InvestmentDossierPdfGenerator Component (Phase 45 Commit 224)', () => 
         expect(typeof hash).toBe('string');
         expect(hash.length).toBe(64);
         expect(/^[a-f0-9]{64}$/i.test(hash)).toBe(true);
+    });
+
+    it('renders cleanly in light and dark theme mode', () => {
+        const authContextValue = {
+            user: { name: 'Adam Kowalski', email: 'adam@finboard.pl' },
+            activeCompany: { name: 'Helvest Partners' }
+        };
+
+        const { unmount } = render(
+            <ThemeProvider defaultTheme={THEMES.LIGHT}>
+                <AuthContext.Provider value={authContextValue}>
+                    <NotificationContext.Provider value={{ success: mockSuccess, error: mockNotifyError }}>
+                        <InvestmentProjectContext.Provider value={{ selectedProject: mockProject }}>
+                            <InvestmentDossierPdfGenerator
+                                project={mockProject}
+                                simulationData={mockSimulationData}
+                            />
+                        </InvestmentProjectContext.Provider>
+                    </NotificationContext.Provider>
+                </AuthContext.Provider>
+            </ThemeProvider>
+        );
+
+        const dossierContainer = screen.getByTestId('investment-dossier-pdf-generator');
+        expect(dossierContainer).toBeInTheDocument();
+        const preview = screen.getByTestId('dossier-document-preview');
+        expect(preview).toHaveClass('bg-white');
+        expect(preview).toHaveClass('dark:bg-zinc-900');
+        unmount();
+
+        render(
+            <ThemeProvider defaultTheme={THEMES.DARK}>
+                <AuthContext.Provider value={authContextValue}>
+                    <NotificationContext.Provider value={{ success: mockSuccess, error: mockNotifyError }}>
+                        <InvestmentProjectContext.Provider value={{ selectedProject: mockProject }}>
+                            <InvestmentDossierPdfGenerator
+                                project={mockProject}
+                                simulationData={mockSimulationData}
+                            />
+                        </InvestmentProjectContext.Provider>
+                    </NotificationContext.Provider>
+                </AuthContext.Provider>
+            </ThemeProvider>
+        );
+
+        const darkPreview = screen.getByTestId('dossier-document-preview');
+        expect(darkPreview).toBeInTheDocument();
+        expect(darkPreview).toHaveClass('bg-white');
+        expect(darkPreview).toHaveClass('dark:bg-zinc-900');
     });
 });

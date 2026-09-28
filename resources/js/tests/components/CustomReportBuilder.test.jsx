@@ -4,6 +4,7 @@ import { render, screen, fireEvent, waitFor, within } from '@testing-library/rea
 import { CustomReportBuilder, REPORT_PRESETS, METRIC_CATALOG } from '../../components/investments/CustomReportBuilder';
 import { InvestmentProjectContext } from '../../context/InvestmentProjectContext';
 import { NotificationContext } from '../../context/NotificationContext';
+import { ThemeProvider, THEMES } from '../../context/ThemeContext';
 
 // Mock Recharts ResponsiveContainer to prevent size observer issues in test DOM
 vi.mock('recharts', async () => {
@@ -414,5 +415,41 @@ describe('CustomReportBuilder Component (Phase 45 Commit 223)', () => {
         );
 
         vi.restoreAllMocks();
+    });
+    it('renders cleanly in light and dark theme mode', () => {
+        const { unmount } = render(
+            <ThemeProvider defaultTheme={THEMES.LIGHT}>
+                <InvestmentProjectContext.Provider value={{ selectedProject: mockProject }}>
+                    <NotificationContext.Provider value={{ success: mockSuccess, error: mockNotifyError }}>
+                        <CustomReportBuilder
+                            project={mockProject}
+                            simulationData={mockSimulationData}
+                        />
+                    </NotificationContext.Provider>
+                </InvestmentProjectContext.Provider>
+            </ThemeProvider>
+        );
+
+        const builderContainer = screen.getByTestId('custom-report-builder');
+        expect(builderContainer).toBeInTheDocument();
+        const table = screen.getByTestId('report-table');
+        expect(table).toBeInTheDocument();
+        unmount();
+
+        render(
+            <ThemeProvider defaultTheme={THEMES.DARK}>
+                <InvestmentProjectContext.Provider value={{ selectedProject: mockProject }}>
+                    <NotificationContext.Provider value={{ success: mockSuccess, error: mockNotifyError }}>
+                        <CustomReportBuilder
+                            project={mockProject}
+                            simulationData={mockSimulationData}
+                        />
+                    </NotificationContext.Provider>
+                </InvestmentProjectContext.Provider>
+            </ThemeProvider>
+        );
+
+        expect(screen.getByTestId('custom-report-builder')).toBeInTheDocument();
+        expect(screen.getByTestId('report-table')).toBeInTheDocument();
     });
 });
