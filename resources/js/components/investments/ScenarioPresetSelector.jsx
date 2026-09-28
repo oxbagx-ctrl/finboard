@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
+import { Tooltip, InfoTooltip } from '../ui/Tooltip';
 
 export const SCENARIO_PRESETS = [
     {
@@ -155,9 +156,16 @@ export const ScenarioPresetSelector = ({
             {/* Top Toolbar: Scenario Buttons & Reset */}
             <div className="flex flex-wrap items-center justify-between gap-3 bg-zinc-950 p-2 rounded-lg border border-zinc-800">
                 <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="text-[10px] text-zinc-500 uppercase font-semibold px-2">
-                        SCENARIUSZ:
-                    </span>
+                    <div className="flex items-center gap-1 px-2">
+                        <span className="text-[10px] text-zinc-500 uppercase font-semibold">
+                            SCENARIUSZ:
+                        </span>
+                        <InfoTooltip
+                            size="xs"
+                            content="Predefiniowane scenariusze makroekonomiczne i stres-testy bankowe służące do szybkiej weryfikacji odporności modelu na szoki popytowe, kosztowe i stóp procentowych."
+                            ariaLabel="Informacje o scenariuszach What-If"
+                        />
+                    </div>
 
                     {SCENARIO_PRESETS.map((preset) => {
                         const Icon = preset.icon;
@@ -173,62 +181,76 @@ export const ScenarioPresetSelector = ({
                         }
 
                         return (
-                            <button
+                            <Tooltip
                                 key={preset.id}
-                                type="button"
-                                onClick={() => handleSelect(preset)}
-                                onMouseEnter={() => setHoveredScenario(preset)}
-                                onMouseLeave={() => setHoveredScenario(null)}
-                                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs rounded transition-all cursor-pointer ${activeClasses}`}
-                                title={preset.description}
+                                content={`${preset.label}: ${preset.description}`}
+                                placement="bottom"
                             >
-                                <Icon className="w-3.5 h-3.5" />
-                                <span>{preset.shortName}</span>
-                                {isActive && (
-                                    <span className="w-1.5 h-1.5 rounded-full bg-current ml-0.5" />
-                                )}
-                            </button>
+                                <button
+                                    type="button"
+                                    onClick={() => handleSelect(preset)}
+                                    onMouseEnter={() => setHoveredScenario(preset)}
+                                    onMouseLeave={() => setHoveredScenario(null)}
+                                    className={`flex items-center gap-1.5 px-3 py-1.5 text-xs rounded transition-all cursor-pointer ${activeClasses}`}
+                                    aria-label={`${preset.shortName} (${preset.label}): ${preset.description}`}
+                                >
+                                    <Icon className="w-3.5 h-3.5" />
+                                    <span>{preset.shortName}</span>
+                                    {isActive && (
+                                        <span className="w-1.5 h-1.5 rounded-full bg-current ml-0.5" />
+                                    )}
+                                </button>
+                            </Tooltip>
                         );
                     })}
 
                     {/* Custom Badge if active scenario is custom */}
                     {activeScenario === 'custom' && (
-                        <div className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded bg-cyan-950/60 border border-cyan-800/70 text-cyan-300 font-bold">
-                            <Sliders className="w-3.5 h-3.5" />
-                            <span>Własny (Manualny)</span>
-                            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 ml-0.5 animate-pulse" />
-                        </div>
+                        <Tooltip content="Własna, niestandardowa parametryzacja suwaków wrażliwości ustalona ręcznie przez użytkownika">
+                            <div className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded bg-cyan-950/60 border border-cyan-800/70 text-cyan-300 font-bold">
+                                <Sliders className="w-3.5 h-3.5" />
+                                <span>Własny (Manualny)</span>
+                                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 ml-0.5 animate-pulse" />
+                            </div>
+                        </Tooltip>
                     )}
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <Button
-                        type="button"
-                        variant="secondary"
-                        size="sm"
-                        onClick={onReset || (() => handleSelect(SCENARIO_PRESETS[0]))}
-                        className="gap-1.5 text-xs"
-                    >
-                        <RotateCcw className="w-3.5 h-3.5" />
-                        <span>Przywróć Bazę</span>
-                    </Button>
+                    <Tooltip content="Przywróć domyślny scenariusz bazowy oraz zerowe odchylenia suwaków">
+                        <Button
+                            type="button"
+                            variant="secondary"
+                            size="sm"
+                            onClick={onReset || (() => handleSelect(SCENARIO_PRESETS[0]))}
+                            className="gap-1.5 text-xs"
+                            aria-label="Przywróć Bazę - zresetuj odchylenia suwaków"
+                        >
+                            <RotateCcw className="w-3.5 h-3.5" />
+                            <span>Przywróć Bazę</span>
+                        </Button>
+                    </Tooltip>
                 </div>
             </div>
 
             {/* Contextual Scenario Description & Impact Strip */}
             <div className="bg-zinc-900/60 border border-zinc-800/80 rounded-lg p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
                 <div className="flex items-start sm:items-center gap-2.5">
-                    <div className="p-1.5 rounded bg-zinc-800 border border-zinc-700 text-zinc-300 shrink-0">
-                        {React.createElement(displayInfoScenario.icon || Activity, { className: 'w-4 h-4' })}
-                    </div>
+                    <Tooltip content={`Aktywny profil scenariusza: ${displayInfoScenario.label}`}>
+                        <div className="p-1.5 rounded bg-zinc-800 border border-zinc-700 text-zinc-300 shrink-0">
+                            {React.createElement(displayInfoScenario.icon || Activity, { className: 'w-4 h-4' })}
+                        </div>
+                    </Tooltip>
                     <div>
                         <div className="flex items-center gap-2">
                             <span className="font-bold text-zinc-200">
                                 {displayInfoScenario.label}
                             </span>
-                            <Badge variant={displayInfoScenario.badgeVariant || 'default'}>
-                                {displayInfoScenario.badge}
-                            </Badge>
+                            <Tooltip content={`Kategoria profilu ryzyka: ${displayInfoScenario.badge}`}>
+                                <Badge variant={displayInfoScenario.badgeVariant || 'default'}>
+                                    {displayInfoScenario.badge}
+                                </Badge>
+                            </Tooltip>
                         </div>
                         <p className="text-[11px] text-zinc-400 mt-0.5">
                             {displayInfoScenario.description}
@@ -240,34 +262,46 @@ export const ScenarioPresetSelector = ({
                 {displayInfoScenario.deltas && (
                     <div className="flex flex-wrap items-center gap-1.5 text-[10px] shrink-0 font-mono">
                         {displayInfoScenario.deltas.capexDelta !== 0 && (
-                            <span className={`px-2 py-0.5 rounded border ${displayInfoScenario.deltas.capexDelta > 0 ? 'bg-rose-500/10 text-rose-300 border-rose-500/30' : 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'}`}>
-                                CAPEX {displayInfoScenario.deltas.capexDelta > 0 ? `+${displayInfoScenario.deltas.capexDelta}%` : `${displayInfoScenario.deltas.capexDelta}%`}
-                            </span>
+                            <Tooltip content={`Modyfikator nakładów CAPEX: ${displayInfoScenario.deltas.capexDelta > 0 ? `+${displayInfoScenario.deltas.capexDelta}%` : `${displayInfoScenario.deltas.capexDelta}%`}`}>
+                                <span className={`px-2 py-0.5 rounded border ${displayInfoScenario.deltas.capexDelta > 0 ? 'bg-rose-500/10 text-rose-300 border-rose-500/30' : 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'}`}>
+                                    CAPEX {displayInfoScenario.deltas.capexDelta > 0 ? `+${displayInfoScenario.deltas.capexDelta}%` : `${displayInfoScenario.deltas.capexDelta}%`}
+                                </span>
+                            </Tooltip>
                         )}
                         {displayInfoScenario.deltas.revenueDelta !== 0 && (
-                            <span className={`px-2 py-0.5 rounded border ${displayInfoScenario.deltas.revenueDelta > 0 ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30' : 'bg-rose-500/10 text-rose-300 border-rose-500/30'}`}>
-                                Przychody {displayInfoScenario.deltas.revenueDelta > 0 ? `+${displayInfoScenario.deltas.revenueDelta}%` : `${displayInfoScenario.deltas.revenueDelta}%`}
-                            </span>
+                            <Tooltip content={`Modyfikator przychodów ze sprzedaży: ${displayInfoScenario.deltas.revenueDelta > 0 ? `+${displayInfoScenario.deltas.revenueDelta}%` : `${displayInfoScenario.deltas.revenueDelta}%`}`}>
+                                <span className={`px-2 py-0.5 rounded border ${displayInfoScenario.deltas.revenueDelta > 0 ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30' : 'bg-rose-500/10 text-rose-300 border-rose-500/30'}`}>
+                                    Przychody {displayInfoScenario.deltas.revenueDelta > 0 ? `+${displayInfoScenario.deltas.revenueDelta}%` : `${displayInfoScenario.deltas.revenueDelta}%`}
+                                </span>
+                            </Tooltip>
                         )}
                         {displayInfoScenario.deltas.varCostDelta !== 0 && (
-                            <span className={`px-2 py-0.5 rounded border ${displayInfoScenario.deltas.varCostDelta > 0 ? 'bg-rose-500/10 text-rose-300 border-rose-500/30' : 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'}`}>
-                                Koszty zm. {displayInfoScenario.deltas.varCostDelta > 0 ? `+${displayInfoScenario.deltas.varCostDelta}%` : `${displayInfoScenario.deltas.varCostDelta}%`}
-                            </span>
+                            <Tooltip content={`Modyfikator kosztów zmiennych: ${displayInfoScenario.deltas.varCostDelta > 0 ? `+${displayInfoScenario.deltas.varCostDelta}%` : `${displayInfoScenario.deltas.varCostDelta}%`}`}>
+                                <span className={`px-2 py-0.5 rounded border ${displayInfoScenario.deltas.varCostDelta > 0 ? 'bg-rose-500/10 text-rose-300 border-rose-500/30' : 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'}`}>
+                                    Koszty zm. {displayInfoScenario.deltas.varCostDelta > 0 ? `+${displayInfoScenario.deltas.varCostDelta}%` : `${displayInfoScenario.deltas.varCostDelta}%`}
+                                </span>
+                            </Tooltip>
                         )}
                         {displayInfoScenario.deltas.payrollDelta !== 0 && (
-                            <span className={`px-2 py-0.5 rounded border ${displayInfoScenario.deltas.payrollDelta > 0 ? 'bg-purple-500/10 text-purple-300 border-purple-500/30' : 'bg-zinc-800 text-zinc-300 border-zinc-700'}`}>
-                                Płace {displayInfoScenario.deltas.payrollDelta > 0 ? `+${displayInfoScenario.deltas.payrollDelta}%` : `${displayInfoScenario.deltas.payrollDelta}%`}
-                            </span>
+                            <Tooltip content={`Modyfikator funduszu płac i stawek wynagrodzeń: ${displayInfoScenario.deltas.payrollDelta > 0 ? `+${displayInfoScenario.deltas.payrollDelta}%` : `${displayInfoScenario.deltas.payrollDelta}%`}`}>
+                                <span className={`px-2 py-0.5 rounded border ${displayInfoScenario.deltas.payrollDelta > 0 ? 'bg-purple-500/10 text-purple-300 border-purple-500/30' : 'bg-zinc-800 text-zinc-300 border-zinc-700'}`}>
+                                    Płace {displayInfoScenario.deltas.payrollDelta > 0 ? `+${displayInfoScenario.deltas.payrollDelta}%` : `${displayInfoScenario.deltas.payrollDelta}%`}
+                                </span>
+                            </Tooltip>
                         )}
                         {displayInfoScenario.deltas.waccDelta && (
-                            <span className="px-2 py-0.5 rounded border bg-amber-500/10 text-amber-300 border-amber-500/30">
-                                WACC +{displayInfoScenario.deltas.waccDelta} p.p.
-                            </span>
+                            <Tooltip content={`Szok stopy dyskontowej WACC: +${displayInfoScenario.deltas.waccDelta} punktów procentowych`}>
+                                <span className="px-2 py-0.5 rounded border bg-amber-500/10 text-amber-300 border-amber-500/30">
+                                    WACC +{displayInfoScenario.deltas.waccDelta} p.p.
+                                </span>
+                            </Tooltip>
                         )}
                         {displayInfoScenario.id === 'base' && (
-                            <span className="px-2 py-0.5 rounded border bg-zinc-800 text-zinc-400 border-zinc-700">
-                                Wszystkie odchylenia = 0%
-                            </span>
+                            <Tooltip content="W scenariuszu bazowym wszystkie mnożniki wrażliwości wynoszą 0%">
+                                <span className="px-2 py-0.5 rounded border bg-zinc-800 text-zinc-400 border-zinc-700">
+                                    Wszystkie odchylenia = 0%
+                                </span>
+                            </Tooltip>
                         )}
                     </div>
                 )}

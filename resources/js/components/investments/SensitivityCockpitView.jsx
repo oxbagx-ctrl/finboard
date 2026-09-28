@@ -353,15 +353,24 @@ export const SensitivityCockpitView = () => {
             {/* Header & Scenario Control Strip */}
             <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded bg-emerald-950/80 border border-emerald-800/80 flex items-center justify-center text-emerald-400">
-                        <Activity className="w-5 h-5" />
-                    </div>
+                    <UiTooltip content="Moduł symulacji wielowariantowej What-If i analizy wrażliwości Project Finance">
+                        <div className="w-10 h-10 rounded bg-emerald-950/80 border border-emerald-800/80 flex items-center justify-center text-emerald-400">
+                            <Activity className="w-5 h-5" />
+                        </div>
+                    </UiTooltip>
                     <div>
                         <div className="flex items-center gap-2">
                             <h2 className="text-sm font-bold text-zinc-100 uppercase tracking-wide">
                                 Cockpit Analizy Wrażliwości & Symulator What-If
                             </h2>
-                            <Badge variant="brand">REAL-TIME</Badge>
+                            <InfoTooltip
+                                size="sm"
+                                content="Interaktywny symulator analizy wrażliwości Project Finance. Umożliwia dynamiczne testowanie odporności projektu na wstrząsy popytowe, inflacyjne, kosztowe (CAPEX/OPEX), zmiany stóp procentowych (WACC) oraz alternatywne profile obsługi długu bankowego."
+                                ariaLabel="Informacje o symulatorze What-If"
+                            />
+                            <UiTooltip content="Wielowątkowe obliczenia modelu finansowego przeliczane asynchronicznie w tle w czasie rzeczywistym">
+                                <Badge variant="brand">REAL-TIME</Badge>
+                            </UiTooltip>
                         </div>
                         <p className="text-[11px] text-zinc-400 mt-0.5">
                             Reaktywny silnik Web Workera przeliczający 15-letni model (180 miesięcy) i wskaźniki bankowalności
@@ -371,11 +380,13 @@ export const SensitivityCockpitView = () => {
 
                 <div className="flex items-center gap-2">
                     {/* Execution Time Badge */}
-                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-zinc-950 border border-zinc-800 text-[11px] text-zinc-400">
-                        <Zap className="w-3.5 h-3.5 text-amber-400" />
-                        <span>Worker:</span>
-                        <span className="font-bold text-zinc-200">{lastExecutionMs || 1.8} ms</span>
-                    </div>
+                    <UiTooltip content="Czas wykonania pełnej symulacji 15-letniego modelu (180 miesięcy) przez dedykowanego Web Workera w przeglądarce">
+                        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-zinc-950 border border-zinc-800 text-[11px] text-zinc-400">
+                            <Zap className="w-3.5 h-3.5 text-amber-400" />
+                            <span>Worker:</span>
+                            <span className="font-bold text-zinc-200">{lastExecutionMs || 1.8} ms</span>
+                        </div>
+                    </UiTooltip>
                 </div>
             </div>
 
@@ -395,17 +406,28 @@ export const SensitivityCockpitView = () => {
                     className={`bg-zinc-900 border rounded-lg p-4 relative overflow-hidden transition-all duration-300 ${waccGlowClass}`}
                 >
                     <div className="flex items-center justify-between text-[10px] text-zinc-400 uppercase font-semibold mb-1">
-                        <span>PROJECT NPV</span>
-                        <DollarSign className="w-3.5 h-3.5 text-emerald-400" />
+                        <div className="flex items-center gap-1">
+                            <span>PROJECT NPV</span>
+                            <InfoTooltip
+                                size="xs"
+                                content="Wartość Bieżąca Netto (Net Present Value) nielewarowanych wolnych przepływów pieniężnych (FCFF) zdyskontowanych stopą WACC. Wartość dodatnia oznacza kreację wartości dla inwestorów."
+                                ariaLabel="Informacje o Project NPV"
+                            />
+                        </div>
+                        <UiTooltip content="Wycena DCF nielewarowanych przepływów pieniężnych projektu">
+                            <DollarSign className="w-3.5 h-3.5 text-emerald-400" />
+                        </UiTooltip>
                     </div>
                     <div className="text-base font-bold text-zinc-100">
                         {formatMoney(currentNpv)}
                     </div>
                     <div className="flex items-center gap-1.5 text-[10px] mt-1">
                         {deltas && deltas.npvDiff !== 0 ? (
-                            <span className={deltas.npvDiff > 0 ? 'text-emerald-400 font-semibold' : 'text-rose-400 font-semibold'}>
-                                {deltas.npvDiff > 0 ? '+' : ''}{formatMoney(deltas.npvDiff)} ({deltas.npvDiffPct > 0 ? '+' : ''}{deltas.npvDiffPct.toFixed(1)}%)
-                            </span>
+                            <UiTooltip content={`Odchylenie wartości NPV wobec scenariusza bazowego: ${deltas.npvDiff > 0 ? '+' : ''}${formatMoney(deltas.npvDiff)}`}>
+                                <span className={deltas.npvDiff > 0 ? 'text-emerald-400 font-semibold' : 'text-rose-400 font-semibold'}>
+                                    {deltas.npvDiff > 0 ? '+' : ''}{formatMoney(deltas.npvDiff)} ({deltas.npvDiffPct > 0 ? '+' : ''}{deltas.npvDiffPct.toFixed(1)}%)
+                                </span>
+                            </UiTooltip>
                         ) : (
                             <span className="text-zinc-500">Wobec scenariusza bazowego</span>
                         )}
@@ -418,18 +440,31 @@ export const SensitivityCockpitView = () => {
                     className={`bg-zinc-900 border rounded-lg p-4 transition-all duration-300 ${waccGlowClass}`}
                 >
                     <div className="flex items-center justify-between text-[10px] text-zinc-400 uppercase font-semibold mb-1">
-                        <span>PROJECT IRR</span>
-                        <TrendingUp className="w-3.5 h-3.5 text-blue-400" />
+                        <div className="flex items-center gap-1">
+                            <span>PROJECT IRR</span>
+                            <InfoTooltip
+                                size="xs"
+                                content="Wewnętrzna Stopa Zwrotu (Internal Rate of Return) dla całego projektu inwestycyjnego. Porównywana ze stopą dyskontową WACC (spread rentowności)."
+                                ariaLabel="Informacje o Project IRR"
+                            />
+                        </div>
+                        <UiTooltip content="Wewnętrzna stopa zwrotu projektu nielewarowanego">
+                            <TrendingUp className="w-3.5 h-3.5 text-blue-400" />
+                        </UiTooltip>
                     </div>
                     <div className="text-base font-bold text-zinc-100">
                         {formatPercent(currentIrr)}
                     </div>
                     <div className="text-[10px] text-zinc-500 mt-1 flex items-center justify-between">
-                        <span>WACC: {formatPercent(currentWacc)}</span>
+                        <UiTooltip content="Średni ważony koszt kapitału będący minimalną wymaganą stopą zwrotu">
+                            <span>WACC: {formatPercent(currentWacc)}</span>
+                        </UiTooltip>
                         {currentIrr !== null && (
-                            <span className={currentIrr > currentWacc ? 'text-emerald-400 font-semibold' : 'text-rose-400 font-semibold'}>
-                                Spread: {(currentIrr - currentWacc).toFixed(2)} p.p.
-                            </span>
+                            <UiTooltip content={`Różnica pomiędzy stopą zwrotu projektu (IRR) a kosztem kapitału (WACC): ${(currentIrr - currentWacc).toFixed(2)} p.p.`}>
+                                <span className={currentIrr > currentWacc ? 'text-emerald-400 font-semibold' : 'text-rose-400 font-semibold'}>
+                                    Spread: {(currentIrr - currentWacc).toFixed(2)} p.p.
+                                </span>
+                            </UiTooltip>
                         )}
                     </div>
                 </div>
@@ -440,51 +475,86 @@ export const SensitivityCockpitView = () => {
                     className={`bg-zinc-900 border rounded-lg p-4 transition-all duration-300 ${waccGlowClass}`}
                 >
                     <div className="flex items-center justify-between text-[10px] text-zinc-400 uppercase font-semibold mb-1">
-                        <span>EQUITY MoIC</span>
-                        <Coins className="w-3.5 h-3.5 text-amber-400" />
+                        <div className="flex items-center gap-1">
+                            <span>EQUITY MoIC</span>
+                            <InfoTooltip
+                                size="xs"
+                                content="Mnożnik zwrotu z zainwestowanego kapitału własnego sponsorów (Multiple on Invested Capital = Wypłaty FCFE dla sponsorów / Wkład własny equity)."
+                                ariaLabel="Informacje o Equity MoIC"
+                            />
+                        </div>
+                        <UiTooltip content="Mnożnik zwrotu z kapitału własnego sponsorów">
+                            <Coins className="w-3.5 h-3.5 text-amber-400" />
+                        </UiTooltip>
                     </div>
                     <div className="text-base font-bold text-zinc-100">
                         {currentMoic.toFixed(2)}x
                     </div>
                     <div className="text-[10px] text-zinc-500 mt-1">
-                        Equity NPV: <span className="text-zinc-300 font-semibold">{formatMoney(whatIfResult?.summary?.equityNpv ?? 0)}</span>
+                        <UiTooltip content="Zdyskontowana wartość bieżąca wolnych przepływów pieniężnych dla sponsorów (FCFE) po pełnej obsłudze długu">
+                            <span>Equity NPV: <span className="text-zinc-300 font-semibold">{formatMoney(whatIfResult?.summary?.equityNpv ?? 0)}</span></span>
+                        </UiTooltip>
                     </div>
                 </div>
 
                 {/* 4. Payback Period */}
                 <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
                     <div className="flex items-center justify-between text-[10px] text-zinc-400 uppercase font-semibold mb-1">
-                        <span>OKRES ZWROTU</span>
-                        <Clock className="w-3.5 h-3.5 text-purple-400" />
+                        <div className="flex items-center gap-1">
+                            <span>OKRES ZWROTU</span>
+                            <InfoTooltip
+                                size="xs"
+                                content="Prosty okres zwrotu (Simple Payback Period) – liczba lat niezbędna do pełnego odzyskania nakładów początkowych CAPEX z wygenerowanych nadwyżek operacyjnych."
+                                ariaLabel="Informacje o okresie zwrotu"
+                            />
+                        </div>
+                        <UiTooltip content="Horyzont zwrotu nakładów początkowych">
+                            <Clock className="w-3.5 h-3.5 text-purple-400" />
+                        </UiTooltip>
                     </div>
                     <div className="text-base font-bold text-zinc-100">
                         {whatIfResult?.summary?.simplePaybackYears ? `${whatIfResult.summary.simplePaybackYears} lat` : '> 15 lat'}
                     </div>
                     <div className="text-[10px] text-zinc-500 mt-1">
-                        Zdyskontowany: <span className="text-zinc-300">{whatIfResult?.summary?.discountedPaybackYears ? `${whatIfResult.summary.discountedPaybackYears} lat` : '> 15 lat'}</span>
+                        <UiTooltip content="Zdyskontowany okres zwrotu (Discounted Payback Period) uwzględniający koszt kapitału WACC">
+                            <span>Zdyskontowany: <span className="text-zinc-300">{whatIfResult?.summary?.discountedPaybackYears ? `${whatIfResult.summary.discountedPaybackYears} lat` : '> 15 lat'}</span></span>
+                        </UiTooltip>
                     </div>
                 </div>
 
                 {/* 5. DSCR & Bankability */}
                 <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
                     <div className="flex items-center justify-between text-[10px] text-zinc-400 uppercase font-semibold mb-1">
-                        <span>KOWENANT DSCR</span>
-                        {isBankable ? (
-                            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                        ) : (
-                            <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
-                        )}
+                        <div className="flex items-center gap-1">
+                            <span>KOWENANT DSCR</span>
+                            <InfoTooltip
+                                size="xs"
+                                content="Wskaźnik pokrycia obsługi długu (Debt Service Coverage Ratio = CFADS / Raty kapitałowo-odsetkowe). Banki wymagają minimalnego DSCR >= 1.20x."
+                                ariaLabel="Informacje o kowenancie DSCR"
+                            />
+                        </div>
+                        <UiTooltip content={isBankable ? 'Projekt bankowalny' : 'Ryzyko kredytowe'}>
+                            {isBankable ? (
+                                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                            ) : (
+                                <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
+                            )}
+                        </UiTooltip>
                     </div>
                     <div className="flex items-center justify-between">
                         <div className="text-base font-bold text-zinc-100">
                             {currentAvgDscr ? `${currentAvgDscr.toFixed(2)}x` : '—'}
                         </div>
-                        <Badge variant={isBankable ? 'success' : 'danger'}>
-                            {isBankable ? 'BANKABLE' : 'RISK (< 1.2x)'}
-                        </Badge>
+                        <UiTooltip content={isBankable ? 'Projekt spełnia minimalny kowenant DSCR >= 1.20x narzucany przez banki' : 'Minimalny DSCR poniżej progu 1.20x - ryzyko naruszenia kowenantów'}>
+                            <Badge variant={isBankable ? 'success' : 'danger'}>
+                                {isBankable ? 'BANKABLE' : 'RISK (< 1.2x)'}
+                            </Badge>
+                        </UiTooltip>
                     </div>
                     <div className="text-[10px] text-zinc-500 mt-1">
-                        Min DSCR: <span className={currentMinDscr && currentMinDscr >= 1.20 ? 'text-emerald-400' : 'text-amber-400'}>{currentMinDscr ? `${currentMinDscr.toFixed(2)}x` : '—'}</span>
+                        <UiTooltip content="Najniższy roczny wskaźnik DSCR odnotowany w okresie spłaty kredytu">
+                            <span>Min DSCR: <span className={currentMinDscr && currentMinDscr >= 1.20 ? 'text-emerald-400' : 'text-amber-400'}>{currentMinDscr ? `${currentMinDscr.toFixed(2)}x` : '—'}</span></span>
+                        </UiTooltip>
                     </div>
                 </div>
             </div>
@@ -493,10 +563,17 @@ export const SensitivityCockpitView = () => {
             <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-5">
                 <div className="flex items-center justify-between mb-4 border-b border-zinc-800 pb-3">
                     <div className="flex items-center gap-2">
-                        <Sliders className="w-4 h-4 text-emerald-400" />
+                        <UiTooltip content="Regulacja kluczowych zmiennych modelu finansowego">
+                            <Sliders className="w-4 h-4 text-emerald-400" />
+                        </UiTooltip>
                         <h3 className="text-xs font-bold text-zinc-100 uppercase tracking-wide">
                             Suwaki Analizy Wrażliwości What-If (Kluczowe Drivery Modelu)
                         </h3>
+                        <InfoTooltip
+                            size="xs"
+                            content="Dynamiczne suwaki pozwalają symulować odchylenia kluczowych zmiennych wejściowych modelu finansowego od wartości bazowych. Wyniki przeliczają się asynchronicznie w czasie rzeczywistym."
+                            ariaLabel="Informacje o suwakach analizy wrażliwości"
+                        />
                     </div>
                     <span className="text-[10px] text-zinc-500">
                         Przeciągaj suwaki, aby w czasie rzeczywistym symulować wpływ zmian na rentowność i płynność
@@ -524,6 +601,7 @@ export const SensitivityCockpitView = () => {
                             max="50"
                             step="1"
                             value={capexDelta}
+                            aria-label="Odchylenie nakładów CAPEX w procentach"
                             onChange={(e) => {
                                 setCapexDelta(parseInt(e.target.value, 10));
                                 setActiveScenario('custom');
@@ -559,6 +637,7 @@ export const SensitivityCockpitView = () => {
                             max="30"
                             step="1"
                             value={revenueDelta}
+                            aria-label="Odchylenie przychodów ze sprzedaży w procentach"
                             onChange={(e) => {
                                 setRevenueDelta(parseInt(e.target.value, 10));
                                 setActiveScenario('custom');
@@ -594,6 +673,7 @@ export const SensitivityCockpitView = () => {
                             max="30"
                             step="1"
                             value={varCostDelta}
+                            aria-label="Odchylenie kosztów zmiennych w procentach"
                             onChange={(e) => {
                                 setVarCostDelta(parseInt(e.target.value, 10));
                                 setActiveScenario('custom');
@@ -629,6 +709,7 @@ export const SensitivityCockpitView = () => {
                             max="30"
                             step="1"
                             value={fixedCostDelta}
+                            aria-label="Odchylenie kosztów stałych OPEX w procentach"
                             onChange={(e) => {
                                 setFixedCostDelta(parseInt(e.target.value, 10));
                                 setActiveScenario('custom');
@@ -664,6 +745,7 @@ export const SensitivityCockpitView = () => {
                             max="30"
                             step="1"
                             value={payrollDelta}
+                            aria-label="Odchylenie funduszu płac w procentach"
                             onChange={(e) => {
                                 setPayrollDelta(parseInt(e.target.value, 10));
                                 setActiveScenario('custom');
@@ -702,6 +784,7 @@ export const SensitivityCockpitView = () => {
                             max="16.0"
                             step="0.25"
                             value={waccOverride !== null ? waccOverride : (baseResult?.appraisal?.waccPercent ?? 8.50)}
+                            aria-label="Ręczna zmiana stopy dyskontowej WACC"
                             onChange={(e) => {
                                 setWaccOverride(parseFloat(e.target.value));
                                 setActiveScenario('custom');
@@ -712,16 +795,19 @@ export const SensitivityCockpitView = () => {
                         <div className="flex items-center justify-between text-[10px] text-zinc-500 font-mono">
                             <span>4.0%</span>
                             {waccOverride !== null && (
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        setWaccOverride(null);
-                                        triggerWaccHighlight();
-                                    }}
-                                    className="text-[10px] text-zinc-400 hover:text-zinc-200 underline cursor-pointer"
-                                >
-                                    Przywróć model WACC
-                                </button>
+                                <UiTooltip content="Przywróć stopę WACC wyliczoną analitycznie na podstawie parametrów CAPM">
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setWaccOverride(null);
+                                            triggerWaccHighlight();
+                                        }}
+                                        className="text-[10px] text-zinc-400 hover:text-zinc-200 underline cursor-pointer"
+                                        aria-label="Przywróć model WACC"
+                                    >
+                                        Przywróć model WACC
+                                    </button>
+                                </UiTooltip>
                             )}
                             <span>16.0%</span>
                         </div>
@@ -748,6 +834,7 @@ export const SensitivityCockpitView = () => {
                             step="5"
                             value={reinvestmentDelta}
                             disabled={!reinvestmentsEnabled}
+                            aria-label="Mnożnik nakładów odtworzeniowych Reinvestment w procentach"
                             onChange={(e) => {
                                 setReinvestmentDelta(parseInt(e.target.value, 10));
                                 setActiveScenario('custom');
@@ -757,25 +844,31 @@ export const SensitivityCockpitView = () => {
                         <div className="flex items-center justify-between text-[10px] text-zinc-500 font-mono">
                             <span>-50%</span>
                             <div className="flex items-center gap-2">
-                                <label className="flex items-center gap-1 cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        checked={reinvestmentsEnabled}
-                                        onChange={(e) => {
-                                            setReinvestmentsEnabled(e.target.checked);
-                                            setActiveScenario('custom');
-                                        }}
-                                        className="w-3 h-3 rounded bg-zinc-900 border-zinc-700 text-emerald-500 focus:ring-0"
-                                    />
-                                    <span className="text-[10px] text-zinc-400">Aktywny</span>
-                                </label>
-                                <button
-                                    type="button"
-                                    onClick={() => setShowReinvestmentDetails(prev => !prev)}
-                                    className="text-[10px] text-cyan-400 hover:text-cyan-300 underline font-bold cursor-pointer"
-                                >
-                                    {showReinvestmentDetails ? 'Ukryj A, B, C' : 'Konfiguruj A, B, C'}
-                                </button>
+                                <UiTooltip content="Włącz lub wyłącz uwzględnianie cyklicznych nakładów odtworzeniowych w przepływach pieniężnych">
+                                    <label className="flex items-center gap-1 cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={reinvestmentsEnabled}
+                                            aria-label="Włącz lub wyłącz cykliczny reinvestment"
+                                            onChange={(e) => {
+                                                setReinvestmentsEnabled(e.target.checked);
+                                                setActiveScenario('custom');
+                                            }}
+                                            className="w-3 h-3 rounded bg-zinc-900 border-zinc-700 text-emerald-500 focus:ring-0"
+                                        />
+                                        <span className="text-[10px] text-zinc-400">Aktywny</span>
+                                    </label>
+                                </UiTooltip>
+                                <UiTooltip content={showReinvestmentDetails ? 'Zwiń szczegółowy panel konfiguracji programów odtworzeniowych A, B, C' : 'Rozwiń szczegółowy panel konfiguracji nakładów odtworzeniowych A, B, C'}>
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowReinvestmentDetails(prev => !prev)}
+                                        className="text-[10px] text-cyan-400 hover:text-cyan-300 underline font-bold cursor-pointer"
+                                        aria-label={showReinvestmentDetails ? 'Ukryj programy odtworzeniowe A, B, C' : 'Konfiguruj programy odtworzeniowe A, B, C'}
+                                    >
+                                        {showReinvestmentDetails ? 'Ukryj A, B, C' : 'Konfiguruj A, B, C'}
+                                    </button>
+                                </UiTooltip>
                             </div>
                             <span>+50%</span>
                         </div>
@@ -783,21 +876,26 @@ export const SensitivityCockpitView = () => {
                         {/* Aggregated 15Y Reinvestment Info & Empty State Handling */}
                         <div className="pt-2 border-t border-zinc-850/60 flex items-center justify-between text-[10px] font-mono">
                             {currentReinvestmentCapex > 0 ? (
-                                <span className="text-zinc-400">
-                                    Suma 15-letnia: <span className="font-bold text-zinc-200">{formatReinvestmentSummary(currentReinvestmentCapex, selectedProject?.currency || 'PLN')}</span>
-                                </span>
+                                <UiTooltip content="Łączna wartość nakładów odtworzeniowych we wszystkich programach A, B, C w horyzoncie 15 lat">
+                                    <span className="text-zinc-400">
+                                        Suma 15-letnia: <span className="font-bold text-zinc-200">{formatReinvestmentSummary(currentReinvestmentCapex, selectedProject?.currency || 'PLN')}</span>
+                                    </span>
+                                </UiTooltip>
                             ) : (
                                 <div className="flex items-center justify-between w-full">
                                     <span className="text-amber-400/90 font-medium">
                                         Suma: 0,00 {selectedProject?.currency || 'PLN'} (brak aktywnych programów)
                                     </span>
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowReinvestmentDetails(true)}
-                                        className="text-[10px] text-cyan-400 hover:text-cyan-300 underline font-bold cursor-pointer"
-                                    >
-                                        Skonfiguruj A, B, C
-                                    </button>
+                                    <UiTooltip content="Otwórz panel i zdefiniuj parametry cyklicznych nakładów odtworzeniowych dla projektu">
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowReinvestmentDetails(true)}
+                                            className="text-[10px] text-cyan-400 hover:text-cyan-300 underline font-bold cursor-pointer"
+                                            aria-label="Skonfiguruj A, B, C - nakłady odtworzeniowe"
+                                        >
+                                            Skonfiguruj A, B, C
+                                        </button>
+                                    </UiTooltip>
                                 </div>
                             )}
                         </div>
@@ -839,69 +937,98 @@ export const SensitivityCockpitView = () => {
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 mb-4 border-b border-zinc-800 pb-3">
                     <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                         <div className="flex items-center gap-2">
-                            <BarChart3 className="w-4 h-4 text-emerald-400" />
+                            <UiTooltip content="Wielowymiarowy wykres 15-letniej projekcji finansowej">
+                                <BarChart3 className="w-4 h-4 text-emerald-400" />
+                            </UiTooltip>
                             <h3 className="text-xs font-bold text-zinc-100 uppercase tracking-wide">
                                 15-letnia Ewolucja Wyników Finansowych (Scenariusz What-If)
                             </h3>
+                            <InfoTooltip
+                                size="xs"
+                                content="Wizualizacja dynamiki przychodów, kosztów operacyjnych, nakładów CAPEX, wyniku EBITDA oraz przepływów pieniężnych (nominalnych lub zdyskontowanych stopą WACC) w pełnym 15-letnim horyzoncie modelu."
+                                ariaLabel="Informacje o 15-letnim wykresie ewolucji"
+                            />
                         </div>
 
                         {/* Chart Mode Switcher (Segmented Control) */}
                         <div className="inline-flex rounded-md p-0.5 bg-zinc-950 border border-zinc-800 text-[11px] self-start sm:self-auto">
-                            <button
-                                type="button"
-                                onClick={() => setChartMode('nominal')}
-                                className={`px-2.5 py-1 rounded transition-colors cursor-pointer ${
-                                    chartMode === 'nominal'
-                                        ? 'bg-emerald-600 text-white font-bold shadow-xs'
-                                        : 'text-zinc-400 hover:text-zinc-200'
-                                }`}
-                            >
-                                Nominalne (P&L i CF)
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setChartMode('discounted')}
-                                className={`px-2.5 py-1 rounded transition-colors cursor-pointer ${
-                                    chartMode === 'discounted'
-                                        ? 'bg-blue-600 text-white font-bold shadow-xs'
-                                        : 'text-zinc-400 hover:text-zinc-200'
-                                }`}
-                            >
-                                Zdyskontowane (DCF & NPV)
-                            </button>
+                            <UiTooltip content="Prezentuj nominalne wielkości P&L (Przychody, OPEX, EBITDA) oraz wolne przepływy pieniężne (FCFF)">
+                                <button
+                                    type="button"
+                                    onClick={() => setChartMode('nominal')}
+                                    className={`px-2.5 py-1 rounded transition-colors cursor-pointer ${
+                                        chartMode === 'nominal'
+                                            ? 'bg-emerald-600 text-white font-bold shadow-xs'
+                                            : 'text-zinc-400 hover:text-zinc-200'
+                                    }`}
+                                    aria-label="Przełącz na widok nominalny P&L i CF"
+                                >
+                                    Nominalne (P&L i CF)
+                                </button>
+                            </UiTooltip>
+                            <UiTooltip content="Prezentuj zdyskontowane przepływy FCFF oraz narastające skumulowane NPV z uwzględnieniem stopy WACC">
+                                <button
+                                    type="button"
+                                    onClick={() => setChartMode('discounted')}
+                                    className={`px-2.5 py-1 rounded transition-colors cursor-pointer ${
+                                        chartMode === 'discounted'
+                                            ? 'bg-blue-600 text-white font-bold shadow-xs'
+                                            : 'text-zinc-400 hover:text-zinc-200'
+                                    }`}
+                                    aria-label="Przełącz na widok zdyskontowany DCF i NPV"
+                                >
+                                    Zdyskontowane (DCF & NPV)
+                                </button>
+                            </UiTooltip>
                         </div>
                     </div>
 
                     {/* Chart Legend */}
                     {chartMode === 'nominal' ? (
                         <div className="text-[11px] text-zinc-400 flex flex-wrap items-center gap-3">
-                            <span className="flex items-center gap-1.5">
-                                <span className="w-2.5 h-2.5 bg-[#10b981] rounded-xs" /> Przychody
-                            </span>
-                            <span className="flex items-center gap-1.5">
-                                <span className="w-2.5 h-2.5 bg-[#f43f5e] rounded-xs" /> Koszty OPEX
-                            </span>
-                            <span className="flex items-center gap-1.5">
-                                <span className="w-2.5 h-2.5 bg-[#818cf8] rounded-xs" /> CAPEX & Reinwestycje
-                            </span>
-                            <span className="flex items-center gap-1.5">
-                                <span className="w-2.5 h-2.5 bg-[#f59e0b] rounded-full" /> EBITDA
-                            </span>
-                            <span className="flex items-center gap-1.5">
-                                <span className="w-2.5 h-2.5 bg-[#3b82f6] rounded-full" /> FCFF
-                            </span>
+                            <UiTooltip content="Przychody operacyjne ze sprzedaży towarów i usług">
+                                <span className="flex items-center gap-1.5 cursor-help">
+                                    <span className="w-2.5 h-2.5 bg-[#10b981] rounded-xs" /> Przychody
+                                </span>
+                            </UiTooltip>
+                            <UiTooltip content="Koszty operacyjne (zmienne, stałe oraz koszty pracy)">
+                                <span className="flex items-center gap-1.5 cursor-help">
+                                    <span className="w-2.5 h-2.5 bg-[#f43f5e] rounded-xs" /> Koszty OPEX
+                                </span>
+                            </UiTooltip>
+                            <UiTooltip content="Nakłady początkowe CAPEX oraz cykliczne nakłady odtworzeniowe Reinvestment">
+                                <span className="flex items-center gap-1.5 cursor-help">
+                                    <span className="w-2.5 h-2.5 bg-[#818cf8] rounded-xs" /> CAPEX & Reinwestycje
+                                </span>
+                            </UiTooltip>
+                            <UiTooltip content="Zysk operacyjny przed potrąceniem odsetek, podatków i amortyzacji (EBITDA)">
+                                <span className="flex items-center gap-1.5 cursor-help">
+                                    <span className="w-2.5 h-2.5 bg-[#f59e0b] rounded-full" /> EBITDA
+                                </span>
+                            </UiTooltip>
+                            <UiTooltip content="Nielewarowane wolne przepływy pieniężne dla firmy (Free Cash Flow to Firm)">
+                                <span className="flex items-center gap-1.5 cursor-help">
+                                    <span className="w-2.5 h-2.5 bg-[#3b82f6] rounded-full" /> FCFF
+                                </span>
+                            </UiTooltip>
                         </div>
                     ) : (
                         <div className="text-[11px] text-zinc-400 flex flex-wrap items-center gap-3">
-                            <span className="flex items-center gap-1.5">
-                                <span className="w-2.5 h-2.5 bg-[#3b82f6] rounded-xs" /> Zdyskontowany FCFF
-                            </span>
-                            <span className="flex items-center gap-1.5">
-                                <span className="w-2.5 h-2.5 bg-[#10b981] rounded-full" /> Skumulowane NPV
-                            </span>
-                            <span className="text-[10px] text-zinc-500 bg-zinc-950 px-2 py-0.5 rounded border border-zinc-800">
-                                WACC: {currentWacc.toFixed(2)}%
-                            </span>
+                            <UiTooltip content="Nielewarowane przepływy FCFF zdyskontowane stopą WACC na moment zero">
+                                <span className="flex items-center gap-1.5 cursor-help">
+                                    <span className="w-2.5 h-2.5 bg-[#3b82f6] rounded-xs" /> Zdyskontowany FCFF
+                                </span>
+                            </UiTooltip>
+                            <UiTooltip content="Narastająca suma zdyskontowanych przepływów pieniężnych (Skumulowane NPV)">
+                                <span className="flex items-center gap-1.5 cursor-help">
+                                    <span className="w-2.5 h-2.5 bg-[#10b981] rounded-full" /> Skumulowane NPV
+                                </span>
+                            </UiTooltip>
+                            <UiTooltip content="Stopa dyskontowa WACC zastosowana w kalkulacji DCF">
+                                <span className="text-[10px] text-zinc-500 bg-zinc-950 px-2 py-0.5 rounded border border-zinc-800">
+                                    WACC: {currentWacc.toFixed(2)}%
+                                </span>
+                            </UiTooltip>
                         </div>
                     )}
                 </div>
@@ -977,25 +1104,54 @@ export const SensitivityCockpitView = () => {
             <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden">
                 <div className="p-4 border-b border-zinc-800 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                        <Layers className="w-4 h-4 text-emerald-400" />
+                        <UiTooltip content="Syntetyczne zestawienie analityczne wariantów">
+                            <Layers className="w-4 h-4 text-emerald-400" />
+                        </UiTooltip>
                         <h3 className="text-xs font-bold text-zinc-100 uppercase tracking-wide">
                             Macierz Porównawcza Wpływu Wrażliwości (Base Case vs What-If)
                         </h3>
+                        <InfoTooltip
+                            size="xs"
+                            content="Zestawienie kluczowych parametrów finansowych i kowenantów bankowych scenariusza bazowego ze zmodyfikowanym wariantem What-If. Prezentuje odchylenie delta oraz ocenę wpływu na profil ryzyka."
+                            ariaLabel="Informacje o macierzy porównawczej"
+                        />
                     </div>
-                    <Badge variant={deltas?.npvDiff && deltas.npvDiff >= 0 ? 'success' : 'warning'}>
-                        {deltas?.npvDiff && deltas.npvDiff >= 0 ? 'WARTOŚĆ DODANA' : 'DECYZJA STRES-TEST'}
-                    </Badge>
+                    <UiTooltip content={deltas?.npvDiff && deltas.npvDiff >= 0 ? 'Modyfikacja założeń zwiększa wartość bieżącą netto projektu (NPV)' : 'Modyfikacja założeń obniża NPV lub wskazuje na scenariusz stresowy'}>
+                        <Badge variant={deltas?.npvDiff && deltas.npvDiff >= 0 ? 'success' : 'warning'}>
+                            {deltas?.npvDiff && deltas.npvDiff >= 0 ? 'WARTOŚĆ DODANA' : 'DECYZJA STRES-TEST'}
+                        </Badge>
+                    </UiTooltip>
                 </div>
 
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-xs border-collapse">
                         <thead>
                             <tr className="border-b border-zinc-800 text-[10px] text-zinc-400 uppercase tracking-wider bg-zinc-950/60">
-                                <th className="py-3 px-4">METRYKA MODELU</th>
-                                <th className="py-3 px-4 text-right">SCENARIUSZ BAZOWY</th>
-                                <th className="py-3 px-4 text-right">SCENARIUSZ WHAT-IF</th>
-                                <th className="py-3 px-4 text-right">ODCHYLENIE DELTA</th>
-                                <th className="py-3 px-4 text-center">WPŁYW / STATUS</th>
+                                <th className="py-3 px-4">
+                                    <UiTooltip content="Wskaźnik finansowy, wielkość przepływów lub kowenant bankowy podlegający symulacji">
+                                        <span className="cursor-help">METRYKA MODELU</span>
+                                    </UiTooltip>
+                                </th>
+                                <th className="py-3 px-4 text-right">
+                                    <UiTooltip content="Wartość nominalna wynikająca z umowy i pierwotnych założeń modelu">
+                                        <span className="cursor-help">SCENARIUSZ BAZOWY</span>
+                                    </UiTooltip>
+                                </th>
+                                <th className="py-3 px-4 text-right">
+                                    <UiTooltip content="Wartość wyliczona w czasie rzeczywistym z uwzględnieniem aktywnych suwaków i scenariuszy">
+                                        <span className="cursor-help">SCENARIUSZ WHAT-IF</span>
+                                    </UiTooltip>
+                                </th>
+                                <th className="py-3 px-4 text-right">
+                                    <UiTooltip content="Różnica nominalna i procentowa pomiędzy wariantem What-If a scenariuszem bazowym">
+                                        <span className="cursor-help">ODCHYLENIE DELTA</span>
+                                    </UiTooltip>
+                                </th>
+                                <th className="py-3 px-4 text-center">
+                                    <UiTooltip content="Kwalifikacja wpływu odchylenia na stabilność finansową, kowenanty bankowe i rentowność">
+                                        <span className="cursor-help">WPŁYW / STATUS</span>
+                                    </UiTooltip>
+                                </th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-zinc-800/60 font-mono text-[11px]">
@@ -1012,12 +1168,15 @@ export const SensitivityCockpitView = () => {
                                 </td>
                                 <td className="py-3 px-4 text-right">
                                     <span className={capexDelta > 0 ? 'text-rose-400' : capexDelta < 0 ? 'text-emerald-400' : 'text-zinc-400'}>
-                                        {capexDelta > 0 ? '+' : ''}{formatMoney(deltas?.capexDiff ?? 0)} ({capexDelta}%)                                    </span>
+                                        {capexDelta > 0 ? '+' : ''}{formatMoney(deltas?.capexDiff ?? 0)} ({capexDelta}%)
+                                    </span>
                                 </td>
                                 <td className="py-3 px-4 text-center">
-                                    <Badge variant={capexDelta <= 0 ? 'success' : 'danger'}>
-                                        {capexDelta <= 0 ? 'W NORMIE' : 'PRZEKROCZENIE'}
-                                    </Badge>
+                                    <UiTooltip content={capexDelta <= 0 ? 'Nakłady mieszczą się w budżecie bazowym' : 'Budżet nakładów początkowych został przekroczony'}>
+                                        <Badge variant={capexDelta <= 0 ? 'success' : 'danger'}>
+                                            {capexDelta <= 0 ? 'W NORMIE' : 'PRZEKROCZENIE'}
+                                        </Badge>
+                                    </UiTooltip>
                                 </td>
                             </tr>
 
@@ -1041,9 +1200,11 @@ export const SensitivityCockpitView = () => {
                                     )}
                                 </td>
                                 <td className="py-3 px-4 text-center">
-                                    <Badge variant={reinvestmentsEnabled ? 'brand' : 'warning'}>
-                                        {reinvestmentsEnabled ? 'AKTYWNY' : 'WYŁĄCZONY'}
-                                    </Badge>
+                                    <UiTooltip content={reinvestmentsEnabled ? 'Programy odtworzeniowe są aktywne w symulacji' : 'Programy odtworzeniowe zostały wyłączone'}>
+                                        <Badge variant={reinvestmentsEnabled ? 'brand' : 'warning'}>
+                                            {reinvestmentsEnabled ? 'AKTYWNY' : 'WYŁĄCZONY'}
+                                        </Badge>
+                                    </UiTooltip>
                                 </td>
                             </tr>
 
@@ -1064,9 +1225,11 @@ export const SensitivityCockpitView = () => {
                                     </span>
                                 </td>
                                 <td className="py-3 px-4 text-center">
-                                    <Badge variant={revenueDelta >= 0 ? 'success' : 'warning'}>
-                                        {revenueDelta >= 0 ? 'POZYTYWNY' : 'SPADEK SPRZEDAŻY'}
-                                    </Badge>
+                                    <UiTooltip content={revenueDelta >= 0 ? 'Przychody równe lub wyższe od wariantu bazowego' : 'Spadek wolumenu lub cen sprzedaży w modelu'}>
+                                        <Badge variant={revenueDelta >= 0 ? 'success' : 'warning'}>
+                                            {revenueDelta >= 0 ? 'POZYTYWNY' : 'SPADEK SPRZEDAŻY'}
+                                        </Badge>
+                                    </UiTooltip>
                                 </td>
                             </tr>
 
@@ -1089,9 +1252,11 @@ export const SensitivityCockpitView = () => {
                                     )}
                                 </td>
                                 <td className="py-3 px-4 text-center">
-                                    <Badge variant={(whatIfResult?.summary?.totalEbitda15Y ?? 0) >= (baseResult?.summary?.totalEbitda15Y ?? 0) ? 'success' : 'warning'}>
-                                        {(whatIfResult?.summary?.totalEbitda15Y ?? 0) >= (baseResult?.summary?.totalEbitda15Y ?? 0) ? 'W NORMIE' : 'REDUKCJA'}
-                                    </Badge>
+                                    <UiTooltip content={(whatIfResult?.summary?.totalEbitda15Y ?? 0) >= (baseResult?.summary?.totalEbitda15Y ?? 0) ? 'Łączny zysk operacyjny EBITDA powyżej bazy' : 'Redukcja skumulowanego zysku operacyjnego EBITDA'}>
+                                        <Badge variant={(whatIfResult?.summary?.totalEbitda15Y ?? 0) >= (baseResult?.summary?.totalEbitda15Y ?? 0) ? 'success' : 'warning'}>
+                                            {(whatIfResult?.summary?.totalEbitda15Y ?? 0) >= (baseResult?.summary?.totalEbitda15Y ?? 0) ? 'W NORMIE' : 'REDUKCJA'}
+                                        </Badge>
+                                    </UiTooltip>
                                 </td>
                             </tr>
 
@@ -1112,9 +1277,11 @@ export const SensitivityCockpitView = () => {
                                     </span>
                                 </td>
                                 <td className="py-3 px-4 text-center">
-                                    <Badge variant={currentNpv > 0 ? 'brand' : 'danger'}>
-                                        {currentNpv > 0 ? 'NPV > 0' : 'DESTRUKCJA'}
-                                    </Badge>
+                                    <UiTooltip content={currentNpv > 0 ? 'Projekt generuje dodatnią wartość bieżącą netto (NPV > 0)' : 'Projekt generuje ujemną wartość bieżącą netto (destrukcja wartości)'}>
+                                        <Badge variant={currentNpv > 0 ? 'brand' : 'danger'}>
+                                            {currentNpv > 0 ? 'NPV > 0' : 'DESTRUKCJA'}
+                                        </Badge>
+                                    </UiTooltip>
                                 </td>
                             </tr>
 
@@ -1135,9 +1302,11 @@ export const SensitivityCockpitView = () => {
                                     </span>
                                 </td>
                                 <td className="py-3 px-4 text-center">
-                                    <Badge variant={currentIrr && currentIrr > currentWacc ? 'success' : 'danger'}>
-                                        {currentIrr && currentIrr > currentWacc ? 'IRR > WACC' : 'IRR < WACC'}
-                                    </Badge>
+                                    <UiTooltip content={currentIrr && currentIrr > currentWacc ? 'Stopa zwrotu projektu (IRR) przekracza koszt kapitału (WACC)' : 'Stopa zwrotu projektu (IRR) poniżej kosztu kapitału (WACC)'}>
+                                        <Badge variant={currentIrr && currentIrr > currentWacc ? 'success' : 'danger'}>
+                                            {currentIrr && currentIrr > currentWacc ? 'IRR > WACC' : 'IRR < WACC'}
+                                        </Badge>
+                                    </UiTooltip>
                                 </td>
                             </tr>
 
@@ -1158,9 +1327,11 @@ export const SensitivityCockpitView = () => {
                                     </span>
                                 </td>
                                 <td className="py-3 px-4 text-center">
-                                    <Badge variant={currentMoic >= 2.0 ? 'brand' : 'default'}>
-                                        {currentMoic >= 2.0 ? 'SUPER RETURN' : 'STANDARD'}
-                                    </Badge>
+                                    <UiTooltip content={currentMoic >= 2.0 ? 'Wysoki zwrot z kapitału własnego sponsorów (MoIC >= 2.0x)' : 'Standardowy poziom zwrotu z kapitału własnego'}>
+                                        <Badge variant={currentMoic >= 2.0 ? 'brand' : 'default'}>
+                                            {currentMoic >= 2.0 ? 'SUPER RETURN' : 'STANDARD'}
+                                        </Badge>
+                                    </UiTooltip>
                                 </td>
                             </tr>
 
@@ -1181,9 +1352,11 @@ export const SensitivityCockpitView = () => {
                                     </span>
                                 </td>
                                 <td className="py-3 px-4 text-center">
-                                    <Badge variant={isBankable ? 'success' : 'danger'}>
-                                        {isBankable ? 'BANKOWALNY' : 'RYZYKO KREDYTOWE'}
-                                    </Badge>
+                                    <UiTooltip content={isBankable ? 'Wskaźnik spełnia wymóg bankowalności (min. 1.20x)' : 'Naruszenie kowenantu bankowego – ryzyko kredytowe'}>
+                                        <Badge variant={isBankable ? 'success' : 'danger'}>
+                                            {isBankable ? 'BANKOWALNY' : 'RYZYKO KREDYTOWE'}
+                                        </Badge>
+                                    </UiTooltip>
                                 </td>
                             </tr>
 
@@ -1204,9 +1377,11 @@ export const SensitivityCockpitView = () => {
                                     </span>
                                 </td>
                                 <td className="py-3 px-4 text-center">
-                                    <Badge variant={repaymentTypeOverride ? 'warning' : 'default'}>
-                                        {repaymentTypeOverride ? 'SYMULACJA' : 'BAZOWY'}
-                                    </Badge>
+                                    <UiTooltip content={repaymentTypeOverride ? 'Testowana jest alternatywna formuła amortyzacji' : 'Formuła spłaty w pełni zgodna z umową kredytową'}>
+                                        <Badge variant={repaymentTypeOverride ? 'warning' : 'default'}>
+                                            {repaymentTypeOverride ? 'SYMULACJA' : 'BAZOWY'}
+                                        </Badge>
+                                    </UiTooltip>
                                 </td>
                             </tr>
 
@@ -1230,9 +1405,11 @@ export const SensitivityCockpitView = () => {
                                     )}
                                 </td>
                                 <td className="py-3 px-4 text-center">
-                                    <Badge variant={(whatIfResult?.summary?.totalInterest15Y ?? 0) <= (baseResult?.summary?.totalInterest15Y ?? 0) ? 'success' : 'danger'}>
-                                        {(whatIfResult?.summary?.totalInterest15Y ?? 0) <= (baseResult?.summary?.totalInterest15Y ?? 0) ? 'OSZCZĘDNOŚĆ' : 'WYŻSZY KOSZT'}
-                                    </Badge>
+                                    <UiTooltip content={(whatIfResult?.summary?.totalInterest15Y ?? 0) <= (baseResult?.summary?.totalInterest15Y ?? 0) ? 'Niższy łączny koszt odsetkowy w horyzoncie 15 lat' : 'Wyższy łączny koszt odsetkowy w horyzoncie 15 lat'}>
+                                        <Badge variant={(whatIfResult?.summary?.totalInterest15Y ?? 0) <= (baseResult?.summary?.totalInterest15Y ?? 0) ? 'success' : 'danger'}>
+                                            {(whatIfResult?.summary?.totalInterest15Y ?? 0) <= (baseResult?.summary?.totalInterest15Y ?? 0) ? 'OSZCZĘDNOŚĆ' : 'WYŻSZY KOSZT'}
+                                        </Badge>
+                                    </UiTooltip>
                                 </td>
                             </tr>
                         </tbody>
