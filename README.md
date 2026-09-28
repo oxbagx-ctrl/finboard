@@ -1022,7 +1022,15 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - `RouteGuards.test.jsx`: stworzenie zestawu 12 testów jednostkowych weryfikujących zachowanie strażników `ProtectedRoute`, `GuestRoute` oraz `RoleGuard` (stany ładowania, przekierowania z zachowaniem `state.from`, autoryzację ról RBAC, ostrzeżenia i renderowanie `<Outlet />`).
     - `Sidebar.test.jsx`: stworzenie zestawu 8 testów jednostkowych weryfikujących atrybuty `href` linków `<NavLink>`, dynamiczne formatowanie aktywnej trasy, kontrolę dostępu do modułów doradczych oraz odporność na brak routera w trybie fallbacku przyciskowego.
     - Weryfikacja testowa: 100% PASS w pełnym zestawie 71 plików Vitest (647 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
-  - [ ] Adaptacja istniejących zestawów testowych Vitest pod routing i weryfikacja zerowej regresji.
+  - [x] Adaptacja istniejących zestawów testowych Vitest pod routing i weryfikacja zerowej regresji.
+    - `spaRoutingNavigationWorkflow.test.jsx`: stworzenie zestawu 6 kompleksowych testów integracyjnych SPA weryfikujących w trybie end-to-end:
+      1. Przekierowanie nieuwierzytelnionego użytkownika z `/dashboard` na `/login`.
+      2. Zachowanie parametru docelowego deep-link (`/records`) w stanie lokalizacji i automatyczne przekierowanie po zalogowaniu.
+      3. Płynne przechodzenie pomiędzy modułami platformy za pośrednictwem linków `<NavLink>` w menu bocznym ze zmianą nagłówka i stylów aktywnych.
+      4. Egzekwowanie reguł kontroli dostępu RBAC na trasie `/advisors` z blokadą dla roli `client` i przekierowaniem na `/dashboard`.
+      5. Obsługę nieznanych ścieżek URL przez dedykowany widok diagnostyczny 404 (`NotFoundView`) z powrotem do pulpitu.
+      6. Pełną procedurę wylogowania użytkownika, zniszczenie tokena sesyjnego w `localStorage` i powrót na ekran logowania.
+    - Weryfikacja testowa: 100% PASS w pełnym zestawie 72 plików Vitest (653 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
   - [ ] Aktualizacja dokumentacji architektonicznej, README i changelogów.
 
 ---
