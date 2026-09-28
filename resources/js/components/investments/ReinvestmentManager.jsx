@@ -37,6 +37,7 @@ import { investmentProjectsApi } from '../../api/investmentProjects';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { Card } from '../ui/Card';
+import { Tooltip as UiTooltip, InfoTooltip } from '../ui/Tooltip';
 import { KST_CLASSIFICATIONS, getKstByCode } from '../../constants/kstClassifications';
 
 export const DEFAULT_REINVESTMENT_PROGRAMS = [
@@ -442,15 +443,29 @@ export const ReinvestmentManager = ({
             <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-5">
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                     <div className="flex items-start gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
-                            <RefreshCw className="w-5 h-5" />
-                        </div>
+                        <UiTooltip content="Harmonogram cyklicznych nakładów odtworzeniowych">
+                            <div
+                                tabIndex={0}
+                                className="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0 cursor-help focus:outline-none"
+                            >
+                                <RefreshCw className="w-5 h-5" />
+                            </div>
+                        </UiTooltip>
                         <div>
                             <div className="flex items-center gap-2">
                                 <h3 className="text-base font-bold text-zinc-100 uppercase tracking-wide">
                                     Harmonogram Nakładów Odtworzeniowych (Reinvestment CAPEX)
                                 </h3>
-                                <Badge variant="neutral">KŚT / 15L</Badge>
+                                <InfoTooltip
+                                    content="Cykliczne nakłady odtworzeniowe technologii (np. inwertery, falowniki, SCADA, ogniwa) w horyzoncie 15 lat z uwzględnieniem odpisów amortyzacyjnych KŚT i tarczy podatkowej CIT."
+                                    ariaLabel="Informacje o harmonogramie nakładów odtworzeniowych"
+                                    size="xs"
+                                />
+                                <UiTooltip content="Horyzont projekcji 15-letniej z przypisanymi stawkami KŚT">
+                                    <span>
+                                        <Badge variant="neutral">KŚT / 15L</Badge>
+                                    </span>
+                                </UiTooltip>
                             </div>
                             <p className="text-xs text-zinc-400 mt-1">
                                 Cykliczne odtworzenia środków trwałych (Nakłady A, B, C) z indywidualną amortyzacją KŚT w horyzoncie 15 lat.
@@ -483,16 +498,19 @@ export const ReinvestmentManager = ({
                             <span className="font-mono font-bold text-emerald-400">
                                 {Math.round(multiplier * 100)}%
                             </span>
-                            <input
-                                type="range"
-                                min="0.5"
-                                max="1.5"
-                                step="0.05"
-                                value={multiplier}
-                                onChange={(e) => setMultiplier(parseFloat(e.target.value))}
-                                className="w-24 accent-emerald-500 cursor-pointer h-1.5 bg-zinc-800 rounded-lg"
-                                title="Mnożnik nakładów odtworzeniowych w symulacji"
-                            />
+                            <UiTooltip content="Mnożnik nakładów odtworzeniowych w symulacji (50% - 150%)">
+                                <input
+                                    type="range"
+                                    min="0.5"
+                                    max="1.5"
+                                    step="0.05"
+                                    value={multiplier}
+                                    onChange={(e) => setMultiplier(parseFloat(e.target.value))}
+                                    className="w-24 accent-emerald-500 cursor-pointer h-1.5 bg-zinc-800 rounded-lg"
+                                    title="Mnożnik nakładów odtworzeniowych w symulacji"
+                                    aria-label="Mnożnik nakładów odtworzeniowych w symulacji"
+                                />
+                            </UiTooltip>
                         </div>
                     </div>
                 </div>
@@ -500,8 +518,13 @@ export const ReinvestmentManager = ({
                 {/* KPI Metric Strip */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-5 pt-5 border-t border-zinc-800/80">
                     <div className="bg-zinc-950/50 p-3 rounded border border-zinc-800">
-                        <div className="text-[11px] text-zinc-400 uppercase tracking-wider font-semibold">
-                            Suma Reinvestmentu (15L)
+                        <div className="flex items-center justify-between text-[11px] text-zinc-400 uppercase tracking-wider font-semibold">
+                            <span>Suma Reinvestmentu (15L)</span>
+                            <InfoTooltip
+                                content="Łączna suma nakładów odtworzeniowych zaplanowanych dla wszystkich aktywnych programów w 15-letnim horyzoncie."
+                                ariaLabel="Informacje o sumie reinvestmentu"
+                                size="xs"
+                            />
                         </div>
                         <div className="text-base font-mono font-bold text-zinc-100 mt-1">
                             {formatMoney(summaryKpis.totalCapex15Y)}
@@ -512,8 +535,13 @@ export const ReinvestmentManager = ({
                     </div>
 
                     <div className="bg-zinc-950/50 p-3 rounded border border-zinc-800">
-                        <div className="text-[11px] text-zinc-400 uppercase tracking-wider font-semibold">
-                            Średnioroczny Reinvestment
+                        <div className="flex items-center justify-between text-[11px] text-zinc-400 uppercase tracking-wider font-semibold">
+                            <span>Średnioroczny Reinvestment</span>
+                            <InfoTooltip
+                                content="Średnie roczne obciążenie przepływów pieniężnych (FCFF) wynikające z wymiany zużywających się aktywów."
+                                ariaLabel="Informacje o średniorocznym reinvestmencie"
+                                size="xs"
+                            />
                         </div>
                         <div className="text-base font-mono font-bold text-emerald-400 mt-1">
                             {formatMoney(summaryKpis.annualAverage)}
@@ -524,8 +552,13 @@ export const ReinvestmentManager = ({
                     </div>
 
                     <div className="bg-zinc-950/50 p-3 rounded border border-zinc-800">
-                        <div className="text-[11px] text-zinc-400 uppercase tracking-wider font-semibold">
-                            Liczba Interwencji CAPEX
+                        <div className="flex items-center justify-between text-[11px] text-zinc-400 uppercase tracking-wider font-semibold">
+                            <span>Liczba Interwencji CAPEX</span>
+                            <InfoTooltip
+                                content="Liczba zdarzeń wymiany sprzętu technologicznego zaplanowanych w okresie 15 lat."
+                                ariaLabel="Informacje o liczbie interwencji CAPEX"
+                                size="xs"
+                            />
                         </div>
                         <div className="text-base font-mono font-bold text-cyan-400 mt-1">
                             {summaryKpis.totalEvents} zdarzeń
@@ -536,8 +569,13 @@ export const ReinvestmentManager = ({
                     </div>
 
                     <div className="bg-zinc-950/50 p-3 rounded border border-zinc-800">
-                        <div className="text-[11px] text-zinc-400 uppercase tracking-wider font-semibold">
-                            Tarcza Podatkowa (CIT 19%)
+                        <div className="flex items-center justify-between text-[11px] text-zinc-400 uppercase tracking-wider font-semibold">
+                            <span>Tarcza Podatkowa (CIT 19%)</span>
+                            <InfoTooltip
+                                content="Oszczędność podatkowa wynikająca z odpisów amortyzacyjnych KŚT dla zrealizowanych odtworzeń (stawka 19%)."
+                                ariaLabel="Informacje o tarczy podatkowej CIT"
+                                size="xs"
+                            />
                         </div>
                         <div className="text-base font-mono font-bold text-purple-400 mt-1">
                             +{formatMoney(summaryKpis.citTaxShield19)}
@@ -585,14 +623,17 @@ export const ReinvestmentManager = ({
                                     </div>
 
                                     {/* Enable switch */}
-                                    <label className="flex items-center cursor-pointer">
-                                        <input
-                                            type="checkbox"
-                                            checked={prog.enabled}
-                                            onChange={() => toggleProgramEnabled(index)}
-                                            className="w-4 h-4 rounded border-zinc-700 bg-zinc-950 text-emerald-500 focus:ring-0"
-                                        />
-                                    </label>
+                                    <UiTooltip content={prog.enabled ? "Wyłącz ten program odtworzeniowy" : "Włącz ten program odtworzeniowy w kalkulacji"}>
+                                        <label className="flex items-center cursor-pointer">
+                                            <input
+                                                type="checkbox"
+                                                checked={prog.enabled}
+                                                onChange={() => toggleProgramEnabled(index)}
+                                                aria-label={`Przełącz program ${prog.program_type === 'program_a' ? 'A' : prog.program_type === 'program_b' ? 'B' : 'C'}`}
+                                                className="w-4 h-4 rounded border-zinc-700 bg-zinc-950 text-emerald-500 focus:ring-0"
+                                            />
+                                        </label>
+                                    </UiTooltip>
                                 </div>
 
                                 {/* Program Name & Description Fields */}
@@ -631,9 +672,16 @@ export const ReinvestmentManager = ({
                                 <div className="space-y-3 pt-2 border-t border-zinc-800">
                                     {/* Net Amount */}
                                     <div>
-                                        <label className="block text-[10px] uppercase font-semibold text-zinc-400 mb-1">
-                                            Kwota jednostkowa netto ({currency})
-                                        </label>
+                                        <div className="flex items-center justify-between mb-1">
+                                            <label className="block text-[10px] uppercase font-semibold text-zinc-400">
+                                                Kwota jednostkowa netto ({currency})
+                                            </label>
+                                            <InfoTooltip
+                                                content="Jednorazowy koszt odtworzenia lub modernizacji urządzeń w danym cyklu wymiany."
+                                                ariaLabel="Informacje o kwocie jednostkowej"
+                                                size="xs"
+                                            />
+                                        </div>
                                         <div className="relative">
                                             <input
                                                 type="number"
@@ -653,9 +701,16 @@ export const ReinvestmentManager = ({
                                     {/* Frequency & First Year */}
                                     <div className="grid grid-cols-2 gap-2">
                                         <div>
-                                            <label className="block text-[10px] uppercase font-semibold text-zinc-400 mb-1">
-                                                Częstotliwość
-                                            </label>
+                                            <div className="flex items-center justify-between mb-1">
+                                                <label className="block text-[10px] uppercase font-semibold text-zinc-400">
+                                                    Częstotliwość
+                                                </label>
+                                                <InfoTooltip
+                                                    content="Odstęp czasu w latach pomiędzy kolejnymi wymianami i modernizacjami technologii."
+                                                    ariaLabel="Informacje o częstotliwości wymiany"
+                                                    size="xs"
+                                                />
+                                            </div>
                                             <select
                                                 value={prog.frequency_years}
                                                 disabled={!prog.enabled}
@@ -674,9 +729,16 @@ export const ReinvestmentManager = ({
                                         </div>
 
                                         <div>
-                                            <label className="block text-[10px] uppercase font-semibold text-zinc-400 mb-1">
-                                                Pierwszy rok
-                                            </label>
+                                            <div className="flex items-center justify-between mb-1">
+                                                <label className="block text-[10px] uppercase font-semibold text-zinc-400">
+                                                    Pierwszy rok
+                                                </label>
+                                                <InfoTooltip
+                                                    content="Pierwszy rok fazy operacyjnej projektu, w którym wystąpi dany nakład odtworzeniowy."
+                                                    ariaLabel="Informacje o pierwszym roku wystąpienia"
+                                                    size="xs"
+                                                />
+                                            </div>
                                             <select
                                                 value={prog.first_occurrence_year}
                                                 disabled={!prog.enabled}
@@ -693,9 +755,16 @@ export const ReinvestmentManager = ({
                                     {/* KŚT Classification */}
                                     <div>
                                         <div className="flex items-center justify-between mb-1">
-                                            <label className="text-[10px] uppercase font-semibold text-zinc-400">
-                                                Klasyfikacja KŚT i Stawka
-                                            </label>
+                                            <div className="flex items-center gap-1">
+                                                <label className="text-[10px] uppercase font-semibold text-zinc-400">
+                                                    Klasyfikacja KŚT i Stawka
+                                                </label>
+                                                <InfoTooltip
+                                                    content="Kategoria Klasyfikacji Środków Trwałych i roczna stawka amortyzacji odpisów dla nakładu odtworzeniowego."
+                                                    ariaLabel="Informacje o klasyfikacji KŚT nakładu"
+                                                    size="xs"
+                                                />
+                                            </div>
                                             <span className="text-[10px] font-mono text-emerald-400 font-bold">
                                                 {prog.kst_annual_rate}% rocznie
                                             </span>
@@ -742,10 +811,17 @@ export const ReinvestmentManager = ({
             <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-5 space-y-4">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
                     <div>
-                        <h4 className="text-xs font-bold text-zinc-100 uppercase tracking-wider flex items-center gap-2">
-                            <Calendar className="w-4 h-4 text-emerald-400" />
-                            Matryca Wdrożeń Reinvestmentu (15-Year Timeline)
-                        </h4>
+                        <div className="flex items-center gap-2">
+                            <h4 className="text-xs font-bold text-zinc-100 uppercase tracking-wider flex items-center gap-2">
+                                <Calendar className="w-4 h-4 text-emerald-400" />
+                                Matryca Wdrożeń Reinvestmentu (15-Year Timeline)
+                            </h4>
+                            <InfoTooltip
+                                content="Wizualizacja lat uderzenia nakładów odtworzeniowych A, B, C oraz rocznego zapotrzebowania CAPEX w trybie tabelarycznym i wykresowym."
+                                ariaLabel="Informacje o matrycy wdrożeń reinvestmentu"
+                                size="xs"
+                            />
+                        </div>
                         <p className="text-[11px] text-zinc-400 mt-0.5">
                             Wizualizacja lat uderzenia nakładów odtworzeniowych A, B, C oraz rocznego zapotrzebowania CAPEX.
                         </p>
@@ -753,51 +829,60 @@ export const ReinvestmentManager = ({
 
                     {/* View Mode Switcher */}
                     <div className="flex items-center bg-zinc-950 p-1 rounded border border-zinc-800 self-start sm:self-auto" role="tablist" aria-label="Wybór trybu wizualizacji">
-                        <button
-                            type="button"
-                            role="tab"
-                            aria-selected={viewMode === 'matrix'}
-                            onClick={() => setViewMode('matrix')}
-                            className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-[11px] font-medium transition-colors ${
-                                viewMode === 'matrix'
-                                    ? 'bg-zinc-800 text-zinc-100 shadow-xs'
-                                    : 'text-zinc-400 hover:text-zinc-200'
-                            }`}
-                            title="Siatka kalendarzowa (15 lat)"
-                        >
-                            <LayoutGrid className="w-3.5 h-3.5 text-emerald-400" />
-                            <span>Siatka 15L</span>
-                        </button>
-                        <button
-                            type="button"
-                            role="tab"
-                            aria-selected={viewMode === 'stacked_bars'}
-                            onClick={() => setViewMode('stacked_bars')}
-                            className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-[11px] font-medium transition-colors ${
-                                viewMode === 'stacked_bars'
-                                    ? 'bg-zinc-800 text-zinc-100 shadow-xs'
-                                    : 'text-zinc-400 hover:text-zinc-200'
-                            }`}
-                            title="Wykres słupkowy skumulowany nakładów rocznych"
-                        >
-                            <BarChart2 className="w-3.5 h-3.5 text-cyan-400" />
-                            <span>Słupki CAPEX</span>
-                        </button>
-                        <button
-                            type="button"
-                            role="tab"
-                            aria-selected={viewMode === 'combo_curve'}
-                            onClick={() => setViewMode('combo_curve')}
-                            className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-[11px] font-medium transition-colors ${
-                                viewMode === 'combo_curve'
-                                    ? 'bg-zinc-800 text-zinc-100 shadow-xs'
-                                    : 'text-zinc-400 hover:text-zinc-200'
-                            }`}
-                            title="Wykres łączony: roczne CAPEX + linia narastająca (S-Curve)"
-                        >
-                            <TrendingUp className="w-3.5 h-3.5 text-amber-400" />
-                            <span>S-Curve (Narastająco)</span>
-                        </button>
+                        <UiTooltip content="Siatka kalendarzowa (15 lat) - macierz wdrożeń nakładów rok po roku">
+                            <button
+                                type="button"
+                                role="tab"
+                                aria-selected={viewMode === 'matrix'}
+                                onClick={() => setViewMode('matrix')}
+                                className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-[11px] font-medium transition-colors ${
+                                    viewMode === 'matrix'
+                                        ? 'bg-zinc-800 text-zinc-100 shadow-xs'
+                                        : 'text-zinc-400 hover:text-zinc-200'
+                                }`}
+                                title="Siatka kalendarzowa (15 lat)"
+                                aria-label="Siatka kalendarzowa 15 lat"
+                            >
+                                <LayoutGrid className="w-3.5 h-3.5 text-emerald-400" />
+                                <span>Siatka 15L</span>
+                            </button>
+                        </UiTooltip>
+                        <UiTooltip content="Wykres słupkowy skumulowanych nakładów rocznych wg programów A, B, C">
+                            <button
+                                type="button"
+                                role="tab"
+                                aria-selected={viewMode === 'stacked_bars'}
+                                onClick={() => setViewMode('stacked_bars')}
+                                className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-[11px] font-medium transition-colors ${
+                                    viewMode === 'stacked_bars'
+                                        ? 'bg-zinc-800 text-zinc-100 shadow-xs'
+                                        : 'text-zinc-400 hover:text-zinc-200'
+                                }`}
+                                title="Wykres słupkowy skumulowany nakładów rocznych"
+                                aria-label="Wykres słupkowy nakładów rocznych"
+                            >
+                                <BarChart2 className="w-3.5 h-3.5 text-cyan-400" />
+                                <span>Słupki CAPEX</span>
+                            </button>
+                        </UiTooltip>
+                        <UiTooltip content="Wykres łączony: roczne nakłady CAPEX oraz skumulowana krzywa S (S-Curve)">
+                            <button
+                                type="button"
+                                role="tab"
+                                aria-selected={viewMode === 'combo_curve'}
+                                onClick={() => setViewMode('combo_curve')}
+                                className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-[11px] font-medium transition-colors ${
+                                    viewMode === 'combo_curve'
+                                        ? 'bg-zinc-800 text-zinc-100 shadow-xs'
+                                        : 'text-zinc-400 hover:text-zinc-200'
+                                }`}
+                                title="Wykres łączony: roczne CAPEX + linia narastająca (S-Curve)"
+                                aria-label="Wykres łączony S-Curve"
+                            >
+                                <TrendingUp className="w-3.5 h-3.5 text-amber-400" />
+                                <span>S-Curve (Narastająco)</span>
+                            </button>
+                        </UiTooltip>
                     </div>
                 </div>
 
@@ -814,9 +899,11 @@ export const ReinvestmentManager = ({
                                     const dotColor = p.color === 'cyan' ? 'bg-cyan-400' : p.color === 'emerald' ? 'bg-emerald-400' : 'bg-purple-400';
 
                                     return (
-                                        <span key={p.id} className={`flex items-center gap-1 ${textColor}`} title={p.name}>
-                                            <span className={`w-2 h-2 rounded-full ${dotColor}`} /> {displayLabel}
-                                        </span>
+                                        <UiTooltip key={p.id} content={`Aktywny program: ${p.name || displayLabel}`}>
+                                            <span tabIndex={0} className={`flex items-center gap-1 ${textColor} cursor-help focus:outline-none`} title={p.name}>
+                                                <span className={`w-2 h-2 rounded-full ${dotColor}`} /> {displayLabel}
+                                            </span>
+                                        </UiTooltip>
                                     );
                                 })
                             ) : (
@@ -828,9 +915,11 @@ export const ReinvestmentManager = ({
 
                         {/* Extra legend entry for S-Curve line when combo_curve mode is active */}
                         {viewMode === 'combo_curve' && reinvestmentsEnabled && programs.some(p => p.enabled) && (
-                            <span className="flex items-center gap-1.5 text-amber-400 font-medium ml-1">
-                                <span className="w-2.5 h-0.5 bg-amber-400 inline-block" /> Skumulowany CAPEX (Krzywa S)
-                            </span>
+                            <UiTooltip content="Skumulowana suma nakładów odtworzeniowych od początku operacji">
+                                <span tabIndex={0} className="flex items-center gap-1.5 text-amber-400 font-medium ml-1 cursor-help focus:outline-none">
+                                    <span className="w-2.5 h-0.5 bg-amber-400 inline-block" /> Skumulowany CAPEX (Krzywa S)
+                                </span>
+                            </UiTooltip>
                         )}
                     </div>
 
@@ -842,7 +931,7 @@ export const ReinvestmentManager = ({
                 {/* VIEW 1: Grid of 15 Years */}
                 {viewMode === 'matrix' && (
                     <div className="overflow-x-auto pb-2" data-testid="timeline-matrix-view">
-                        <div 
+                        <div
                             className="grid grid-cols-15 min-w-[750px] gap-1.5"
                             style={{ gridTemplateColumns: 'repeat(15, minmax(0, 1fr))' }}
                         >
@@ -866,19 +955,21 @@ export const ReinvestmentManager = ({
                                         <div className="flex flex-col gap-1 my-1 w-full items-center">
                                             {hasHits ? (
                                                 hits.map((h, i) => (
-                                                    <span
-                                                        key={i}
-                                                        title={`${h.name}: ${formatShortMoney(h.amount)}`}
-                                                        className={`w-full py-0.5 px-1 rounded text-[9px] font-mono font-bold truncate ${
-                                                            h.color === 'cyan'
-                                                                ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
-                                                                : h.color === 'emerald'
-                                                                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                                                                : 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
-                                                        }`}
-                                                    >
-                                                        {h.programType === 'program_a' ? 'A' : h.programType === 'program_b' ? 'B' : 'C'}
-                                                    </span>
+                                                    <UiTooltip key={i} content={`${h.name}: ${formatMoney(h.amount)} (Rok Y${year})`}>
+                                                        <span
+                                                            tabIndex={0}
+                                                            title={`${h.name}: ${formatShortMoney(h.amount)}`}
+                                                            className={`w-full py-0.5 px-1 rounded text-[9px] font-mono font-bold truncate cursor-help focus:outline-none ${
+                                                                h.color === 'cyan'
+                                                                    ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
+                                                                    : h.color === 'emerald'
+                                                                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                                                                    : 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
+                                                            }`}
+                                                        >
+                                                            {h.programType === 'program_a' ? 'A' : h.programType === 'program_b' ? 'B' : 'C'}
+                                                        </span>
+                                                    </UiTooltip>
                                                 ))
                                             ) : (
                                                 <span className="text-[11px] text-zinc-700">—</span>
@@ -1048,20 +1139,27 @@ export const ReinvestmentManager = ({
             {/* Bottom Actions & Notifications */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-zinc-900 border border-zinc-800 rounded-lg p-4">
                 <div className="flex items-center gap-3">
-                    <Button
-                        variant="secondary"
-                        size="sm"
-                        onClick={handleResetDefaults}
-                        icon={RotateCcw}
-                    >
-                        Przywróć Domyślne A, B, C
-                    </Button>
+                    <UiTooltip content="Przywróć domyślne parametry i stawki programów odtworzeniowych A, B, C">
+                        <span>
+                            <Button
+                                variant="secondary"
+                                size="sm"
+                                onClick={handleResetDefaults}
+                                icon={RotateCcw}
+                                aria-label="Przywróć domyślne A, B, C"
+                            >
+                                Przywróć Domyślne A, B, C
+                            </Button>
+                        </span>
+                    </UiTooltip>
 
                     {hasUnsavedChanges && (
-                        <span className="text-xs text-amber-400 flex items-center gap-1.5 font-mono">
-                            <AlertCircle className="w-3.5 h-3.5" />
-                            Niezapisane zmiany założeń
-                        </span>
+                        <UiTooltip content="Wprowadzono modyfikacje w programach, które nie zostały jeszcze zapisane w bazie">
+                            <span tabIndex={0} className="text-xs text-amber-400 flex items-center gap-1.5 font-mono cursor-help focus:outline-none">
+                                <AlertCircle className="w-3.5 h-3.5" />
+                                Niezapisane zmiany założeń
+                            </span>
+                        </UiTooltip>
                     )}
 
                     {saveSuccess && (
@@ -1080,16 +1178,21 @@ export const ReinvestmentManager = ({
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <Button
-                        variant="primary"
-                        size="sm"
-                        onClick={handleSave}
-                        disabled={isSaving || !hasUnsavedChanges}
-                        loading={isSaving}
-                        icon={Save}
-                    >
-                        Zapisz Założenia Reinvestmentu
-                    </Button>
+                    <UiTooltip content="Zapisz zaktualizowaną konfigurację programów reinvestmentu w projekcie">
+                        <span>
+                            <Button
+                                variant="primary"
+                                size="sm"
+                                onClick={handleSave}
+                                disabled={isSaving || !hasUnsavedChanges}
+                                loading={isSaving}
+                                icon={Save}
+                                aria-label="Zapisz założenia reinvestmentu"
+                            >
+                                Zapisz Założenia Reinvestmentu
+                            </Button>
+                        </span>
+                    </UiTooltip>
                 </div>
             </div>
         </div>

@@ -19,6 +19,7 @@ import { investmentProjectsApi } from '../../api/investmentProjects';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { Card } from '../ui/Card';
+import { Tooltip, InfoTooltip } from '../ui/Tooltip';
 import { CapexStageModal } from './CapexStageModal';
 import { CapexStageDeleteModal } from './CapexStageDeleteModal';
 import { getKstByCode } from '../../constants/kstClassifications';
@@ -133,34 +134,62 @@ export const CapexScheduleManager = () => {
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-zinc-900 border border-zinc-800 rounded-lg p-4 shadow-sm">
                 <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded bg-zinc-800 border border-zinc-700 flex items-center justify-center text-emerald-400">
-                        <Layers className="w-5 h-5" />
-                    </div>
+                    <Tooltip content="Harmonogram rzeczowo-finansowy nakładów CAPEX">
+                        <div
+                            tabIndex={0}
+                            className="w-9 h-9 rounded bg-zinc-800 border border-zinc-700 flex items-center justify-center text-emerald-400 cursor-help focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                        >
+                            <Layers className="w-5 h-5" />
+                        </div>
+                    </Tooltip>
                     <div>
-                        <h2 className="text-sm font-bold text-zinc-100 uppercase tracking-wide">
-                            Harmonogram Etapów CAPEX & Środki Trwałe KŚT
-                        </h2>
+                        <div className="flex items-center gap-2">
+                            <h2 className="text-sm font-bold text-zinc-100 uppercase tracking-wide">
+                                Harmonogram Etapów CAPEX & Środki Trwałe KŚT
+                            </h2>
+                            <InfoTooltip
+                                content="Harmonogram rzeczowo-finansowy Project Finance. Zdefiniuj poszczególne etapy nakładów inwestycyjnych z przypisaną klasyfikacją KŚT, datami realizacji oraz kwalifikowalnością dotacyjną dla automatycznej amortyzacji i modelowania cash flow."
+                                ariaLabel="Informacje o harmonogramie etapów CAPEX i KŚT"
+                                size="xs"
+                            />
+                        </div>
                         <p className="text-[11px] text-zinc-400">
                             Podział nakładów, czas trwania, klasyfikacja amortyzacji i kwalifikowalność dotacyjna
                         </p>
                     </div>
                 </div>
 
-                <Button
-                    variant="primary"
-                    icon={Plus}
-                    onClick={() => setIsAddModalOpen(true)}
-                >
-                    Dodaj Etap CAPEX
-                </Button>
+                <Tooltip content="Otwórz formularz dodawania nowego etapu nakładów inwestycyjnych">
+                    <span>
+                        <Button
+                            variant="primary"
+                            icon={Plus}
+                            onClick={() => setIsAddModalOpen(true)}
+                            aria-label="Dodaj Etap CAPEX"
+                        >
+                            Dodaj Etap CAPEX
+                        </Button>
+                    </span>
+                </Tooltip>
             </div>
 
             {/* Summary Cards */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                 <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
                     <div className="flex items-center justify-between text-[10px] text-zinc-400 uppercase font-semibold mb-1">
-                        <span>NAKŁADY NETTO (SUMA)</span>
-                        <Landmark className="w-3.5 h-3.5 text-emerald-400" />
+                        <div className="flex items-center gap-1.5">
+                            <span>NAKŁADY NETTO (SUMA)</span>
+                            <InfoTooltip
+                                content="Łączna suma nakładów inwestycyjnych netto ze wszystkich etapów harmonogramu."
+                                ariaLabel="Informacje o sumie nakładów netto"
+                                size="xs"
+                            />
+                        </div>
+                        <Tooltip content="Suma nakładów CAPEX netto">
+                            <span tabIndex={0} className="cursor-help focus:outline-none focus:text-emerald-300">
+                                <Landmark className="w-3.5 h-3.5 text-emerald-400" />
+                            </span>
+                        </Tooltip>
                     </div>
                     <div className="text-base font-bold text-zinc-100">
                         {formatCurrency(totalNetCapex)}
@@ -172,8 +201,19 @@ export const CapexScheduleManager = () => {
 
                 <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
                     <div className="flex items-center justify-between text-[10px] text-zinc-400 uppercase font-semibold mb-1">
-                        <span>WYDATKI KWALIFIKOWANE</span>
-                        <TrendingUp className="w-3.5 h-3.5 text-blue-400" />
+                        <div className="flex items-center gap-1.5">
+                            <span>WYDATKI KWALIFIKOWANE</span>
+                            <InfoTooltip
+                                content="Wartość nakładów kwalifikujących się do dofinansowania dotacyjnego lub wsparcia ze środków publicznych."
+                                ariaLabel="Informacje o wydatkach kwalifikowanych"
+                                size="xs"
+                            />
+                        </div>
+                        <Tooltip content="Baza kosztów kwalifikowanych do dotacji">
+                            <span tabIndex={0} className="cursor-help focus:outline-none focus:text-blue-300">
+                                <TrendingUp className="w-3.5 h-3.5 text-blue-400" />
+                            </span>
+                        </Tooltip>
                     </div>
                     <div className="text-base font-bold text-zinc-100">
                         {formatCurrency(totalGrantEligible)}
@@ -185,8 +225,19 @@ export const CapexScheduleManager = () => {
 
                 <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
                     <div className="flex items-center justify-between text-[10px] text-zinc-400 uppercase font-semibold mb-1">
-                        <span>ŚREDNIA STAWKA KŚT</span>
-                        <Percent className="w-3.5 h-3.5 text-amber-400" />
+                        <div className="flex items-center gap-1.5">
+                            <span>ŚREDNIA STAWKA KŚT</span>
+                            <InfoTooltip
+                                content="Średnioroczna stawka amortyzacji bilansowo-podatkowej ważona wielkością nakładów netto poszczególnych etapów."
+                                ariaLabel="Informacje o średniej stawce KŚT"
+                                size="xs"
+                            />
+                        </div>
+                        <Tooltip content="Ważona stawka amortyzacji KŚT">
+                            <span tabIndex={0} className="cursor-help focus:outline-none focus:text-amber-300">
+                                <Percent className="w-3.5 h-3.5 text-amber-400" />
+                            </span>
+                        </Tooltip>
                     </div>
                     <div className="text-base font-bold text-zinc-100">
                         {weightedKstRate.toFixed(2)}% / ROK
@@ -198,8 +249,19 @@ export const CapexScheduleManager = () => {
 
                 <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
                     <div className="flex items-center justify-between text-[10px] text-zinc-400 uppercase font-semibold mb-1">
-                        <span>STATUS HARMONOGRAMU</span>
-                        <Clock className="w-3.5 h-3.5 text-purple-400" />
+                        <div className="flex items-center gap-1.5">
+                            <span>STATUS HARMONOGRAMU</span>
+                            <InfoTooltip
+                                content="Status kompletności harmonogramu nakładów CAPEX i gotowości do projekcji wieloletniej."
+                                ariaLabel="Informacje o statusie harmonogramu"
+                                size="xs"
+                            />
+                        </div>
+                        <Tooltip content="Status harmonogramu rzeczowo-finansowego">
+                            <span tabIndex={0} className="cursor-help focus:outline-none focus:text-purple-300">
+                                <Clock className="w-3.5 h-3.5 text-purple-400" />
+                            </span>
+                        </Tooltip>
                     </div>
                     <div className="text-base font-bold text-zinc-100">
                         {sortedStages.length > 0 ? 'SKONFIGUROWANY' : 'BRAK ETAPÓW'}
@@ -222,13 +284,18 @@ export const CapexScheduleManager = () => {
                     <p className="text-[11px] text-zinc-400 max-w-md mx-auto mb-4 leading-relaxed">
                         Dodaj poszczególne etapy nakładów (np. prace ziemne, budowa hali, zakup maszyn) i przypisz im właściwe stawki amortyzacji KŚT.
                     </p>
-                    <Button
-                        variant="primary"
-                        icon={Plus}
-                        onClick={() => setIsAddModalOpen(true)}
-                    >
-                        Dodaj Pierwszy Etap CAPEX
-                    </Button>
+                    <Tooltip content="Rozpocznij definicję pierwszego etapu prac i nakładów inwestycyjnych">
+                        <span>
+                            <Button
+                                variant="primary"
+                                icon={Plus}
+                                onClick={() => setIsAddModalOpen(true)}
+                                aria-label="Dodaj Pierwszy Etap CAPEX"
+                            >
+                                Dodaj Pierwszy Etap CAPEX
+                            </Button>
+                        </span>
+                    </Tooltip>
                 </div>
             ) : (
                 <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden shadow-sm">
@@ -236,13 +303,41 @@ export const CapexScheduleManager = () => {
                         <table className="w-full text-left text-xs border-collapse">
                             <thead>
                                 <tr className="border-b border-zinc-800 bg-zinc-950/80 text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">
-                                    <th className="py-3 px-4 w-12 text-center">LP</th>
-                                    <th className="py-3 px-4">NAZWA ETAPU</th>
-                                    <th className="py-3 px-4">KLASYFIKACJA KŚT</th>
-                                    <th className="py-3 px-4 text-right">KWOTA NETTO</th>
-                                    <th className="py-3 px-4">HARMONOGRAM (START → OT)</th>
-                                    <th className="py-3 px-4 text-center">DOTACJA</th>
-                                    <th className="py-3 px-4 text-right w-24">AKCJE</th>
+                                    <th className="py-3 px-4 w-12 text-center">
+                                        <Tooltip content="Liczba porządkowa / kolejność realizacji etapu">
+                                            <span tabIndex={0} className="cursor-help focus:outline-none focus:text-zinc-200">LP</span>
+                                        </Tooltip>
+                                    </th>
+                                    <th className="py-3 px-4">
+                                        <Tooltip content="Nazwa zadania lub pozycji inwestycyjnej w harmonogramie">
+                                            <span tabIndex={0} className="cursor-help focus:outline-none focus:text-zinc-200">NAZWA ETAPU</span>
+                                        </Tooltip>
+                                    </th>
+                                    <th className="py-3 px-4">
+                                        <Tooltip content="Grupa Klasyfikacji Środków Trwałych i roczna stawka amortyzacji">
+                                            <span tabIndex={0} className="cursor-help focus:outline-none focus:text-zinc-200">KLASYFIKACJA KŚT</span>
+                                        </Tooltip>
+                                    </th>
+                                    <th className="py-3 px-4 text-right">
+                                        <Tooltip content="Wartość nakładów netto bez VAT w walucie projektu">
+                                            <span tabIndex={0} className="cursor-help focus:outline-none focus:text-zinc-200">KWOTA NETTO</span>
+                                        </Tooltip>
+                                    </th>
+                                    <th className="py-3 px-4">
+                                        <Tooltip content="Data startu etapu oraz moment przyjęcia do używania (OT)">
+                                            <span tabIndex={0} className="cursor-help focus:outline-none focus:text-zinc-200">HARMONOGRAM (START → OT)</span>
+                                        </Tooltip>
+                                    </th>
+                                    <th className="py-3 px-4 text-center">
+                                        <Tooltip content="Kwalifikowalność do dofinansowania dotacyjnego">
+                                            <span tabIndex={0} className="cursor-help focus:outline-none focus:text-zinc-200">DOTACJA</span>
+                                        </Tooltip>
+                                    </th>
+                                    <th className="py-3 px-4 text-right w-24">
+                                        <Tooltip content="Dostępne operacje edycji i usuwania etapu">
+                                            <span tabIndex={0} className="cursor-help focus:outline-none focus:text-zinc-200">AKCJE</span>
+                                        </Tooltip>
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-zinc-800/60">
@@ -267,9 +362,13 @@ export const CapexScheduleManager = () => {
                                                     <span className="font-semibold text-zinc-200 text-[11px]">
                                                         {stage.kst_code}
                                                     </span>
-                                                    <Badge variant="brand" size="sm">
-                                                        {kstRate}%
-                                                    </Badge>
+                                                    <Tooltip content={`Roczna stawka amortyzacji KŚT: ${kstRate}%`}>
+                                                        <span>
+                                                            <Badge variant="brand" size="sm">
+                                                                {kstRate}%
+                                                            </Badge>
+                                                        </span>
+                                                    </Tooltip>
                                                 </div>
                                                 <div className="text-[10px] text-zinc-500 truncate max-w-xs">
                                                     {kstObj.name}
@@ -290,29 +389,43 @@ export const CapexScheduleManager = () => {
                                             </td>
                                             <td className="py-3 px-4 text-center">
                                                 {isGrant ? (
-                                                    <Badge variant="success" size="sm">
-                                                        TAK ({stage.grant_eligible_amount !== null && stage.grant_eligible_amount !== undefined ? formatCurrency(stage.grant_eligible_amount) : '100%'})
-                                                    </Badge>
+                                                    <Tooltip content={`Wydatki kwalifikowane: ${stage.grant_eligible_amount !== null && stage.grant_eligible_amount !== undefined ? formatCurrency(stage.grant_eligible_amount) : '100% kwoty netto'}`}>
+                                                        <span>
+                                                            <Badge variant="success" size="sm">
+                                                                TAK ({stage.grant_eligible_amount !== null && stage.grant_eligible_amount !== undefined ? formatCurrency(stage.grant_eligible_amount) : '100%'})
+                                                            </Badge>
+                                                        </span>
+                                                    </Tooltip>
                                                 ) : (
-                                                    <Badge variant="default" size="sm">NIE</Badge>
+                                                    <Tooltip content="Etap niekwalifikowany do wsparcia dotacyjnego">
+                                                        <span>
+                                                            <Badge variant="default" size="sm">NIE</Badge>
+                                                        </span>
+                                                    </Tooltip>
                                                 )}
                                             </td>
                                             <td className="py-3 px-4 text-right">
                                                 <div className="flex items-center justify-end gap-1.5">
-                                                    <button
-                                                        onClick={() => setEditingStage(stage)}
-                                                        title="Edytuj etap"
-                                                        className="p-1.5 rounded text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-colors"
-                                                    >
-                                                        <Edit2 className="w-3.5 h-3.5" />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => setDeletingStage(stage)}
-                                                        title="Usuń etap"
-                                                        className="p-1.5 rounded text-zinc-500 hover:text-rose-400 hover:bg-zinc-800 transition-colors"
-                                                    >
-                                                        <Trash2 className="w-3.5 h-3.5" />
-                                                    </button>
+                                                    <Tooltip content={`Edytuj etap: ${stage.stage_name}`}>
+                                                        <button
+                                                            onClick={() => setEditingStage(stage)}
+                                                            title="Edytuj etap"
+                                                            aria-label={`Edytuj etap ${stage.stage_name}`}
+                                                            className="p-1.5 rounded text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-colors focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                                                        >
+                                                            <Edit2 className="w-3.5 h-3.5" />
+                                                        </button>
+                                                    </Tooltip>
+                                                    <Tooltip content={`Usuń etap: ${stage.stage_name}`}>
+                                                        <button
+                                                            onClick={() => setDeletingStage(stage)}
+                                                            title="Usuń etap"
+                                                            aria-label={`Usuń etap ${stage.stage_name}`}
+                                                            className="p-1.5 rounded text-zinc-500 hover:text-rose-400 hover:bg-zinc-800 transition-colors focus:outline-none focus:ring-1 focus:ring-rose-500"
+                                                        >
+                                                            <Trash2 className="w-3.5 h-3.5" />
+                                                        </button>
+                                                    </Tooltip>
                                                 </div>
                                             </td>
                                         </tr>
@@ -347,12 +460,18 @@ export const CapexScheduleManager = () => {
                                 const color = colors[idx % colors.length];
 
                                 return (
-                                    <div
+                                    <Tooltip
                                         key={stage.id || idx}
-                                        style={{ width: `${pct}%` }}
-                                        title={`${stage.stage_name}: ${pct.toFixed(1)}%`}
-                                        className={`${color} h-full transition-all`}
-                                    />
+                                        content={`${stage.stage_name}: ${pct.toFixed(1)}% (${formatCurrency(stage.net_amount)})`}
+                                    >
+                                        <div
+                                            tabIndex={0}
+                                            style={{ width: `${pct}%` }}
+                                            title={`${stage.stage_name}: ${pct.toFixed(1)}%`}
+                                            aria-label={`${stage.stage_name}: ${pct.toFixed(1)}%`}
+                                            className={`${color} h-full transition-all cursor-pointer focus:outline-none focus:ring-1 focus:ring-white`}
+                                        />
+                                    </Tooltip>
                                 );
                             })}
                         </div>
@@ -373,11 +492,16 @@ export const CapexScheduleManager = () => {
                                 const color = dotColors[idx % dotColors.length];
 
                                 return (
-                                    <div key={stage.id || idx} className="flex items-center gap-1.5">
-                                        <span className={`w-2 h-2 rounded-full ${color}`} />
-                                        <span className="text-zinc-300 truncate max-w-[150px]">{stage.stage_name}</span>
-                                        <span className="text-zinc-500">({pct.toFixed(1)}%)</span>
-                                    </div>
+                                    <Tooltip
+                                        key={stage.id || idx}
+                                        content={`Udział w budżecie: ${pct.toFixed(1)}% (${formatCurrency(stage.net_amount)})`}
+                                    >
+                                        <div tabIndex={0} className="flex items-center gap-1.5 cursor-help focus:outline-none">
+                                            <span className={`w-2 h-2 rounded-full ${color}`} />
+                                            <span className="text-zinc-300 truncate max-w-[150px]">{stage.stage_name}</span>
+                                            <span className="text-zinc-500">({pct.toFixed(1)}%)</span>
+                                        </div>
+                                    </Tooltip>
                                 );
                             })}
                         </div>
@@ -412,3 +536,5 @@ export const CapexScheduleManager = () => {
         </div>
     );
 };
+
+export default CapexScheduleManager;

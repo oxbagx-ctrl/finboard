@@ -955,6 +955,15 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Wdrożenie dymków `<Tooltip>` i komponentów `<InfoTooltip size="xs">` w formularzu tworzenia projektu `CreateProjectModal.jsx`: przycisk zamykania z `aria-label`, objaśnienia etykiet pól (nazwa projektu, data startu, horyzont planowania, waluta bazowa, equity, senior debt, opis strategiczny) oraz dymki dla przycisków w stopce ("Anuluj", "Utwórz Projekt").
     - Weryfikacja testowa: dedykowany zestaw testowy `InvestmentPlanningTooltips.test.jsx` (6/6), `InvestmentPlanningView.test.jsx` (9/9), 100% PASS w pełnym zestawie 66 plików Vitest (607 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
+  - [x] Wdrożenie dostępnych podpowiedzi Tooltip i InfoTooltip w komponentach zakładki "1. Założenia & CAPEX" modułu Project Finance (CapexScheduleManager, CapexStageModal, CapexStageDeleteModal, FinancingStructureConfigurator, ReinvestmentManager, OperatingAssumptionsForm).
+    - `CapexScheduleManager.jsx`: dymki nagłówka, `InfoTooltip` tytułu z definicją etapowania nakładów brutto/netto i przypisań KŚT, przycisk "Dodaj Etap CAPEX", 4 karty podsumowań KPI (Nakłady netto, Wydatki kwalifikowane, Średnia stawka KŚT, Status), nagłówki 7 kolumn tabeli, odznaki KŚT i dotacji, akcje wierszy (Edytuj/Usuń) oraz segmenty paska nakładów wraz z legendą.
+    - `CapexStageModal.jsx`: przycisk zamykania, 8 etykiet pól z `InfoTooltip` (Nazwa, KŚT, Stawka amortyzacji, Kwota netto, Kolejność, Start, Czas trwania, Dotacja/Kwota kwalifikowana), separacja przycisku informacyjnego poza znacznikiem `<label>` oraz przyciski stopki "Anuluj" i "Dodaj Etap / Zapisz Zmiany".
+    - `CapexStageDeleteModal.jsx`: dymki `<Tooltip>` na przyciskach "Anuluj" oraz "Usuń Etap".
+    - `FinancingStructureConfigurator.jsx`: nagłówek z `InfoTooltip`, odznaka statusu luki montażu, 4 metryki kapitałowe, pasek Capital Stack, szybkie przyciski proporcji (20%, 30%, 50%, 70%, pokryj lukę), parametry kredytu (stopa bazowa, marża, tenor, karencja, profile spłaty Annuity/Linear/Bullet), kalkulator kredytu VAT oraz przyciski resetu i zapisu.
+    - `ReinvestmentManager.jsx`: nagłówek z odznaką KŚT/15L i `InfoTooltip`, 4 karty KPI odtworzeń (Suma 15L, Średnioroczny, Liczba interwencji, Tarcza podatkowa CIT), suwak What-If, przełączniki i pola programów A/B/C, matryca wdrożeń, przełączniki trybów (Siatka 15L, Słupki, S-Curve) i przyciski stopki.
+    - `OperatingAssumptionsForm.jsx`: nagłówek z odznaką COD i `InfoTooltip`, 4 karty KPI (Przychody, EBITDA, CCC, FTE), 5 podzakładek (Przychody, OPEX, NWC, Kadry, CIT), suwaki wzrostu i ramp-up, tabele strumieni przychodowych i etatów z akcjami, opcje CIT/tarczy podatkowej oraz tabela projekcji wieloletniej.
+    - Weryfikacja testowa: rozszerzony zestaw `InvestmentPlanningTooltips.test.jsx` (10/10), 100% PASS we wszystkich 6 zestawach testowych modułu inwestycji (66 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
+
 ---
 
 

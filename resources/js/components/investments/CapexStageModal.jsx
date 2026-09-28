@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Layers, Calendar, DollarSign, Tag, CheckSquare, Clock } from 'lucide-react';
 import { Button } from '../ui/Button';
+import { Tooltip, InfoTooltip } from '../ui/Tooltip';
 import { KST_CLASSIFICATIONS } from '../../constants/kstClassifications';
 
 export const CapexStageModal = ({
@@ -146,13 +147,17 @@ export const CapexStageModal = ({
                             </p>
                         </div>
                     </div>
-                    <button
-                        onClick={onClose}
-                        disabled={submitting}
-                        className="text-zinc-500 hover:text-zinc-300 transition-colors p-1"
-                    >
-                        <X className="w-4 h-4" />
-                    </button>
+                    <Tooltip content="Zamknij formularz etapu CAPEX">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            disabled={submitting}
+                            aria-label="Zamknij formularz etapu"
+                            className="text-zinc-500 hover:text-zinc-300 transition-colors p-1 rounded focus:outline-none focus:ring-1 focus:ring-zinc-400"
+                        >
+                            <X className="w-4 h-4" />
+                        </button>
+                    </Tooltip>
                 </div>
 
                 {/* Form */}
@@ -165,9 +170,16 @@ export const CapexStageModal = ({
 
                     {/* Stage Name */}
                     <div>
-                        <label htmlFor="stage-name" className="block text-xs font-semibold text-zinc-300 uppercase mb-1">
-                            Nazwa Etapu CAPEX *
-                        </label>
+                        <div className="flex items-center gap-1.5 mb-1">
+                            <label htmlFor="stage-name" className="text-xs font-semibold text-zinc-300 uppercase">
+                                Nazwa Etapu CAPEX *
+                            </label>
+                            <InfoTooltip
+                                content="Nazwa zadania inwestycyjnego, np. Roboty ziemne, Stan surowy, Przyłącze SN, Falowniki, Magazyn energii BESS."
+                                ariaLabel="Informacje o nazwie etapu CAPEX"
+                                size="xs"
+                            />
+                        </div>
                         <input
                             id="stage-name"
                             type="text"
@@ -184,9 +196,16 @@ export const CapexStageModal = ({
                     {/* Row: Net Amount & Currency & Order */}
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <div className="sm:col-span-2">
-                            <label htmlFor="stage-net-amount" className="block text-xs font-semibold text-zinc-300 uppercase mb-1">
-                                Kwota Netto ({formData.currency}) *
-                            </label>
+                            <div className="flex items-center gap-1.5 mb-1">
+                                <label htmlFor="stage-net-amount" className="text-xs font-semibold text-zinc-300 uppercase">
+                                    Kwota Netto ({formData.currency}) *
+                                </label>
+                                <InfoTooltip
+                                    content="Całkowita wartość wydatków inwestycyjnych netto bez podatku od towarów i usług (VAT)."
+                                    ariaLabel="Informacje o kwocie netto etapu"
+                                    size="xs"
+                                />
+                            </div>
                             <input
                                 id="stage-net-amount"
                                 type="number"
@@ -203,9 +222,16 @@ export const CapexStageModal = ({
                         </div>
 
                         <div>
-                            <label htmlFor="stage-order" className="block text-xs font-semibold text-zinc-300 uppercase mb-1">
-                                Kolejność
-                            </label>
+                            <div className="flex items-center gap-1.5 mb-1">
+                                <label htmlFor="stage-order" className="text-xs font-semibold text-zinc-300 uppercase">
+                                    Kolejność
+                                </label>
+                                <InfoTooltip
+                                    content="Numer porządkowy etapu w harmonogramie rzeczowo-finansowym."
+                                    ariaLabel="Informacje o kolejności etapu"
+                                    size="xs"
+                                />
+                            </div>
                             <input
                                 id="stage-order"
                                 type="number"
@@ -221,9 +247,16 @@ export const CapexStageModal = ({
                     {/* Row: Start Date & Duration */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
-                            <label htmlFor="stage-start-date" className="block text-xs font-semibold text-zinc-300 uppercase mb-1">
-                                Data Rozpoczęcia *
-                            </label>
+                            <div className="flex items-center gap-1.5 mb-1">
+                                <label htmlFor="stage-start-date" className="text-xs font-semibold text-zinc-300 uppercase">
+                                    Data Rozpoczęcia *
+                                </label>
+                                <InfoTooltip
+                                    content="Planowana data pierwszych wydatków lub rozpoczęcia prac budowlano-montażowych."
+                                    ariaLabel="Informacje o dacie rozpoczęcia"
+                                    size="xs"
+                                />
+                            </div>
                             <input
                                 id="stage-start-date"
                                 type="date"
@@ -237,9 +270,16 @@ export const CapexStageModal = ({
                         </div>
 
                         <div>
-                            <label htmlFor="stage-duration" className="block text-xs font-semibold text-zinc-300 uppercase mb-1">
-                                Czas Trwania (Miesiące) *
-                            </label>
+                            <div className="flex items-center gap-1.5 mb-1">
+                                <label htmlFor="stage-duration" className="text-xs font-semibold text-zinc-300 uppercase">
+                                    Czas Trwania (Miesiące) *
+                                </label>
+                                <InfoTooltip
+                                    content="Czas trwania etapu w miesiącach. Data zakończenia określa moment oddania środka trwałego do używania (OT)."
+                                    ariaLabel="Informacje o czasie trwania etapu"
+                                    size="xs"
+                                />
+                            </div>
                             <input
                                 id="stage-duration"
                                 type="number"
@@ -257,9 +297,16 @@ export const CapexStageModal = ({
 
                     {/* KŚT Classification */}
                     <div>
-                        <label htmlFor="stage-kst" className="block text-xs font-semibold text-zinc-300 uppercase mb-1">
-                            Klasyfikacja Środka Trwałego (KŚT) *
-                        </label>
+                        <div className="flex items-center gap-1.5 mb-1">
+                            <label htmlFor="stage-kst" className="text-xs font-semibold text-zinc-300 uppercase">
+                                Klasyfikacja Środka Trwałego (KŚT) *
+                            </label>
+                            <InfoTooltip
+                                content="Grupa KŚT determinująca urzędową stawkę amortyzacji bilansowej i podatkowej oraz rozpoczęcie odpisów od momentu OT."
+                                ariaLabel="Informacje o klasyfikacji KŚT"
+                                size="xs"
+                            />
+                        </div>
                         <select
                             id="stage-kst"
                             value={formData.kst_code}
@@ -279,29 +326,43 @@ export const CapexStageModal = ({
 
                     {/* Grant Eligibility Section */}
                     <div className="p-3 bg-zinc-950 border border-zinc-800 rounded space-y-2">
-                        <label className="flex items-center gap-2 cursor-pointer">
-                            <input
-                                type="checkbox"
-                                checked={formData.is_grant_eligible}
-                                onChange={(e) => setFormData({
-                                    ...formData,
-                                    is_grant_eligible: e.target.checked,
-                                    grant_eligible_amount: e.target.checked && !formData.grant_eligible_amount
-                                        ? formData.net_amount
-                                        : formData.grant_eligible_amount,
-                                })}
-                                className="w-4 h-4 rounded bg-zinc-900 border-zinc-700 text-emerald-500 focus:ring-0 focus:outline-none cursor-pointer"
+                        <div className="flex items-center gap-2">
+                            <label className="flex items-center gap-2 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    checked={formData.is_grant_eligible}
+                                    onChange={(e) => setFormData({
+                                        ...formData,
+                                        is_grant_eligible: e.target.checked,
+                                        grant_eligible_amount: e.target.checked && !formData.grant_eligible_amount
+                                            ? formData.net_amount
+                                            : formData.grant_eligible_amount,
+                                    })}
+                                    className="w-4 h-4 rounded bg-zinc-900 border-zinc-700 text-emerald-500 focus:ring-0 focus:outline-none cursor-pointer"
+                                />
+                                <span className="text-xs font-semibold text-zinc-200 uppercase">
+                                    Wydatki Kwalifikowane do Dotacji / Pomocy Publicznej
+                                </span>
+                            </label>
+                            <InfoTooltip
+                                content="Oznacz etap jako kwalifikujący się do refundacji w ramach dotacji unijnych lub krajowych programów pomocowych."
+                                ariaLabel="Informacje o kwalifikowalności dotacyjnej"
+                                size="xs"
                             />
-                            <span className="text-xs font-semibold text-zinc-200 uppercase">
-                                Wydatki Kwalifikowane do Dotacji / Pomocy Publicznej
-                            </span>
-                        </label>
+                        </div>
 
                         {formData.is_grant_eligible && (
                             <div className="pt-2">
-                                <label htmlFor="stage-grant-eligible-amount" className="block text-[11px] font-semibold text-zinc-400 uppercase mb-1">
-                                    Kwota Wydatków Kwalifikowanych ({formData.currency})
-                                </label>
+                                <div className="flex items-center gap-1.5 mb-1">
+                                    <label htmlFor="stage-grant-eligible-amount" className="text-[11px] font-semibold text-zinc-400 uppercase">
+                                        Kwota Wydatków Kwalifikowanych ({formData.currency})
+                                    </label>
+                                    <InfoTooltip
+                                        content="Część nakładów netto tego etapu kwalifikująca się do objęcia dofinansowaniem. Domyślnie 100% wartości etapu."
+                                        ariaLabel="Informacje o kwocie wydatków kwalifikowanych"
+                                        size="xs"
+                                    />
+                                </div>
                                 <input
                                     id="stage-grant-eligible-amount"
                                     type="number"
@@ -323,21 +384,31 @@ export const CapexStageModal = ({
 
                     {/* Footer buttons */}
                     <div className="flex items-center justify-end gap-3 pt-3 border-t border-zinc-800">
-                        <Button
-                            type="button"
-                            variant="secondary"
-                            onClick={onClose}
-                            disabled={submitting}
-                        >
-                            Anuluj
-                        </Button>
-                        <Button
-                            type="submit"
-                            variant="primary"
-                            loading={submitting}
-                        >
-                            {isEdit ? 'Zapisz Zmiany' : 'Dodaj Etap'}
-                        </Button>
+                        <Tooltip content="Odrzuć zmiany i zamknij okno dialogowe">
+                            <span>
+                                <Button
+                                    type="button"
+                                    variant="secondary"
+                                    onClick={onClose}
+                                    disabled={submitting}
+                                    aria-label="Anuluj edycję etapu"
+                                >
+                                    Anuluj
+                                </Button>
+                            </span>
+                        </Tooltip>
+                        <Tooltip content={isEdit ? 'Zapisz zaktualizowane parametry etapu CAPEX' : 'Zapisz i dodaj nowy etap do harmonogramu projektu'}>
+                            <span>
+                                <Button
+                                    type="submit"
+                                    variant="primary"
+                                    loading={submitting}
+                                    aria-label={isEdit ? 'Zapisz Zmiany' : 'Dodaj Etap'}
+                                >
+                                    {isEdit ? 'Zapisz Zmiany' : 'Dodaj Etap'}
+                                </Button>
+                            </span>
+                        </Tooltip>
                     </div>
                 </form>
             </div>

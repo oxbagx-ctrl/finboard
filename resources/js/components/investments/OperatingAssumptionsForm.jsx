@@ -22,6 +22,7 @@ import {
 import { useInvestmentProject } from "../../context/InvestmentProjectContext";
 import { investmentProjectsApi } from "../../api/investmentProjects";
 import { calculate15YearStatements } from "../../workers/financialCalculations";
+import { Tooltip, InfoTooltip } from "../ui/Tooltip";
 
 const formatCurrency = (val, currency = "PLN") => {
   return new Intl.NumberFormat("pl-PL", {
@@ -568,40 +569,73 @@ export const OperatingAssumptionsForm = () => {
       {/* Header & KPI Summary Strip */}
       <div className="bg-zinc-900/60 border border-zinc-800 rounded-xl p-6 shadow-sm">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-zinc-800">
-          <div>
-            <h3 className="text-lg font-semibold text-zinc-100 flex items-center gap-2">
-              <Activity className="w-5 h-5 text-emerald-400" />
-              Założenia Operacyjne & Model P&L
-            </h3>
-            <p className="text-sm text-zinc-400">
-              Konfiguracja strumieni przychodowych, driverów OPEX, rotacji
-              kapitału obrotowego (NWC) oraz matrycy zatrudnienia.
-            </p>
+          <div className="flex items-start gap-3">
+            <Tooltip content="Wskaźniki operacyjne, przychody, koszty i podatki w fazie eksploatacji">
+              <span
+                tabIndex={0}
+                className="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0 cursor-help focus:outline-none"
+              >
+                <Activity className="w-5 h-5" />
+              </span>
+            </Tooltip>
+            <div>
+              <h3 className="text-lg font-semibold text-zinc-100 flex items-center gap-2">
+                <span>Założenia Operacyjne & Model P&L</span>
+                <InfoTooltip
+                  content="Parametryzacja modelu biznesowego po uruchomieniu komercyjnym (COD): cenniki, wolumeny, eskalacja kosztów, struktura zatrudnienia oraz tarcza podatkowa CIT."
+                  ariaLabel="Informacje o założeniach operacyjnych"
+                  size="xs"
+                />
+              </h3>
+              <p className="text-sm text-zinc-400">
+                Konfiguracja strumieni przychodowych, driverów OPEX, rotacji
+                kapitału obrotowego (NWC) oraz matrycy zatrudnienia.
+              </p>
+            </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-zinc-800 text-zinc-300 border border-zinc-700">
-              <Clock className="w-3.5 h-3.5 text-emerald-400" />
-              COD: {selectedProject.commercial_operation_date || "Nieustalona"}
-            </span>
+            <Tooltip content="Commercial Operation Date - planowana data rozpoczęcia fazy operacyjnej projektu">
+              <span
+                tabIndex={0}
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-zinc-800 text-zinc-300 border border-zinc-700 cursor-help focus:outline-none"
+              >
+                <Clock className="w-3.5 h-3.5 text-emerald-400" />
+                COD: {selectedProject.commercial_operation_date || "Nieustalona"}
+              </span>
+            </Tooltip>
           </div>
         </div>
 
         {/* KPI Metrics */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
           <div className="bg-zinc-950/60 border border-zinc-800/80 rounded-lg p-3.5">
-            <span className="text-xs text-zinc-400 block mb-1">
-              Przychody Bazowe (Rok)
-            </span>
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-xs text-zinc-400">
+                Przychody Bazowe (Rok)
+              </span>
+              <InfoTooltip
+                content="Suma rocznych strumieni przychodowych w pierwszym roku pełnej mocy operacyjnej."
+                ariaLabel="Informacje o przychodach bazowych"
+                size="xs"
+              />
+            </div>
             <span className="text-lg font-bold font-mono text-zinc-100">
               {formatCurrency(calculatedAnnualRevenueBase, currency)}
             </span>
           </div>
 
           <div className="bg-zinc-950/60 border border-zinc-800/80 rounded-lg p-3.5">
-            <span className="text-xs text-zinc-400 block mb-1">
-              EBITDA Bazowa (Marża)
-            </span>
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-xs text-zinc-400">
+                EBITDA Bazowa (Marża)
+              </span>
+              <InfoTooltip
+                content="Zysk operacyjny przed amortyzacją i podatkiem przy bazowym obciążeniu OPEX i płacami."
+                ariaLabel="Informacje o EBITDA bazowej"
+                size="xs"
+              />
+            </div>
             <span
               className={`text-lg font-bold font-mono ${calculatedEbitda >= 0 ? "text-emerald-400" : "text-rose-400"}`}
             >
@@ -613,9 +647,16 @@ export const OperatingAssumptionsForm = () => {
           </div>
 
           <div className="bg-zinc-950/60 border border-zinc-800/80 rounded-lg p-3.5">
-            <span className="text-xs text-zinc-400 block mb-1">
-              Cykl Konwersji (CCC)
-            </span>
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-xs text-zinc-400">
+                Cykl Konwersji (CCC)
+              </span>
+              <InfoTooltip
+                content="Czas w dniach od wydatkowania gotówki na zapasy/dostawców do odzyskania gotówki z należności (DIO + DSO - DPO)."
+                ariaLabel="Informacje o cyklu konwersji gotówki"
+                size="xs"
+              />
+            </div>
             <span
               className={`text-lg font-bold font-mono ${cashConversionCycle <= 45 ? "text-emerald-400" : cashConversionCycle <= 90 ? "text-amber-400" : "text-rose-400"}`}
             >
@@ -624,9 +665,16 @@ export const OperatingAssumptionsForm = () => {
           </div>
 
           <div className="bg-zinc-950/60 border border-zinc-800/80 rounded-lg p-3.5">
-            <span className="text-xs text-zinc-400 block mb-1">
-              Zespół & Płace (FTE)
-            </span>
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-xs text-zinc-400">
+                Zespół & Płace (FTE)
+              </span>
+              <InfoTooltip
+                content="Łączna liczba etatów (Full-Time Equivalent) oraz roczny fundusz płac z narzutami pracodawcy."
+                ariaLabel="Informacje o zespole i płacach"
+                size="xs"
+              />
+            </div>
             <span className="text-lg font-bold font-mono text-indigo-400">
               {totalFte} FTE
               <span className="text-xs font-normal text-zinc-400 ml-1.5">
@@ -643,28 +691,51 @@ export const OperatingAssumptionsForm = () => {
               id: "revenues",
               label: "1. Przychody & Ramp-Up",
               icon: TrendingUp,
+              description: "Strumienie przychodowe, wolumeny, cenniki i profil dojścia do pełnej mocy",
             },
-            { id: "opex", label: "2. Koszty OPEX", icon: Sliders },
-            { id: "nwc", label: "3. Kapitał Obrotowy (NWC)", icon: Clock },
-            { id: "payroll", label: "4. Matryca Etatów", icon: Users },
-            { id: "taxes", label: "5. Podatki & CIT", icon: Receipt },
+            {
+              id: "opex",
+              label: "2. Koszty OPEX",
+              icon: Sliders,
+              description: "Koszty zmienne bezpośrednie, baza kosztów stałych oraz eskalacja inflacyjna",
+            },
+            {
+              id: "nwc",
+              label: "3. Kapitał Obrotowy (NWC)",
+              icon: Clock,
+              description: "Dni rotacji należności (DSO), zobowiązań (DPO), zapasów (DIO) i cykl gotówki (CCC)",
+            },
+            {
+              id: "payroll",
+              label: "4. Matryca Etatów",
+              icon: Users,
+              description: "Struktura zatrudnienia, wynagrodzenia brutto, narzuty pracodawcy i dynamika płac",
+            },
+            {
+              id: "taxes",
+              label: "5. Podatki & CIT",
+              icon: Receipt,
+              description: "Stawka podatku dochodowego CIT, tarcza WACC oraz rozliczanie strat z lat ubiegłych",
+            },
           ].map((tab) => {
             const Icon = tab.icon;
             const isActive = activeSubTab === tab.id;
             return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setActiveSubTab(tab.id)}
-                className={`flex items-center gap-1.5 px-3 py-2 border-b-2 font-medium transition-colors whitespace-nowrap ${
-                  isActive
-                    ? "border-emerald-500 text-emerald-400 bg-emerald-500/10"
-                    : "border-transparent text-zinc-400 hover:text-zinc-200 hover:border-zinc-700"
-                }`}
-              >
-                <Icon className="w-3.5 h-3.5" />
-                {tab.label}
-              </button>
+              <Tooltip key={tab.id} content={tab.description}>
+                <button
+                  type="button"
+                  onClick={() => setActiveSubTab(tab.id)}
+                  aria-label={tab.label}
+                  className={`flex items-center gap-1.5 px-3 py-2 border-b-2 font-medium transition-colors whitespace-nowrap ${
+                    isActive
+                      ? "border-emerald-500 text-emerald-400 bg-emerald-500/10"
+                      : "border-transparent text-zinc-400 hover:text-zinc-200 hover:border-zinc-700"
+                  }`}
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                  {tab.label}
+                </button>
+              </Tooltip>
             );
           })}
         </div>
@@ -684,14 +755,17 @@ export const OperatingAssumptionsForm = () => {
                 roczną bazę przychodów COD.
               </p>
             </div>
-            <button
-              type="button"
-              onClick={handleAddRevenueLine}
-              className="px-3 py-1.5 text-xs bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg flex items-center gap-1.5 transition-colors shadow-sm font-medium"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              Dodaj Strumień
-            </button>
+            <Tooltip content="Dodaj nową linię przychodową do modelu sprzedaży">
+              <button
+                type="button"
+                onClick={handleAddRevenueLine}
+                aria-label="Dodaj strumień przychodowy"
+                className="px-3 py-1.5 text-xs bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg flex items-center gap-1.5 transition-colors shadow-sm font-medium"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                Dodaj Strumień
+              </button>
+            </Tooltip>
           </div>
 
           {/* Revenue Lines Table */}
@@ -699,14 +773,36 @@ export const OperatingAssumptionsForm = () => {
             <table className="w-full text-left text-xs text-zinc-300">
               <thead className="bg-zinc-950/80 text-zinc-400 border-b border-zinc-800 font-mono">
                 <tr>
-                  <th className="py-2.5 px-3">Nazwa Strumienia</th>
-                  <th className="py-2.5 px-3 w-28">Jednostka</th>
-                  <th className="py-2.5 px-3 w-32">Wolumen</th>
-                  <th className="py-2.5 px-3 w-36">Cena Jedn. ({currency})</th>
-                  <th className="py-2.5 px-3 w-40 text-right">
-                    Roczna Wartość
+                  <th className="py-2.5 px-3">
+                    <Tooltip content="Nazwa lub kategoria źródła przychodów operacyjnych">
+                      <span className="cursor-help">Nazwa Strumienia</span>
+                    </Tooltip>
                   </th>
-                  <th className="py-2.5 px-2 w-12 text-center">Akcja</th>
+                  <th className="py-2.5 px-3 w-28">
+                    <Tooltip content="Jednostka miary wolumenu sprzedaży (np. MWh, szt., usł., t)">
+                      <span className="cursor-help">Jednostka</span>
+                    </Tooltip>
+                  </th>
+                  <th className="py-2.5 px-3 w-32">
+                    <Tooltip content="Roczny wolumen sprzedaży w jednostkach fizycznych">
+                      <span className="cursor-help">Wolumen</span>
+                    </Tooltip>
+                  </th>
+                  <th className="py-2.5 px-3 w-36">
+                    <Tooltip content={`Cena jednostkowa netto za jednostkę wolumenu w ${currency}`}>
+                      <span className="cursor-help">Cena Jedn. ({currency})</span>
+                    </Tooltip>
+                  </th>
+                  <th className="py-2.5 px-3 w-40 text-right">
+                    <Tooltip content="Iloczyn wolumenu i ceny jednostkowej w skali pełnego roku operacyjnego">
+                      <span className="cursor-help">Roczna Wartość</span>
+                    </Tooltip>
+                  </th>
+                  <th className="py-2.5 px-2 w-12 text-center">
+                    <Tooltip content="Dostępne operacje na pozycji">
+                      <span className="cursor-help">Akcja</span>
+                    </Tooltip>
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-800/60 font-mono">
@@ -793,14 +889,16 @@ export const OperatingAssumptionsForm = () => {
                         {formatCurrency(line.total, currency)}
                       </td>
                       <td className="py-2 px-2 text-center">
-                        <button
-                          type="button"
-                          aria-label="Usuń linię"
-                          onClick={() => handleRemoveRevenueLine(line.id)}
-                          className="p-1 text-zinc-500 hover:text-rose-400 transition-colors"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
+                        <Tooltip content="Usuń tę linię przychodową">
+                          <button
+                            type="button"
+                            aria-label="Usuń linię"
+                            onClick={() => handleRemoveRevenueLine(line.id)}
+                            className="p-1 text-zinc-500 hover:text-rose-400 transition-colors"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </Tooltip>
                       </td>
                     </tr>
                   ))
@@ -826,8 +924,15 @@ export const OperatingAssumptionsForm = () => {
           {/* Ramp-up & Growth Rate */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-zinc-800">
             <div className="bg-zinc-950/60 p-4 rounded-lg border border-zinc-800/80 space-y-3">
-              <label className="text-xs text-zinc-300 font-medium flex justify-between">
-                <span>Roczna Stopa Wzrostu Przychodów (%)</span>
+              <label className="text-xs text-zinc-300 font-medium flex justify-between items-center">
+                <span className="flex items-center gap-1.5">
+                  <span>Roczna Stopa Wzrostu Przychodów (%)</span>
+                  <InfoTooltip
+                    content="Stopa indeksacji cen lub organicznego wzrostu wolumenu sprzedaży rok do roku (CAGR)."
+                    ariaLabel="Informacje o rocznej stopie wzrostu przychodów"
+                    size="xs"
+                  />
+                </span>
                 <span className="font-mono text-emerald-400">
                   {revenueGrowthRate.toFixed(1)}%
                 </span>
@@ -890,9 +995,16 @@ export const OperatingAssumptionsForm = () => {
             </div>
 
             <div className="bg-zinc-950/60 p-4 rounded-lg border border-zinc-800/80 space-y-3">
-              <span className="text-xs text-zinc-300 font-medium block">
-                Profil Dojścia do Pełnej Mocy (Ramp-Up %)
-              </span>
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-xs text-zinc-300 font-medium">
+                  Profil Dojścia do Pełnej Mocy (Ramp-Up %)
+                </span>
+                <InfoTooltip
+                  content="Procentowe osiągnięcie nominalnych przychodów w początkowych latach rozruchu technologicznego i komercyjnego."
+                  ariaLabel="Informacje o profilu ramp-up"
+                  size="xs"
+                />
+              </div>
               <div className="grid grid-cols-3 gap-2 text-xs font-mono">
                 <div>
                   <span className="text-[11px] text-zinc-500 block mb-1">
@@ -981,9 +1093,16 @@ export const OperatingAssumptionsForm = () => {
             {/* Variable Costs */}
             <div className="bg-zinc-950/60 p-5 rounded-lg border border-zinc-800/80 space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-zinc-200">
-                  Koszty Zmienne (% Przychodów)
-                </span>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs font-semibold text-zinc-200">
+                    Koszty Zmienne (% Przychodów)
+                  </span>
+                  <InfoTooltip
+                    content="Udział kosztów bezpośrednio uzależnionych od wolumenu sprzedaży w przychodach (media, surowce, prowizje)."
+                    ariaLabel="Informacje o kosztach zmiennych"
+                    size="xs"
+                  />
+                </div>
                 <span className="font-mono text-amber-400 font-bold text-sm">
                   {variableCostPercent.toFixed(1)}%
                 </span>
@@ -1017,9 +1136,16 @@ export const OperatingAssumptionsForm = () => {
             {/* Fixed Costs */}
             <div className="bg-zinc-950/60 p-5 rounded-lg border border-zinc-800/80 space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-zinc-200">
-                  Roczne Koszty Stałe Bazowe
-                </span>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs font-semibold text-zinc-200">
+                    Roczne Koszty Stałe Bazowe
+                  </span>
+                  <InfoTooltip
+                    content="Roczna baza kosztów stałych w roku uruchomienia komercyjnego (serwis O&M, ubezpieczenia majątkowe, podatki lokalne, dzierżawy)."
+                    ariaLabel="Informacje o rocznych kosztach stałych"
+                    size="xs"
+                  />
+                </div>
                 <span className="font-mono text-zinc-100 font-bold text-sm">
                   {formatCurrency(annualFixedCostsBase, currency)}
                 </span>
@@ -1037,8 +1163,15 @@ export const OperatingAssumptionsForm = () => {
               />
 
               <div className="pt-2 border-t border-zinc-800 space-y-2">
-                <label className="text-xs text-zinc-400 flex justify-between">
-                  <span>Eskalacja Inflacyjna Kosztów Stałych (%)</span>
+                <label className="text-xs text-zinc-400 flex justify-between items-center">
+                  <span className="flex items-center gap-1.5">
+                    <span>Eskalacja Inflacyjna Kosztów Stałych (%)</span>
+                    <InfoTooltip
+                      content="Wskaźnik corocznej indeksacji cen usług obcych i materiałów w kolejnych latach operacyjnych."
+                      ariaLabel="Informacje o eskalacji kosztów stałych"
+                      size="xs"
+                    />
+                  </span>
                   <span className="font-mono text-amber-400">
                     {fixedCostGrowthRate.toFixed(1)}%
                   </span>
@@ -1164,9 +1297,16 @@ export const OperatingAssumptionsForm = () => {
             {/* DSO */}
             <div className="bg-zinc-950/60 p-4 rounded-lg border border-zinc-800/80 space-y-3">
               <div className="flex justify-between items-center text-xs">
-                <span className="font-semibold text-zinc-200">
-                  DSO (Należności)
-                </span>
+                <div className="flex items-center gap-1.5">
+                  <span className="font-semibold text-zinc-200">
+                    DSO (Należności)
+                  </span>
+                  <InfoTooltip
+                    content="Days Sales Outstanding - średnia liczba dni od wystawienia faktury do otrzymania zapłaty od kontrahenta."
+                    ariaLabel="Informacje o wskaźniku DSO"
+                    size="xs"
+                  />
+                </div>
                 <span className="font-mono text-sky-400 font-bold">
                   {dso} dni
                 </span>
@@ -1188,9 +1328,16 @@ export const OperatingAssumptionsForm = () => {
             {/* DPO */}
             <div className="bg-zinc-950/60 p-4 rounded-lg border border-zinc-800/80 space-y-3">
               <div className="flex justify-between items-center text-xs">
-                <span className="font-semibold text-zinc-200">
-                  DPO (Zobowiązania)
-                </span>
+                <div className="flex items-center gap-1.5">
+                  <span className="font-semibold text-zinc-200">
+                    DPO (Zobowiązania)
+                  </span>
+                  <InfoTooltip
+                    content="Days Payable Outstanding - średni termin płatności faktur wobec dostawców i wykonawców."
+                    ariaLabel="Informacje o wskaźniku DPO"
+                    size="xs"
+                  />
+                </div>
                 <span className="font-mono text-emerald-400 font-bold">
                   {dpo} dni
                 </span>
@@ -1212,9 +1359,16 @@ export const OperatingAssumptionsForm = () => {
             {/* DIO */}
             <div className="bg-zinc-950/60 p-4 rounded-lg border border-zinc-800/80 space-y-3">
               <div className="flex justify-between items-center text-xs">
-                <span className="font-semibold text-zinc-200">
-                  DIO (Zapasy)
-                </span>
+                <div className="flex items-center gap-1.5">
+                  <span className="font-semibold text-zinc-200">
+                    DIO (Zapasy)
+                  </span>
+                  <InfoTooltip
+                    content="Days Inventory Outstanding - średni czas zalegania zapasów magazynowych, części zamiennych lub surowców."
+                    ariaLabel="Informacje o wskaźniku DIO"
+                    size="xs"
+                  />
+                </div>
                 <span className="font-mono text-amber-400 font-bold">
                   {dio} dni
                 </span>
@@ -1276,14 +1430,17 @@ export const OperatingAssumptionsForm = () => {
                 społecznych pracodawcy (ZUS / PPK).
               </p>
             </div>
-            <button
-              type="button"
-              onClick={handleAddHeadcountRole}
-              className="px-3 py-1.5 text-xs bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg flex items-center gap-1.5 transition-colors shadow-sm font-medium"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              Dodaj Stanowisko
-            </button>
+            <Tooltip content="Dodaj nowe stanowisko pracownicze do matrycy etatów">
+              <button
+                type="button"
+                onClick={handleAddHeadcountRole}
+                aria-label="Dodaj stanowisko"
+                className="px-3 py-1.5 text-xs bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg flex items-center gap-1.5 transition-colors shadow-sm font-medium"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                Dodaj Stanowisko
+              </button>
+            </Tooltip>
           </div>
 
           {/* Headcount Table */}
@@ -1291,16 +1448,36 @@ export const OperatingAssumptionsForm = () => {
             <table className="w-full text-left text-xs text-zinc-300">
               <thead className="bg-zinc-950/80 text-zinc-400 border-b border-zinc-800 font-mono">
                 <tr>
-                  <th className="py-2.5 px-3">Stanowisko / Rola</th>
-                  <th className="py-2.5 px-3 w-24">Etaty (FTE)</th>
+                  <th className="py-2.5 px-3">
+                    <Tooltip content="Stanowisko lub rola w zespole operacyjnym">
+                      <span className="cursor-help">Stanowisko / Rola</span>
+                    </Tooltip>
+                  </th>
+                  <th className="py-2.5 px-3 w-24">
+                    <Tooltip content="Liczba pełnych etatów (Full-Time Equivalent)">
+                      <span className="cursor-help">Etaty (FTE)</span>
+                    </Tooltip>
+                  </th>
                   <th className="py-2.5 px-3 w-36">
-                    Brutto / m-c ({currency})
+                    <Tooltip content={`Miesięczne wynagrodzenie zasadnicze brutto na jeden etat w ${currency}`}>
+                      <span className="cursor-help">Brutto / m-c ({currency})</span>
+                    </Tooltip>
                   </th>
-                  <th className="py-2.5 px-3 w-32">Narzut (%)</th>
+                  <th className="py-2.5 px-3 w-32">
+                    <Tooltip content="Narzut kosztów pracodawcy: ZUS, FP, FGŚP, PPK (standardowo ok. 20.48%)">
+                      <span className="cursor-help">Narzut (%)</span>
+                    </Tooltip>
+                  </th>
                   <th className="py-2.5 px-3 w-40 text-right">
-                    Roczny Koszt Pracodawcy
+                    <Tooltip content="Łączny roczny koszt pracodawcy (FTE × Brutto × 12 × Narzut)">
+                      <span className="cursor-help">Roczny Koszt Pracodawcy</span>
+                    </Tooltip>
                   </th>
-                  <th className="py-2.5 px-2 w-12 text-center">Akcja</th>
+                  <th className="py-2.5 px-2 w-12 text-center">
+                    <Tooltip content="Dostępne operacje na pozycji">
+                      <span className="cursor-help">Akcja</span>
+                    </Tooltip>
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-800/60 font-mono">
@@ -1389,14 +1566,16 @@ export const OperatingAssumptionsForm = () => {
                         {formatCurrency(role.annualCost, currency)}
                       </td>
                       <td className="py-2 px-2 text-center">
-                        <button
-                          type="button"
-                          aria-label="Usuń stanowisko"
-                          onClick={() => handleRemoveHeadcountRole(role.id)}
-                          className="p-1 text-zinc-500 hover:text-rose-400 transition-colors"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
+                        <Tooltip content="Usuń to stanowisko z matrycy zatrudnienia">
+                          <button
+                            type="button"
+                            aria-label="Usuń stanowisko"
+                            onClick={() => handleRemoveHeadcountRole(role.id)}
+                            className="p-1 text-zinc-500 hover:text-rose-400 transition-colors"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </Tooltip>
                       </td>
                     </tr>
                   ))
@@ -1424,8 +1603,15 @@ export const OperatingAssumptionsForm = () => {
 
           {/* Payroll Escalation */}
           <div className="bg-zinc-950/60 p-4 rounded-lg border border-zinc-800/80 space-y-3">
-            <label className="text-xs text-zinc-300 font-medium flex justify-between">
-              <span>Roczna Stopa Wzrostu Wynagrodzeń (%)</span>
+            <label className="text-xs text-zinc-300 font-medium flex justify-between items-center">
+              <span className="flex items-center gap-1.5">
+                <span>Roczna Stopa Wzrostu Wynagrodzeń (%)</span>
+                <InfoTooltip
+                  content="Roczna stopa indeksacji wynagrodzeń pracowników uwzględniająca presję płacową i inflację."
+                  ariaLabel="Informacje o wzroście płac"
+                  size="xs"
+                />
+              </span>
               <span className="font-mono text-indigo-400">
                 {payrollGrowthRate.toFixed(1)}%
               </span>
@@ -1465,9 +1651,16 @@ export const OperatingAssumptionsForm = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* CIT Rate */}
             <div className="bg-zinc-950/60 p-5 rounded-lg border border-zinc-800/80 space-y-4">
-              <span className="text-xs font-semibold text-zinc-200 block">
-                Stawka Podatku CIT
-              </span>
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-zinc-200 block">
+                  Stawka Podatku CIT
+                </span>
+                <InfoTooltip
+                  content="Ustawowa stawka podatku dochodowego od osób prawnych w Polsce (standardowa 19% lub obniżona 9% dla małych podatników)."
+                  ariaLabel="Informacje o stawce CIT"
+                  size="xs"
+                />
+              </div>
               <div className="grid grid-cols-2 gap-3 text-xs">
                 {[
                   {
@@ -1481,23 +1674,25 @@ export const OperatingAssumptionsForm = () => {
                     desc: "Dla małych podatników i startupów",
                   },
                 ].map((option) => (
-                  <button
-                    key={option.rate}
-                    type="button"
-                    onClick={() => setCitRatePercent(option.rate)}
-                    className={`p-3 rounded-lg border text-left transition-all ${
-                      citRatePercent === option.rate
-                        ? "bg-emerald-500/20 border-emerald-500 text-emerald-300"
-                        : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:border-zinc-700"
-                    }`}
-                  >
-                    <div className="font-bold font-mono text-sm">
-                      {option.label}
-                    </div>
-                    <div className="text-[11px] text-zinc-500 mt-1">
-                      {option.desc}
-                    </div>
-                  </button>
+                  <Tooltip key={option.rate} content={option.desc}>
+                    <button
+                      type="button"
+                      onClick={() => setCitRatePercent(option.rate)}
+                      aria-label={option.label}
+                      className={`p-3 rounded-lg border text-left transition-all w-full ${
+                        citRatePercent === option.rate
+                          ? "bg-emerald-500/20 border-emerald-500 text-emerald-300"
+                          : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:border-zinc-700"
+                      }`}
+                    >
+                      <div className="font-bold font-mono text-sm">
+                        {option.label}
+                      </div>
+                      <div className="text-[11px] text-zinc-500 mt-1">
+                        {option.desc}
+                      </div>
+                    </button>
+                  </Tooltip>
                 ))}
               </div>
 
@@ -1528,29 +1723,46 @@ export const OperatingAssumptionsForm = () => {
             <div className="bg-zinc-950/60 p-5 rounded-lg border border-zinc-800/80 space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="text-xs font-semibold text-zinc-200 block">
-                    Rozliczanie Strat Podatkowych
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs font-semibold text-zinc-200 block">
+                      Rozliczanie Strat Podatkowych
+                    </span>
+                    <InfoTooltip
+                      content="Art. 7 ust. 5 ustawy o CIT: prawo obniżenia dochodu uzyskanego w najbliższych kolejno po sobie następujących 5 latach podatkowych o wysokość straty."
+                      ariaLabel="Informacje o rozliczaniu strat podatkowych"
+                      size="xs"
+                    />
+                  </div>
                   <span className="text-[11px] text-zinc-400">
                     Aktywuj tarczę podatkową z etapu budowy / CAPEX
                   </span>
                 </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={taxLossCarryForward}
-                    onChange={(e) => setTaxLossCarryForward(e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-zinc-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500" />
-                </label>
+                <Tooltip content="Włącz lub wyłącz odliczanie strat podatkowych z etapu budowy / CAPEX od przyszłych dochodów">
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={taxLossCarryForward}
+                      onChange={(e) => setTaxLossCarryForward(e.target.checked)}
+                      aria-label="Włącz rozliczanie strat podatkowych"
+                      className="sr-only peer"
+                    />
+                    <div className="w-9 h-5 bg-zinc-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500" />
+                  </label>
+                </Tooltip>
               </div>
 
               <div className={`space-y-4 pt-2 border-t border-zinc-800/80 ${!taxLossCarryForward ? "opacity-50" : ""}`}>
                 <div>
-                  <label className="text-xs font-semibold text-zinc-300 block mb-2">
-                    Ustawowy Tryb Rozliczenia Strat (art. 7 ust. 5 CIT)
-                  </label>
+                  <div className="flex items-center gap-1.5 mb-2">
+                    <label className="text-xs font-semibold text-zinc-300 block">
+                      Ustawowy Tryb Rozliczenia Strat (art. 7 ust. 5 CIT)
+                    </label>
+                    <InfoTooltip
+                      content="Wybór metody kalkulacji limitu odliczenia strat podatkowych w myśl przepisów polskiego prawa podatkowego."
+                      ariaLabel="Informacje o trybach rozliczania strat"
+                      size="xs"
+                    />
+                  </div>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                     {[
                       {
@@ -1572,27 +1784,29 @@ export const OperatingAssumptionsForm = () => {
                         desc: "Limit % bieżącego dochodu",
                       },
                     ].map((mode) => (
-                      <button
-                        key={mode.id}
-                        type="button"
-                        disabled={!taxLossCarryForward}
-                        onClick={() => setTaxLossSettlementMode(mode.id)}
-                        className={`p-2.5 rounded-lg border text-left transition-all disabled:cursor-not-allowed ${
-                          taxLossSettlementMode === mode.id
-                            ? "bg-emerald-500/20 border-emerald-500 text-emerald-300 shadow-sm"
-                            : "bg-zinc-900/80 border-zinc-800 text-zinc-400 hover:border-zinc-700"
-                        }`}
-                      >
-                        <div className="font-semibold text-xs text-zinc-200">
-                          {mode.title}
-                        </div>
-                        <div className="text-[10px] text-emerald-400/90 font-mono mt-0.5">
-                          {mode.art}
-                        </div>
-                        <div className="text-[10px] text-zinc-500 mt-1 line-clamp-2">
-                          {mode.desc}
-                        </div>
-                      </button>
+                      <Tooltip key={mode.id} content={`${mode.title} (${mode.art}): ${mode.desc}`}>
+                        <button
+                          type="button"
+                          disabled={!taxLossCarryForward}
+                          onClick={() => setTaxLossSettlementMode(mode.id)}
+                          aria-label={mode.title}
+                          className={`p-2.5 rounded-lg border text-left transition-all disabled:cursor-not-allowed w-full ${
+                            taxLossSettlementMode === mode.id
+                              ? "bg-emerald-500/20 border-emerald-500 text-emerald-300 shadow-sm"
+                              : "bg-zinc-900/80 border-zinc-800 text-zinc-400 hover:border-zinc-700"
+                          }`}
+                        >
+                          <div className="font-semibold text-xs text-zinc-200">
+                            {mode.title}
+                          </div>
+                          <div className="text-[10px] text-emerald-400/90 font-mono mt-0.5">
+                            {mode.art}
+                          </div>
+                          <div className="text-[10px] text-zinc-500 mt-1 line-clamp-2">
+                            {mode.desc}
+                          </div>
+                        </button>
+                      </Tooltip>
                     ))}
                   </div>
                 </div>
@@ -1601,9 +1815,16 @@ export const OperatingAssumptionsForm = () => {
                 {taxLossSettlementMode === "one_off_5m" ? (
                   <div className="space-y-2 p-3 bg-zinc-900/60 rounded-lg border border-zinc-800">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-zinc-300 font-medium">
-                        Limit Odliczenia Jednorazowego (PLN):
-                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-zinc-300 font-medium">
+                          Limit Odliczenia Jednorazowego (PLN):
+                        </span>
+                        <InfoTooltip
+                          content="Maksymalny limit jednorazowego odliczenia straty z danego roku zgodnie z art. 7 ust. 5 pkt 2 ustawy o CIT (ustawowo 5 000 000 PLN)."
+                          ariaLabel="Informacje o limicie jednorazowym"
+                          size="xs"
+                        />
+                      </div>
                       <span className="font-mono text-emerald-400 font-bold text-xs">
                         {formatCurrency(taxLossOneOffCapAmount, currency)}
                       </span>
@@ -1628,8 +1849,15 @@ export const OperatingAssumptionsForm = () => {
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    <label className="text-xs text-zinc-400 flex justify-between">
-                      <span>Limit Rocznego Odliczenia Straty (%)</span>
+                    <label className="text-xs text-zinc-400 flex justify-between items-center">
+                      <span className="flex items-center gap-1.5">
+                        <span>Limit Rocznego Odliczenia Straty (%)</span>
+                        <InfoTooltip
+                          content="Maksymalny dopuszczalny udział straty rocznika, który można odliczyć w pojedynczym roku podatkowym (standardowo 50%)."
+                          ariaLabel="Informacje o limicie rocznego odliczenia"
+                          size="xs"
+                        />
+                      </span>
                       <span className="font-mono text-emerald-400 font-bold">
                         {taxLossOffsetCap.toFixed(0)}%
                       </span>
@@ -1681,28 +1909,56 @@ export const OperatingAssumptionsForm = () => {
             {/* KPI Cards */}
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
               <div className="p-3 bg-zinc-900/60 rounded-lg border border-zinc-800/80">
-                <span className="text-[11px] text-zinc-400 block">Wygenerowane Straty</span>
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] text-zinc-400 block">Wygenerowane Straty</span>
+                  <InfoTooltip
+                    content="Suma ujemnych wyników brutto (EBT) wygenerowanych w fazie inwestycyjnej lub pierwszych latach rozruchu."
+                    ariaLabel="Informacje o wygenerowanych stratach"
+                    size="xs"
+                  />
+                </div>
                 <span className="font-mono text-sm font-bold text-rose-400 mt-1 block">
                   {formatCurrency(taxRollForwardTrajectory?.totalLossesGenerated, currency)}
                 </span>
               </div>
 
               <div className="p-3 bg-zinc-900/60 rounded-lg border border-zinc-800/80">
-                <span className="text-[11px] text-zinc-400 block">Wykorzystana Tarcza</span>
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] text-zinc-400 block">Wykorzystana Tarcza</span>
+                  <InfoTooltip
+                    content="Łączna kwota strat odliczona od podstawy opodatkowania w całym 15-letnim okresie projekcji."
+                    ariaLabel="Informacje o wykorzystanej tarczy"
+                    size="xs"
+                  />
+                </div>
                 <span className="font-mono text-sm font-bold text-emerald-400 mt-1 block">
                   {formatCurrency(taxRollForwardTrajectory?.totalLossesUsed, currency)}
                 </span>
               </div>
 
               <div className="p-3 bg-zinc-900/60 rounded-lg border border-zinc-800/80">
-                <span className="text-[11px] text-zinc-400 block">Oszczędność CIT</span>
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] text-zinc-400 block">Oszczędność CIT</span>
+                  <InfoTooltip
+                    content="Efektywna korzyść finansowa wynikająca z obniżenia należnego podatku dochodowego CIT (Straty × Stawka CIT)."
+                    ariaLabel="Informacje o oszczędności CIT"
+                    size="xs"
+                  />
+                </div>
                 <span className="font-mono text-sm font-bold text-emerald-300 mt-1 block">
                   {formatCurrency(taxRollForwardTrajectory?.totalTaxSaved, currency)}
                 </span>
               </div>
 
               <div className="p-3 bg-zinc-900/60 rounded-lg border border-zinc-800/80">
-                <span className="text-[11px] text-zinc-400 block">Wygasłe Straty (T+5)</span>
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] text-zinc-400 block">Wygasłe Straty (T+5)</span>
+                  <InfoTooltip
+                    content="Straty nieodliczone w ustawowym 5-letnim oknie czasowym (art. 7 ust. 5 CIT), które bezpowrotnie przepadły."
+                    ariaLabel="Informacje o wygasłych stratach"
+                    size="xs"
+                  />
+                </div>
                 <span className={`font-mono text-sm font-bold mt-1 block ${
                   (taxRollForwardTrajectory?.totalLossesExpired || 0) > 0 ? "text-rose-400" : "text-zinc-500"
                 }`}>
@@ -1711,7 +1967,14 @@ export const OperatingAssumptionsForm = () => {
               </div>
 
               <div className="p-3 bg-zinc-900/60 rounded-lg border border-zinc-800/80 col-span-2 sm:col-span-1">
-                <span className="text-[11px] text-zinc-400 block">Saldo Końcowe Tarczy</span>
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] text-zinc-400 block">Saldo Końcowe Tarczy</span>
+                  <InfoTooltip
+                    content="Pozostała pula nierozliczonych strat podatkowych na koniec 15. roku operacji."
+                    ariaLabel="Informacje o saldzie końcowym"
+                    size="xs"
+                  />
+                </div>
                 <span className="font-mono text-sm font-bold text-amber-400 mt-1 block">
                   {formatCurrency(taxRollForwardTrajectory?.closingPool, currency)}
                 </span>
@@ -1723,14 +1986,46 @@ export const OperatingAssumptionsForm = () => {
               <table className="w-full text-left text-xs font-mono">
                 <thead className="bg-zinc-900/90 text-zinc-400 border-b border-zinc-800">
                   <tr>
-                    <th className="py-2 px-3">Okres</th>
-                    <th className="py-2 px-3 text-right">Saldo Otwarcia</th>
-                    <th className="py-2 px-3 text-right">Wynik Brutto (EBT)</th>
-                    <th className="py-2 px-3 text-right">Wygasłe (T+5)</th>
-                    <th className="py-2 px-3 text-right">Odliczona Tarcza</th>
-                    <th className="py-2 px-3 text-right">Podstawa CIT</th>
-                    <th className="py-2 px-3 text-right">Należny CIT</th>
-                    <th className="py-2 px-3 text-right">Saldo Zamknięcia</th>
+                    <th className="py-2 px-3">
+                      <Tooltip content="Kolejny rok w 15-letniej projekcji finansowej">
+                        <span className="cursor-help">Okres</span>
+                      </Tooltip>
+                    </th>
+                    <th className="py-2 px-3 text-right">
+                      <Tooltip content="Dostępna pula nierozliczonych strat podatkowych na początek roku">
+                        <span className="cursor-help">Saldo Otwarcia</span>
+                      </Tooltip>
+                    </th>
+                    <th className="py-2 px-3 text-right">
+                      <Tooltip content="Wynik finansowy brutto (EBT = EBITDA - Amortyzacja - Odsetki)">
+                        <span className="cursor-help">Wynik Brutto (EBT)</span>
+                      </Tooltip>
+                    </th>
+                    <th className="py-2 px-3 text-right">
+                      <Tooltip content="Kwota strat, dla których upłynął 5-letni okres ustawowego odliczenia">
+                        <span className="cursor-help">Wygasłe (T+5)</span>
+                      </Tooltip>
+                    </th>
+                    <th className="py-2 px-3 text-right">
+                      <Tooltip content="Kwota straty faktycznie odliczona w danym roku podatkowym">
+                        <span className="cursor-help">Odliczona Tarcza</span>
+                      </Tooltip>
+                    </th>
+                    <th className="py-2 px-3 text-right">
+                      <Tooltip content="Dochód do opodatkowania po uwzględnieniu odliczonej tarczy podatkowej">
+                        <span className="cursor-help">Podstawa CIT</span>
+                      </Tooltip>
+                    </th>
+                    <th className="py-2 px-3 text-right">
+                      <Tooltip content="Należny podatek dochodowy (Podstawa CIT × Stawka CIT)">
+                        <span className="cursor-help">Należny CIT</span>
+                      </Tooltip>
+                    </th>
+                    <th className="py-2 px-3 text-right">
+                      <Tooltip content="Pozostała pula nierozliczonych strat podatkowych na koniec roku">
+                        <span className="cursor-help">Saldo Zamknięcia</span>
+                      </Tooltip>
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-800/50">
@@ -1826,34 +2121,40 @@ export const OperatingAssumptionsForm = () => {
         </div>
 
         <div className="flex items-center gap-3 w-full sm:w-auto">
-          <button
-            type="button"
-            onClick={handleReset}
-            disabled={isSaving}
-            className="px-4 py-2 text-sm text-zinc-400 hover:text-zinc-200 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50"
-          >
-            <RotateCcw className="w-4 h-4" />
-            Resetuj
-          </button>
+          <Tooltip content="Przywróć zapisane parametry założeń operacyjnych z bazy danych">
+            <button
+              type="button"
+              onClick={handleReset}
+              disabled={isSaving}
+              aria-label="Resetuj założenia operacyjne"
+              className="px-4 py-2 text-sm text-zinc-400 hover:text-zinc-200 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50"
+            >
+              <RotateCcw className="w-4 h-4" />
+              Resetuj
+            </button>
+          </Tooltip>
 
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={isSaving}
-            className="px-5 py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-500 rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-50 shadow-sm"
-          >
-            {isSaving ? (
-              <>
-                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                Zapisywanie...
-              </>
-            ) : (
-              <>
-                <Save className="w-4 h-4" />
-                Zapisz Założenia Operacyjne
-              </>
-            )}
-          </button>
+          <Tooltip content="Zapisz zaktualizowane założenia operacyjne w projekcie inwestycyjnym">
+            <button
+              type="button"
+              onClick={handleSave}
+              disabled={isSaving}
+              aria-label="Zapisz założenia operacyjne"
+              className="px-5 py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-500 rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-50 shadow-sm"
+            >
+              {isSaving ? (
+                <>
+                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Zapisywanie...
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4" />
+                  Zapisz Założenia Operacyjne
+                </>
+              )}
+            </button>
+          </Tooltip>
         </div>
       </div>
     </div>

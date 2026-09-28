@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { AlertTriangle, Trash2, X } from 'lucide-react';
 import { Button } from '../ui/Button';
+import { Tooltip } from '../ui/Tooltip';
 
 export const CapexStageDeleteModal = ({
     isOpen,
@@ -50,24 +51,34 @@ export const CapexStageDeleteModal = ({
                     </div>
 
                     <div className="flex items-center justify-end gap-3">
-                        <Button
-                            type="button"
-                            variant="secondary"
-                            onClick={onClose}
-                            disabled={submitting}
-                        >
-                            Anuluj
-                        </Button>
-                        <Button
-                            type="button"
-                            variant="danger"
-                            icon={Trash2}
-                            loading={submitting}
-                            onClick={handleConfirm}
-                            data-testid="confirm-delete-stage-btn"
-                        >
-                            Usuń Etap
-                        </Button>
+                        <Tooltip content="Anuluj usuwanie i zachowaj etap w harmonogramie">
+                            <span>
+                                <Button
+                                    type="button"
+                                    variant="secondary"
+                                    onClick={onClose}
+                                    disabled={submitting}
+                                    aria-label="Anuluj usuwanie etapu"
+                                >
+                                    Anuluj
+                                </Button>
+                            </span>
+                        </Tooltip>
+                        <Tooltip content="Potwierdź usunięcie etapu i przelicz harmonogram CAPEX">
+                            <span>
+                                <Button
+                                    type="button"
+                                    variant="danger"
+                                    icon={Trash2}
+                                    loading={submitting}
+                                    onClick={handleConfirm}
+                                    data-testid="confirm-delete-stage-btn"
+                                    aria-label={`Potwierdź usunięcie etapu ${stage.stage_name}`}
+                                >
+                                    Usuń Etap
+                                </Button>
+                            </span>
+                        </Tooltip>
                     </div>
                 </div>
             </div>
