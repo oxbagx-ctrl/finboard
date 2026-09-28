@@ -833,73 +833,73 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - 100% PASS w pełnym pakiecie 515 testów Vitest (55 plików testowych) oraz 662 testów PHPUnit (8469 asercji).
 
 - [x] **Faza 55: Permission Matrix, Dynamic PDF Watermarking & Final VDR Security**
-  - [x] Agregat domenowy Matrycy Uprawnień VDR, obiekty wartości i migracje bazy danych.
+  - Agregat domenowy Matrycy Uprawnień VDR, obiekty wartości i migracje bazy danych.
     - Obiekty wartości: `PermissionLevel` (`none`, `view`, `download`, `manage`), `AccessSubject` (role transakcyjne `role:{name}` oraz konkretni użytkownicy `user:{uuid}`), `VdrPermissionId`, `EffectivePermission` ze śledzeniem źródła grantu.
     - Korzenie agregatu i zdarzenia domenowe: `VdrFolderPermission` (`VdrFolderPermissionGranted`, `VdrFolderPermissionRevoked`), `VdrDocumentPermission` (`VdrDocumentPermissionGranted`, `VdrDocumentPermissionRevoked`).
     - Agregat / silnik domenowy `VdrPermissionMatrix` realizujący hierarchiczne wyznaczanie uprawnień efektywnych (nadpisywanie ról przez użytkowników, nadpisywanie folderów przez dokumenty, rekurencyjne dziedziczenie z folderów nadrzędnych Dewey).
     - Migracja bazy danych `2026_03_30_100000_create_vdr_permissions_tables.php` tworząca tabele `vdr_folder_permissions` oraz `vdr_document_permissions` z indeksami unikalnymi i kaskadami kluczy obcych.
     - Modele Eloquent `VdrFolderPermission` i `VdrDocumentPermission` oraz repozytorium `EloquentVdrPermissionRepository` powiązane z `VdrPermissionRepositoryInterface`.
     - Pakiet testów jednostkowych i integracyjnych: `PermissionLevelTest`, `VdrPermissionMatrixTest`, `VdrPermissionRepositoryDatabaseTest` (18 testów, 115 asercji), 100% PASS w pełnym zestawie 680 testów PHPUnit (8584 asercje).
-  - [x] Komendy/zapytania CQRS i punkty końcowe REST API dla Matrycy Uprawnień VDR.
+  - Komendy/zapytania CQRS i punkty końcowe REST API dla Matrycy Uprawnień VDR.
     - Komendy CQRS: `SetVdrFolderPermissionCommand` i `SetVdrFolderPermissionHandler`, `SetVdrDocumentPermissionCommand` i `SetVdrDocumentPermissionHandler`, `RevokeVdrPermissionCommand` i `RevokeVdrPermissionHandler`.
     - Zapytania CQRS: `GetVdrPermissionMatrixQuery` i `GetVdrPermissionMatrixHandler` (pełna matryca z nazwami folderów, indeksami Dewey, tytułami dokumentów i etykietami), `GetEffectiveVdrPermissionQuery` i `GetEffectiveVdrPermissionHandler` (hierarchiczne wyznaczanie uprawnień efektywnych).
     - Warstwa REST API: `VdrPermissionController`, `SetVdrPermissionRequest`, trasy `api.documents.permissions.*` (`GET matrix`, `GET effective`, `POST folders/{folderId}`, `POST documents/{documentId}`, `DELETE {type}/{id}`).
     - Bezpieczeństwo i autoryzacja: restrykcja modyfikacji wyłącznie dla doradców (`advisor`) i administratorów (`super_admin`), ścisła izolacja multi-tenant.
     - Pakiety testów: jednostkowe CQRS `VdrPermissionCqrsHandlersTest` (8 testów, 42 asercje), funkcjonalne REST API `VdrPermissionApiTest` (10 testów, 58 asercji), 100% PASS w pełnym zestawie 698 testów PHPUnit (8684 asercje) oraz 515 testów Vitest.
-  - [x] Usługa dynamicznego nakładania znaków wodnych PDF (Dynamic PDF Watermarking Service).
+  - Usługa dynamicznego nakładania znaków wodnych PDF (Dynamic PDF Watermarking Service).
     - Obiekt wartości: `WatermarkOptions` (identyfikacja użytkownika, email, IP, znacznik czasu UTC, nazwa spółki, klauzula poufności, przezroczystość alfa, kąt obrotu, rozmiar fontu, formatowanie ukośnych linii, nagłówka i stopki).
     - Silnik FPDI: instalacja `setasign/fpdf` i `setasign/fpdi`, rozszerzenie `WatermarkFpdi` z obsługą przezroczystości PDF 1.4+ (`/ExtGState`) oraz rotacji współrzędnych `rotate()`.
     - Serwis domenowy: `FpdiPdfWatermarkService` implementujący `PdfWatermarkServiceInterface` ze skalowaniem do oryginalnej geometrii stron (A4/Letter, pion/poziom) oraz odpornym fallbackiem przy plikach nie-PDF.
     - Integracja pobierania i podglądu: rozszerzenie `DownloadDocumentCommand` i `DownloadDocumentHandler`, aktualizacja `DocumentController::download` z wymuszeniem znaku wodnego wg uprawnienia efektywnego (`watermarkRequired()`) oraz nowy endpoint podglądu w przeglądarce `GET /api/v1/documents/{id}/preview` (`inline`).
     - Pakiety testów: `WatermarkOptionsTest` (5 testów, 23 asercje), `PdfWatermarkServiceTest` (4 testy, 22 asercje), `PdfWatermarkIntegrationTest` (6 testów, 22 asercje), 100% PASS w pełnym zestawie 713 testów PHPUnit (8751 asercji) oraz 515 testów Vitest.
-  - [x] Interfejs zarządzania matrycą uprawnień VDR, odznaka znaku wodnego i strażnik dostępu.
+  - Interfejs zarządzania matrycą uprawnień VDR, odznaka znaku wodnego i strażnik dostępu.
     - Komponenty etykiet: `VdrPermissionBadge` (wizualizacja poziomów `none`, `view`, `download`, `manage` ze specjalną paletą kolorów i ikonami) oraz `WatermarkBadge` (bursztynowa odznaka `ZNAK WODNY` z tarczą ostrzegawczą dla dokumentów chronionych).
     - Modal zarządzania matrycą uprawnień: `VdrPermissionMatrixModal` dostępny dla doradców i administratorów (`canManagePermissions`) z dwoma zakładkami (`📁 Foldery M&A`, `📄 Nadpisania Plików`), tabelą grantów, formularzem konfiguracji ról/użytkowników oraz akcją natychmiastowego odwoływania (`DELETE /documents/permissions/:type/:id`).
     - Bezpieczny podgląd dokumentów: `DocumentPreviewModal` z osadzonym zabezpieczonym PDF w ramce `<iframe>`, metadanymi, kodem Dewey, sumą SHA-256, banerem ostrzegawczym `POUFNY PODGLĄD VDR` oraz blokadą pobierania przy braku uprawnień.
     - Tabela dokumentów i DataRoomView: przycisk `Matryca Uprawnień` w nagłówku, przycisk natychmiastowego podglądu dokumentu `onPreview` (ikona oka), blokada przycisku pobierania (`can_download === false`) z etykietą tooltip oraz odznaka `WatermarkBadge` przy plikach PDF.
     - Pakiety testów: `VdrPermissionBadge.test.jsx` (6 testów), `DocumentPreviewModal.test.jsx` (6 testów), `VdrPermissionMatrixModal.test.jsx` (7 testów), rozszerzony `DataRoom.test.jsx` (14 testów), 100% PASS w 58 plikach testowych Vitest (537 testów) oraz 713 testach PHPUnit (8751 asercji).
-  - [x] Audyt bezpieczeństwa VDR, testy penetracyjno-regresyjne i finalne zamknięcie Fazy 55.
+  - Audyt bezpieczeństwa VDR, testy penetracyjno-regresyjne i finalne zamknięcie Fazy 55.
     - Kompleksowy pakiet testów penetracyjnych i regresyjnych: `VdrSecurityPenetrationRegressionTest.php` (10 testów, 31 asercji).
     - Weryfikacja 10 kluczowych wektorów ataków: eskalacja uprawnień klienta (403), brak uwierzytelnienia (401), izolacja wielodostępowa doradców między spółkami (403), bezpieczne blokowanie cross-tenant resource spoofing (404), hierarchiczne pierwszeństwo restrykcji dokumentu nad folderem (`none`), nadpisywanie ról przez granty konkretnych użytkowników (UUID), uniemożliwienie pobrania czystego oryginału w trybie View-Only z wymuszeniem stempla tożsamości w podglądzie inline, odporność na próby ominięcia znaku wodnego w parametrach żądania, rekurencyjne dziedziczenie uprawnień w taksonomii Dewey oraz integralność nienaruszalnego rejestru audytowego WORM (`document_access_logs`).
     - Uodpornienie kontrolera `VdrPermissionController`: obsługa wyjątków `\InvalidArgumentException` z mapowaniem na czyste kody HTTP 404 (`NotFoundHttpException`).
     - 100% PASS w pełnym zestawie 723 testów PHPUnit (8782 asercje) oraz 58 plikach testowych Vitest (537 testów).
 
 - [x] **Faza 56: Wdrożenie Systemu Tooltipów @floating-ui/react, Audyt Dostępności WCAG 2.1/2.2 AA oraz Wyjaśnialność Wskaźników Finansowych**
-  - [x] Implementacja dostępnych komponentów Tooltip i InfoTooltip z WAI-ARIA role="tooltip" i nawigacją klawiaturą (@floating-ui/react).
+  - Implementacja dostępnych komponentów Tooltip i InfoTooltip z WAI-ARIA role="tooltip" i nawigacją klawiaturą (@floating-ui/react).
     - Nowoczesny silnik podpowiedzi oparty o `@floating-ui/react` eliminujący ograniczenia natywnego `title="..."` (zgodność z WCAG 2.1/2.2 AA 1.4.13 i 2.1.1).
     - Komponent `<Tooltip />` z obsługą `useFloating`, `flip()`, `shift({ padding: 8 })`, `offset(8)`, `arrow()` i `safePolygon()`.
     - Obsługa urządzeń mobilnych/tabletów (toggle on tap) oraz odrzucanie klawiszem Escape bez utraty fokusu.
     - Dedykowany komponent `<InfoTooltip />` ze wskaźnikiem ikony dla metryk finansowych i nagłówków tabel.
     - Pakiet testów jednostkowych `Tooltip.test.jsx` (14 testów).
-  - [x] Migracja natywnych atrybutów HTML title na dostępne komponenty Tooltip w VDR, layout i tabelach danych.
+  - Migracja natywnych atrybutów HTML title na dostępne komponenty Tooltip w VDR, layout i tabelach danych.
     - Eliminacja natywnego `title="..."` z `DocumentTable.jsx`, `VdrPermissionBadge.jsx`, `FolderTreeNav.jsx`, `BatchActionBar.jsx`, `Header.jsx`, `Sidebar.jsx` oraz `FinancialTable.jsx`.
     - Interaktywny tooltip kopiowania sumy kontrolnej SHA-256 z dynamicznym feedbackiem ("Kopiuj pełną sumę kontrolną SHA-256" / "Skopiowano sumę SHA-256!").
     - Dostępne podpowiedzi dla odznaki dynamicznego znaku wodnego oraz wskaźników pozycji pomniejszającej wynik `(-)` i kodów P&L.
     - Dostępne etykiety `aria-label` dla przycisków ikonowych oraz synchronizacja testów komponentowych.
-  - [x] Kontekstowe podpowiedzi finansowe i definicje kowenantów bankowych LMA w kokpicie i pasku mnożników.
+  - Kontekstowe podpowiedzi finansowe i definicje kowenantów bankowych LMA w kokpicie i pasku mnożników.
     - Wzbogacenie pasków wskaźników rynkowych (`FinancialMultiplesStrip.jsx`) o szczegółowe dymki metodologiczne dla EV/EBITDA, EV/EBIT, P/E, Długu Netto / EBITDA i P/BV wraz ze wzorami matematycznymi i interpretacją benchmarków.
     - Wdrożenie komponentów `<InfoTooltip />` w module kowenantów bankowych (`BankingCovenantsStrip.jsx`) z definicjami LMA dla DSCR, ICR, Current Ratio, Peak Leverage, DSRF oraz LLCR.
     - Integracja pomocniczych podpowiedzi informacyjnych w matrycy suwaków What-If analizy wrażliwości (`SensitivityCockpitView.jsx`): CAPEX, Przychody ze Sprzedaży, Koszty Zmienne, Koszty Stałe OPEX, Fundusz Płac, Stopa Dyskontowa WACC oraz Reinwestycje A/B/C.
     - Weryfikacja testowa: `FinancialMultiplesStrip.test.jsx` (3/3), `BankingCovenantsStrip.test.jsx` (17/17), `SensitivityCockpitView.test.jsx` (15/15).
-  - [x] Audyt dostępności WCAG 2.1/2.2 AA, testy regresyjne i integracyjne oraz bezkolizyjne współistnienie z Recharts.
+  - Audyt dostępności WCAG 2.1/2.2 AA, testy regresyjne i integracyjne oraz bezkolizyjne współistnienie z Recharts.
     - Kompleksowy pakiet testów integracyjnych i regresyjnych `TooltipAccessibilityRegression.test.jsx` (7 testów).
     - Weryfikacja kryteriów WCAG: Dismissible (klawisz Escape bez utraty fokusu), Hoverable (bezpieczne najechanie na treść podpowiedzi), Persistent (brak przedwczesnego wygasania).
     - Potwierdzenie bezkolizyjnego współistnienia w DOM i nasłuchiwaczach pomiędzy dymkami UI a wykresem Recharts (`CustomChartTooltip`).
     - 100% PASS w pełnym zestawie testów Vitest oraz pomyślna kompilacja produkcyjna (`npm run build`).
-  - [x] Wdrożenie dostępnych podpowiedzi Tooltip i InfoTooltip w widoku Pulpitu Zarządczego (Executive Overview).
+  - Wdrożenie dostępnych podpowiedzi Tooltip i InfoTooltip w widoku Pulpitu Zarządczego (Executive Overview).
     - Rozszerzenie `MetricCard` o obsługę `tooltipContent` z dedykowaną ikonką `<InfoTooltip size="xs" />`.
     - Dostępne objaśnienia metodologiczne dla 4 głównych kart KPI: Przychody ze Sprzedaży, Wynik EBITDA, Zysk Operacyjny (EBIT) oraz Wskaźnik Płynności Bieżącej.
     - Zastąpienie natywnego `title="..."` na przycisku celów benchmarkowych M&A oraz dodanie podpowiedzi dla odznaki spółki, NIP, filtru zakresu, waluty i silnika CQRS/DDD.
     - Wzbogacenie nagłówków i przełączników wykresów (`TREND P&L` / `PŁYNNOŚĆ CR/QR`) oraz dziennika audytowego WORM (`AuditTrailSnippet`) o interaktywne dymki.
     - Weryfikacja testowa: `MetricCard.test.jsx` (4/4), `DashboardView.test.jsx` (9/9), `dashboardViewE2EWorkflow.test.jsx` (6/6).
-  - [x] Wdrożenie dostępnych podpowiedzi Tooltip i InfoTooltip w widoku Analityki P&L, Marż i Wskaźników Płynności.
+  - Wdrożenie dostępnych podpowiedzi Tooltip i InfoTooltip w widoku Analityki P&L, Marż i Wskaźników Płynności.
     - Eliminacja natywnych atrybutów `title="..."` z etykiet legendy w `CostBreakdownChart.jsx` z aliasowaniem `UiTooltip` zapobiegającym kolizji z Recharts `<Tooltip />`.
     - Wzbogacenie nagłówka kontekstowego `AnalyticsView.jsx`: podpowiedzi dla odznaki spółki, NIP, filtru dat, waluty oraz przycisku odświeżania z etykietą `aria-label`.
     - Dostępne podpowiedzi nawigacyjne na wszystkich 5 zakładkach: Podsumowanie P&L, Rentowność i Marże, Płynność i Zadłużenie, Dekompozycja Pozycji oraz Cele Benchmarkowe.
     - Wdrożenie `tooltipContent` w 4 głównych kartach KPI (Przychody, EBITDA, EBIT, Zysk Netto) oraz `<InfoTooltip size="xs" />` w nagłówkach wykresów i tabel marżowych.
     - Dodanie dymków metodologicznych dla wskaźników płynności (Current Ratio, Quick Ratio, NWC), statusów ewaluacji, wykresu dekompozycji oraz matrycy celów M&A.
     - Weryfikacja testowa: `AnalyticsView.test.jsx` (6/6), `CostBreakdownChart.test.jsx` (4/4), 100% PASS w pełnym zestawie 60 plików Vitest (562 testy) i bezbłędny build Vite.
-  - [x] Wdrożenie dostępnych podpowiedzi Tooltip i InfoTooltip w widoku Księgi Transakcji Finansowych (RecordsView).
+  - Wdrożenie dostępnych podpowiedzi Tooltip i InfoTooltip w widoku Księgi Transakcji Finansowych (RecordsView).
     - Refaktoryzacja bazowego komponentu `Button.jsx` z obsługą `React.forwardRef` do bezkolizyjnej integracji z `@floating-ui/react`.
     - Eliminacja natywnych atrybutów `title="..."` z przycisków akcji wiersza (Edytuj/Usuń zapis), przycisku eksportu CSV oraz modali transakcyjnych (`BatchDeleteConfirmationModal`, `DeleteRecordConfirmationModal`, `FinancialRecordModal`).
     - Wzbogacenie nagłówka modułu `RecordsView.jsx`: `<Tooltip>` dla ikony modułu, kodu podmiotu, przycisku eksportu CSV i nowego zapisu oraz `<InfoTooltip size="xs">` dla tytułu księgi głównej.
@@ -907,7 +907,7 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Dostępne podpowiedzi dla paska filtrów: wyszukiwarka, selektor typu transakcji, selektor kategorii, przycisk resetu filtrów oraz filtry zakresu dat z pełnymi etykietami `aria-label`.
     - Dostępne nagłówki kolumn tabeli, master checkbox, checkboxy wierszy, kody kategorii, odznaki klasyfikacji (`getTypeBadge`) oraz dymki paginacji.
     - Weryfikacja testowa: `RecordsView.test.jsx` (22/22), `FinancialRecordModal.test.jsx` (7/7), `BatchDeleteConfirmationModal.test.jsx` (6/6), `BatchActionBar.test.jsx` (5/5), 100% PASS w 60 plikach Vitest (563 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
-  - [x] Wdrożenie dostępnych podpowiedzi Tooltip i InfoTooltip w widoku Importu Wyciągów i Zbiorów CSV (ImportView).
+  - Wdrożenie dostępnych podpowiedzi Tooltip i InfoTooltip w widoku Importu Wyciągów i Zbiorów CSV (ImportView).
     - Refaktoryzacja komponentu `Badge.jsx` z obsługą `React.forwardRef` do bezkolizyjnego montowania dymków Floating UI na odznakach.
     - Eliminacja natywnych atrybutów `title="..."` z przycisku pobierania szablonu CSV i przycisku zmiany wybranego pliku.
     - Wzbogacenie nagłówka modułu `ImportView.jsx`: `<Tooltip>` dla ikony modułu, odznaki spółki portfelowej, wskaźnika workera Redis, tarczy Dry-Run oraz `<InfoTooltip size="xs">` dla asynchronicznej kolejki importu.
@@ -915,18 +915,18 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Dostępne podpowiedzi w tabeli weryfikacji wstępnej `CsvPreviewTable.jsx`: baner walidacji Dry-Run, rejestr błędów wierszy, przyciski akcji (Rozpocznij Import / Anuluj), nagłówki kolumn tabeli i komórki próbki rekordów.
     - Integracja dymków w monitorze postępu `ImportJobProgress.jsx` (identyfikator zadania kolejki Redis, odznaki statusu, pasek postępu, przyciski nawigacyjne) oraz w dzienniku audytowym `ImportHistoryTable.jsx` (nagłówki kolumn, odznaki statusów, przycisk odświeżania z `aria-label`).
     - Weryfikacja testowa: `ImportView.test.jsx` (7/7), `CsvPreviewTable.test.jsx` (4/4), 100% PASS w pełnym zestawie 61 plików Vitest (570 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
-  - [x] Wdrożenie dostępnych podpowiedzi Tooltip i InfoTooltip w module Virtual Data Room (VDR) i modalach transakcyjnych.
+  - Wdrożenie dostępnych podpowiedzi Tooltip i InfoTooltip w module Virtual Data Room (VDR) i modalach transakcyjnych.
     - Wzbogacenie nagłówka modułu `DataRoomView.jsx`: `<Tooltip>` dla ikony kryptograficznego skarbca VDR, odznaki spółki transakcyjnej, przycisków akcji ("Foldery M&A", "Odśwież", "Matryca Uprawnień", "Wgraj Dokument"), filtru ścieżki folderu, 7 zakładek kategorii Due Diligence, pola wyszukiwarki i paginacji.
     - Dodanie dymków objaśniających `<InfoTooltip size="xs">` w `DataRoomStats.jsx` do 4 kart KPI (Dokumenty VDR, Wolumen Danych, Pobrania Audytowe, Kategorie Due Diligence) oraz dymków `<Tooltip>` dla certyfikatów bezpieczeństwa (AES-256 GCM, SHA-256, WORM).
     - Dostępne podpowiedzi w tabeli dokumentów `DocumentTable.jsx`: nagłówki wszystkich 7 kolumn, kod taksonomii dziesiętnej Dewey, tytuł dokumentu, ostrzeżenie o dynamicznym znaku wodnym, suma kontrolna SHA-256 wraz z przyciskiem kopiowania (`aria-label`) oraz 6 przycisków akcji wiersza (Podgląd, Pobierz, Ścieżka audytowa, Edytuj, Archiwum, Usuń).
     - Wdrożenie dymków `<Tooltip>` i `<InfoTooltip>` we wszystkich 7 modalach transakcyjnych VDR: `CreateFolderModal.jsx`, `DeleteDocumentModal.jsx`, `DocumentAuditModal.jsx`, `DocumentEditModal.jsx`, `DocumentPreviewModal.jsx`, `DocumentUploadModal.jsx` oraz `VdrPermissionMatrixModal.jsx` z zachowaniem atrybutów `title` wymaganych przez testy iframe i przycisków zamykania.
     - Weryfikacja testowa: `DataRoomTooltips.test.jsx` (8/8), `DataRoom.test.jsx` (14/14), `DocumentPreviewModal.test.jsx` (6/6), `VdrPermissionMatrixModal.test.jsx` (7/7), `FolderTreeNav.test.jsx` (5/5), `CreateFolderModal.test.jsx` (5/5), `VdrPermissionBadge.test.jsx` (6/6), 100% PASS w pełnym zestawie 62 plików Vitest (578 testów) oraz bezbłędny build produkcyjny (`npm run build`).
-  - [x] Wdrożenie dostępnych podpowiedzi Tooltip i InfoTooltip w module Raporty Zarządcze & Generator PDF (ReportsView, ReportConfigurator, ExecutivePdfReport).
+  - Wdrożenie dostępnych podpowiedzi Tooltip i InfoTooltip w module Raporty Zarządcze & Generator PDF (ReportsView, ReportConfigurator, ExecutivePdfReport).
     - Wzbogacenie nagłówka modułu `ReportsView.jsx`: `<Tooltip>` dla ikony raportów finansowych, aktywnej odznaki spółki portfelowej i odznaki wektorowego PDF A4 oraz `<InfoTooltip size="xs">` z dedykowanym `ariaLabel` dla generatora memorandów zarządczych.
     - Dostępne podpowiedzi w konfiguratorze parametrów `ReportConfigurator.jsx`: dymki dla przycisków akcji ("Przelicz", "Eksport JSON", "Drukuj / Eksportuj PDF") z zachowaniem atrybutów `title="..."` dla testów, objaśnienia sekcji konfiguracyjnych (horyzont czasowy, waluta prezentacji, klauzule poufności, zakres sekcji, komentarz analityczny) oraz dymki dla szablonów komentarzy i przełączników sekcji.
     - Wdrożenie dymków w podglądzie wektorowego raportu PDF `ExecutivePdfReport.jsx`: bezpieczne dymki informacyjne z klasą `print:hidden` (ukrywane podczas druku PDF A4 do formatu fizycznego), objaśnienia 4 kart KPI, 9 kodów klasyfikacji P&L, wskaźników płynności i kowenantów LMA, dekompozycji OPEX oraz pieczęci kryptograficznej SHA-256 z blokami podpisów członków zarządu.
     - Weryfikacja testowa: dedykowany zestaw testowy `ExecutiveReportsTooltips.test.jsx` (7/7), `ExecutiveReports.test.jsx` (6/6), `dealAdvisoryE2EWorkflow.test.jsx` (2/2), 100% PASS w pełnym zestawie 63 plików Vitest (585 testów) oraz bezbłędny build produkcyjny (`npm run build`).
-  - [x] Wdrożenie dostępnych podpowiedzi Tooltip i InfoTooltip w module Rejestr Nadzoru i Ścieżka Audytowa (AuditLogsView, AuditActionBadge, FinancialAuditDetailModal).
+  - Wdrożenie dostępnych podpowiedzi Tooltip i InfoTooltip w module Rejestr Nadzoru i Ścieżka Audytowa (AuditLogsView, AuditActionBadge, FinancialAuditDetailModal).
     - Refaktoryzacja komponentu odznaki audytowej `AuditActionBadge.jsx` z obsługą `React.forwardRef` do bezkolizyjnego montowania podpowiedzi `@floating-ui/react`.
     - Wzbogacenie nagłówka modułu `AuditLogsView.jsx`: `<Tooltip>` dla ikony tarczy kryptograficznej WORM (`role="img"`, `aria-label`), odznaki spółki portfelowej, przycisku odświeżania z `aria-label` oraz `<InfoTooltip size="xs">` dla dziennika nadzoru SOX/RODO.
     - Nawigacja zakładkowa z dymkami `<Tooltip>` i etykietami `aria-label` dla audytu transakcji finansowych oraz dokumentów VDR.
@@ -936,7 +936,7 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Wdrożenie dymków w modalnym oknie inspekcji `FinancialAuditDetailModal.jsx`: nagłówek z tarczą, odznaką akcji, czasem i UUID, przycisk zamykania z zachowaniem `title="Zamknij"` i `aria-label`, objaśnienia sekcji opisu, operacji usunięcia rekordów, profilu operatora, środowiska sieciowego oraz porównania zrzutów migawkowych JSON diff (`old_values` vs `new_values`).
     - Weryfikacja testowa: dedykowany zestaw testowy `AuditLogsTooltips.test.jsx` (8/8), `AuditLogsView.test.jsx` (10/10), `FinancialAuditDetailModal.test.jsx` (6/6), `AuditActionBadge.test.jsx` (10/10), `vdrAuditRegression.test.jsx` (4/4), 100% PASS w pełnym zestawie 64 plików Vitest (593 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
-  - [x] Wdrożenie dostępnych podpowiedzi Tooltip i InfoTooltip w module Doradcy & Przypisania (AdvisorsManagementView, modale operacyjne i diagnostyka SMTP).
+  - Wdrożenie dostępnych podpowiedzi Tooltip i InfoTooltip w module Doradcy & Przypisania (AdvisorsManagementView, modale operacyjne i diagnostyka SMTP).
     - Wzbogacenie paska nagłówka `AdvisorsManagementView.jsx`: `<Tooltip>` dla ikony tarczy Deal Advisory (`role="img"`, `tabIndex={0}`), odznak ról (`SUPER ADMIN`, `DORADCA M&A`, `MULTI-TENANT RBAC`), przycisków akcji ("Testuj SMTP", "Dodaj Spółkę", "Zaproś Użytkownika", "Odśwież") oraz `<InfoTooltip size="xs">` objaśniający architekturę Multi-Tenant RBAC i separację danych podmiotów.
     - Dostarczenie objaśnień metodologicznych w 4 kartach KPI (`MetricCard` z `tooltipContent`): Doradcy & Partnerzy, Spółki w Portfelu, Oczekujące Zaproszenia oraz Aktywowane Konta.
     - Dostępna nawigacja zakładkowa z dymkami `<Tooltip>` i etykietami `aria-label` dla Rejestru Doradców, Matrycy Spółek Portfelowych, Wysłanych Zaproszeń i Diagnostyki SMTP.
@@ -945,7 +945,7 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Integracja dostępnych dymków w komponencie telemetrii `SmtpStatusWidget.jsx` (kompaktowy i pełny widok, wskaźniki gniazda TCP, detekcja blokady portu 25 w OCI, karty konfiguracji i terminal powitalny kod 220).
     - Weryfikacja testowa: dedykowany zestaw testowy `AdvisorsTooltips.test.jsx` (8/8), `AdvisorsManagement.test.jsx` (15/15), `CreateCompanyModal.test.jsx` (8/8), `InviteUserModal.test.jsx` (9/9), `MailDiagnostics.test.jsx` (9/9), 100% PASS w pełnym zestawie 65 plików Vitest (601 testów) oraz bezbłędny build produkcyjny (`npm run build`).
 
-  - [x] Wdrożenie dostępnych podpowiedzi Tooltip i InfoTooltip w module Planowanie Inwestycji i Montaż Finansowy (InvestmentPlanningView, CreateProjectModal).
+  - Wdrożenie dostępnych podpowiedzi Tooltip i InfoTooltip w module Planowanie Inwestycji i Montaż Finansowy (InvestmentPlanningView, CreateProjectModal).
     - Wzbogacenie paska nagłówka `InvestmentPlanningView.jsx`: `<Tooltip>` dla ikony kalkulatora inżynierii finansowej CAPEX, odznaki modułu Project Finance, aktywnego kodu podmiotu gospodarczego oraz `<InfoTooltip size="sm">` szczegółowo objaśniający wieloletnie modelowanie nakładów CAPEX (zgodnie z KŚT), optymalizację struktury długu (DSCR/LLCR), 15-letni model 3-Statement oraz wycenę DCF/WACC.
     - Dostępny selektor projektu (`<select data-testid="project-selector">`) oraz dymki `<Tooltip>` zintegrowane w odznakach statusów projektu (`getStatusBadge` dla wariantów approved, active, completed, under_review, draft).
     - Dymki `<Tooltip>` dla przycisków akcji nagłówka ("Nowy Projekt") oraz pustego stanu inicjalizacji ("Zainicjalizuj Pierwszy Projekt").
@@ -955,7 +955,7 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Wdrożenie dymków `<Tooltip>` i komponentów `<InfoTooltip size="xs">` w formularzu tworzenia projektu `CreateProjectModal.jsx`: przycisk zamykania z `aria-label`, objaśnienia etykiet pól (nazwa projektu, data startu, horyzont planowania, waluta bazowa, equity, senior debt, opis strategiczny) oraz dymki dla przycisków w stopce ("Anuluj", "Utwórz Projekt").
     - Weryfikacja testowa: dedykowany zestaw testowy `InvestmentPlanningTooltips.test.jsx` (6/6), `InvestmentPlanningView.test.jsx` (9/9), 100% PASS w pełnym zestawie 66 plików Vitest (607 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
-  - [x] Wdrożenie dostępnych podpowiedzi Tooltip i InfoTooltip w komponentach zakładki "1. Założenia & CAPEX" modułu Project Finance (CapexScheduleManager, CapexStageModal, CapexStageDeleteModal, FinancingStructureConfigurator, ReinvestmentManager, OperatingAssumptionsForm).
+  - Wdrożenie dostępnych podpowiedzi Tooltip i InfoTooltip w komponentach zakładki "1. Założenia & CAPEX" modułu Project Finance (CapexScheduleManager, CapexStageModal, CapexStageDeleteModal, FinancingStructureConfigurator, ReinvestmentManager, OperatingAssumptionsForm).
     - `CapexScheduleManager.jsx`: dymki nagłówka, `InfoTooltip` tytułu z definicją etapowania nakładów brutto/netto i przypisań KŚT, przycisk "Dodaj Etap CAPEX", 4 karty podsumowań KPI (Nakłady netto, Wydatki kwalifikowane, Średnia stawka KŚT, Status), nagłówki 7 kolumn tabeli, odznaki KŚT i dotacji, akcje wierszy (Edytuj/Usuń) oraz segmenty paska nakładów wraz z legendą.
     - `CapexStageModal.jsx`: przycisk zamykania, 8 etykiet pól z `InfoTooltip` (Nazwa, KŚT, Stawka amortyzacji, Kwota netto, Kolejność, Start, Czas trwania, Dotacja/Kwota kwalifikowana), separacja przycisku informacyjnego poza znacznikiem `<label>` oraz przyciski stopki "Anuluj" i "Dodaj Etap / Zapisz Zmiany".
     - `CapexStageDeleteModal.jsx`: dymki `<Tooltip>` na przyciskach "Anuluj" oraz "Usuń Etap".
@@ -964,24 +964,43 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - `OperatingAssumptionsForm.jsx`: nagłówek z odznaką COD i `InfoTooltip`, 4 karty KPI (Przychody, EBITDA, CCC, FTE), 5 podzakładek (Przychody, OPEX, NWC, Kadry, CIT), suwaki wzrostu i ramp-up, tabele strumieni przychodowych i etatów z akcjami, opcje CIT/tarczy podatkowej oraz tabela projekcji wieloletniej.
     - Weryfikacja testowa: rozszerzony zestaw `InvestmentPlanningTooltips.test.jsx` (10/10), 100% PASS we wszystkich 6 zestawach testowych modułu inwestycji (66 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
-  - [x] Wdrożenie dostępnych podpowiedzi Tooltip i InfoTooltip w komponentach zakładki "2. Symulator What-If" modułu Project Finance (SensitivityCockpitView, ScenarioPresetSelector, DebtRepaymentModeSwitcher).
+  - Wdrożenie dostępnych podpowiedzi Tooltip i InfoTooltip w komponentach zakładki "2. Symulator What-If" modułu Project Finance (SensitivityCockpitView, ScenarioPresetSelector, DebtRepaymentModeSwitcher).
     - `SensitivityCockpitView.jsx`: dymki ikony aktywności, `InfoTooltip` tytułu symulatora What-If, odznaki `REAL-TIME` i telemetrii Web Workera (`Worker: X.X ms`), `InfoTooltip` i dymki we wszystkich 5 kartach KPI (Project NPV z deltami, Project IRR ze spreadem WACC, Equity MoIC z Equity NPV, Okres Zwrotu ze zdyskontowanym DPB, Kowenant DSCR z odznaką bankowalności i min DSCR), nagłówek sekcji suwaków z `InfoTooltip`, dostępne etykiety `aria-label` dla 7 suwaków wejściowych (CAPEX, Przychody, Koszty zmienne, Koszty stałe OPEX, Fundusz płac, WACC, Reinvestment), dymki dla przycisku przywrócenia modelu WACC, checkboxa aktywacji reinvestmentu oraz przycisków konfiguracji programów A/B/C, nagłówek wykresu 15-letniego z `InfoTooltip`, przełącznik trybów wykresu (Nominalne vs Zdyskontowane), dymki legendy serii danych i odznaki WACC, nagłówek tabeli Base vs What-If z `InfoTooltip`, odznaka statusu wariantu, dymki 5 nagłówków kolumn tabeli oraz precyzyjne dymki dla odznak wierszy.
     - `ScenarioPresetSelector.jsx`: migracja natywnych atrybutów `title` do komponentów `<Tooltip>`, dymek informacyjny `<InfoTooltip size="xs">` obok etykiety `SCENARIUSZ:`, dymki `<Tooltip>` z etykietami `aria-label` dla 5 przycisków scenariuszy (Bazowy, Optymistyczny, Stres-Test Bankowy, Stagflacja, Presja Płacowa), dymek dla przycisku akcji *"Przywróć Bazę"*, dymki dla odznak profilu ryzyka oraz odznaki scenariusza manualnego (`Własny`), dymki parametrów odchyleń (CAPEX, Przychody, Koszty zmienne, Płace, WACC).
     - `DebtRepaymentModeSwitcher.jsx`: migracja natywnego `title` do `<Tooltip>`, dymek na ikonie banku i `<InfoTooltip>` tytułu modułu spłat kapitałowych, dymki dla odznak statusu umowy oraz przycisku *"Przywróć umowę"*, pełna obsługa klawiatury (`role="button"`, `tabIndex={0}`, Enter/Space) z dymkami dla 3 kart amortyzacji długu (Annuity, Linear, Bullet), komponenty `<InfoTooltip size="xs">` i dymki statusu w pasku *Live Covenant & Cost Impact Bar* (Kowenant Min DSCR z odznaką bankowalności, Średni DSCR, Łączny koszt odsetek, Oszczędność/koszt wobec bazy).
     - Weryfikacja testowa: dedykowany zestaw testowy `SensitivityCockpitTooltips.test.jsx` (3/3), `SensitivityCockpitView.test.jsx` (15/15), `investmentSimulationRealTimeIntegration.test.jsx` (17/17), 100% PASS we wszystkich 5 zestawach testowych modułu inwestycji (54 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
-  - [x] Wdrożenie dostępnych podpowiedzi Tooltip i InfoTooltip w komponentach zakładki "3. Model 15-letni & Wycena" modułu Project Finance (BankingCovenantsStrip, ExitValuationOverlay, ExitWaterfallVisualizer, ThreeStatementGrid).
+  - Wdrożenie dostępnych podpowiedzi Tooltip i InfoTooltip w komponentach zakładki "3. Model 15-letni & Wycena" modułu Project Finance (BankingCovenantsStrip, ExitValuationOverlay, ExitWaterfallVisualizer, ThreeStatementGrid).
     - `BankingCovenantsStrip.jsx`: eliminacja natywnego atrybutu `title` z listy naruszeń na rzecz dostępnego `<Tooltip>`, podpowiedzi na ikonie Landmark, badge statusu bankowalności, przełącznikach presetów ostrożnościowych (Standard LMA / Konserwatywny / Indywidualny), przełączniku skali (tys. / mln / pełne), przycisku zwijania, nagłówkach kolumn tabeli (Okres, EBITDA, CFADS, Obsługa Długu, DSCR, LLCR, ICR, CR, Dźwignia, DSRF, Zgodność), podpowiedzi dla komórek z bezpiecznym sprawdzaniem wartości null/undefined oraz wsparcie ARIA dla suwaków konfiguratora.
     - `ExitValuationOverlay.jsx`: dymki nagłówka i telemetrii (EV, MoIC, IRR, Buyer Yield), selektor skali, przycisk zwijania, komponenty `<InfoTooltip>` dla suwaków horyzontu wyjścia (Exit Timing z presetami Y3–Y15) i mnożnika EV/EBITDA z benchmarkami branżowymi, objaśnienia pojęć finansowych w 4 Executive KPI Cards, dymki w zakładce mostu wyceny (EV to Equity Bridge) oraz ekonomii nabywcy, pełna dostępność komórek dwuwymiarowej macierzy wrażliwości (`role="button"`, `tabIndex={0}`, obsługa klawiszy Enter / Space, etykiety ARIA i Floating UI tooltips).
     - `ExitWaterfallVisualizer.jsx`: dymki na ikonie sekcji Layers, podsumowaniu zwrotów (Sponsor MoIC, Partner MoIC, Total EqV), selektorze skali, przełączniku widoczności, komponenty `<InfoTooltip>` dla 4 paneli kontrolnych (Rok Wyjścia, Mnożnik EV, Struktura Podziału Pari Passu vs Two-Tier Hurdle, Udział Sponsora/LP), dymki dla zakładek podrzędnych, pasków poziomych mostu kaskadowego, kart inwestorów GP/LP oraz kolumn tabeli harmonogramu wypłat.
     - `ThreeStatementGrid.jsx`: migracja natywnego `title` na wskaźniku integralności bilansu (`balance-integrity-badge`) oraz przycisku tarczy podatkowej CIT do komponentów `<Tooltip>`, dymki dla przełącznika sprawozdań (RZiS, Bilans, Cash Flow, Zbiorczy), granularności (15 Lat vs 180M), skali (PLN / tys. / mln), przycisku eksportu do CSV oraz kontrolek rozwijania i zwijania sekcji.
     - Weryfikacja testowa: dedykowany zestaw testowy `InvestmentStatementsValuationTooltips.test.jsx` (7/7), `BankingCovenantsStrip.test.jsx` (17/17), `ExitValuationOverlay.test.jsx` (11/11), `ExitWaterfallVisualizer.test.jsx` (10/10), `ThreeStatementGrid.test.jsx` (11/11), 100% PASS we wszystkich 5 zestawach testowych modułu (56 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
-  - [x] Wdrożenie dostępnych podpowiedzi Tooltip i InfoTooltip w komponentach zakładki "4. Scoring & Dossier PDF" modułu Project Finance (InvestmentDossierPdfGenerator, InvestmentReadinessScorecard, CustomReportBuilder).
+  - Wdrożenie dostępnych podpowiedzi Tooltip i InfoTooltip w komponentach zakładki "4. Scoring & Dossier PDF" modułu Project Finance (InvestmentDossierPdfGenerator, InvestmentReadinessScorecard, CustomReportBuilder).
     - `InvestmentDossierPdfGenerator.jsx`: bezkolizyjny import wykresów Recharts (`Tooltip as RechartsTooltip`), migracja natywnego `title` z pieczęci SHA-256 do `<Tooltip>`, dymki dla ikony nagłówka, odznaki LMA, przycisków akcji („Zwiń/Pokaż Podgląd”, „Dossier JSON”, „Drukuj / Pobierz PDF”), selektora skali kwot, selektora znaku wodnego, przycisku kopiowania SHA-256 oraz 7 checkboxów sekcji dossier, dymki w podglądzie wydruku A4 (sekcje, KPI, scorecard, warunki CP, parametry długu, tabela 15-letnia i wycena).
     - `InvestmentReadinessScorecard.jsx`: dymki na ikonie nagłówka, `InfoTooltip` dla scorecardu i presetów, tarcza punktacji (`overall-score-dial`), odznaka bankowalności, kafelki CPs i braków, pasek postępu, presety etapów dojrzałości (Greenfield, Development, RTB, COD), przyciski resetu (z zachowaniem wstecznej kompatybilności `title`), eksportu CSV i zapisu oceny, 4 karty filarów audytu, pasek filtrów, wskaźniki Auto-Sync oraz przyciski ewaluacji statusu kryteriów.
     - `CustomReportBuilder.jsx`: bezkolizyjny import wykresów Recharts (`Tooltip as RechartsTooltip`), dymki nagłówka, badge 15-Year Horizon, przyciski „Dodaj Pozycję”, „Pokaż/Ukryj Wykres”, „Eksportuj CSV”, komponenty `<InfoTooltip>` dla szablonów, horyzontu (5L, 10L, 15L), skali kwot oraz nagłówków tabeli, dymki dla przełączników wykresów liniowych i słupkowych, akcji wierszy (widoczność, góra, dół, usuń) oraz modalu wyboru wskaźników finansowych z dostępnym `aria-label="Zamknij bibliotekę"`.
     - Weryfikacja testowa: dedykowany zestaw testowy `InvestmentScoringDossierTooltips.test.jsx` (6/6), `InvestmentDossierPdfGenerator.test.jsx` (11/11), `InvestmentReadinessScorecard.test.jsx` (12/12), `CustomReportBuilder.test.jsx` (8/8), 100% PASS we wszystkich 4 zestawach testowych zakładki 4 (37 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
+
+- [ ] **Faza 57: Fundament Architektury Routingu i Ochrona Tras (Commity 286–288)**
+  - [x] Instalacja biblioteki react-router-dom oraz konfiguracja bazowej infrastruktury routingu.
+    - Dodanie zależności `react-router-dom` (^7.18.4) w `package.json`.
+    - Utworzenie centralnego rejestru tras `ROUTES` oraz słownika nagłówków widoków `ROUTE_TITLES` w `resources/js/constants/routes.js`.
+    - Opakowanie korzenia aplikacji `<App />` w dostawcę kontekstu `<BrowserRouter>` w `resources/js/app.jsx`.
+    - Weryfikacja testowa: 100% PASS w pełnym zestawie 69 plików Vitest (627 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
+  - [ ] Implementacja strażników tras ProtectedRoute, GuestRoute oraz RoleGuard z RBAC.
+  - [ ] Synchronizacja przepływów uwierzytelniania i autoryzacji z historią React Router.
+
+- [ ] **Faza 58: Integracja Układu Aplikacji i Semantycznej Nawigacji (Commity 289–291)**
+  - [ ] Przekształcenie AppLayout w układ oparty na gnieździe Outlet z dynamiczną rezolucją nagłówka.
+  - [ ] Migracja nawigacji w Sidebarze na komponenty NavLink z dynamicznymi stanami aktywności.
+  - [ ] Eliminacja przestarzałej nawigacji hash i dedykowany widok błędu 404 Not Found.
+
+- [ ] **Faza 59: Adaptacja Środowiska Testowego, Weryfikacja Regresji i Dokumentacja (Commity 292–294)**
+  - [ ] Pomocnik testowy renderWithRouter oraz testy jednostkowe strażników tras i Sidebara.
+  - [ ] Adaptacja istniejących zestawów testowych Vitest pod routing i weryfikacja zerowej regresji.
+  - [ ] Aktualizacja dokumentacji architektonicznej, README i changelogów.
 
 ---
 

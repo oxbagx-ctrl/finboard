@@ -263,6 +263,7 @@ describe('AnalyticsView Component', () => {
 
         await waitFor(() => {
             expect(apiClient.get).toHaveBeenCalledTimes(5);
+            expect(screen.getByRole('button', { name: /Odśwież/i })).not.toBeDisabled();
         });
 
         const refreshBtn = screen.getByRole('button', { name: /Odśwież/i });

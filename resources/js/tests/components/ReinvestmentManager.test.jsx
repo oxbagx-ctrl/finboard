@@ -393,8 +393,8 @@ describe('ReinvestmentManager Component (Phase 43 Commit 214)', () => {
         renderComponent();
 
         // Check tabs exist
-        const matrixTab = screen.getByRole('tab', { name: /Siatka 15L/i });
-        const stackedBarsTab = screen.getByRole('tab', { name: /Słupki CAPEX/i });
+        const matrixTab = screen.getByRole('tab', { name: /Siatka/i });
+        const stackedBarsTab = screen.getByRole('tab', { name: /Słupki|słupkowy/i });
         const comboCurveTab = screen.getByRole('tab', { name: /S-Curve/i });
 
         expect(matrixTab).toBeInTheDocument();

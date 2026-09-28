@@ -193,16 +193,22 @@ describe('FinancingStructureConfigurator Component', () => {
             expect(investmentProjectsApi.updateProject).toHaveBeenCalledWith(
                 'proj-001',
                 expect.objectContaining({
-                    equity_contribution: 3000000,
-                    bank_loan_principal: 5000000,
-                    grant_amount: 2000000,
-                    vat_bridge_loan: 2300000,
-                    bank_base_rate: 5.85,
-                    bank_margin: 2.15,
-                    bank_tenor_months: 120,
-                    bank_grace_period_months: 12,
-                    amortization_type: 'ANNUITY',
-                    upfront_fee_rate: 1.0,
+                    financing_structure: expect.objectContaining({
+                        equity_contribution: 3000000,
+                        bank_loan_amount: 5000000,
+                        grant_amount: 2000000,
+                        vat_bridge_loan: 2300000,
+                    }),
+                    debt_facilities: expect.arrayContaining([
+                        expect.objectContaining({
+                            base_rate_percent: 5.85,
+                            margin_percent: 2.15,
+                            tenor_months: 120,
+                            grace_period_months: 12,
+                            amortization_type: 'ANNUITY',
+                            upfront_fee_percent: 1.0,
+                        }),
+                    ]),
                 })
             );
             expect(mockLoadProjectDetails).toHaveBeenCalledWith('proj-001');
