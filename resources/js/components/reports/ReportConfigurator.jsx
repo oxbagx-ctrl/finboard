@@ -97,10 +97,10 @@ export const ReportConfigurator = ({
     };
 
     return (
-        <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 font-mono text-xs space-y-4 print:hidden shadow-sm">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-800">
-                <div className="flex items-center gap-2 text-zinc-100 font-bold uppercase tracking-wider text-xs">
-                    <Sliders className="w-4 h-4 text-zinc-400" />
+        <div data-testid="report-configurator" className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-4 font-mono text-xs space-y-4 print:hidden shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-200 dark:border-zinc-800">
+                <div className="flex items-center gap-2 text-zinc-900 dark:text-zinc-100 font-bold uppercase tracking-wider text-xs">
+                    <Sliders className="w-4 h-4 text-zinc-500 dark:text-zinc-400" />
                     <span>Konfigurator Parametrów Raportu Zarządczego (Executive Memo)</span>
                     <InfoTooltip
                         size="xs"
@@ -157,7 +157,7 @@ export const ReportConfigurator = ({
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* 1. Period Selector */}
                 <div className="space-y-1.5">
-                    <label className="block text-[10px] uppercase font-semibold text-zinc-400 flex items-center gap-1.5">
+                    <label className="block text-[10px] uppercase font-semibold text-zinc-600 dark:text-zinc-400 flex items-center gap-1.5">
                         <Calendar className="w-3 h-3 text-zinc-500" />
                         Horyzont Czasowy Raportu
                         <InfoTooltip
@@ -171,11 +171,11 @@ export const ReportConfigurator = ({
                         <select
                             value={config.periodPreset}
                             onChange={(e) => handlePresetPeriod(e.target.value)}
-                            className="w-full bg-zinc-950 border border-zinc-750 rounded px-2.5 py-1.5 text-xs text-zinc-200 focus:outline-none focus:ring-1 focus:ring-zinc-400 cursor-pointer"
+                            className="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-750 rounded px-2.5 py-1.5 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 cursor-pointer"
                             aria-label="Wybierz horyzont czasowy raportu"
                         >
                             {PERIOD_PRESETS.map((p) => (
-                                <option key={p.id} value={p.id} className="bg-zinc-950 text-zinc-200">
+                                <option key={p.id} value={p.id} className="bg-white dark:bg-zinc-950 text-zinc-800 dark:text-zinc-200">
                                     {p.label}
                                 </option>
                             ))}
@@ -185,25 +185,25 @@ export const ReportConfigurator = ({
                     {config.periodPreset === 'custom' && (
                         <div className="grid grid-cols-2 gap-2 pt-1">
                             <div>
-                                <span className="text-[9px] text-zinc-500 block mb-0.5">OD:</span>
+                                <span className="text-[9px] text-zinc-500 dark:text-zinc-400 block mb-0.5">OD:</span>
                                 <Tooltip content="Początkowa data analizowanego okresu obrachunkowego (RRRR-MM-DD)">
                                     <input
                                         type="date"
                                         value={config.startDate}
                                         onChange={(e) => onChange({ ...config, startDate: e.target.value })}
-                                        className="w-full bg-zinc-950 border border-zinc-800 rounded px-2 py-1 text-[11px] text-zinc-200"
+                                        className="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded px-2 py-1 text-[11px] text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-1 focus:ring-zinc-400"
                                         aria-label="Początkowa data analizowanego okresu"
                                     />
                                 </Tooltip>
                             </div>
                             <div>
-                                <span className="text-[9px] text-zinc-500 block mb-0.5">DO:</span>
+                                <span className="text-[9px] text-zinc-500 dark:text-zinc-400 block mb-0.5">DO:</span>
                                 <Tooltip content="Końcowa data analizowanego okresu obrachunkowego (RRRR-MM-DD)">
                                     <input
                                         type="date"
                                         value={config.endDate}
                                         onChange={(e) => onChange({ ...config, endDate: e.target.value })}
-                                        className="w-full bg-zinc-950 border border-zinc-800 rounded px-2 py-1 text-[11px] text-zinc-200"
+                                        className="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded px-2 py-1 text-[11px] text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-1 focus:ring-zinc-400"
                                         aria-label="Końcowa data analizowanego okresu"
                                     />
                                 </Tooltip>
@@ -214,7 +214,7 @@ export const ReportConfigurator = ({
 
                 {/* 2. Currency & Confidentiality */}
                 <div className="space-y-1.5">
-                    <label className="block text-[10px] uppercase font-semibold text-zinc-400 flex items-center gap-1.5">
+                    <label className="block text-[10px] uppercase font-semibold text-zinc-600 dark:text-zinc-400 flex items-center gap-1.5">
                         <Coins className="w-3 h-3 text-zinc-500" />
                         Waluta Prezentacji & Przeliczenia
                         <InfoTooltip
@@ -228,18 +228,18 @@ export const ReportConfigurator = ({
                         <select
                             value={config.currency}
                             onChange={(e) => onChange({ ...config, currency: e.target.value })}
-                            className="w-full bg-zinc-950 border border-zinc-750 rounded px-2.5 py-1.5 text-xs text-zinc-200 focus:outline-none focus:ring-1 focus:ring-zinc-400 cursor-pointer"
+                            className="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-750 rounded px-2.5 py-1.5 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 cursor-pointer"
                             aria-label="Wybierz walutę prezentacji raportu"
                         >
                             {CURRENCIES.map((c) => (
-                                <option key={c.code} value={c.code} className="bg-zinc-950 text-zinc-200">
+                                <option key={c.code} value={c.code} className="bg-white dark:bg-zinc-950 text-zinc-800 dark:text-zinc-200">
                                     {c.code} – {c.label}
                                 </option>
                             ))}
                         </select>
                     </Tooltip>
 
-                    <label className="block text-[10px] uppercase font-semibold text-zinc-400 pt-1 flex items-center gap-1.5">
+                    <label className="block text-[10px] uppercase font-semibold text-zinc-600 dark:text-zinc-400 pt-1 flex items-center gap-1.5">
                         <Shield className="w-3 h-3 text-zinc-500" />
                         Klauzula Poufności (Header Watermark)
                         <InfoTooltip
@@ -253,11 +253,11 @@ export const ReportConfigurator = ({
                         <select
                             value={config.confidentiality}
                             onChange={(e) => onChange({ ...config, confidentiality: e.target.value })}
-                            className="w-full bg-zinc-950 border border-zinc-750 rounded px-2.5 py-1.5 text-xs text-zinc-200 focus:outline-none focus:ring-1 focus:ring-zinc-400 cursor-pointer"
+                            className="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-750 rounded px-2.5 py-1.5 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 cursor-pointer"
                             aria-label="Wybierz klauzulę poufności raportu"
                         >
                             {CONFIDENTIALITY_LEVELS.map((level) => (
-                                <option key={level.id} value={level.id} className="bg-zinc-950 text-zinc-200">
+                                <option key={level.id} value={level.id} className="bg-white dark:bg-zinc-950 text-zinc-800 dark:text-zinc-200">
                                     {level.label}
                                 </option>
                             ))}
@@ -267,7 +267,7 @@ export const ReportConfigurator = ({
 
                 {/* 3. Sections Checkboxes */}
                 <div className="space-y-1.5">
-                    <label className="block text-[10px] uppercase font-semibold text-zinc-400 flex items-center gap-1.5">
+                    <label className="block text-[10px] uppercase font-semibold text-zinc-600 dark:text-zinc-400 flex items-center gap-1.5">
                         <FileText className="w-3 h-3 text-zinc-500" />
                         Sekcje Do Uwzględnienia w Raporcie
                         <InfoTooltip
@@ -292,15 +292,15 @@ export const ReportConfigurator = ({
                                 <button
                                     type="button"
                                     onClick={() => toggleSection(sec.id)}
-                                    className="flex items-center gap-2 text-[11px] text-zinc-300 hover:text-white transition-colors cursor-pointer w-full text-left"
+                                    className="flex items-center gap-2 text-[11px] text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer w-full text-left"
                                     aria-label={`Przełącz sekcję: ${sec.label}`}
                                 >
                                     {config.sections[sec.id] ? (
-                                        <CheckSquare className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                                        <CheckSquare className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                                     ) : (
-                                        <Square className="w-3.5 h-3.5 text-zinc-600 shrink-0" />
+                                        <Square className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-600 shrink-0" />
                                     )}
-                                    <span className={config.sections[sec.id] ? 'text-zinc-200' : 'text-zinc-500'}>
+                                    <span className={config.sections[sec.id] ? 'text-zinc-900 dark:text-zinc-200 font-medium' : 'text-zinc-500 dark:text-zinc-500'}>
                                         {sec.label}
                                     </span>
                                 </button>
@@ -311,9 +311,9 @@ export const ReportConfigurator = ({
             </div>
 
             {/* Commentary / Recommendation */}
-            <div className="pt-2 border-t border-zinc-800/80 space-y-1.5">
+            <div className="pt-2 border-t border-zinc-200 dark:border-zinc-800/80 space-y-1.5">
                 <div className="flex items-center justify-between">
-                    <label className="block text-[10px] uppercase font-semibold text-zinc-400 flex items-center gap-1.5">
+                    <label className="block text-[10px] uppercase font-semibold text-zinc-600 dark:text-zinc-400 flex items-center gap-1.5">
                         Komentarz Analityczny Doradcy M&A / CFO (Opcjonalny do wydruku)
                         <InfoTooltip
                             size="xs"
@@ -322,7 +322,7 @@ export const ReportConfigurator = ({
                             content="Oficjalna opinia i rekomendacja doradcy transakcyjnego lub CFO dołączana do memorandum dla komitetu inwestycyjnego."
                         />
                     </label>
-                    <div className="flex items-center gap-1.5 text-[10px] text-zinc-500">
+                    <div className="flex items-center gap-1.5 text-[10px] text-zinc-500 dark:text-zinc-400">
                         <span>Wstaw szablon:</span>
                         {COMMENTARY_PRESETS.map((preset, idx) => (
                             <Tooltip
@@ -332,7 +332,7 @@ export const ReportConfigurator = ({
                                 <button
                                     type="button"
                                     onClick={() => onChange({ ...config, commentary: preset.text })}
-                                    className="text-zinc-400 hover:text-zinc-200 underline cursor-pointer"
+                                    className="text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200 underline cursor-pointer"
                                     aria-label={`Wstaw szablon: ${preset.label}`}
                                 >
                                     {preset.label}
@@ -347,7 +347,7 @@ export const ReportConfigurator = ({
                         value={config.commentary}
                         onChange={(e) => onChange({ ...config, commentary: e.target.value })}
                         placeholder="Wprowadź rekomendację dla komitetu inwestycyjnego lub zarządu..."
-                        className="w-full bg-zinc-950 border border-zinc-750 rounded px-3 py-2 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
+                        className="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-750 rounded px-3 py-2 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 font-mono"
                         aria-label="Komentarz analityczny doradcy M&A lub CFO"
                     />
                 </Tooltip>

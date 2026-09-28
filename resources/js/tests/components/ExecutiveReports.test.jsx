@@ -3,6 +3,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ReportConfigurator } from '../../components/reports/ReportConfigurator';
 import { ExecutivePdfReport } from '../../components/reports/ExecutivePdfReport';
+import { ThemeProvider, THEMES } from '../../context/ThemeContext';
 
 const mockCompany = {
     id: 'comp-1',
@@ -146,6 +147,45 @@ describe('ReportConfigurator Component', () => {
                 }),
             })
         );
+    });
+
+    it('renders adaptive dual-theme classes in Light and Dark mode', () => {
+        const { unmount } = render(
+            <ThemeProvider defaultTheme={THEMES.LIGHT}>
+                <ReportConfigurator
+                    config={mockConfig}
+                    onChange={vi.fn()}
+                    onPrint={vi.fn()}
+                    onExportJson={vi.fn()}
+                    onRefresh={vi.fn()}
+                    loading={false}
+                />
+            </ThemeProvider>
+        );
+
+        const configurator = screen.getByTestId('report-configurator');
+        expect(configurator.className).toContain('bg-white');
+        expect(configurator.className).toContain('dark:bg-zinc-900');
+        expect(configurator.className).toContain('border-zinc-200');
+        expect(configurator.className).toContain('dark:border-zinc-800');
+
+        unmount();
+
+        render(
+            <ThemeProvider defaultTheme={THEMES.DARK}>
+                <ReportConfigurator
+                    config={mockConfig}
+                    onChange={vi.fn()}
+                    onPrint={vi.fn()}
+                    onExportJson={vi.fn()}
+                    onRefresh={vi.fn()}
+                    loading={false}
+                />
+            </ThemeProvider>
+        );
+
+        const darkConfigurator = screen.getByTestId('report-configurator');
+        expect(darkConfigurator.className).toContain('dark:bg-zinc-900');
     });
 });
 
@@ -314,5 +354,53 @@ describe('ExecutivePdfReport Component', () => {
         expect(screen.getByText('OPEX')).toBeInTheDocument();
         expect(screen.getByText('D&A')).toBeInTheDocument();
         expect(screen.getByText('TAX / FIN')).toBeInTheDocument();
+    });
+
+    it('renders adaptive dual-theme classes and preserves vector print styles', () => {
+        const { unmount } = render(
+            <ThemeProvider defaultTheme={THEMES.LIGHT}>
+                <ExecutivePdfReport
+                    company={mockCompany}
+                    currentUser={mockUser}
+                    config={mockConfig}
+                    metrics={mockMetrics}
+                    trends={[]}
+                    breakdown={mockBreakdown}
+                    reportHash="abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890"
+                    generatedAt="2026-09-18T20:00:00Z"
+                />
+            </ThemeProvider>
+        );
+
+        const reportContainer = document.getElementById('executive-pdf-report');
+        expect(reportContainer).toBeInTheDocument();
+        expect(reportContainer.className).toContain('bg-white');
+        expect(reportContainer.className).toContain('dark:bg-zinc-950');
+        expect(reportContainer.className).toContain('border-zinc-200');
+        expect(reportContainer.className).toContain('dark:border-zinc-800');
+        expect(reportContainer.className).toContain('text-zinc-800');
+        expect(reportContainer.className).toContain('dark:text-zinc-200');
+        expect(reportContainer.className).toContain('print:bg-white');
+        expect(reportContainer.className).toContain('print:text-black');
+
+        unmount();
+
+        render(
+            <ThemeProvider defaultTheme={THEMES.DARK}>
+                <ExecutivePdfReport
+                    company={mockCompany}
+                    currentUser={mockUser}
+                    config={mockConfig}
+                    metrics={mockMetrics}
+                    trends={[]}
+                    breakdown={mockBreakdown}
+                    reportHash="abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890"
+                    generatedAt="2026-09-18T20:00:00Z"
+                />
+            </ThemeProvider>
+        );
+
+        const darkReport = document.getElementById('executive-pdf-report');
+        expect(darkReport.className).toContain('dark:bg-zinc-950');
     });
 });
