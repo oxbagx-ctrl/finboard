@@ -988,8 +988,11 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Dodanie zależności `react-router-dom` (^7.18.4) w `package.json`.
     - Utworzenie centralnego rejestru tras `ROUTES` oraz słownika nagłówków widoków `ROUTE_TITLES` w `resources/js/constants/routes.js`.
     - Opakowanie korzenia aplikacji `<App />` w dostawcę kontekstu `<BrowserRouter>` w `resources/js/app.jsx`.
+  - [x] Implementacja strażników tras ProtectedRoute, GuestRoute oraz RoleGuard z RBAC.
+    - Implementacja komponentów ochrony tras w `resources/js/components/routing/`: `ProtectedRoute.jsx` (przekierowanie na `/login` z zapamiętaniem `state.from`), `GuestRoute.jsx` (ochrona ekranów uwierzytelniania przed zalogowanymi użytkownikami) oraz `RoleGuard.jsx` (kontrola uprawnień RBAC z ostrzeżeniem i przekierowaniem na `/dashboard`).
+    - Zbudowanie kompletnej deklaracji drzewa tras `<Routes>` w `resources/js/App.jsx` z powłoką `ProtectedLayout` i przekazywaniem kontekstu odświeżania (`Outlet context`).
+    - Dedykowane zabezpieczenie trasy domenowej `/advisors` za pomocą `<RoleGuard allowedRoles={['super_admin', 'admin', 'advisor']}>`.
     - Weryfikacja testowa: 100% PASS w pełnym zestawie 69 plików Vitest (627 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
-  - [ ] Implementacja strażników tras ProtectedRoute, GuestRoute oraz RoleGuard z RBAC.
   - [ ] Synchronizacja przepływów uwierzytelniania i autoryzacji z historią React Router.
 
 - [ ] **Faza 58: Integracja Układu Aplikacji i Semantycznej Nawigacji (Commity 289–291)**

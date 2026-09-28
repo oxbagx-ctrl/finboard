@@ -1,8 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { AuthProvider, useAuth } from './context/AuthContext';
+import React, { useState } from 'react';
+import { Routes, Route, Navigate, useLocation, useNavigate, useOutletContext, Outlet } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
 import { DealProvider } from './context/DealContext';
 import { InvestmentProjectProvider } from './context/InvestmentProjectContext';
+import { ROUTES } from './constants/routes';
+import { ProtectedRoute, GuestRoute, RoleGuard } from './components/routing';
 import { AppLayout } from './components/layout/AppLayout';
 import { LoginView } from './views/LoginView';
 import { AcceptInvitationView } from './views/AcceptInvitationView';
@@ -16,83 +19,106 @@ import { ReportsView } from './views/ReportsView';
 import { AuditLogsView } from './views/AuditLogsView';
 import { AdvisorsManagementView } from './views/AdvisorsManagementView';
 
-const hasInvitationTokenInUrl = () => {
-    if (typeof window === 'undefined') return false;
-    const searchParams = new URLSearchParams(window.location.search);
-    const hasToken = !!searchParams.get('token');
-    const isInvitationPath = window.location.pathname.includes('/invitation') || window.location.pathname.includes('/accept-invitation');
-    return hasToken || isInvitationPath;
-};
-
-const MainRouter = () => {
-    const { isAuthenticated, loading } = useAuth();
-    const [currentRoute, setCurrentRoute] = useState('dashboard');
+/**
+ * ProtectedLayout Shell
+ * Connects router location with legacy AppLayout navigation props during the transition phase.
+ */
+const ProtectedLayout = () => {
     const [refreshKey, setRefreshKey] = useState(0);
-    const [showInvitation, setShowInvitation] = useState(hasInvitationTokenInUrl);
+    const location = useLocation();
+    const navigate = useNavigate();
 
-    useEffect(() => {
-        const handlePopState = () => {
-            setShowInvitation(hasInvitationTokenInUrl());
-        };
-        window.addEventListener('popstate', handlePopState);
-        return () => window.removeEventListener('popstate', handlePopState);
-    }, []);
+    // Map current pathname to route identifier for Header and Sidebar
+    const currentRoute = location.pathname === '/' || location.pathname === ROUTES.DASHBOARD
+        ? 'dashboard'
+        : location.pathname.replace(/^\//, '');
 
-    if (loading) {
-        return (
-            <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center font-mono">
-                <div className="w-10 h-10 rounded bg-zinc-900 border border-zinc-750 flex items-center justify-center text-zinc-100 font-bold text-base mb-3 shadow-sm">
-                    FB
-                </div>
-                <div className="text-xs text-zinc-400">INICJALIZACJA ŚRODOWISKA DEAL ADVISORY...</div>
-            </div>
-        );
-    }
-
-    if (!isAuthenticated) {
-        if (showInvitation) {
-            return (
-                <AcceptInvitationView
-                    onNavigateLogin={() => setShowInvitation(false)}
-                />
-            );
-        }
-        return <LoginView />;
-    }
-
-    const renderView = () => {
-        switch (currentRoute) {
-            case 'dashboard':
-                return <DashboardView key={refreshKey} />;
-            case 'analytics':
-                return <AnalyticsView key={refreshKey} />;
-            case 'records':
-                return <RecordsView key={refreshKey} />;
-            case 'investments':
-                return <InvestmentPlanningView key={refreshKey} />;
-            case 'import':
-                return <ImportView key={refreshKey} />;
-            case 'data-room':
-                return <DataRoomView key={refreshKey} />;
-            case 'reports':
-                return <ReportsView key={refreshKey} />;
-            case 'audit-logs':
-                return <AuditLogsView key={refreshKey} />;
-            case 'advisors':
-                return <AdvisorsManagementView key={refreshKey} />;
-            default:
-                return <DashboardView key={refreshKey} />;
-        }
+    const handleRouteChange = (routeId) => {
+        const targetPath = routeId === 'dashboard' ? ROUTES.DASHBOARD : `/${routeId}`;
+        navigate(targetPath);
     };
 
     return (
         <AppLayout
             currentRoute={currentRoute}
-            onRouteChange={setCurrentRoute}
-            onRefreshData={() => setRefreshKey(prev => prev + 1)}
+            onRouteChange={handleRouteChange}
+            onRefreshData={() => setRefreshKey((prev) => prev + 1)}
         >
-            {renderView()}
+            <Outlet context={{ refreshKey, onRefreshData: () => setRefreshKey((prev) => prev + 1) }} />
         </AppLayout>
+    );
+};
+
+/**
+ * RouteView Wrapper
+ * Passes refresh key down to active view component to force re-mounting on manual refresh.
+ */
+const RouteView = ({ component: Component }) => {
+    const context = useOutletContext() || {};
+    return <Component key={context.refreshKey ?? 0} />;
+};
+
+/**
+ * Application Routes Declaration
+ */
+export const AppRoutes = () => {
+    return (
+        <Routes>
+            {/* Public / Guest Routes */}
+            <Route
+                path={ROUTES.LOGIN}
+                element={
+                    <GuestRoute>
+                        <LoginView />
+                    </GuestRoute>
+                }
+            />
+            <Route
+                path={ROUTES.ACCEPT_INVITATION}
+                element={
+                    <GuestRoute>
+                        <AcceptInvitationView />
+                    </GuestRoute>
+                }
+            />
+            {/* Backward-compatibility alias for invitation paths */}
+            <Route
+                path="/invitation"
+                element={<Navigate to={ROUTES.ACCEPT_INVITATION} replace />}
+            />
+
+            {/* Protected Application Routes */}
+            <Route
+                element={
+                    <ProtectedRoute>
+                        <ProtectedLayout />
+                    </ProtectedRoute>
+                }
+            >
+                <Route index element={<Navigate to={ROUTES.DASHBOARD} replace />} />
+                <Route path={ROUTES.DASHBOARD} element={<RouteView component={DashboardView} />} />
+                <Route path={ROUTES.ANALYTICS} element={<RouteView component={AnalyticsView} />} />
+                <Route path={ROUTES.RECORDS} element={<RouteView component={RecordsView} />} />
+                <Route path={ROUTES.INVESTMENTS} element={<RouteView component={InvestmentPlanningView} />} />
+                <Route path={ROUTES.IMPORT} element={<RouteView component={ImportView} />} />
+                <Route path={ROUTES.DATA_ROOM} element={<RouteView component={DataRoomView} />} />
+                <Route path={ROUTES.REPORTS} element={<RouteView component={ReportsView} />} />
+                <Route path={ROUTES.AUDIT_LOGS} element={<RouteView component={AuditLogsView} />} />
+
+                {/* Role-Guarded Route: Advisors Management */}
+                <Route
+                    path={ROUTES.ADVISORS}
+                    element={
+                        <RoleGuard allowedRoles={['super_admin', 'admin', 'advisor']}>
+                            <RouteView component={AdvisorsManagementView} />
+                        </RoleGuard>
+                    }
+                />
+            </Route>
+
+            {/* Catch-all Fallback */}
+            <Route path="*" element={<Navigate to={ROUTES.DASHBOARD} replace />} />
+        </Routes>
     );
 };
 
@@ -102,7 +128,7 @@ export const App = () => {
             <AuthProvider>
                 <DealProvider>
                     <InvestmentProjectProvider>
-                        <MainRouter />
+                        <AppRoutes />
                     </InvestmentProjectProvider>
                 </DealProvider>
             </AuthProvider>

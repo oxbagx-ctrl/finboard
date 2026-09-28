@@ -533,7 +533,9 @@ describe('AuditLogsView Component', () => {
 
         // 3. Pagination: Click next page
         const nextPageBtn = screen.getByTestId('vdr-next-page');
-        expect(nextPageBtn).not.toBeDisabled();
+        await waitFor(() => {
+            expect(nextPageBtn).not.toBeDisabled();
+        });
         fireEvent.click(nextPageBtn);
 
         await waitFor(() => {
