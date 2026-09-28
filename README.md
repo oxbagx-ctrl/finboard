@@ -984,16 +984,16 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Weryfikacja testowa: dedykowany zestaw testowy `InvestmentScoringDossierTooltips.test.jsx` (6/6), `InvestmentDossierPdfGenerator.test.jsx` (11/11), `InvestmentReadinessScorecard.test.jsx` (12/12), `CustomReportBuilder.test.jsx` (8/8), 100% PASS we wszystkich 4 zestawach testowych zakładki 4 (37 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
 - [x] **Faza 57: Fundament Architektury Routingu i Ochrona Tras (Commity 286–288)**
-  - [x] Instalacja biblioteki react-router-dom oraz konfiguracja bazowej infrastruktury routingu.
+  - Instalacja biblioteki react-router-dom oraz konfiguracja bazowej infrastruktury routingu.
     - Dodanie zależności `react-router-dom` (^7.18.4) w `package.json`.
     - Utworzenie centralnego rejestru tras `ROUTES` oraz słownika nagłówków widoków `ROUTE_TITLES` w `resources/js/constants/routes.js`.
     - Opakowanie korzenia aplikacji `<App />` w dostawcę kontekstu `<BrowserRouter>` w `resources/js/app.jsx`.
-  - [x] Implementacja strażników tras ProtectedRoute, GuestRoute oraz RoleGuard z RBAC.
+  - Implementacja strażników tras ProtectedRoute, GuestRoute oraz RoleGuard z RBAC.
     - Implementacja komponentów ochrony tras w `resources/js/components/routing/`: `ProtectedRoute.jsx` (przekierowanie na `/login` z zapamiętaniem `state.from`), `GuestRoute.jsx` (ochrona ekranów uwierzytelniania przed zalogowanymi użytkownikami) oraz `RoleGuard.jsx` (kontrola uprawnień RBAC z ostrzeżeniem i przekierowaniem na `/dashboard`).
     - Zbudowanie kompletnej deklaracji drzewa tras `<Routes>` w `resources/js/App.jsx` z powłoką `ProtectedLayout` i przekazywaniem kontekstu odświeżania (`Outlet context`).
     - Dedykowane zabezpieczenie trasy domenowej `/advisors` za pomocą `<RoleGuard allowedRoles={['super_admin', 'admin', 'advisor']}>`.
     - Weryfikacja testowa: 100% PASS w pełnym zestawie 69 plików Vitest (627 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
-  - [x] Synchronizacja przepływów uwierzytelniania i autoryzacji z historią React Router.
+  - Synchronizacja przepływów uwierzytelniania i autoryzacji z historią React Router.
     - `LoginView.jsx`: integracja hooków `useNavigate` i `useLocation`, płynne przekierowanie na żądany pierwotnie adres (`location.state?.from?.pathname`) lub `/dashboard` po udanym logowaniu.
     - `Sidebar.jsx`: implementacja asynchronicznego `handleLogout` z czyszczeniem sesji i nawigacją na `/login`.
     - `client.js`: zsynchronizowanie interceptora HTTP 401 z adresem `ROUTES.LOGIN` oraz czyszczeniem pamięci podręcznej spółek.
@@ -1001,23 +1001,27 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - Weryfikacja testowa: 100% PASS w pełnym zestawie 69 plików Vitest (627 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
 - [x] **Faza 58: Integracja Układu Aplikacji i Semantycznej Nawigacji (Commity 289–291)**
-  - [x] Przekształcenie AppLayout w układ oparty na gnieździe Outlet z dynamiczną rezolucją nagłówka.
+  - Przekształcenie AppLayout w układ oparty na gnieździe Outlet z dynamiczną rezolucją nagłówka.
     - `AppLayout.jsx`: wdrożenie komponentu `<Outlet context={{ onRefreshData, refreshing, refreshKey }} />` wewnątrz kontenera `<main>` z zachowaniem wsparcia dla propa `children` dla pełnej kompatybilności wstecznej.
     - `Header.jsx`: wdrożenie bezpiecznej rezolucji `useLocation()`, integracja stałych `ROUTE_TITLES` oraz hierarchicznego fallbacku tytułu ekranu (ścieżka URL -> strona główna -> parametry wsteczne -> domyślna nazwa 'FinBoard').
     - `App.jsx`: uproszczenie powłoki `ProtectedLayout` do natywnego użycia samonawigującego `<AppLayout />` i propagacji kontekstu odświeżania do `RouteView`.
     - Weryfikacja testowa: 100% PASS w pełnym zestawie 69 plików Vitest (627 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
-  - [x] Migracja nawigacji w Sidebarze na komponenty NavLink z dynamicznymi stanami aktywności.
+  - Migracja nawigacji w Sidebarze na komponenty NavLink z dynamicznymi stanami aktywności.
     - `Sidebar.jsx`: powiązanie wszystkich modułów analitycznych i administracyjnych ze ścieżkami `ROUTES`, zastąpienie elementów `<button>` semantycznymi linkami `<NavLink to={item.path}>` z dynamicznym formatowaniem aktywnego modułu (`border-l-2 border-zinc-100`, kolory ikon i kodów modułów) oraz bezpiecznym fallbackiem `useInRouterContext()` dla odizolowanych testów jednostkowych.
     - `App.jsx`: usunięcie manualnego sterowania trasą `currentRoute` i procedurą `onRouteChange` z `ProtectedLayout`, powierzając nawigację komponentom `<NavLink>` i gniazdu `<Outlet />`.
     - Weryfikacja testowa: 100% PASS w pełnym zestawie 69 plików Vitest (627 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
-  - [x] Eliminacja przestarzałej nawigacji hash i dedykowany widok błędu 404 Not Found.
+  - Eliminacja przestarzałej nawigacji hash i dedykowany widok błędu 404 Not Found.
     - `ImportView.jsx`: eliminacja instrukcji `window.location.hash = '#records'` i zastąpienie jej semantyczną nawigacją `navigate(ROUTES.RECORDS)`.
     - `NotFoundView.jsx`: implementacja dedykowanego widoku błędu 404 w stylistyce dark terminal FinBoard Deal Advisory z diagnostyką ścieżki (`404-requested-path`), statusem sesji, symulacją polecenia CLI routera oraz przyciskami powrotu do Pulpitu / Ekranu Logowania i cofania w historii (`navigate(-1)`).
     - `routes.js` & `App.jsx`: rejestracja stałej `ROUTES.NOT_FOUND` (`/404`) oraz podpięcie `<NotFoundView />` pod jawną trasę `/404` i łapacz wszystkich nieznanych ścieżek (`*`).
     - Weryfikacja testowa: 100% PASS w pełnym zestawie 69 plików Vitest (627 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
 - [ ] **Faza 59: Adaptacja Środowiska Testowego, Weryfikacja Regresji i Dokumentacja (Commity 292–294)**
-  - [ ] Pomocnik testowy renderWithRouter oraz testy jednostkowe strażników tras i Sidebara.
+  - [x] Pomocnik testowy renderWithRouter oraz testy jednostkowe strażników tras i Sidebara.
+    - `renderWithRouter.jsx`: implementacja uniwersalnego pomocnika testowego dostarczającego `MemoryRouter`, sparametryzowane wpisy historii oraz instytucjonalne mocki kontekstów autoryzacji (`AuthContext`) i powiadomień (`NotificationContext`).
+    - `RouteGuards.test.jsx`: stworzenie zestawu 12 testów jednostkowych weryfikujących zachowanie strażników `ProtectedRoute`, `GuestRoute` oraz `RoleGuard` (stany ładowania, przekierowania z zachowaniem `state.from`, autoryzację ról RBAC, ostrzeżenia i renderowanie `<Outlet />`).
+    - `Sidebar.test.jsx`: stworzenie zestawu 8 testów jednostkowych weryfikujących atrybuty `href` linków `<NavLink>`, dynamiczne formatowanie aktywnej trasy, kontrolę dostępu do modułów doradczych oraz odporność na brak routera w trybie fallbacku przyciskowego.
+    - Weryfikacja testowa: 100% PASS w pełnym zestawie 71 plików Vitest (647 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
   - [ ] Adaptacja istniejących zestawów testowych Vitest pod routing i weryfikacja zerowej regresji.
   - [ ] Aktualizacja dokumentacji architektonicznej, README i changelogów.
 
