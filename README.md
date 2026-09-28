@@ -1038,7 +1038,7 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - `docs/ROUTING_ARCHITECTURE.md`: opracowanie kompletnej, instytucjonalnej dokumentacji technicznej architektury nawigacji SPA, rejestru tras `ROUTES`, strażników tras (`ProtectedRoute`, `GuestRoute`, `RoleGuard`), powłoki `<Outlet />`, dynamicznej rezolucji nagłówka, semantycznego paska `Sidebar`, obsługi błędów 404, infrastruktury testowej `renderWithRouter` oraz wytycznych deweloperskich.
     - `README.md` & `changelog/README.md`: aktualizacja spisu technologii, opisu interfejsu SPA i rejestru zmian dokumentująca pełną eliminację problemu zamrożonego adresu URL i wdrożenie nowoczesnego routingu w całej aplikacji.
     - Weryfikacja testowa: 100% PASS w pełnym zestawie 72 plików Vitest (653 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
-- [ ] **Faza 60: Wielomotywowość (Light, Dark & System Theme Architecture) (Commity 295–302)**
+- [x] **Faza 60: Wielomotywowość (Light, Dark & System Theme Architecture) (Commity 295–302)**
     - [x] Konfiguracja strategii Dark Mode w Tailwind CSS i eliminacja zjawiska FOUC za pomocą skryptu bootstrapowego.
         - `tailwind.config.js`: aktywacja strategii `darkMode: 'class'` umożliwiającej warunkowe stosowanie stylów motywu ciemnego za pośrednictwem wariantów `dark:*` sterowanych klasą `.dark` na elemencie `<html>`.
         - `resources/views/app.blade.php`: implementacja synchronicznego, odpornego na błędy skryptu bootstrapowego w sekcji `<head>`, natychmiast aplikującego klasę `dark` na podstawie `localStorage` (`finboard_theme`) lub preferencji systemowych `prefers-color-scheme: dark`, zapobiegając zjawisku FOUC.
@@ -1079,6 +1079,10 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - [x] Implementacja testów jednostkowych i integracyjnych dla ThemeContext i ThemeToggle.
         - `resources/js/tests/unit/ThemeContext.test.jsx`: 10 kompleksowych testów weryfikujących inicjalizację z `prefers-color-scheme`, trwałość w `localStorage`, przełączanie trybów `light`, `dark` i `system`, dynamiczne nasłuchiwanie zdarzeń systemowych `matchMedia`, bezpieczny fallback poza providerem oraz walidację danych wejściowych.
         - `resources/js/tests/components/ThemeToggle.test.jsx`: 7 testów komponentowych sprawdzających renderowanie przycisku, atrybuty WAI-ARIA (`role="menu"`, `role="menuitemradio"`, `aria-checked`), otwieranie/zamykanie menu, interakcję wyboru motywu z powrotem fokusu oraz pełną obsługę klawiatury (`ArrowDown`, `ArrowUp`, `Escape`) i outside click.
+        - Weryfikacja testowa: 100% PASS w pełnym zestawie 74 plików Vitest (670 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
+    - [x] Opracowanie kompleksowej dokumentacji architektonicznej wielomotywowości i finalizacja Fazy 60.
+        - `docs/THEME_ARCHITECTURE.md`: opracowanie instytucjonalnej dokumentacji technicznej architektury wielomotywowości, eliminacji FOUC, konfiguracji Tailwind CSS `darkMode: 'class'`, cyklu życia i stanu `ThemeContext`, komponentu `ThemeToggle` z obsługą WAI-ARIA, tabeli tokenów stylistycznych, adaptacji wykresów Recharts oraz wytycznych deweloperskich.
+        - `README.md` & `changelog/README.md`: aktualizacja spisu technologii, opisu interfejsu i rejestru zmian dokumentująca pełną realizację Fazy 60.
         - Weryfikacja testowa: 100% PASS w pełnym zestawie 74 plików Vitest (670 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
 ---
