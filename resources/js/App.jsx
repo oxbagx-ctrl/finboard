@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Routes, Route, Navigate, useOutletContext } from 'react-router-dom';
+import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
 import { DealProvider } from './context/DealContext';
@@ -140,15 +141,17 @@ export const AppRoutes = () => {
 
 export const App = () => {
     return (
-        <NotificationProvider>
-            <AuthProvider>
-                <DealProvider>
-                    <InvestmentProjectProvider>
-                        <AppRoutes />
-                    </InvestmentProjectProvider>
-                </DealProvider>
-            </AuthProvider>
-        </NotificationProvider>
+        <ThemeProvider>
+            <NotificationProvider>
+                <AuthProvider>
+                    <DealProvider>
+                        <InvestmentProjectProvider>
+                            <AppRoutes />
+                        </InvestmentProjectProvider>
+                    </DealProvider>
+                </AuthProvider>
+            </NotificationProvider>
+        </ThemeProvider>
     );
 };
 

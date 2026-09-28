@@ -1044,6 +1044,11 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
         - `resources/views/app.blade.php`: implementacja synchronicznego, odpornego na błędy skryptu bootstrapowego w sekcji `<head>`, natychmiast aplikującego klasę `dark` na podstawie `localStorage` (`finboard_theme`) lub preferencji systemowych `prefers-color-scheme: dark`, zapobiegając zjawisku FOUC.
         - Adaptacja klas bazowych kontenera `<html>` i `<body>` do elastycznych barw `bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 transition-colors duration-150`.
         - Weryfikacja testowa: 100% PASS w pełnym zestawie 72 plików Vitest (653 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
+    - [x] Implementacja ThemeContext, hooka useTheme oraz synchronizacja z preferencjami systemowymi.
+        - `resources/js/context/ThemeContext.jsx`: centralny silnik stanu motywu obsługujący tryby `light`, `dark` oraz `system` z trwałością w `localStorage` (`finboard_theme`).
+        - Reaktywne wyznaczanie `resolvedTheme` i dynamiczne nasłuchiwanie zdarzeń systemowych `window.matchMedia('(prefers-color-scheme: dark)')` z automatyczną manipulacją klasą `.dark` na `document.documentElement`.
+        - `resources/js/App.jsx`: integracja dostawcy `<ThemeProvider>` na szczycie hierarchii providerów platformy FinBoard.
+        - Weryfikacja testowa: 100% PASS w pełnym zestawie 72 plików Vitest (653 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
 ---
 
