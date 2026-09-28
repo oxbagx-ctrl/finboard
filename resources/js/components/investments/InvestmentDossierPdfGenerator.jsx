@@ -34,7 +34,7 @@ import {
     XAxis,
     YAxis,
     CartesianGrid,
-    Tooltip,
+    Tooltip as RechartsTooltip,
     Legend
 } from 'recharts';
 import { useInvestmentProject } from '../../context/InvestmentProjectContext';
@@ -42,6 +42,7 @@ import { useNotification } from '../../context/NotificationContext';
 import { useAuth } from '../../context/AuthContext';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
+import { Tooltip, InfoTooltip } from '../ui/Tooltip';
 import { getInvestmentWorkerClient } from '../../workers/InvestmentWorkerClient';
 import { calculateInvestmentReadiness, DEFAULT_READINESS_CRITERIA } from '../../workers/financialCalculations';
 
@@ -302,17 +303,28 @@ export const InvestmentDossierPdfGenerator = ({
             <div className="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-6 backdrop-blur-md shadow-xl print:hidden">
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-700/60 pb-5">
                     <div className="flex items-center space-x-3">
-                        <div className="p-3 bg-gradient-to-tr from-amber-600/30 to-emerald-600/30 border border-amber-500/40 rounded-xl text-amber-400 shadow-inner">
-                            <Award className="w-6 h-6" />
-                        </div>
+                        <Tooltip content="Dossier Inwestycyjne Project Finance przygotowane w standardzie LMA dla Komitetu Kredytowego i Sponsorów">
+                            <div className="p-3 bg-gradient-to-tr from-amber-600/30 to-emerald-600/30 border border-amber-500/40 rounded-xl text-amber-400 shadow-inner cursor-help">
+                                <Award className="w-6 h-6" />
+                            </div>
+                        </Tooltip>
                         <div>
                             <div className="flex items-center space-x-2">
                                 <h3 className="text-xl font-bold text-white tracking-wide">
                                     Generator Dossier Inwestycyjnego & Raportu PDF
                                 </h3>
-                                <Badge variant="info" className="bg-emerald-500/10 border-emerald-500/30 text-emerald-400 font-mono text-xs">
-                                    LMA & Credit Committee Ready
-                                </Badge>
+                                <InfoTooltip
+                                    size="sm"
+                                    content="Generator oficjalnego dossier i memorandum inwestycyjnego w standardzie LMA, łączący 15-letni model 3-Statement, scoring gotowości oraz kryptograficzną pieczęć integralności SHA-256."
+                                    ariaLabel="Objaśnienie Generatora Dossier Inwestycyjnego"
+                                />
+                                <Tooltip content="Model spełnia kryteria formalne i audytowe oceny zdolności kredytowej i bankowalności projektu">
+                                    <span>
+                                        <Badge variant="info" className="bg-emerald-500/10 border-emerald-500/30 text-emerald-400 font-mono text-xs cursor-help">
+                                            LMA & Credit Committee Ready
+                                        </Badge>
+                                    </span>
+                                </Tooltip>
                             </div>
                             <p className="text-xs text-slate-400 mt-1">
                                 Kompilacja 15-letniego modelu finansowego, karty gotowości bankowej oraz pieczęci integralności SHA-256 w standaryzowany dokument A4
@@ -322,38 +334,44 @@ export const InvestmentDossierPdfGenerator = ({
 
                     {/* Action Buttons */}
                     <div className="flex flex-wrap items-center gap-2">
-                        <Button
-                            variant="secondary"
-                            size="sm"
-                            onClick={() => setIsPreviewVisible(!isPreviewVisible)}
-                            data-testid="toggle-preview-button"
-                            className="bg-slate-700/80 hover:bg-slate-700 border-slate-600 text-slate-200"
-                        >
-                            {isPreviewVisible ? <EyeOff className="w-4 h-4 mr-1.5" /> : <Eye className="w-4 h-4 mr-1.5" />}
-                            <span>{isPreviewVisible ? 'Zwiń Podgląd' : 'Pokaż Podgląd'}</span>
-                        </Button>
+                        <Tooltip content={isPreviewVisible ? "Ukryj podgląd dokumentu A4" : "Wyświetl dynamiczny podgląd dokumentu A4"}>
+                            <Button
+                                variant="secondary"
+                                size="sm"
+                                onClick={() => setIsPreviewVisible(!isPreviewVisible)}
+                                data-testid="toggle-preview-button"
+                                className="bg-slate-700/80 hover:bg-slate-700 border-slate-600 text-slate-200"
+                            >
+                                {isPreviewVisible ? <EyeOff className="w-4 h-4 mr-1.5" /> : <Eye className="w-4 h-4 mr-1.5" />}
+                                <span>{isPreviewVisible ? 'Zwiń Podgląd' : 'Pokaż Podgląd'}</span>
+                            </Button>
+                        </Tooltip>
 
-                        <Button
-                            variant="secondary"
-                            size="sm"
-                            onClick={handleExportJson}
-                            data-testid="export-json-dossier-button"
-                            className="bg-slate-700/80 hover:bg-slate-700 border-slate-600 text-slate-200"
-                        >
-                            <Download className="w-4 h-4 mr-1.5 text-blue-400" />
-                            <span>Dossier JSON</span>
-                        </Button>
+                        <Tooltip content="Pobierz kompletny zestaw danych modelu, założeń i sum kontrolnych w formacie JSON">
+                            <Button
+                                variant="secondary"
+                                size="sm"
+                                onClick={handleExportJson}
+                                data-testid="export-json-dossier-button"
+                                className="bg-slate-700/80 hover:bg-slate-700 border-slate-600 text-slate-200"
+                            >
+                                <Download className="w-4 h-4 mr-1.5 text-blue-400" />
+                                <span>Dossier JSON</span>
+                            </Button>
+                        </Tooltip>
 
-                        <Button
-                            variant="primary"
-                            size="sm"
-                            onClick={handlePrint}
-                            data-testid="print-pdf-button"
-                            className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold shadow-md shadow-emerald-900/30"
-                        >
-                            <Printer className="w-4 h-4 mr-1.5" />
-                            <span>Drukuj / Pobierz PDF</span>
-                        </Button>
+                        <Tooltip content="Wygeneruj dokument PDF lub otwórz okno drukowania w układzie wektorowym A4">
+                            <Button
+                                variant="primary"
+                                size="sm"
+                                onClick={handlePrint}
+                                data-testid="print-pdf-button"
+                                className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold shadow-md shadow-emerald-900/30"
+                            >
+                                <Printer className="w-4 h-4 mr-1.5" />
+                                <span>Drukuj / Pobierz PDF</span>
+                            </Button>
+                        </Tooltip>
                     </div>
                 </div>
 
@@ -364,25 +382,32 @@ export const InvestmentDossierPdfGenerator = ({
                         <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center gap-1.5">
                             <DollarSign className="w-3.5 h-3.5 text-emerald-400" />
                             <span>Skala Prezentacji Kwot</span>
+                            <InfoTooltip
+                                size="xs"
+                                content="Wybierz jednostkę prezentacji kwot liczbowych w tabelach i wykresach dossier (PLN, tys. PLN lub mln PLN)."
+                                ariaLabel="Objaśnienie skali kwot"
+                            />
                         </label>
                         <div className="flex bg-slate-900/90 p-1 rounded-xl border border-slate-700" data-testid="dossier-scale-selector">
                             {[
-                                { id: 'full', label: 'PLN' },
-                                { id: 'thousands', label: 'tys. PLN' },
-                                { id: 'millions', label: 'mln PLN' }
+                                { id: 'full', label: 'PLN', tooltip: 'Prezentuj pełne wartości kwotowe w PLN' },
+                                { id: 'thousands', label: 'tys. PLN', tooltip: 'Prezentuj kwoty w tysiącach PLN' },
+                                { id: 'millions', label: 'mln PLN', tooltip: 'Prezentuj kwoty w milionach PLN' }
                             ].map(opt => (
-                                <button
-                                    key={opt.id}
-                                    type="button"
-                                    onClick={() => setScale(opt.id)}
-                                    className={`flex-1 py-1.5 px-2 text-xs font-medium rounded-lg transition-all ${
-                                        scale === opt.id
-                                            ? 'bg-emerald-600 text-white shadow-sm'
-                                            : 'text-slate-400 hover:text-slate-200'
-                                    }`}
-                                >
-                                    {opt.label}
-                                </button>
+                                <Tooltip key={opt.id} content={opt.tooltip}>
+                                    <button
+                                        key={opt.id}
+                                        type="button"
+                                        onClick={() => setScale(opt.id)}
+                                        className={`flex-1 py-1.5 px-2 text-xs font-medium rounded-lg transition-all ${
+                                            scale === opt.id
+                                                ? 'bg-emerald-600 text-white shadow-sm'
+                                                : 'text-slate-400 hover:text-slate-200'
+                                        }`}
+                                    >
+                                        {opt.label}
+                                    </button>
+                                </Tooltip>
                             ))}
                         </div>
                     </div>
@@ -392,6 +417,11 @@ export const InvestmentDossierPdfGenerator = ({
                         <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center gap-1.5">
                             <Shield className="w-3.5 h-3.5 text-amber-400" />
                             <span>Znak Wodny (Watermark)</span>
+                            <InfoTooltip
+                                size="xs"
+                                content="Wybierz znak wodny nakładany na stronę dokumentu (Poufne, Oficjalne dossier, Szkic lub Brak znaku wodnego)."
+                                ariaLabel="Objaśnienie znaku wodnego"
+                            />
                         </label>
                         <select
                             data-testid="watermark-select"
@@ -408,60 +438,75 @@ export const InvestmentDossierPdfGenerator = ({
 
                     {/* Cryptographic SHA-256 Quick Badge */}
                     <div>
-                        <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center justify-between">
+                        <div className="flex items-center justify-between text-xs font-semibold text-slate-300 mb-1.5">
                             <span className="flex items-center gap-1.5">
                                 <Hash className="w-3.5 h-3.5 text-cyan-400" />
                                 <span>Pieczęć SHA-256</span>
+                                <InfoTooltip
+                                    size="xs"
+                                    content="Kryptograficzny skrót SHA-256 generowany z pełnego zestawu danych modelu (FIPS 180-4), gwarantujący nienaruszalność i autentyczność dossier."
+                                    ariaLabel="Objaśnienie pieczęci SHA-256"
+                                />
                             </span>
-                            <button
-                                type="button"
-                                onClick={handleCopyHash}
-                                data-testid="copy-sha-button"
-                                className="text-[11px] text-cyan-400 hover:text-cyan-300 flex items-center gap-1"
-                            >
-                                {copiedHash ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
-                                <span>{copiedHash ? 'Skopiowano' : 'Kopiuj'}</span>
-                            </button>
-                        </label>
-                        <div className="bg-slate-900/90 border border-slate-700 rounded-xl px-3 py-2 font-mono text-[11px] text-cyan-300 truncate" title={sha256Hash}>
-                            {isComputingHash ? 'Generowanie podpisu...' : sha256Hash || 'Inicjalizacja...'}
+                            <Tooltip content={copiedHash ? "Skopiowano skrót do schowka!" : "Kopiuj pełny 64-znakowy hash SHA-256 do schowka"}>
+                                <button
+                                    type="button"
+                                    onClick={handleCopyHash}
+                                    data-testid="copy-sha-button"
+                                    className="text-[11px] text-cyan-400 hover:text-cyan-300 flex items-center gap-1 cursor-pointer"
+                                >
+                                    {copiedHash ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                                    <span>{copiedHash ? 'Skopiowano' : 'Kopiuj'}</span>
+                                </button>
+                            </Tooltip>
                         </div>
+                        <Tooltip content={`Pełny skrót SHA-256 (FIPS 180-4): ${sha256Hash || 'Inicjalizacja...'}`}>
+                            <div className="bg-slate-900/90 border border-slate-700 rounded-xl px-3 py-2 font-mono text-[11px] text-cyan-300 truncate cursor-help">
+                                {isComputingHash ? 'Generowanie podpisu...' : sha256Hash || 'Inicjalizacja...'}
+                            </div>
+                        </Tooltip>
                     </div>
                 </div>
 
                 {/* Section Inclusion Checkboxes */}
                 <div className="mt-5 pt-4 border-t border-slate-700/60">
-                    <label className="block text-xs font-semibold text-slate-300 mb-2 flex items-center gap-1.5">
+                    <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-300 mb-2">
                         <SlidersHorizontal className="w-3.5 h-3.5 text-blue-400" />
                         <span>Sekcje dołączone do wydruku Dossier:</span>
-                    </label>
+                        <InfoTooltip
+                            size="xs"
+                            content="Wybierz moduły analityczne i sprawozdawcze, które mają zostać uwzględnione w wydruku memorandum inwestycyjnego."
+                            ariaLabel="Objaśnienie sekcji dossier"
+                        />
+                    </div>
                     <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2" data-testid="section-toggles">
                         {[
-                            { key: 'seal', label: '1. Pieczęć SHA-256' },
-                            { key: 'summary', label: '2. Executive Memo' },
-                            { key: 'scorecard', label: '3. Readiness Score' },
-                            { key: 'financing', label: '4. Finansowanie' },
-                            { key: 'statements', label: '5. Model 15-letni' },
-                            { key: 'waterfall', label: '6. Exit Waterfall' },
-                            { key: 'charts', label: '7. Wykresy' }
+                            { key: 'seal', label: '1. Pieczęć SHA-256', tooltip: 'Certyfikat integralności danych i suma kontrolna SHA-256' },
+                            { key: 'summary', label: '2. Executive Memo', tooltip: 'Kluczowe wskaźniki projektu: CAPEX, Equity, Dług Senior, NPV, IRR' },
+                            { key: 'scorecard', label: '3. Readiness Score', tooltip: 'Karta punktacji gotowości inwestycyjnej LMA oraz warunki zawieszające (CPs)' },
+                            { key: 'financing', label: '4. Finansowanie', tooltip: 'Parametry długu, tenor, marża, oprocentowanie, bufory DSCR i ICR' },
+                            { key: 'statements', label: '5. Model 15-letni', tooltip: '15-letnia synteza sprawozdań: RZiS, Bilans, Cash Flow, FCFE' },
+                            { key: 'waterfall', label: '6. Exit Waterfall', tooltip: 'Wycena wyjścia z inwestycji (EV, Equity Value, MoIC, IRR) i kaskada wpływów' },
+                            { key: 'charts', label: '7. Wykresy', tooltip: 'Wizualizacja trendów przychodów, EBITDA i obsługi długu na osi czasu' }
                         ].map(sec => (
-                            <label
-                                key={sec.key}
-                                className={`flex items-center space-x-1.5 p-2 rounded-xl border text-xs cursor-pointer select-none transition-all ${
-                                    sections[sec.key]
-                                        ? 'bg-blue-600/15 border-blue-500/40 text-blue-200'
-                                        : 'bg-slate-900/40 border-slate-800 text-slate-500'
-                                }`}
-                            >
-                                <input
-                                    type="checkbox"
-                                    data-testid={`toggle-section-${sec.key}`}
-                                    checked={sections[sec.key]}
-                                    onChange={() => toggleSection(sec.key)}
-                                    className="rounded border-slate-700 text-blue-600 focus:ring-0 w-3.5 h-3.5"
-                                />
-                                <span className="truncate">{sec.label}</span>
-                            </label>
+                            <Tooltip key={sec.key} content={sec.tooltip}>
+                                <label
+                                    className={`flex items-center space-x-1.5 p-2 rounded-xl border text-xs cursor-pointer select-none transition-all ${
+                                        sections[sec.key]
+                                            ? 'bg-blue-600/15 border-blue-500/40 text-blue-200'
+                                            : 'bg-slate-900/40 border-slate-800 text-slate-500'
+                                    }`}
+                                >
+                                    <input
+                                        type="checkbox"
+                                        data-testid={`toggle-section-${sec.key}`}
+                                        checked={sections[sec.key]}
+                                        onChange={() => toggleSection(sec.key)}
+                                        className="rounded border-slate-700 text-blue-600 focus:ring-0 w-3.5 h-3.5"
+                                    />
+                                    <span className="truncate">{sec.label}</span>
+                                </label>
+                            </Tooltip>
                         ))}
                     </div>
                 </div>
@@ -471,6 +516,11 @@ export const InvestmentDossierPdfGenerator = ({
                     <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center gap-1.5">
                         <FileText className="w-3.5 h-3.5 text-slate-400" />
                         <span>Notatki Analityka / Rekomendacja dla Komitetu Kredytowego (Wydruk):</span>
+                        <InfoTooltip
+                            size="xs"
+                            content="Wprowadź oficjalny komentarz analityka lub warunki komitetu kredytowego, które zostaną wydrukowane na dokumencie."
+                            ariaLabel="Objaśnienie komentarza analityka"
+                        />
                     </label>
                     <textarea
                         data-testid="executive-notes-input"
@@ -504,12 +554,16 @@ export const InvestmentDossierPdfGenerator = ({
                     <div className="border-b-2 border-slate-700 print:border-black pb-6 relative z-10 flex flex-col sm:flex-row justify-between items-start gap-4">
                         <div>
                             <div className="flex items-center space-x-2">
-                                <span className="px-2 py-0.5 rounded bg-blue-600 text-white text-[10px] font-mono uppercase tracking-wider font-bold print:bg-black print:text-white">
-                                    Project Finance LMA Dossier
-                                </span>
-                                <span className="text-xs text-slate-400 print:text-slate-600 font-mono">
-                                    FinBoard Deal Advisory v2.45
-                                </span>
+                                <Tooltip content="Oficjalny szablon memorandum Project Finance zgodny ze standardem LMA">
+                                    <span className="px-2 py-0.5 rounded bg-blue-600 text-white text-[10px] font-mono uppercase tracking-wider font-bold print:bg-black print:text-white cursor-help">
+                                        Project Finance LMA Dossier
+                                    </span>
+                                </Tooltip>
+                                <Tooltip content="System FinBoard Deal Advisory & Terminal Analityczny M&A">
+                                    <span className="text-xs text-slate-400 print:text-slate-600 font-mono cursor-help">
+                                        FinBoard Deal Advisory v2.45
+                                    </span>
+                                </Tooltip>
                             </div>
                             <h1 className="text-2xl sm:text-3xl font-black text-white print:text-black mt-2 tracking-tight">
                                 {activeProject?.name || 'Memorandum Inwestycyjne Projektu'}
@@ -532,21 +586,27 @@ export const InvestmentDossierPdfGenerator = ({
                         <div data-testid="dossier-section-seal" className="bg-slate-850/80 border border-slate-700/80 rounded-xl p-4 print:bg-slate-50 print:border-slate-300 print:p-3 relative z-10 break-inside-avoid">
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                                 <div className="flex items-center space-x-3">
-                                    <div className="p-2.5 bg-emerald-500/20 border border-emerald-500/40 rounded-lg text-emerald-400 print:bg-emerald-100 print:text-emerald-800">
-                                        <ShieldCheck className="w-5 h-5" />
-                                    </div>
+                                    <Tooltip content="Podpis kryptograficzny zweryfikowany: integralność danych modelu potwierdzona algorytmem SHA-256">
+                                        <div className="p-2.5 bg-emerald-500/20 border border-emerald-500/40 rounded-lg text-emerald-400 print:bg-emerald-100 print:text-emerald-800 cursor-help">
+                                            <ShieldCheck className="w-5 h-5" />
+                                        </div>
+                                    </Tooltip>
                                     <div>
                                         <div className="flex items-center space-x-2">
                                             <span className="text-xs font-bold text-white print:text-black uppercase tracking-wider">
                                                 Certyfikat Integralności Danych (SHA-256 Audit Seal)
                                             </span>
-                                            <span className="px-1.5 py-0.2 rounded text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 print:bg-emerald-100 print:text-emerald-800 font-bold">
-                                                VERIFIED / UNALTERED
-                                            </span>
+                                            <Tooltip content="Suma kontrolna FIPS 180-4 zgodna z parametrami wejściowymi i wynikami 15-letnimi">
+                                                <span className="px-1.5 py-0.2 rounded text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 print:bg-emerald-100 print:text-emerald-800 font-bold cursor-help">
+                                                    VERIFIED / UNALTERED
+                                                </span>
+                                            </Tooltip>
                                         </div>
-                                        <div className="font-mono text-[10px] text-cyan-300 print:text-slate-800 break-all mt-1 select-all" data-testid="rendered-sha256">
-                                            {sha256Hash}
-                                        </div>
+                                        <Tooltip content={`Pełny skrót SHA-256: ${sha256Hash}`}>
+                                            <div className="font-mono text-[10px] text-cyan-300 print:text-slate-800 break-all mt-1 select-all cursor-help" data-testid="rendered-sha256">
+                                                {sha256Hash}
+                                            </div>
+                                        </Tooltip>
                                     </div>
                                 </div>
                                 <div className="text-right text-[10px] text-slate-400 print:text-slate-600 font-mono shrink-0">
@@ -563,41 +623,54 @@ export const InvestmentDossierPdfGenerator = ({
                             <h3 className="text-sm font-bold text-white print:text-black uppercase tracking-wider flex items-center gap-2 border-b border-slate-800 print:border-slate-300 pb-2">
                                 <Award className="w-4 h-4 text-amber-400 print:text-black" />
                                 <span>1. Główne Wskaźniki Inwestycyjne & Rekomendacja Zarządcza</span>
+                                <InfoTooltip
+                                    size="xs"
+                                    content="Zestawienie kluczowych parametrów montażu finansowego, efektywności kapitałowej (NPV/IRR) oraz struktury kosztów projektu."
+                                    ariaLabel="Objaśnienie głównych wskaźników inwestycyjnych"
+                                />
                             </h3>
 
                             {/* KPI Metrics Strip */}
                             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 font-mono">
-                                <div className="p-3 bg-slate-850 rounded-xl border border-slate-700 print:bg-slate-50 print:border-slate-300">
-                                    <div className="text-[10px] text-slate-400 print:text-slate-600 uppercase">Łączny CAPEX</div>
-                                    <div className="text-lg font-bold text-white print:text-black mt-0.5">
-                                        {fmt(simulationData?.summary?.totalCapex || activeProject?.capex_stages?.reduce((s, c) => s + Number(c.net_amount || 0), 0))}
+                                <Tooltip content="Łączna wartość nakładów inwestycyjnych netto zaplanowanych w harmonogramie CAPEX">
+                                    <div className="p-3 bg-slate-850 rounded-xl border border-slate-700 print:bg-slate-50 print:border-slate-300 cursor-help">
+                                        <div className="text-[10px] text-slate-400 print:text-slate-600 uppercase">Łączny CAPEX</div>
+                                        <div className="text-lg font-bold text-white print:text-black mt-0.5">
+                                            {fmt(simulationData?.summary?.totalCapex || activeProject?.capex_stages?.reduce((s, c) => s + Number(c.net_amount || 0), 0))}
+                                        </div>
+                                        <div className="text-[10px] text-slate-500">Koszty inwestycji</div>
                                     </div>
-                                    <div className="text-[10px] text-slate-500">Koszty inwestycji</div>
-                                </div>
+                                </Tooltip>
 
-                                <div className="p-3 bg-slate-850 rounded-xl border border-slate-700 print:bg-slate-50 print:border-slate-300">
-                                    <div className="text-[10px] text-slate-400 print:text-slate-600 uppercase">Wkład Własny (Equity)</div>
-                                    <div className="text-lg font-bold text-emerald-400 print:text-black mt-0.5">
-                                        {fmt(simulationData?.summary?.initialEquity || (Number(activeProject?.financing_structure?.investor1_equity || 0) + Number(activeProject?.financing_structure?.investor2_equity || 0)))}
+                                <Tooltip content="Całkowity kapitał własny wniesiony przez inwestorów i sponsorów projektu">
+                                    <div className="p-3 bg-slate-850 rounded-xl border border-slate-700 print:bg-slate-50 print:border-slate-300 cursor-help">
+                                        <div className="text-[10px] text-slate-400 print:text-slate-600 uppercase">Wkład Własny (Equity)</div>
+                                        <div className="text-lg font-bold text-emerald-400 print:text-black mt-0.5">
+                                            {fmt(simulationData?.summary?.initialEquity || (Number(activeProject?.financing_structure?.investor1_equity || 0) + Number(activeProject?.financing_structure?.investor2_equity || 0)))}
+                                        </div>
+                                        <div className="text-[10px] text-slate-500">Kapitał sponsorów</div>
                                     </div>
-                                    <div className="text-[10px] text-slate-500">Kapitał sponsorów</div>
-                                </div>
+                                </Tooltip>
 
-                                <div className="p-3 bg-slate-850 rounded-xl border border-slate-700 print:bg-slate-50 print:border-slate-300">
-                                    <div className="text-[10px] text-slate-400 print:text-slate-600 uppercase">Kredyt Bankowy</div>
-                                    <div className="text-lg font-bold text-blue-400 print:text-black mt-0.5">
-                                        {fmt(activeProject?.debt_facility?.principal_amount || simulationData?.summary?.initialDebt || 0)}
+                                <Tooltip content="Główna linia kredytowa długu senioralnego pozyskana z konsorcjum bankowego">
+                                    <div className="p-3 bg-slate-850 rounded-xl border border-slate-700 print:bg-slate-50 print:border-slate-300 cursor-help">
+                                        <div className="text-[10px] text-slate-400 print:text-slate-600 uppercase">Kredyt Bankowy</div>
+                                        <div className="text-lg font-bold text-blue-400 print:text-black mt-0.5">
+                                            {fmt(activeProject?.debt_facility?.principal_amount || simulationData?.summary?.initialDebt || 0)}
+                                        </div>
+                                        <div className="text-[10px] text-slate-500">Dług senioralny</div>
                                     </div>
-                                    <div className="text-[10px] text-slate-500">Dług senioralny</div>
-                                </div>
+                                </Tooltip>
 
-                                <div className="p-3 bg-slate-850 rounded-xl border border-slate-700 print:bg-slate-50 print:border-slate-300">
-                                    <div className="text-[10px] text-slate-400 print:text-slate-600 uppercase">Project NPV & IRR</div>
-                                    <div className="text-lg font-bold text-amber-400 print:text-black mt-0.5">
-                                        {fmt(simulationData?.appraisal?.npv)} / {fmt(simulationData?.appraisal?.irr, false, true)}
+                                <Tooltip content={`Project Net Present Value przy WACC ${simulationData?.appraisal?.waccPercent || 8.5}% oraz Wewnętrzna Stopa Zwrotu (IRR)`}>
+                                    <div className="p-3 bg-slate-850 rounded-xl border border-slate-700 print:bg-slate-50 print:border-slate-300 cursor-help">
+                                        <div className="text-[10px] text-slate-400 print:text-slate-600 uppercase">Project NPV & IRR</div>
+                                        <div className="text-lg font-bold text-amber-400 print:text-black mt-0.5">
+                                            {fmt(simulationData?.appraisal?.npv)} / {fmt(simulationData?.appraisal?.irr, false, true)}
+                                        </div>
+                                        <div className="text-[10px] text-slate-500">WACC: {simulationData?.appraisal?.waccPercent || 8.5}%</div>
                                     </div>
-                                    <div className="text-[10px] text-slate-500">WACC: {simulationData?.appraisal?.waccPercent || 8.5}%</div>
-                                </div>
+                                </Tooltip>
                             </div>
 
                             {/* Executive commentary box */}
@@ -619,50 +692,74 @@ export const InvestmentDossierPdfGenerator = ({
                                 <span className="flex items-center gap-2">
                                     <ShieldCheck className="w-4 h-4 text-emerald-400 print:text-black" />
                                     <span>2. Audyt Gotowości Inwestycyjnej LMA (Investment Readiness Scorecard)</span>
+                                    <InfoTooltip
+                                        size="xs"
+                                        content="Metodologia scoringu gotowości inwestycyjnej LMA oceniająca 4 filary: Techniczny, Prawny, Rynkowy i Finansowy w skali 0-100 pkt."
+                                        ariaLabel="Objaśnienie audytu gotowości LMA"
+                                    />
                                 </span>
-                                <span className="font-mono text-xs font-bold text-emerald-400 print:text-black">
-                                    WYNIK: {readinessData.overallScore} / 100 PKT
-                                </span>
+                                <Tooltip content="Łączny wynik punktowy audytu gotowości bankowej w skali 0-100">
+                                    <span className="font-mono text-xs font-bold text-emerald-400 print:text-black cursor-help">
+                                        WYNIK: {readinessData.overallScore} / 100 PKT
+                                    </span>
+                                </Tooltip>
                             </h3>
 
                             {/* 4 Pillars Grid */}
                             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                                 {Object.values(readinessData.pillars || {}).map(pillar => (
-                                    <div key={pillar.pillar} className="p-3 bg-slate-850 rounded-xl border border-slate-700 print:bg-slate-50 print:border-slate-300 text-xs">
-                                        <div className="text-[10px] font-semibold text-slate-400 print:text-slate-600 uppercase truncate">
-                                            {pillar.title}
+                                    <Tooltip
+                                        key={pillar.pillar}
+                                        content={`Filar: ${pillar.title} • Punkty: ${pillar.earnedPoints}/${pillar.maxPoints} • Spełnione: ${pillar.passedCount}/${pillar.criteriaCount}`}
+                                    >
+                                        <div className="p-3 bg-slate-850 rounded-xl border border-slate-700 print:bg-slate-50 print:border-slate-300 text-xs cursor-help">
+                                            <div className="text-[10px] font-semibold text-slate-400 print:text-slate-600 uppercase truncate">
+                                                {pillar.title}
+                                            </div>
+                                            <div className="text-base font-bold text-white print:text-black mt-1">
+                                                {pillar.earnedPoints} <span className="text-xs text-slate-400 font-normal">/ {pillar.maxPoints} pkt</span>
+                                            </div>
+                                            <div className="text-[10px] text-slate-400 print:text-slate-500 mt-1">
+                                                Spełniono: {pillar.passedCount} / {pillar.criteriaCount}
+                                            </div>
                                         </div>
-                                        <div className="text-base font-bold text-white print:text-black mt-1">
-                                            {pillar.earnedPoints} <span className="text-xs text-slate-400 font-normal">/ {pillar.maxPoints} pkt</span>
-                                        </div>
-                                        <div className="text-[10px] text-slate-400 print:text-slate-500 mt-1">
-                                            Spełniono: {pillar.passedCount} / {pillar.criteriaCount}
-                                        </div>
-                                    </div>
+                                    </Tooltip>
                                 ))}
                             </div>
 
                             {/* Conditions Precedent (CPs) Checklist */}
                             <div className="p-3 bg-slate-850 rounded-xl border border-slate-700 print:bg-slate-50 print:border-slate-300">
                                 <div className="text-[11px] font-bold text-white print:text-black uppercase mb-2 flex items-center justify-between">
-                                    <span>Kluczowe Warunki Zawieszające (Conditions Precedent - CPs)</span>
+                                    <span className="flex items-center gap-1.5">
+                                        <span>Kluczowe Warunki Zawieszające (Conditions Precedent - CPs)</span>
+                                        <InfoTooltip
+                                            size="xs"
+                                            content="Warunki prawne, finansowe i techniczne, które muszą zostać bezwzględnie spełnione przed uruchomieniem kredytu."
+                                            ariaLabel="Objaśnienie warunków CP"
+                                        />
+                                    </span>
                                     <span className="font-mono text-[10px] text-amber-400 print:text-black">
                                         {readinessData.fulfilledCps} z {readinessData.totalCps} spełnionych
                                     </span>
                                 </div>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                                     {(readinessData.criteria || []).filter(c => c.isConditionPrecedent).map(cp => (
-                                        <div key={cp.id} className="flex items-center space-x-2 text-slate-300 print:text-black">
-                                            {cp.status === 'passed' ? (
-                                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 print:text-black shrink-0" />
-                                            ) : (
-                                                <AlertTriangle className="w-3.5 h-3.5 text-amber-400 print:text-black shrink-0" />
-                                            )}
-                                            <span className="truncate">{cp.title}</span>
-                                            <span className="text-[10px] font-mono text-slate-400 print:text-slate-600">
-                                                ({cp.status === 'passed' ? 'Spełniony' : 'Do Uzyskania'})
-                                            </span>
-                                        </div>
+                                        <Tooltip
+                                            key={cp.id}
+                                            content={cp.status === 'passed' ? `Warunek spełniony: ${cp.description || cp.title}` : `Warunek wymagany przed wypłatą długu: ${cp.description || cp.title}`}
+                                        >
+                                            <div className="flex items-center space-x-2 text-slate-300 print:text-black cursor-help">
+                                                {cp.status === 'passed' ? (
+                                                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 print:text-black shrink-0" />
+                                                ) : (
+                                                    <AlertTriangle className="w-3.5 h-3.5 text-amber-400 print:text-black shrink-0" />
+                                                )}
+                                                <span className="truncate">{cp.title}</span>
+                                                <span className="text-[10px] font-mono text-slate-400 print:text-slate-600">
+                                                    ({cp.status === 'passed' ? 'Spełniony' : 'Do Uzyskania'})
+                                                </span>
+                                            </div>
+                                        </Tooltip>
                                     ))}
                                 </div>
                             </div>
@@ -675,39 +772,52 @@ export const InvestmentDossierPdfGenerator = ({
                             <h3 className="text-sm font-bold text-white print:text-black uppercase tracking-wider flex items-center gap-2 border-b border-slate-800 print:border-slate-300 pb-2">
                                 <DollarSign className="w-4 h-4 text-blue-400 print:text-black" />
                                 <span>3. Parametry Długu Senioralnego & Testy Kowenantów Bankowych</span>
+                                <InfoTooltip
+                                    size="xs"
+                                    content="Zestawienie kluczowych parametrów instrumentów dłużnych: okres spłaty (tenor), stopa referencyjna, marża oraz wskaźniki obsługi długu."
+                                    ariaLabel="Objaśnienie parametrów długu"
+                                />
                             </h3>
 
                             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono">
-                                <div className="p-2.5 bg-slate-850 rounded-xl border border-slate-700 print:bg-slate-50 print:border-slate-300">
-                                    <div className="text-[10px] text-slate-400 print:text-slate-600">Tenor Kredytu</div>
-                                    <div className="text-sm font-bold text-white print:text-black mt-0.5">
-                                        {activeProject?.debt_facility?.tenor_months || 120} miesięcy ({((activeProject?.debt_facility?.tenor_months || 120) / 12).toFixed(1)} lat)
+                                <Tooltip content="Całkowity horyzont czasowy spłaty kredytu senioralnego">
+                                    <div className="p-2.5 bg-slate-850 rounded-xl border border-slate-700 print:bg-slate-50 print:border-slate-300 cursor-help">
+                                        <div className="text-[10px] text-slate-400 print:text-slate-600">Tenor Kredytu</div>
+                                        <div className="text-sm font-bold text-white print:text-black mt-0.5">
+                                            {activeProject?.debt_facility?.tenor_months || 120} miesięcy ({((activeProject?.debt_facility?.tenor_months || 120) / 12).toFixed(1)} lat)
+                                        </div>
                                     </div>
-                                </div>
+                                </Tooltip>
 
-                                <div className="p-2.5 bg-slate-850 rounded-xl border border-slate-700 print:bg-slate-50 print:border-slate-300">
-                                    <div className="text-[10px] text-slate-400 print:text-slate-600">Oprocentowanie Łączne</div>
-                                    <div className="text-sm font-bold text-white print:text-black mt-0.5">
-                                        {((Number(activeProject?.debt_facility?.base_interest_rate_percent || 5.75)) + (Number(activeProject?.debt_facility?.margin_percent || 2.25))).toFixed(2)}% p.a.
+                                <Tooltip content="Nominalny roczny koszt odsetkowy: stopa bazowa (WIBOR/EURIBOR) + marża banku">
+                                    <div className="p-2.5 bg-slate-850 rounded-xl border border-slate-700 print:bg-slate-50 print:border-slate-300 cursor-help">
+                                        <div className="text-[10px] text-slate-400 print:text-slate-600">Oprocentowanie Łączne</div>
+                                        <div className="text-sm font-bold text-white print:text-black mt-0.5">
+                                            {((Number(activeProject?.debt_facility?.base_interest_rate_percent || 5.75)) + (Number(activeProject?.debt_facility?.margin_percent || 2.25))).toFixed(2)}% p.a.
+                                        </div>
+                                        <div className="text-[9px] text-slate-500">Marża: {activeProject?.debt_facility?.margin_percent || 2.25}%</div>
                                     </div>
-                                    <div className="text-[9px] text-slate-500">Marża: {activeProject?.debt_facility?.margin_percent || 2.25}%</div>
-                                </div>
+                                </Tooltip>
 
-                                <div className="p-2.5 bg-slate-850 rounded-xl border border-slate-700 print:bg-slate-50 print:border-slate-300">
-                                    <div className="text-[10px] text-slate-400 print:text-slate-600">Min & Średni DSCR</div>
-                                    <div className="text-sm font-bold text-emerald-400 print:text-black mt-0.5">
-                                        {fmt(simulationData?.covenants?.summary?.minDscr, true)} / {fmt(simulationData?.covenants?.summary?.avgDscr, true)}
+                                <Tooltip content="Wskaźnik pokrycia obsługi długu (Debt Service Coverage Ratio): minimalny i średni w 15-letnim modelu">
+                                    <div className="p-2.5 bg-slate-850 rounded-xl border border-slate-700 print:bg-slate-50 print:border-slate-300 cursor-help">
+                                        <div className="text-[10px] text-slate-400 print:text-slate-600">Min & Średni DSCR</div>
+                                        <div className="text-sm font-bold text-emerald-400 print:text-black mt-0.5">
+                                            {fmt(simulationData?.covenants?.summary?.minDscr, true)} / {fmt(simulationData?.covenants?.summary?.avgDscr, true)}
+                                        </div>
+                                        <div className="text-[9px] text-slate-500">Wymóg min: 1.20x</div>
                                     </div>
-                                    <div className="text-[9px] text-slate-500">Wymóg min: 1.20x</div>
-                                </div>
+                                </Tooltip>
 
-                                <div className="p-2.5 bg-slate-850 rounded-xl border border-slate-700 print:bg-slate-50 print:border-slate-300">
-                                    <div className="text-[10px] text-slate-400 print:text-slate-600">Bufor DSRF & ICR</div>
-                                    <div className="text-sm font-bold text-cyan-400 print:text-black mt-0.5">
-                                        {simulationData?.covenants?.summary?.minDsrfMonths?.toFixed(1) || '8.5'} m-cy / {fmt(simulationData?.covenants?.summary?.minIcr, true)}
+                                <Tooltip content="Miesiące rezerwy obsługi długu na rachunku DSRF oraz min Interest Coverage Ratio (ICR)">
+                                    <div className="p-2.5 bg-slate-850 rounded-xl border border-slate-700 print:bg-slate-50 print:border-slate-300 cursor-help">
+                                        <div className="text-[10px] text-slate-400 print:text-slate-600">Bufor DSRF & ICR</div>
+                                        <div className="text-sm font-bold text-cyan-400 print:text-black mt-0.5">
+                                            {simulationData?.covenants?.summary?.minDsrfMonths?.toFixed(1) || '8.5'} m-cy / {fmt(simulationData?.covenants?.summary?.minIcr, true)}
+                                        </div>
+                                        <div className="text-[9px] text-slate-500">Rezerwa obsługi długu</div>
                                     </div>
-                                    <div className="text-[9px] text-slate-500">Rezerwa obsługi długu</div>
-                                </div>
+                                </Tooltip>
                             </div>
                         </div>
                     )}
@@ -719,6 +829,11 @@ export const InvestmentDossierPdfGenerator = ({
                                 <h3 className="text-sm font-bold text-white print:text-black uppercase tracking-wider flex items-center gap-2">
                                     <Table className="w-4 h-4 text-emerald-400 print:text-black" />
                                     <span>4. 15-letnia Synteza Trzech Sprawozdań Finansowych</span>
+                                    <InfoTooltip
+                                        size="xs"
+                                        content="Zintegrowana 15-letnia projekcja rachunku zysków i strat, bilansu oraz przepływów pieniężnych (OCF, FCFE, stan gotówki, DSCR)."
+                                        ariaLabel="Objaśnienie syntezy 3-Statement"
+                                    />
                                 </h3>
                                 <span className="font-mono text-xs text-slate-400 print:text-slate-600">
                                     Wartości w: {scaleSuffix}
@@ -739,7 +854,11 @@ export const InvestmentDossierPdfGenerator = ({
                                     <tbody className="divide-y divide-slate-800 print:divide-slate-200 text-slate-200 print:text-black">
                                         {/* Revenue */}
                                         <tr>
-                                            <td className="p-2 pl-3 font-semibold">Przychody ze sprzedaży</td>
+                                            <td className="p-2 pl-3 font-semibold">
+                                                <Tooltip content="Przychody operacyjne ze sprzedaży towarów i usług">
+                                                    <span className="cursor-help">Przychody ze sprzedaży</span>
+                                                </Tooltip>
+                                            </td>
                                             {annualPeriods.slice(0, 10).map((p, i) => (
                                                 <td key={i} className="p-2 text-right">{fmt(p.revenue)}</td>
                                             ))}
@@ -747,7 +866,11 @@ export const InvestmentDossierPdfGenerator = ({
                                         </tr>
                                         {/* EBITDA */}
                                         <tr>
-                                            <td className="p-2 pl-3 font-semibold text-emerald-400 print:text-black">EBITDA</td>
+                                            <td className="p-2 pl-3 font-semibold text-emerald-400 print:text-black">
+                                                <Tooltip content="Zysk operacyjny powiększony o amortyzację (EBITDA)">
+                                                    <span className="cursor-help">EBITDA</span>
+                                                </Tooltip>
+                                            </td>
                                             {annualPeriods.slice(0, 10).map((p, i) => (
                                                 <td key={i} className="p-2 text-right text-emerald-400 print:text-black">{fmt(p.ebitda)}</td>
                                             ))}
@@ -755,7 +878,11 @@ export const InvestmentDossierPdfGenerator = ({
                                         </tr>
                                         {/* Net Income */}
                                         <tr>
-                                            <td className="p-2 pl-3">Zysk netto</td>
+                                            <td className="p-2 pl-3">
+                                                <Tooltip content="Wynik finansowy netto po odliczeniu podatku dochodowego CIT">
+                                                    <span className="cursor-help">Zysk netto</span>
+                                                </Tooltip>
+                                            </td>
                                             {annualPeriods.slice(0, 10).map((p, i) => (
                                                 <td key={i} className="p-2 text-right">{fmt(p.netIncome)}</td>
                                             ))}
@@ -763,7 +890,11 @@ export const InvestmentDossierPdfGenerator = ({
                                         </tr>
                                         {/* CAPEX */}
                                         <tr>
-                                            <td className="p-2 pl-3 text-rose-400 print:text-black">CAPEX & Reinwestycje</td>
+                                            <td className="p-2 pl-3 text-rose-400 print:text-black">
+                                                <Tooltip content="Wydatki inwestycyjne oraz nakłady odtworzeniowe w fazie operacyjnej">
+                                                    <span className="cursor-help">CAPEX & Reinwestycje</span>
+                                                </Tooltip>
+                                            </td>
                                             {annualPeriods.slice(0, 10).map((p, i) => (
                                                 <td key={i} className="p-2 text-right text-rose-400 print:text-black">{fmt(p.capex)}</td>
                                             ))}
@@ -771,7 +902,11 @@ export const InvestmentDossierPdfGenerator = ({
                                         </tr>
                                         {/* Operating CF */}
                                         <tr>
-                                            <td className="p-2 pl-3">CF Operacyjny (OCF)</td>
+                                            <td className="p-2 pl-3">
+                                                <Tooltip content="Przepływy pieniężne z działalności operacyjnej (OCF)">
+                                                    <span className="cursor-help">CF Operacyjny (OCF)</span>
+                                                </Tooltip>
+                                            </td>
                                             {annualPeriods.slice(0, 10).map((p, i) => (
                                                 <td key={i} className="p-2 text-right">{fmt(p.operatingCashFlow)}</td>
                                             ))}
@@ -779,7 +914,11 @@ export const InvestmentDossierPdfGenerator = ({
                                         </tr>
                                         {/* Debt Service */}
                                         <tr>
-                                            <td className="p-2 pl-3 text-amber-400 print:text-black">Obsługa Długu (P+I)</td>
+                                            <td className="p-2 pl-3 text-amber-400 print:text-black">
+                                                <Tooltip content="Roczna suma spłaty rat kapitałowych oraz odsetek kredytu senioralnego">
+                                                    <span className="cursor-help">Obsługa Długu (P+I)</span>
+                                                </Tooltip>
+                                            </td>
                                             {annualPeriods.slice(0, 10).map((_, i) => {
                                                 const ds = simulationData?.covenants?.annualCovenants?.[i]?.totalDebtService ?? 0;
                                                 return <td key={i} className="p-2 text-right text-amber-400 print:text-black">{fmt(ds)}</td>;
@@ -790,7 +929,11 @@ export const InvestmentDossierPdfGenerator = ({
                                         </tr>
                                         {/* FCFE */}
                                         <tr>
-                                            <td className="p-2 pl-3 font-semibold text-purple-400 print:text-black">FCFE (Dywidendy)</td>
+                                            <td className="p-2 pl-3 font-semibold text-purple-400 print:text-black">
+                                                <Tooltip content="Free Cash Flow to Equity: wolne przepływy pieniężne dla sponsorów projektu">
+                                                    <span className="cursor-help">FCFE (Dywidendy)</span>
+                                                </Tooltip>
+                                            </td>
                                             {annualPeriods.slice(0, 10).map((p, i) => (
                                                 <td key={i} className="p-2 text-right text-purple-400 print:text-black">{fmt(p.fcfe)}</td>
                                             ))}
@@ -798,7 +941,11 @@ export const InvestmentDossierPdfGenerator = ({
                                         </tr>
                                         {/* Closing Cash */}
                                         <tr>
-                                            <td className="p-2 pl-3 font-semibold text-cyan-400 print:text-black">Stan Gotówki Końcowej</td>
+                                            <td className="p-2 pl-3 font-semibold text-cyan-400 print:text-black">
+                                                <Tooltip content="Środki pieniężne na rachunku bankowym na koniec danego okresu bilansowego">
+                                                    <span className="cursor-help">Stan Gotówki Końcowej</span>
+                                                </Tooltip>
+                                            </td>
                                             {annualPeriods.slice(0, 10).map((p, i) => (
                                                 <td key={i} className="p-2 text-right text-cyan-400 print:text-black">{fmt(p.closingCash)}</td>
                                             ))}
@@ -806,7 +953,11 @@ export const InvestmentDossierPdfGenerator = ({
                                         </tr>
                                         {/* DSCR */}
                                         <tr className="bg-slate-850/50 print:bg-slate-50">
-                                            <td className="p-2 pl-3 font-bold text-amber-400 print:text-black">Wskaźnik DSCR</td>
+                                            <td className="p-2 pl-3 font-bold text-amber-400 print:text-black">
+                                                <Tooltip content="Roczny wskaźnik pokrycia obsługi długu CFADS / Debt Service">
+                                                    <span className="cursor-help">Wskaźnik DSCR</span>
+                                                </Tooltip>
+                                            </td>
                                             {annualPeriods.slice(0, 10).map((p, i) => {
                                                 const d = simulationData?.covenants?.annualCovenants?.[i]?.dscr ?? p.dscr;
                                                 return <td key={i} className="p-2 text-right font-bold text-amber-400 print:text-black">{fmt(d, true)}</td>;
@@ -825,40 +976,53 @@ export const InvestmentDossierPdfGenerator = ({
                             <h3 className="text-sm font-bold text-white print:text-black uppercase tracking-wider flex items-center gap-2 border-b border-slate-800 print:border-slate-300 pb-2">
                                 <TrendingUp className="w-4 h-4 text-purple-400 print:text-black" />
                                 <span>5. Wycena Wyjścia (Exit Valuation) & Podział Wpływów Waterfall</span>
+                                <InfoTooltip
+                                    size="xs"
+                                    content="Wycena wyjścia z inwestycji (Enterprise Value, Equity Value) oraz wskaźniki zwrotu sponsorów (MoIC, IRR) przy transakcji M&A."
+                                    ariaLabel="Objaśnienie wyceny wyjścia"
+                                />
                             </h3>
 
                             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono">
-                                <div className="p-2.5 bg-slate-850 rounded-xl border border-slate-700 print:bg-slate-50 print:border-slate-300">
-                                    <div className="text-[10px] text-slate-400 print:text-slate-600">Enterprise Value (EV)</div>
-                                    <div className="text-sm font-bold text-white print:text-black mt-0.5">
-                                        {fmt(simulationData.exitValuation.enterpriseValue)}
+                                <Tooltip content={`Wycena całego przedsiębiorstwa (Enterprise Value) przy mnożniku ${simulationData.exitValuation.exitMultiple || 7.5}x EBITDA`}>
+                                    <div className="p-2.5 bg-slate-850 rounded-xl border border-slate-700 print:bg-slate-50 print:border-slate-300 cursor-help">
+                                        <div className="text-[10px] text-slate-400 print:text-slate-600">Enterprise Value (EV)</div>
+                                        <div className="text-sm font-bold text-white print:text-black mt-0.5">
+                                            {fmt(simulationData.exitValuation.enterpriseValue)}
+                                        </div>
+                                        <div className="text-[9px] text-slate-500">Mnożnik: {simulationData.exitValuation.exitMultiple || 7.5}x EBITDA</div>
                                     </div>
-                                    <div className="text-[9px] text-slate-500">Mnożnik: {simulationData.exitValuation.exitMultiple || 7.5}x EBITDA</div>
-                                </div>
+                                </Tooltip>
 
-                                <div className="p-2.5 bg-slate-850 rounded-xl border border-slate-700 print:bg-slate-50 print:border-slate-300">
-                                    <div className="text-[10px] text-slate-400 print:text-slate-600">Dług Netto przy Wyjściu</div>
-                                    <div className="text-sm font-bold text-rose-400 print:text-black mt-0.5">
-                                        {fmt(simulationData.exitValuation.netDebtAtExit || 0)}
+                                <Tooltip content="Zadłużenie netto spłacane w pierwszej kolejności z wpływów transakcyjnych">
+                                    <div className="p-2.5 bg-slate-850 rounded-xl border border-slate-700 print:bg-slate-50 print:border-slate-300 cursor-help">
+                                        <div className="text-[10px] text-slate-400 print:text-slate-600">Dług Netto przy Wyjściu</div>
+                                        <div className="text-sm font-bold text-rose-400 print:text-black mt-0.5">
+                                            {fmt(simulationData.exitValuation.netDebtAtExit || 0)}
+                                        </div>
+                                        <div className="text-[9px] text-slate-500">Do spłaty przy transakcji</div>
                                     </div>
-                                    <div className="text-[9px] text-slate-500">Do spłaty przy transakcji</div>
-                                </div>
+                                </Tooltip>
 
-                                <div className="p-2.5 bg-slate-850 rounded-xl border border-slate-700 print:bg-slate-50 print:border-slate-300">
-                                    <div className="text-[10px] text-slate-400 print:text-slate-600">Wartość Kapitału (Equity)</div>
-                                    <div className="text-sm font-bold text-emerald-400 print:text-black mt-0.5">
-                                        {fmt(simulationData.exitValuation.equityValue)}
+                                <Tooltip content="Czysta wartość kapitału własnego podlegająca dystrybucji do sponsorów projektu">
+                                    <div className="p-2.5 bg-slate-850 rounded-xl border border-slate-700 print:bg-slate-50 print:border-slate-300 cursor-help">
+                                        <div className="text-[10px] text-slate-400 print:text-slate-600">Wartość Kapitału (Equity)</div>
+                                        <div className="text-sm font-bold text-emerald-400 print:text-black mt-0.5">
+                                            {fmt(simulationData.exitValuation.equityValue)}
+                                        </div>
+                                        <div className="text-[9px] text-slate-500">Dla sponsorów projektu</div>
                                     </div>
-                                    <div className="text-[9px] text-slate-500">Dla sponsorów projektu</div>
-                                </div>
+                                </Tooltip>
 
-                                <div className="p-2.5 bg-slate-850 rounded-xl border border-slate-700 print:bg-slate-50 print:border-slate-300">
-                                    <div className="text-[10px] text-slate-400 print:text-slate-600">Zwrot Inwestora (MoIC / IRR)</div>
-                                    <div className="text-sm font-bold text-purple-400 print:text-black mt-0.5">
-                                        {fmt(simulationData.exitValuation.equityMoic, true)} / {fmt(simulationData.exitValuation.equityIrrPercent, false, true)}
+                                <Tooltip content={`Mnożnik zainwestowanego kapitału (MoIC) oraz wewnętrzna stopa zwrotu (IRR) przy wyjściu w ${simulationData.exitValuation.exitYear}. roku`}>
+                                    <div className="p-2.5 bg-slate-850 rounded-xl border border-slate-700 print:bg-slate-50 print:border-slate-300 cursor-help">
+                                        <div className="text-[10px] text-slate-400 print:text-slate-600">Zwrot Inwestora (MoIC / IRR)</div>
+                                        <div className="text-sm font-bold text-purple-400 print:text-black mt-0.5">
+                                            {fmt(simulationData.exitValuation.equityMoic, true)} / {fmt(simulationData.exitValuation.equityIrrPercent, false, true)}
+                                        </div>
+                                        <div className="text-[9px] text-slate-500">W horyzoncie wyjścia (Rok {simulationData.exitValuation.exitYear})</div>
                                     </div>
-                                    <div className="text-[9px] text-slate-500">W horyzoncie wyjścia (Rok {simulationData.exitValuation.exitYear})</div>
-                                </div>
+                                </Tooltip>
                             </div>
                         </div>
                     )}
@@ -869,6 +1033,11 @@ export const InvestmentDossierPdfGenerator = ({
                             <h3 className="text-sm font-bold text-white print:text-black uppercase tracking-wider flex items-center gap-2 border-b border-slate-800 print:border-slate-300 pb-2">
                                 <BarChart3 className="w-4 h-4 text-cyan-400 print:text-black" />
                                 <span>6. Wizualizacja Trendów Finansowych na Osi Czasu</span>
+                                <InfoTooltip
+                                    size="xs"
+                                    content="Porównanie dynamiki przychodów ze sprzedaży, wyniku EBITDA oraz rocznych obciążeń z tytułu obsługi zadłużenia (P+I)."
+                                    ariaLabel="Objaśnienie wykresu trendów finansowych"
+                                />
                             </h3>
 
                             <div className="h-60 w-full bg-slate-850 rounded-xl p-3 border border-slate-700">
@@ -877,7 +1046,7 @@ export const InvestmentDossierPdfGenerator = ({
                                         <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.5} />
                                         <XAxis dataKey="year" stroke="#94A3B8" fontSize={10} />
                                         <YAxis stroke="#94A3B8" fontSize={10} />
-                                        <Tooltip
+                                        <RechartsTooltip
                                             contentStyle={{
                                                 backgroundColor: '#0F172A',
                                                 borderColor: '#334155',
@@ -904,7 +1073,9 @@ export const InvestmentDossierPdfGenerator = ({
                         </div>
                         <div className="text-right font-mono text-[9px] text-slate-400 print:text-slate-600">
                             <div>Strona 1 z 1 // Wydanie Oficjalne</div>
-                            <div>Suma SHA-256: {sha256Hash.substring(0, 16)}...{sha256Hash.substring(48)}</div>
+                            <Tooltip content={`Suma kontrolna SHA-256: ${sha256Hash}`}>
+                                <div className="cursor-help">Suma SHA-256: {sha256Hash.substring(0, 16)}...{sha256Hash.substring(48)}</div>
+                            </Tooltip>
                         </div>
                     </div>
                 </div>

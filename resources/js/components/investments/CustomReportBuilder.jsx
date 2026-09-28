@@ -39,9 +39,10 @@ import {
     XAxis,
     YAxis,
     CartesianGrid,
-    Tooltip,
+    Tooltip as RechartsTooltip,
     Legend
 } from 'recharts';
+import { Tooltip, InfoTooltip } from '../ui/Tooltip';
 import { useInvestmentProject } from '../../context/InvestmentProjectContext';
 import { useNotification } from '../../context/NotificationContext';
 import { Button } from '../ui/Button';
@@ -931,17 +932,28 @@ export const CustomReportBuilder = ({
             <div className="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-6 backdrop-blur-md shadow-xl">
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-700/60 pb-5">
                     <div className="flex items-center space-x-3">
-                        <div className="p-3 bg-gradient-to-tr from-cyan-600/30 to-blue-600/30 border border-cyan-500/40 rounded-xl text-cyan-400 shadow-inner">
-                            <FileSpreadsheet className="w-6 h-6" />
-                        </div>
+                        <Tooltip content="Kreator niestandardowych raportów finansowych z 15-letniego modelu">
+                            <div className="p-3 bg-gradient-to-tr from-cyan-600/30 to-blue-600/30 border border-cyan-500/40 rounded-xl text-cyan-400 shadow-inner cursor-help">
+                                <FileSpreadsheet className="w-6 h-6" />
+                            </div>
+                        </Tooltip>
                         <div>
                             <div className="flex items-center space-x-2">
                                 <h3 className="text-xl font-bold text-white tracking-wide">
                                     Kreator Raportów Finansowych (Custom Report Builder)
                                 </h3>
-                                <Badge variant="info" className="bg-cyan-500/10 border-cyan-500/30 text-cyan-400 font-mono text-xs">
-                                    15-Year Horizon
-                                </Badge>
+                                <InfoTooltip
+                                    size="sm"
+                                    content="Kreator umożliwiający dynamiczne komponowanie własnych zestawień z ponad 30 wskaźników finansowych, kowenantów i wyceny wyjścia z eksportem CSV oraz wizualizacją trendów."
+                                    ariaLabel="Objaśnienie Kreatora Raportów"
+                                />
+                                <Tooltip content="Pełny 15-letni horyzont projekcji finansowej">
+                                    <span>
+                                        <Badge variant="info" className="bg-cyan-500/10 border-cyan-500/30 text-cyan-400 font-mono text-xs cursor-help">
+                                            15-Year Horizon
+                                        </Badge>
+                                    </span>
+                                </Tooltip>
                             </div>
                             <p className="text-xs text-slate-400 mt-1">
                                 Elastyczna kompozycja pozycji z RZiS, Bilansu, Cash Flow, kowenantów bankowych i wyceny wyjścia z eksportem CSV
@@ -951,38 +963,44 @@ export const CustomReportBuilder = ({
 
                     {/* Action Buttons */}
                     <div className="flex flex-wrap items-center gap-2">
-                        <Button
-                            variant="secondary"
-                            size="sm"
-                            onClick={() => setIsPickerOpen(true)}
-                            data-testid="open-metric-picker-button"
-                            className="bg-slate-700/80 hover:bg-slate-700 border-slate-600 text-slate-200"
-                        >
-                            <Plus className="w-4 h-4 mr-1.5 text-cyan-400" />
-                            <span>Dodaj Pozycję</span>
-                        </Button>
+                        <Tooltip content="Otwórz bibliotekę 30+ instytucjonalnych pozycji finansowych do dodania do raportu">
+                            <Button
+                                variant="secondary"
+                                size="sm"
+                                onClick={() => setIsPickerOpen(true)}
+                                data-testid="open-metric-picker-button"
+                                className="bg-slate-700/80 hover:bg-slate-700 border-slate-600 text-slate-200"
+                            >
+                                <Plus className="w-4 h-4 mr-1.5 text-cyan-400" />
+                                <span>Dodaj Pozycję</span>
+                            </Button>
+                        </Tooltip>
 
-                        <Button
-                            variant="secondary"
-                            size="sm"
-                            onClick={() => setChartVisible(!chartVisible)}
-                            data-testid="toggle-chart-button"
-                            className={`border-slate-600 ${chartVisible ? 'bg-cyan-600/20 text-cyan-300 border-cyan-500/40' : 'bg-slate-700/80 text-slate-300'}`}
-                        >
-                            {chartVisible ? <EyeOff className="w-4 h-4 mr-1.5" /> : <Eye className="w-4 h-4 mr-1.5" />}
-                            <span>{chartVisible ? 'Ukryj Wykres' : 'Pokaż Wykres'}</span>
-                        </Button>
+                        <Tooltip content={chartVisible ? "Ukryj panel wykresu trendów" : "Pokaż panel interaktywnego wykresu trendów liniowych lub słupkowych"}>
+                            <Button
+                                variant="secondary"
+                                size="sm"
+                                onClick={() => setChartVisible(!chartVisible)}
+                                data-testid="toggle-chart-button"
+                                className={`border-slate-600 ${chartVisible ? 'bg-cyan-600/20 text-cyan-300 border-cyan-500/40' : 'bg-slate-700/80 text-slate-300'}`}
+                            >
+                                {chartVisible ? <EyeOff className="w-4 h-4 mr-1.5" /> : <Eye className="w-4 h-4 mr-1.5" />}
+                                <span>{chartVisible ? 'Ukryj Wykres' : 'Pokaż Wykres'}</span>
+                            </Button>
+                        </Tooltip>
 
-                        <Button
-                            variant="secondary"
-                            size="sm"
-                            onClick={handleExportCsv}
-                            data-testid="export-csv-button"
-                            className="bg-slate-700/80 hover:bg-slate-700 border-slate-600 text-slate-200"
-                        >
-                            <Download className="w-4 h-4 mr-1.5 text-emerald-400" />
-                            <span>Eksportuj CSV</span>
-                        </Button>
+                        <Tooltip content="Eksportuj skomponowany raport wraz z danymi okresów do pliku CSV">
+                            <Button
+                                variant="secondary"
+                                size="sm"
+                                onClick={handleExportCsv}
+                                data-testid="export-csv-button"
+                                className="bg-slate-700/80 hover:bg-slate-700 border-slate-600 text-slate-200"
+                            >
+                                <Download className="w-4 h-4 mr-1.5 text-emerald-400" />
+                                <span>Eksportuj CSV</span>
+                            </Button>
+                        </Tooltip>
                     </div>
                 </div>
 
@@ -993,6 +1011,11 @@ export const CustomReportBuilder = ({
                         <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center gap-1.5">
                             <Layers className="w-3.5 h-3.5 text-cyan-400" />
                             <span>Szablon Raportu (Preset)</span>
+                            <InfoTooltip
+                                size="xs"
+                                content="Wybierz gotowy szablon analityczny (np. Standardowy, Bankowy, Płynnościowy lub Wyceny) albo stwórz własny."
+                                ariaLabel="Objaśnienie szablonu raportu"
+                            />
                         </label>
                         <select
                             data-testid="preset-select"
@@ -1013,21 +1036,27 @@ export const CustomReportBuilder = ({
                         <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center gap-1.5">
                             <Calendar className="w-3.5 h-3.5 text-blue-400" />
                             <span>Horyzont Czasowy</span>
+                            <InfoTooltip
+                                size="xs"
+                                content="Ogranicz horyzont czasowy raportu do 5, 10 lub pełnych 15 lat projekcji finansowej."
+                                ariaLabel="Objaśnienie horyzontu czasowego"
+                            />
                         </label>
                         <div className="flex bg-slate-900/90 p-1 rounded-xl border border-slate-700" data-testid="horizon-selector">
                             {HORIZON_OPTIONS.map(opt => (
-                                <button
-                                    key={opt.id}
-                                    type="button"
-                                    onClick={() => setHorizonYears(opt.id)}
-                                    className={`flex-1 py-1.5 px-2 text-xs font-medium rounded-lg transition-all ${
-                                        horizonYears === opt.id
-                                            ? 'bg-blue-600 text-white shadow-sm'
-                                            : 'text-slate-400 hover:text-slate-200'
-                                    }`}
-                                >
-                                    {opt.id}L
-                                </button>
+                                <Tooltip key={opt.id} content={`Ustaw horyzont czasowy raportu na ${opt.id} lat`}>
+                                    <button
+                                        type="button"
+                                        onClick={() => setHorizonYears(opt.id)}
+                                        className={`flex-1 py-1.5 px-2 text-xs font-medium rounded-lg transition-all ${
+                                            horizonYears === opt.id
+                                                ? 'bg-blue-600 text-white shadow-sm'
+                                                : 'text-slate-400 hover:text-slate-200'
+                                        }`}
+                                    >
+                                        {opt.id}L
+                                    </button>
+                                </Tooltip>
                             ))}
                         </div>
                     </div>
@@ -1037,21 +1066,27 @@ export const CustomReportBuilder = ({
                         <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center gap-1.5">
                             <DollarSign className="w-3.5 h-3.5 text-emerald-400" />
                             <span>Skala Prezentacji Kwot</span>
+                            <InfoTooltip
+                                size="xs"
+                                content="Zmień jednostkę prezentacji kwot w tabeli i na wykresie (PLN, tys. PLN lub mln PLN)."
+                                ariaLabel="Objaśnienie skali kwot"
+                            />
                         </label>
                         <div className="flex bg-slate-900/90 p-1 rounded-xl border border-slate-700" data-testid="scale-selector">
                             {SCALE_OPTIONS.map(opt => (
-                                <button
-                                    key={opt.id}
-                                    type="button"
-                                    onClick={() => setScale(opt.id)}
-                                    className={`flex-1 py-1.5 px-2 text-xs font-medium rounded-lg transition-all ${
-                                        scale === opt.id
-                                            ? 'bg-emerald-600 text-white shadow-sm'
-                                            : 'text-slate-400 hover:text-slate-200'
-                                    }`}
-                                >
-                                    {opt.label}
-                                </button>
+                                <Tooltip key={opt.id} content={`Prezentuj kwoty w jednostkach: ${opt.label}`}>
+                                    <button
+                                        type="button"
+                                        onClick={() => setScale(opt.id)}
+                                        className={`flex-1 py-1.5 px-2 text-xs font-medium rounded-lg transition-all ${
+                                            scale === opt.id
+                                                ? 'bg-emerald-600 text-white shadow-sm'
+                                                : 'text-slate-400 hover:text-slate-200'
+                                        }`}
+                                    >
+                                        {opt.label}
+                                    </button>
+                                </Tooltip>
                             ))}
                         </div>
                     </div>
@@ -1080,24 +1115,30 @@ export const CustomReportBuilder = ({
                             </p>
                         </div>
                         <div className="flex items-center gap-2 bg-slate-900/90 p-1 rounded-xl border border-slate-700">
-                            <button
-                                type="button"
-                                data-testid="chart-type-line"
-                                onClick={() => setChartType('line')}
-                                className={`p-1.5 rounded-lg text-xs font-medium transition-all ${chartType === 'line' ? 'bg-cyan-600 text-white' : 'text-slate-400 hover:text-slate-200'}`}
-                                title="Wykres liniowy"
-                            >
-                                <LineChartIcon className="w-4 h-4" />
-                            </button>
-                            <button
-                                type="button"
-                                data-testid="chart-type-bar"
-                                onClick={() => setChartType('bar')}
-                                className={`p-1.5 rounded-lg text-xs font-medium transition-all ${chartType === 'bar' ? 'bg-cyan-600 text-white' : 'text-slate-400 hover:text-slate-200'}`}
-                                title="Wykres słupkowy"
-                            >
-                                <BarChart3 className="w-4 h-4" />
-                            </button>
+                            <Tooltip content="Przełącz na liniowy wykres trendu">
+                                <button
+                                    type="button"
+                                    data-testid="chart-type-line"
+                                    onClick={() => setChartType('line')}
+                                    className={`p-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${chartType === 'line' ? 'bg-cyan-600 text-white' : 'text-slate-400 hover:text-slate-200'}`}
+                                    title="Wykres liniowy"
+                                    aria-label="Wykres liniowy"
+                                >
+                                    <LineChartIcon className="w-4 h-4" />
+                                </button>
+                            </Tooltip>
+                            <Tooltip content="Przełącz na słupkowy wykres porównawczy">
+                                <button
+                                    type="button"
+                                    data-testid="chart-type-bar"
+                                    onClick={() => setChartType('bar')}
+                                    className={`p-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${chartType === 'bar' ? 'bg-cyan-600 text-white' : 'text-slate-400 hover:text-slate-200'}`}
+                                    title="Wykres słupkowy"
+                                    aria-label="Wykres słupkowy"
+                                >
+                                    <BarChart3 className="w-4 h-4" />
+                                </button>
+                            </Tooltip>
                         </div>
                     </div>
 
@@ -1108,7 +1149,7 @@ export const CustomReportBuilder = ({
                                     <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.5} />
                                     <XAxis dataKey="year" stroke="#94A3B8" fontSize={11} />
                                     <YAxis stroke="#94A3B8" fontSize={11} />
-                                    <Tooltip
+                                    <RechartsTooltip
                                         contentStyle={{
                                             backgroundColor: '#0F172A',
                                             borderColor: '#334155',
@@ -1140,7 +1181,7 @@ export const CustomReportBuilder = ({
                                     <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.5} />
                                     <XAxis dataKey="year" stroke="#94A3B8" fontSize={11} />
                                     <YAxis stroke="#94A3B8" fontSize={11} />
-                                    <Tooltip
+                                    <RechartsTooltip
                                         contentStyle={{
                                             backgroundColor: '#0F172A',
                                             borderColor: '#334155',
@@ -1236,19 +1277,22 @@ export const CustomReportBuilder = ({
 
                                             {/* Chart Toggle */}
                                             <td className="p-3 text-center">
-                                                <button
-                                                    type="button"
-                                                    data-testid={`toggle-chart-row-${metric.id}`}
-                                                    onClick={() => toggleChartMetric(metric.id)}
-                                                    className={`p-1 rounded-lg transition-colors ${
-                                                        isChartActive
-                                                            ? 'text-cyan-400 bg-cyan-500/10 hover:bg-cyan-500/20'
-                                                            : 'text-slate-500 hover:text-slate-300'
-                                                    }`}
-                                                    title={isChartActive ? 'Usuń z wykresu' : 'Pokaż na wykresie'}
-                                                >
-                                                    {isChartActive ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
-                                                </button>
+                                                <Tooltip content={isChartActive ? 'Usuń pozycję z wykresu trendów' : 'Wyświetl pozycję na wykresie trendów'}>
+                                                    <button
+                                                        type="button"
+                                                        data-testid={`toggle-chart-row-${metric.id}`}
+                                                        onClick={() => toggleChartMetric(metric.id)}
+                                                        className={`p-1 rounded-lg transition-colors cursor-pointer ${
+                                                            isChartActive
+                                                                ? 'text-cyan-400 bg-cyan-500/10 hover:bg-cyan-500/20'
+                                                                : 'text-slate-500 hover:text-slate-300'
+                                                        }`}
+                                                        title={isChartActive ? 'Usuń z wykresu' : 'Pokaż na wykresie'}
+                                                        aria-label={isChartActive ? 'Usuń z wykresu' : 'Pokaż na wykresie'}
+                                                    >
+                                                        {isChartActive ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+                                                    </button>
+                                                </Tooltip>
                                             </td>
 
                                             {/* Category Badge */}
@@ -1289,32 +1333,41 @@ export const CustomReportBuilder = ({
                                             {/* Actions: Reorder and Remove */}
                                             <td className="p-3 text-center">
                                                 <div className="flex items-center justify-center space-x-1">
-                                                    <button
-                                                        type="button"
-                                                        disabled={index === 0}
-                                                        onClick={() => handleMoveMetric(index, -1)}
-                                                        className="p-1 text-slate-400 hover:text-slate-200 disabled:opacity-30 disabled:hover:text-slate-400"
-                                                        title="Przesuń w górę"
-                                                    >
-                                                        <ArrowUp className="w-3 h-3" />
-                                                    </button>
-                                                    <button
-                                                        type="button"
-                                                        disabled={index === activeMetrics.length - 1}
-                                                        onClick={() => handleMoveMetric(index, 1)}
-                                                        className="p-1 text-slate-400 hover:text-slate-200 disabled:opacity-30 disabled:hover:text-slate-400"
-                                                        title="Przesuń w dół"
-                                                    >
-                                                        <ArrowDown className="w-3 h-3" />
-                                                    </button>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => handleRemoveMetric(metric.id)}
-                                                        className="p-1 text-rose-400 hover:text-rose-300"
-                                                        title="Usuń pozycję"
-                                                    >
-                                                        <Trash2 className="w-3 h-3" />
-                                                    </button>
+                                                    <Tooltip content="Przesuń pozycję wyżej w tabeli">
+                                                        <button
+                                                            type="button"
+                                                            disabled={index === 0}
+                                                            onClick={() => handleMoveMetric(index, -1)}
+                                                            className="p-1 text-slate-400 hover:text-slate-200 disabled:opacity-30 disabled:hover:text-slate-400 cursor-pointer"
+                                                            title="Przesuń w górę"
+                                                            aria-label="Przesuń w górę"
+                                                        >
+                                                            <ArrowUp className="w-3 h-3" />
+                                                        </button>
+                                                    </Tooltip>
+                                                    <Tooltip content="Przesuń pozycję niżej w tabeli">
+                                                        <button
+                                                            type="button"
+                                                            disabled={index === activeMetrics.length - 1}
+                                                            onClick={() => handleMoveMetric(index, 1)}
+                                                            className="p-1 text-slate-400 hover:text-slate-200 disabled:opacity-30 disabled:hover:text-slate-400 cursor-pointer"
+                                                            title="Przesuń w dół"
+                                                            aria-label="Przesuń w dół"
+                                                        >
+                                                            <ArrowDown className="w-3 h-3" />
+                                                        </button>
+                                                    </Tooltip>
+                                                    <Tooltip content="Usuń pozycję z aktywnego raportu">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleRemoveMetric(metric.id)}
+                                                            className="p-1 text-rose-400 hover:text-rose-300 cursor-pointer"
+                                                            title="Usuń pozycję"
+                                                            aria-label="Usuń pozycję"
+                                                        >
+                                                            <Trash2 className="w-3 h-3" />
+                                                        </button>
+                                                    </Tooltip>
                                                 </div>
                                             </td>
                                         </tr>
@@ -1348,13 +1401,16 @@ export const CustomReportBuilder = ({
                                     </p>
                                 </div>
                             </div>
-                            <button
-                                type="button"
-                                onClick={() => setIsPickerOpen(false)}
-                                className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-700/60 transition-colors"
-                            >
-                                <X className="w-5 h-5" />
-                            </button>
+<Tooltip content="Zamknij bibliotekę pozycji">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsPickerOpen(false)}
+                                    className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-700/60 transition-colors cursor-pointer"
+                                    aria-label="Zamknij bibliotekę"
+                                >
+                                    <X className="w-5 h-5" />
+                                </button>
+                            </Tooltip>
                         </div>
 
                         {/* Search & Filter Strip */}
@@ -1379,18 +1435,19 @@ export const CustomReportBuilder = ({
                                     { id: 'covenants', label: 'Kowenanty' },
                                     { id: 'valuation', label: 'Wycena' }
                                 ].map(cat => (
-                                    <button
-                                        key={cat.id}
-                                        type="button"
-                                        onClick={() => setPickerCategoryFilter(cat.id)}
-                                        className={`px-2.5 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
-                                            pickerCategoryFilter === cat.id
-                                                ? 'bg-cyan-600 text-white'
-                                                : 'text-slate-400 hover:bg-slate-700/60 hover:text-slate-200'
-                                        }`}
-                                    >
-                                        {cat.label}
-                                    </button>
+                                    <Tooltip key={cat.id} content={`Filtruj pozycje kategorii ${cat.label}`}>
+                                        <button
+                                            type="button"
+                                            onClick={() => setPickerCategoryFilter(cat.id)}
+                                            className={`px-2.5 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors cursor-pointer ${
+                                                pickerCategoryFilter === cat.id
+                                                    ? 'bg-cyan-600 text-white'
+                                                    : 'text-slate-400 hover:bg-slate-700/60 hover:text-slate-200'
+                                            }`}
+                                        >
+                                            {cat.label}
+                                        </button>
+                                    </Tooltip>
                                 ))}
                             </div>
                         </div>

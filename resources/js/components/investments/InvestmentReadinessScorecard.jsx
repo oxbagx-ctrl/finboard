@@ -27,6 +27,7 @@ import { useInvestmentProject } from '../../context/InvestmentProjectContext';
 import { useNotification } from '../../context/NotificationContext';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
+import { Tooltip, InfoTooltip } from '../ui/Tooltip';
 import {
     calculateInvestmentReadiness,
     DEFAULT_READINESS_CRITERIA,
@@ -347,9 +348,11 @@ export const InvestmentReadinessScorecard = ({
             {/* Top Bar: Title, Presets, Actions */}
             <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 sm:p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4 shadow-sm">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-md bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
-                        <ClipboardCheck className="w-5 h-5" />
-                    </div>
+                    <Tooltip content="Audyt Bankowalności i Gotowości Inwestycyjnej LMA">
+                        <div className="w-10 h-10 rounded-md bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0 cursor-help">
+                            <ClipboardCheck className="w-5 h-5" />
+                        </div>
+                    </Tooltip>
                     <div>
                         <div className="flex items-center gap-2 mb-0.5 flex-wrap">
                             <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
@@ -362,6 +365,11 @@ export const InvestmentReadinessScorecard = ({
                         </div>
                         <h2 className="text-sm sm:text-base font-bold text-zinc-100 flex items-center gap-2">
                             <span>Karta Oceny Gotowości Inwestycyjnej</span>
+                            <InfoTooltip
+                                size="sm"
+                                content="Standaryzowana karta oceny gotowości inwestycyjnej LMA (Loan Market Association) weryfikująca 16 kryteriów bankowalności w 4 filarach."
+                                ariaLabel="Objaśnienie Scorecardu Gotowości Inwestycyjnej"
+                            />
                             <span className="text-zinc-500 text-xs font-normal">| {activeProject.name}</span>
                         </h2>
                     </div>
@@ -370,58 +378,72 @@ export const InvestmentReadinessScorecard = ({
                 <div className="flex flex-wrap items-center gap-2.5">
                     {/* Preset Stage Selector */}
                     <div className="flex items-center bg-zinc-950 border border-zinc-800 rounded-lg p-1 text-[11px]">
-                        <span className="text-[10px] text-zinc-500 uppercase px-1.5">Preset:</span>
+                        <span className="text-[10px] text-zinc-500 uppercase px-1.5 flex items-center gap-1">
+                            <span>Preset:</span>
+                            <InfoTooltip
+                                size="xs"
+                                content="Wybierz predefiniowany etap dojrzałości projektu, aby automatycznie dostosować statusy kryteriów."
+                                ariaLabel="Objaśnienie presetów"
+                            />
+                        </span>
                         {Object.entries(READINESS_PRESETS).map(([key, p]) => (
-                            <button
-                                key={key}
-                                type="button"
-                                onClick={() => applyPreset(key)}
-                                className={`px-2 py-0.5 rounded transition-all cursor-pointer ${
-                                    activePreset === key
-                                        ? 'bg-zinc-800 text-zinc-100 font-bold shadow-xs'
-                                        : 'text-zinc-400 hover:text-zinc-200'
-                                }`}
-                                title={p.description}
-                            >
-                                {p.label.split(' ')[0]}
-                            </button>
+                            <Tooltip key={key} content={p.description}>
+                                <button
+                                    type="button"
+                                    onClick={() => applyPreset(key)}
+                                    className={`px-2 py-0.5 rounded transition-all cursor-pointer ${
+                                        activePreset === key
+                                            ? 'bg-zinc-800 text-zinc-100 font-bold shadow-xs'
+                                            : 'text-zinc-400 hover:text-zinc-200'
+                                    }`}
+                                >
+                                    {p.label.split(' ')[0]}
+                                </button>
+                            </Tooltip>
                         ))}
                     </div>
 
                     {/* Reset Button */}
-                    <button
-                        type="button"
-                        onClick={resetToDefaults}
-                        className="p-1.5 bg-zinc-950 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-800 rounded-md transition-colors"
+                    <Tooltip content="Przywróć domyślne kryteria i wagi scorecardu">
+                        <button
+                            type="button"
+                            onClick={resetToDefaults}
+                            className="p-1.5 bg-zinc-950 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-800 rounded-md transition-colors cursor-pointer"
+                            aria-label="Przywróć domyślne kryteria"
                         title="Przywróć domyślne kryteria"
-                    >
-                        <RotateCcw className="w-4 h-4" />
-                    </button>
+                        >
+                            <RotateCcw className="w-4 h-4" />
+                        </button>
+                    </Tooltip>
 
                     {/* Export CSV */}
-                    <Button
-                        type="button"
-                        variant="secondary"
-                        size="sm"
-                        onClick={exportToCsv}
-                        className="gap-1.5 text-xs"
-                    >
-                        <Download className="w-3.5 h-3.5" />
-                        <span>Eksportuj CSV</span>
-                    </Button>
+                    <Tooltip content="Eksportuj pełną listę kryteriów, statusów i uwag audytowych do pliku CSV">
+                        <Button
+                            type="button"
+                            variant="secondary"
+                            size="sm"
+                            onClick={exportToCsv}
+                            className="gap-1.5 text-xs"
+                        >
+                            <Download className="w-3.5 h-3.5" />
+                            <span>Eksportuj CSV</span>
+                        </Button>
+                    </Tooltip>
 
                     {/* Save Scorecard */}
-                    <Button
-                        type="button"
-                        variant="primary"
-                        size="sm"
-                        onClick={handleSaveScorecard}
-                        disabled={saving || projectLoading}
-                        className="gap-1.5 text-xs"
-                    >
-                        <Save className="w-3.5 h-3.5" />
-                        <span>{saving ? 'Zapisywanie...' : 'Zapisz Ocenę'}</span>
-                    </Button>
+                    <Tooltip content="Zapisz aktualną ewaluację kryteriów w projekcie">
+                        <Button
+                            type="button"
+                            variant="primary"
+                            size="sm"
+                            onClick={handleSaveScorecard}
+                            disabled={saving || projectLoading}
+                            className="gap-1.5 text-xs"
+                        >
+                            <Save className="w-3.5 h-3.5" />
+                            <span>{saving ? 'Zapisywanie...' : 'Zapisz Ocenę'}</span>
+                        </Button>
+                    </Tooltip>
                 </div>
             </div>
 
@@ -430,20 +452,24 @@ export const InvestmentReadinessScorecard = ({
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                     {/* Left: Overall Score Dial & Status */}
                     <div className="flex items-center gap-5">
-                        <div className="relative w-24 h-24 shrink-0 rounded-2xl bg-zinc-950 border border-zinc-800/80 flex flex-col items-center justify-center shadow-inner">
-                            <span className="text-[10px] uppercase font-bold text-zinc-500 tracking-wider">SCORE</span>
-                            <span className={`text-3xl font-extrabold tracking-tight ${statusTheme.text}`} data-testid="overall-score-display">
-                                {overallScore}
-                            </span>
-                            <span className="text-[10px] text-zinc-500 font-medium">/ 100 pkt</span>
-                        </div>
+                        <Tooltip content={`Łączna punktacja ważona gotowości inwestycyjnej: ${overallScore}/100 pkt`}>
+                            <div data-testid="overall-score-dial" className="relative w-24 h-24 shrink-0 rounded-2xl bg-zinc-950 border border-zinc-800/80 flex flex-col items-center justify-center shadow-inner cursor-help">
+                                <span className="text-[10px] uppercase font-bold text-zinc-500 tracking-wider">SCORE</span>
+                                <span className={`text-3xl font-extrabold tracking-tight ${statusTheme.text}`} data-testid="overall-score-display">
+                                    {overallScore}
+                                </span>
+                                <span className="text-[10px] text-zinc-500 font-medium">/ 100 pkt</span>
+                            </div>
+                        </Tooltip>
 
                         <div className="space-y-1.5">
                             <div className="flex items-center gap-2 flex-wrap">
-                                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md border text-xs font-bold tracking-wider ${statusTheme.badge}`} data-testid="bankability-badge">
-                                    <StatusIcon className="w-4 h-4" />
-                                    <span>{statusLabel}</span>
-                                </span>
+                                <Tooltip content={`Status bankowalności projektu: ${statusLabel}`}>
+                                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md border text-xs font-bold tracking-wider cursor-help ${statusTheme.badge}`} data-testid="bankability-badge">
+                                        <StatusIcon className="w-4 h-4" />
+                                        <span>{statusLabel}</span>
+                                    </span>
+                                </Tooltip>
                                 <span className="text-[11px] text-zinc-400">
                                     ({scorecardResult.totalEarnedPoints} / {scorecardResult.totalMaxPoints} pkt ważonych)
                                 </span>
@@ -458,52 +484,60 @@ export const InvestmentReadinessScorecard = ({
                     {/* Right: Quick Bankability Gauges */}
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 shrink-0">
                         {/* Conditions Precedent Tile */}
-                        <div className="bg-zinc-950/80 border border-zinc-800 rounded-lg p-2.5 text-center min-w-[110px]">
-                            <div className="text-[10px] text-zinc-500 uppercase font-semibold">Warunki CP</div>
-                            <div className="text-sm font-bold text-zinc-100 mt-0.5">
-                                {conditionsPrecedent.passedCount} / {conditionsPrecedent.totalCount}
+                        <Tooltip content="Warunki zawieszające (Conditions Precedent): bezwzględnie wymagane przed uruchomieniem finansowania dłużnego">
+                            <div className="bg-zinc-950/80 border border-zinc-800 rounded-lg p-2.5 text-center min-w-[110px] cursor-help">
+                                <div className="text-[10px] text-zinc-500 uppercase font-semibold">Warunki CP</div>
+                                <div className="text-sm font-bold text-zinc-100 mt-0.5">
+                                    {conditionsPrecedent.passedCount} / {conditionsPrecedent.totalCount}
+                                </div>
+                                <div className={`text-[10px] mt-0.5 font-medium ${conditionsPrecedent.pendingCount === 0 ? 'text-emerald-400' : 'text-amber-400'}`}>
+                                    {conditionsPrecedent.pendingCount === 0 ? 'Wszystkie spełnione' : `${conditionsPrecedent.pendingCount} w toku / brak`}
+                                </div>
                             </div>
-                            <div className={`text-[10px] mt-0.5 font-medium ${conditionsPrecedent.pendingCount === 0 ? 'text-emerald-400' : 'text-amber-400'}`}>
-                                {conditionsPrecedent.pendingCount === 0 ? 'Wszystkie spełnione' : `${conditionsPrecedent.pendingCount} w toku / brak`}
-                            </div>
-                        </div>
+                        </Tooltip>
 
                         {/* Critical Red Flags Tile */}
-                        <div className="bg-zinc-950/80 border border-zinc-800 rounded-lg p-2.5 text-center min-w-[110px]">
-                            <div className="text-[10px] text-zinc-500 uppercase font-semibold">Red Flags</div>
-                            <div className={`text-sm font-bold mt-0.5 ${redFlags.length === 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                                {redFlags.length}
+                        <Tooltip content="Krytyczne ryzyka i niespełnione kryteria blokujące zamknięcie finansowe (Financial Close)">
+                            <div className="bg-zinc-950/80 border border-zinc-800 rounded-lg p-2.5 text-center min-w-[110px] cursor-help">
+                                <div className="text-[10px] text-zinc-500 uppercase font-semibold">Red Flags</div>
+                                <div className={`text-sm font-bold mt-0.5 ${redFlags.length === 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                                    {redFlags.length}
+                                </div>
+                                <div className="text-[10px] text-zinc-400 mt-0.5 font-medium">
+                                    {redFlags.length === 0 ? 'Brak blokad' : 'Krytyczne braki'}
+                                </div>
                             </div>
-                            <div className="text-[10px] text-zinc-400 mt-0.5 font-medium">
-                                {redFlags.length === 0 ? 'Brak blokad' : 'Krytyczne braki'}
-                            </div>
-                        </div>
+                        </Tooltip>
 
                         {/* Automated Verification Status */}
-                        <div className="bg-zinc-950/80 border border-zinc-800 rounded-lg p-2.5 text-center min-w-[110px] col-span-2 sm:col-span-1">
-                            <div className="text-[10px] text-zinc-500 uppercase font-semibold">Model 3-State</div>
-                            <div className="text-sm font-bold text-emerald-400 mt-0.5 flex items-center justify-center gap-1">
-                                <Sparkles className="w-3.5 h-3.5" />
-                                <span>LMA Sync</span>
+                        <Tooltip content="Automatyczna synchronizacja wskaźników z modelem finansowym 15-letnim i bilansowaniem zero-variance">
+                            <div className="bg-zinc-950/80 border border-zinc-800 rounded-lg p-2.5 text-center min-w-[110px] col-span-2 sm:col-span-1 cursor-help">
+                                <div className="text-[10px] text-zinc-500 uppercase font-semibold">Model 3-State</div>
+                                <div className="text-sm font-bold text-emerald-400 mt-0.5 flex items-center justify-center gap-1">
+                                    <Sparkles className="w-3.5 h-3.5" />
+                                    <span>LMA Sync</span>
+                                </div>
+                                <div className="text-[10px] text-zinc-400 mt-0.5">
+                                    Zero-Variance OK
+                                </div>
                             </div>
-                            <div className="text-[10px] text-zinc-400 mt-0.5">
-                                Zero-Variance OK
-                            </div>
-                        </div>
+                        </Tooltip>
                     </div>
                 </div>
 
                 {/* Progress Bar under Banner */}
-                <div className="mt-5 pt-4 border-t border-zinc-800/80 flex items-center gap-4">
-                    <span className="text-[10px] uppercase font-bold text-zinc-500 shrink-0">POSTĘP DOJRZAŁOŚCI:</span>
-                    <div className="w-full bg-zinc-950 rounded-full h-2.5 overflow-hidden border border-zinc-800/60 flex">
-                        <div
-                            className={`h-full transition-all duration-300 ${statusTheme.progress}`}
-                            style={{ width: `${overallScore}%` }}
-                        />
+                <Tooltip content={`Ogólny stopień dojrzałości inwestycyjnej projektu: ${overallScore}%`}>
+                    <div className="mt-5 pt-4 border-t border-zinc-800/80 flex items-center gap-4 cursor-help">
+                        <span className="text-[10px] uppercase font-bold text-zinc-500 shrink-0">POSTĘP DOJRZAŁOŚCI:</span>
+                        <div className="w-full bg-zinc-950 rounded-full h-2.5 overflow-hidden border border-zinc-800/60 flex">
+                            <div
+                                className={`h-full transition-all duration-300 ${statusTheme.progress}`}
+                                style={{ width: `${overallScore}%` }}
+                            />
+                        </div>
+                        <span className="text-xs font-bold text-zinc-200 shrink-0">{overallScore}%</span>
                     </div>
-                    <span className="text-xs font-bold text-zinc-200 shrink-0">{overallScore}%</span>
-                </div>
+                </Tooltip>
             </div>
 
             {/* 4 Pillar Breakdown Cards */}
@@ -524,49 +558,53 @@ export const InvestmentReadinessScorecard = ({
                     const isWarning = pScore.status === 'warning';
 
                     return (
-                        <div
+                        <Tooltip
                             key={pKey}
-                            onClick={() => setActivePillarFilter(activePillarFilter === pKey ? 'all' : pKey)}
-                            className={`p-4 rounded-xl border transition-all cursor-pointer ${
-                                activePillarFilter === pKey
-                                    ? 'bg-zinc-850 border-emerald-500/50 shadow-md ring-1 ring-emerald-500/30'
-                                    : 'bg-zinc-900 border-zinc-800 hover:border-zinc-700'
-                            }`}
+                            content={`Filar ${pScore.title}: ${pScore.earnedPoints}/${pScore.maxPoints} pkt (${pScore.percentage}%). Kliknij, aby filtrować tabelę.`}
                         >
-                            <div className="flex items-center justify-between mb-2">
-                                <div className="flex items-center gap-2">
-                                    <div className={`w-7 h-7 rounded-md flex items-center justify-center ${
-                                        isCompliant ? 'bg-emerald-500/10 text-emerald-400' : isWarning ? 'bg-amber-500/10 text-amber-400' : 'bg-rose-500/10 text-rose-400'
-                                    }`}>
-                                        <PIcon className="w-4 h-4" />
+                            <div
+                                onClick={() => setActivePillarFilter(activePillarFilter === pKey ? 'all' : pKey)}
+                                className={`p-4 rounded-xl border transition-all cursor-pointer ${
+                                    activePillarFilter === pKey
+                                        ? 'bg-zinc-850 border-emerald-500/50 shadow-md ring-1 ring-emerald-500/30'
+                                        : 'bg-zinc-900 border-zinc-800 hover:border-zinc-700'
+                                }`}
+                            >
+                                <div className="flex items-center justify-between mb-2">
+                                    <div className="flex items-center gap-2">
+                                        <div className={`w-7 h-7 rounded-md flex items-center justify-center ${
+                                            isCompliant ? 'bg-emerald-500/10 text-emerald-400' : isWarning ? 'bg-amber-500/10 text-amber-400' : 'bg-rose-500/10 text-rose-400'
+                                        }`}>
+                                            <PIcon className="w-4 h-4" />
+                                        </div>
+                                        <span className="text-xs font-bold text-zinc-200 uppercase tracking-wide">
+                                            {pKey}
+                                        </span>
                                     </div>
-                                    <span className="text-xs font-bold text-zinc-200 uppercase tracking-wide">
-                                        {pKey}
+                                    <span className={`text-xs font-extrabold ${isCompliant ? 'text-emerald-400' : isWarning ? 'text-amber-400' : 'text-rose-400'}`}>
+                                        {pScore.percentage}%
                                     </span>
                                 </div>
-                                <span className={`text-xs font-extrabold ${isCompliant ? 'text-emerald-400' : isWarning ? 'text-amber-400' : 'text-rose-400'}`}>
-                                    {pScore.percentage}%
-                                </span>
-                            </div>
 
-                            <div className="text-[11px] font-semibold text-zinc-300 truncate mb-1">
-                                {pScore.title.split(' ')[0]}
-                            </div>
+                                <div className="text-[11px] font-semibold text-zinc-300 truncate mb-1">
+                                    {pScore.title.split(' ')[0]}
+                                </div>
 
-                            <div className="flex items-center justify-between text-[10px] text-zinc-500 mb-2">
-                                <span>Punkty: {pScore.earnedPoints} / {pScore.maxPoints}</span>
-                                <span>Spełnione: {pScore.passedCount}/{pScore.criteriaCount}</span>
-                            </div>
+                                <div className="flex items-center justify-between text-[10px] text-zinc-500 mb-2">
+                                    <span>Punkty: {pScore.earnedPoints} / {pScore.maxPoints}</span>
+                                    <span>Spełnione: {pScore.passedCount}/{pScore.criteriaCount}</span>
+                                </div>
 
-                            <div className="w-full bg-zinc-950 rounded-full h-1.5 overflow-hidden">
-                                <div
-                                    className={`h-full transition-all duration-300 ${
-                                        isCompliant ? 'bg-emerald-500' : isWarning ? 'bg-amber-500' : 'bg-rose-500'
-                                    }`}
-                                    style={{ width: `${pScore.percentage}%` }}
-                                />
+                                <div className="w-full bg-zinc-950 rounded-full h-1.5 overflow-hidden">
+                                    <div
+                                        className={`h-full transition-all duration-300 ${
+                                            isCompliant ? 'bg-emerald-500' : isWarning ? 'bg-amber-500' : 'bg-rose-500'
+                                        }`}
+                                        style={{ width: `${pScore.percentage}%` }}
+                                    />
+                                </div>
                             </div>
-                        </div>
+                        </Tooltip>
                     );
                 })}
             </div>
@@ -576,85 +614,99 @@ export const InvestmentReadinessScorecard = ({
                 {/* Section Controls Toolbar */}
                 <div className="p-4 bg-zinc-950/60 border-b border-zinc-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="flex flex-wrap items-center gap-1.5">
-                        <button
-                            type="button"
-                            onClick={() => setActivePillarFilter('all')}
-                            className={`px-2.5 py-1 text-xs rounded transition-all cursor-pointer ${
-                                activePillarFilter === 'all'
-                                    ? 'bg-zinc-800 text-zinc-100 font-bold shadow-xs'
-                                    : 'text-zinc-400 hover:text-zinc-200'
-                            }`}
-                        >
-                            Wszystkie ({criteria.length})
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setActivePillarFilter('legal')}
-                            className={`px-2.5 py-1 text-xs rounded transition-all cursor-pointer ${
-                                activePillarFilter === 'legal'
-                                    ? 'bg-zinc-800 text-zinc-100 font-bold shadow-xs'
-                                    : 'text-zinc-400 hover:text-zinc-200'
-                            }`}
-                        >
-                            Formalno-Prawne (4)
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setActivePillarFilter('technical')}
-                            className={`px-2.5 py-1 text-xs rounded transition-all cursor-pointer ${
-                                activePillarFilter === 'technical'
-                                    ? 'bg-zinc-800 text-zinc-100 font-bold shadow-xs'
-                                    : 'text-zinc-400 hover:text-zinc-200'
-                            }`}
-                        >
-                            Techniczne (4)
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setActivePillarFilter('market')}
-                            className={`px-2.5 py-1 text-xs rounded transition-all cursor-pointer ${
-                                activePillarFilter === 'market'
-                                    ? 'bg-zinc-800 text-zinc-100 font-bold shadow-xs'
-                                    : 'text-zinc-400 hover:text-zinc-200'
-                            }`}
-                        >
-                            Rynkowe (4)
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setActivePillarFilter('financial')}
-                            className={`px-2.5 py-1 text-xs rounded transition-all cursor-pointer ${
-                                activePillarFilter === 'financial'
-                                    ? 'bg-zinc-800 text-zinc-100 font-bold shadow-xs'
-                                    : 'text-zinc-400 hover:text-zinc-200'
-                            }`}
-                        >
-                            Finansowe (4)
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setActivePillarFilter('cp_only')}
-                            className={`px-2.5 py-1 text-xs rounded transition-all cursor-pointer flex items-center gap-1 ${
-                                activePillarFilter === 'cp_only'
-                                    ? 'bg-amber-950/60 text-amber-300 font-bold border border-amber-800/80'
-                                    : 'text-amber-400/80 hover:text-amber-300'
-                            }`}
-                        >
-                            <ShieldCheck className="w-3.5 h-3.5" />
-                            <span>Tylko CP ({conditionsPrecedent.totalCount})</span>
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setActivePillarFilter('gaps_only')}
-                            className={`px-2.5 py-1 text-xs rounded transition-all cursor-pointer flex items-center gap-1 ${
-                                activePillarFilter === 'gaps_only'
-                                    ? 'bg-rose-950/60 text-rose-300 font-bold border border-rose-800/80'
-                                    : 'text-rose-400/80 hover:text-rose-300'
-                            }`}
-                        >
-                            <AlertTriangle className="w-3.5 h-3.5" />
-                            <span>Braki & Do Poprawy</span>
-                        </button>
+                        <Tooltip content="Pokaż wszystkie kryteria ze wszystkich 4 filarów">
+                            <button
+                                type="button"
+                                onClick={() => setActivePillarFilter('all')}
+                                className={`px-2.5 py-1 text-xs rounded transition-all cursor-pointer ${
+                                    activePillarFilter === 'all'
+                                        ? 'bg-zinc-800 text-zinc-100 font-bold shadow-xs'
+                                        : 'text-zinc-400 hover:text-zinc-200'
+                                }`}
+                            >
+                                Wszystkie ({criteria.length})
+                            </button>
+                        </Tooltip>
+                        <Tooltip content="Filtruj kryteria filaru Formalno-Prawnego (struktura SPV, pozwolenia, umowy EPC)">
+                            <button
+                                type="button"
+                                onClick={() => setActivePillarFilter('legal')}
+                                className={`px-2.5 py-1 text-xs rounded transition-all cursor-pointer ${
+                                    activePillarFilter === 'legal'
+                                        ? 'bg-zinc-800 text-zinc-100 font-bold shadow-xs'
+                                        : 'text-zinc-400 hover:text-zinc-200'
+                                }`}
+                            >
+                                Formalno-Prawne (4)
+                            </button>
+                        </Tooltip>
+                        <Tooltip content="Filtruj kryteria filaru Technicznego (raport doradcy technicznego, harmonogram, rezerwy)">
+                            <button
+                                type="button"
+                                onClick={() => setActivePillarFilter('technical')}
+                                className={`px-2.5 py-1 text-xs rounded transition-all cursor-pointer ${
+                                    activePillarFilter === 'technical'
+                                        ? 'bg-zinc-800 text-zinc-100 font-bold shadow-xs'
+                                        : 'text-zinc-400 hover:text-zinc-200'
+                                }`}
+                            >
+                                Techniczne (4)
+                            </button>
+                        </Tooltip>
+                        <Tooltip content="Filtruj kryteria filaru Rynkowego (analiza popytu, umowy offtake/PPA, hedging)">
+                            <button
+                                type="button"
+                                onClick={() => setActivePillarFilter('market')}
+                                className={`px-2.5 py-1 text-xs rounded transition-all cursor-pointer ${
+                                    activePillarFilter === 'market'
+                                        ? 'bg-zinc-800 text-zinc-100 font-bold shadow-xs'
+                                        : 'text-zinc-400 hover:text-zinc-200'
+                                }`}
+                            >
+                                Rynkowe (4)
+                            </button>
+                        </Tooltip>
+                        <Tooltip content="Filtruj kryteria filaru Finansowego (bufor DSCR, LLCR, rezerwa DSRF, kapitał własny)">
+                            <button
+                                type="button"
+                                onClick={() => setActivePillarFilter('financial')}
+                                className={`px-2.5 py-1 text-xs rounded transition-all cursor-pointer ${
+                                    activePillarFilter === 'financial'
+                                        ? 'bg-zinc-800 text-zinc-100 font-bold shadow-xs'
+                                        : 'text-zinc-400 hover:text-zinc-200'
+                                }`}
+                            >
+                                Finansowe (4)
+                            </button>
+                        </Tooltip>
+                        <Tooltip content="Pokaż wyłącznie kluczowe warunki zawieszające (Conditions Precedent)">
+                            <button
+                                type="button"
+                                onClick={() => setActivePillarFilter('cp_only')}
+                                className={`px-2.5 py-1 text-xs rounded transition-all cursor-pointer flex items-center gap-1 ${
+                                    activePillarFilter === 'cp_only'
+                                        ? 'bg-amber-950/60 text-amber-300 font-bold border border-amber-800/80'
+                                        : 'text-amber-400/80 hover:text-amber-300'
+                                }`}
+                            >
+                                <ShieldCheck className="w-3.5 h-3.5" />
+                                <span>Tylko CP ({conditionsPrecedent.totalCount})</span>
+                            </button>
+                        </Tooltip>
+                        <Tooltip content="Pokaż niespełnione kryteria oraz pozycje wymagające uzupełnienia">
+                            <button
+                                type="button"
+                                onClick={() => setActivePillarFilter('gaps_only')}
+                                className={`px-2.5 py-1 text-xs rounded transition-all cursor-pointer flex items-center gap-1 ${
+                                    activePillarFilter === 'gaps_only'
+                                        ? 'bg-rose-950/60 text-rose-300 font-bold border border-rose-800/80'
+                                        : 'text-rose-400/80 hover:text-rose-300'
+                                }`}
+                            >
+                                <AlertTriangle className="w-3.5 h-3.5" />
+                                <span>Braki & Do Poprawy</span>
+                            </button>
+                        </Tooltip>
                     </div>
 
                     {/* Search Input */}
@@ -665,6 +717,7 @@ export const InvestmentReadinessScorecard = ({
                             placeholder="Szukaj kryterium audytowego..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
+                            aria-label="Szukaj kryterium audytowego"
                             className="w-full bg-zinc-950 border border-zinc-800 rounded pl-8 pr-3 py-1.5 text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-zinc-700"
                         />
                     </div>
@@ -685,7 +738,7 @@ export const InvestmentReadinessScorecard = ({
                             </tr>
                         </thead>
 
-                        <tbody className="divide-y divide-zinc-850 text-zinc-300">
+                        <tbody className="divide-y divide-zinc-855 text-zinc-300">
                             {filteredCriteria.length === 0 ? (
                                 <tr>
                                     <td colSpan={7} className="py-8 text-center text-zinc-500">
@@ -718,25 +771,31 @@ export const InvestmentReadinessScorecard = ({
                                                 <td className="py-3 px-3 text-zinc-400 text-[11px] leading-relaxed">
                                                     {item.description}
                                                     {item.autoKey && (
-                                                        <span className="inline-flex items-center gap-1 ml-2 text-[10px] text-emerald-400 bg-emerald-950/40 px-1.5 py-0.5 rounded border border-emerald-800/50" title="Kryterium ewaluowane automatycznie z parametrów modelu">
-                                                            <Sparkles className="w-2.5 h-2.5" />
-                                                            Auto-Sync
-                                                        </span>
+                                                        <Tooltip content="Kryterium ewaluowane automatycznie na podstawie wskaźników modelu 15-letniego i struktury finansowania">
+                                                            <span className="inline-flex items-center gap-1 ml-2 text-[10px] text-emerald-400 bg-emerald-950/40 px-1.5 py-0.5 rounded border border-emerald-800/50 cursor-help">
+                                                                <Sparkles className="w-2.5 h-2.5" />
+                                                                Auto-Sync
+                                                            </span>
+                                                        </Tooltip>
                                                     )}
                                                 </td>
 
                                                 {/* Weight */}
                                                 <td className="py-3 px-3 text-center font-bold text-zinc-300">
-                                                    {item.weight} pkt
+                                                    <Tooltip content={`Waga kryterium w scorecardzie: ${item.weight} pkt`}>
+                                                        <span className="cursor-help">{item.weight} pkt</span>
+                                                    </Tooltip>
                                                 </td>
 
                                                 {/* CP Badge */}
                                                 <td className="py-3 px-3 text-center">
                                                     {item.isConditionPrecedent ? (
-                                                        <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded bg-amber-950/60 text-amber-300 border border-amber-800/80">
-                                                            <ShieldCheck className="w-3 h-3" />
-                                                            CP
-                                                        </span>
+                                                        <Tooltip content="Kluczowy warunek zawieszający (Condition Precedent) przed wypłatą kredytu">
+                                                            <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded bg-amber-950/60 text-amber-300 border border-amber-800/80 cursor-help">
+                                                                <ShieldCheck className="w-3 h-3" />
+                                                                CP
+                                                            </span>
+                                                        </Tooltip>
                                                     ) : (
                                                         <span className="text-zinc-600 text-[10px]">—</span>
                                                     )}
@@ -745,69 +804,76 @@ export const InvestmentReadinessScorecard = ({
                                                 {/* Status Selector Buttons */}
                                                 <td className="py-3 px-3 text-center">
                                                     <div className="inline-flex items-center bg-zinc-950 p-1 rounded-lg border border-zinc-800 gap-1">
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => handleStatusChange(item.id, 'passed')}
-                                                            className={`px-2 py-1 text-[11px] font-semibold rounded transition-all cursor-pointer ${
-                                                                item.status === 'passed'
-                                                                    ? 'bg-emerald-600 text-white shadow-xs'
-                                                                    : 'text-zinc-400 hover:text-emerald-300'
-                                                            }`}
-                                                            title="Spełniony (100% punktów)"
-                                                        >
-                                                            Spełniony
-                                                        </button>
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => handleStatusChange(item.id, 'in_progress')}
-                                                            className={`px-2 py-1 text-[11px] font-semibold rounded transition-all cursor-pointer ${
-                                                                item.status === 'in_progress'
-                                                                    ? 'bg-amber-600 text-white shadow-xs'
-                                                                    : 'text-zinc-400 hover:text-amber-300'
-                                                            }`}
-                                                            title="W toku / Częściowy (50% punktów)"
-                                                        >
-                                                            W toku
-                                                        </button>
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => handleStatusChange(item.id, 'failed')}
-                                                            className={`px-2 py-1 text-[11px] font-semibold rounded transition-all cursor-pointer ${
-                                                                item.status === 'failed'
-                                                                    ? 'bg-rose-600 text-white shadow-xs'
-                                                                    : 'text-zinc-400 hover:text-rose-300'
-                                                            }`}
-                                                            title="Niespełniony (0 punktów)"
-                                                        >
-                                                            Brak
-                                                        </button>
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => handleStatusChange(item.id, 'na')}
-                                                            className={`px-2 py-1 text-[11px] font-semibold rounded transition-all cursor-pointer ${
-                                                                item.status === 'na'
-                                                                    ? 'bg-zinc-700 text-zinc-100 shadow-xs'
-                                                                    : 'text-zinc-500 hover:text-zinc-300'
-                                                            }`}
-                                                            title="Nie dotyczy"
-                                                        >
-                                                            N/D
-                                                        </button>
+                                                        <Tooltip content="Spełniony (100% punktów wagi kryterium)">
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => handleStatusChange(item.id, 'passed')}
+                                                                className={`px-2 py-1 text-[11px] font-semibold rounded transition-all cursor-pointer ${
+                                                                    item.status === 'passed'
+                                                                        ? 'bg-emerald-600 text-white shadow-xs'
+                                                                        : 'text-zinc-400 hover:text-emerald-300'
+                                                                }`}
+                                                            >
+                                                                Spełniony
+                                                            </button>
+                                                        </Tooltip>
+                                                        <Tooltip content="W toku / Częściowy (50% punktów wagi kryterium)">
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => handleStatusChange(item.id, 'in_progress')}
+                                                                className={`px-2 py-1 text-[11px] font-semibold rounded transition-all cursor-pointer ${
+                                                                    item.status === 'in_progress'
+                                                                        ? 'bg-amber-600 text-white shadow-xs'
+                                                                        : 'text-zinc-400 hover:text-amber-300'
+                                                                }`}
+                                                            >
+                                                                W toku
+                                                            </button>
+                                                        </Tooltip>
+                                                        <Tooltip content="Niespełniony (0 punktów wagi kryterium)">
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => handleStatusChange(item.id, 'failed')}
+                                                                className={`px-2 py-1 text-[11px] font-semibold rounded transition-all cursor-pointer ${
+                                                                    item.status === 'failed'
+                                                                        ? 'bg-rose-600 text-white shadow-xs'
+                                                                        : 'text-zinc-400 hover:text-rose-300'
+                                                                }`}
+                                                            >
+                                                                Brak
+                                                            </button>
+                                                        </Tooltip>
+                                                        <Tooltip content="Nie dotyczy (kryterium wyłączone z kalkulacji mianownika wag)">
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => handleStatusChange(item.id, 'na')}
+                                                                className={`px-2 py-1 text-[11px] font-semibold rounded transition-all cursor-pointer ${
+                                                                    item.status === 'na'
+                                                                        ? 'bg-zinc-700 text-zinc-100 shadow-xs'
+                                                                        : 'text-zinc-500 hover:text-zinc-300'
+                                                                }`}
+                                                            >
+                                                                N/D
+                                                            </button>
+                                                        </Tooltip>
                                                     </div>
                                                 </td>
 
                                                 {/* Notes Toggle */}
                                                 <td className="py-3 px-3 text-center">
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => toggleNotesExpanded(item.id)}
-                                                        className={`p-1.5 rounded transition-colors ${
-                                                            item.notes ? 'text-emerald-400 bg-emerald-950/30' : 'text-zinc-500 hover:text-zinc-300'
-                                                        }`}
-                                                        title="Dodaj lub edytuj notatkę audytową"
-                                                    >
-                                                        <Info className="w-4 h-4" />
-                                                    </button>
+                                                    <Tooltip content="Dodaj lub edytuj notatkę audytową kryterium">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => toggleNotesExpanded(item.id)}
+                                                            className={`p-1.5 rounded transition-colors cursor-pointer ${
+                                                                item.notes ? 'text-emerald-400 bg-emerald-950/30' : 'text-zinc-500 hover:text-zinc-300'
+                                                            }`}
+                                                            aria-label="Notatka audytowa kryterium"
+                                                            title="Dodaj lub edytuj notatkę audytową"
+                                                        >
+                                                            <Info className="w-4 h-4" />
+                                                        </button>
+                                                    </Tooltip>
                                                 </td>
                                             </tr>
 
@@ -824,6 +890,7 @@ export const InvestmentReadinessScorecard = ({
                                                                 placeholder="Wpisz uzasadnienie, sygnaturę decyzji lub uwagi do weryfikacji..."
                                                                 value={item.notes || ''}
                                                                 onChange={(e) => handleNotesChange(item.id, e.target.value)}
+                                                                aria-label={`Notatka do kryterium ${item.name}`}
                                                                 className="w-full bg-zinc-900 border border-zinc-700 rounded px-3 py-1 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-emerald-500"
                                                             />
                                                         </div>
@@ -843,13 +910,22 @@ export const InvestmentReadinessScorecard = ({
             <div className="bg-zinc-900/90 border border-zinc-800 rounded-xl p-5 shadow-sm">
                 <div className="flex items-center justify-between gap-4 mb-3 flex-wrap">
                     <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
-                            <ShieldCheck className="w-4 h-4" />
-                        </div>
+                        <Tooltip content="Weryfikacja kompletu warunków zawieszających LMA">
+                            <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 cursor-help">
+                                <ShieldCheck className="w-4 h-4" />
+                            </div>
+                        </Tooltip>
                         <div>
-                            <h3 className="text-sm font-bold text-zinc-100">
-                                Warunki Zawieszające przed Wypłatą Finansowania (Conditions Precedent - CPs)
-                            </h3>
+                            <div className="flex items-center gap-2">
+                                <h3 className="text-sm font-bold text-zinc-100">
+                                    Warunki Zawieszające przed Wypłatą Finansowania (Conditions Precedent - CPs)
+                                </h3>
+                                <InfoTooltip
+                                    size="xs"
+                                    content="Zestawienie wymogów formalno-prawnych i technicznych LMA, których spełnienie warunkuje podpisanie umowy i uruchomienie kredytu."
+                                    ariaLabel="Objaśnienie warunków CP"
+                                />
+                            </div>
                             <p className="text-xs text-zinc-400 mt-0.5">
                                 Zestawienie wymogów formalno-prawnych i technicznych LMA, których spełnienie warunkuje podpisanie umowy i uruchomienie kredytu.
                             </p>
@@ -858,42 +934,50 @@ export const InvestmentReadinessScorecard = ({
 
                     <div className="text-right">
                         <span className="text-xs text-zinc-400 font-semibold">Status CPs: </span>
-                        <span className={`text-sm font-bold ${conditionsPrecedent.pendingCount === 0 ? 'text-emerald-400' : 'text-amber-400'}`}>
-                            {conditionsPrecedent.passedCount} z {conditionsPrecedent.totalCount} spełnionych
-                        </span>
+                        <Tooltip content={`${conditionsPrecedent.passedCount} z ${conditionsPrecedent.totalCount} kluczowych warunków CP zostało już spełnionych`}>
+                            <span className={`text-sm font-bold cursor-help ${conditionsPrecedent.pendingCount === 0 ? 'text-emerald-400' : 'text-amber-400'}`}>
+                                {conditionsPrecedent.passedCount} z {conditionsPrecedent.totalCount} spełnionych
+                            </span>
+                        </Tooltip>
                     </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-4">
                     {conditionsPrecedent.items.map((cp) => (
-                        <div
+                        <Tooltip
                             key={cp.id}
-                            className={`p-2.5 rounded-lg border flex items-center justify-between gap-3 text-xs ${
-                                cp.status === 'passed'
-                                    ? 'bg-emerald-950/20 border-emerald-800/40 text-emerald-300'
-                                    : cp.status === 'in_progress'
-                                    ? 'bg-amber-950/20 border-amber-800/40 text-amber-300'
-                                    : 'bg-rose-950/20 border-rose-800/40 text-rose-300'
-                            }`}
+                            content={cp.status === 'passed' ? `Warunek CP spełniony: ${cp.name}` : `Warunek CP wymagany przed uruchomieniem transzy kredytu: ${cp.name}`}
                         >
-                            <div className="flex items-center gap-2 truncate">
-                                {cp.status === 'passed' ? (
-                                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                                ) : cp.status === 'in_progress' ? (
-                                    <Clock className="w-4 h-4 text-amber-400 shrink-0" />
-                                ) : (
-                                    <XCircle className="w-4 h-4 text-rose-400 shrink-0" />
-                                )}
-                                <span className="font-semibold truncate">{cp.name}</span>
-                            </div>
+                            <div
+                                className={`p-2.5 rounded-lg border flex items-center justify-between gap-3 text-xs cursor-help ${
+                                    cp.status === 'passed'
+                                        ? 'bg-emerald-950/20 border-emerald-800/40 text-emerald-300'
+                                        : cp.status === 'in_progress'
+                                        ? 'bg-amber-950/20 border-amber-800/40 text-amber-300'
+                                        : 'bg-rose-950/20 border-rose-800/40 text-rose-300'
+                                }`}
+                            >
+                                <div className="flex items-center gap-2 truncate">
+                                    {cp.status === 'passed' ? (
+                                        <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                                    ) : cp.status === 'in_progress' ? (
+                                        <Clock className="w-4 h-4 text-amber-400 shrink-0" />
+                                    ) : (
+                                        <XCircle className="w-4 h-4 text-rose-400 shrink-0" />
+                                    )}
+                                    <span className="font-semibold truncate">{cp.name}</span>
+                                </div>
 
-                            <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-zinc-950/60 border border-zinc-800 shrink-0">
-                                {cp.status === 'passed' ? 'SPEŁNIONY' : cp.status === 'in_progress' ? 'W TOKU' : 'WYMAGANY'}
-                            </span>
-                        </div>
+                                <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-zinc-950/60 border border-zinc-800 shrink-0">
+                                    {cp.status === 'passed' ? 'SPEŁNIONY' : cp.status === 'in_progress' ? 'W TOKU' : 'WYMAGANY'}
+                                </span>
+                            </div>
+                        </Tooltip>
                     ))}
                 </div>
             </div>
         </div>
     );
 };
+
+export default InvestmentReadinessScorecard;
