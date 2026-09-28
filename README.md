@@ -1000,7 +1000,7 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - `AcceptInvitationView.jsx` & `App.jsx`: obsługa parametrów ścieżki i query params za pomocą `useParams` oraz `useSearchParams`, wsparcie dla wariantów `/accept-invitation/:token` i `/invitation/accept`.
     - Weryfikacja testowa: 100% PASS w pełnym zestawie 69 plików Vitest (627 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
-- [ ] **Faza 58: Integracja Układu Aplikacji i Semantycznej Nawigacji (Commity 289–291)**
+- [x] **Faza 58: Integracja Układu Aplikacji i Semantycznej Nawigacji (Commity 289–291)**
   - [x] Przekształcenie AppLayout w układ oparty na gnieździe Outlet z dynamiczną rezolucją nagłówka.
     - `AppLayout.jsx`: wdrożenie komponentu `<Outlet context={{ onRefreshData, refreshing, refreshKey }} />` wewnątrz kontenera `<main>` z zachowaniem wsparcia dla propa `children` dla pełnej kompatybilności wstecznej.
     - `Header.jsx`: wdrożenie bezpiecznej rezolucji `useLocation()`, integracja stałych `ROUTE_TITLES` oraz hierarchicznego fallbacku tytułu ekranu (ścieżka URL -> strona główna -> parametry wsteczne -> domyślna nazwa 'FinBoard').
@@ -1010,7 +1010,11 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - `Sidebar.jsx`: powiązanie wszystkich modułów analitycznych i administracyjnych ze ścieżkami `ROUTES`, zastąpienie elementów `<button>` semantycznymi linkami `<NavLink to={item.path}>` z dynamicznym formatowaniem aktywnego modułu (`border-l-2 border-zinc-100`, kolory ikon i kodów modułów) oraz bezpiecznym fallbackiem `useInRouterContext()` dla odizolowanych testów jednostkowych.
     - `App.jsx`: usunięcie manualnego sterowania trasą `currentRoute` i procedurą `onRouteChange` z `ProtectedLayout`, powierzając nawigację komponentom `<NavLink>` i gniazdu `<Outlet />`.
     - Weryfikacja testowa: 100% PASS w pełnym zestawie 69 plików Vitest (627 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
-  - [ ] Eliminacja przestarzałej nawigacji hash i dedykowany widok błędu 404 Not Found.
+  - [x] Eliminacja przestarzałej nawigacji hash i dedykowany widok błędu 404 Not Found.
+    - `ImportView.jsx`: eliminacja instrukcji `window.location.hash = '#records'` i zastąpienie jej semantyczną nawigacją `navigate(ROUTES.RECORDS)`.
+    - `NotFoundView.jsx`: implementacja dedykowanego widoku błędu 404 w stylistyce dark terminal FinBoard Deal Advisory z diagnostyką ścieżki (`404-requested-path`), statusem sesji, symulacją polecenia CLI routera oraz przyciskami powrotu do Pulpitu / Ekranu Logowania i cofania w historii (`navigate(-1)`).
+    - `routes.js` & `App.jsx`: rejestracja stałej `ROUTES.NOT_FOUND` (`/404`) oraz podpięcie `<NotFoundView />` pod jawną trasę `/404` i łapacz wszystkich nieznanych ścieżek (`*`).
+    - Weryfikacja testowa: 100% PASS w pełnym zestawie 69 plików Vitest (627 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
 - [ ] **Faza 59: Adaptacja Środowiska Testowego, Weryfikacja Regresji i Dokumentacja (Commity 292–294)**
   - [ ] Pomocnik testowy renderWithRouter oraz testy jednostkowe strażników tras i Sidebara.

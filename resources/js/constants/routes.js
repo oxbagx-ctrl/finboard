@@ -16,6 +16,7 @@ export const ROUTES = Object.freeze({
     REPORTS: '/reports',
     AUDIT_LOGS: '/audit-logs',
     ADVISORS: '/advisors',
+    NOT_FOUND: '/404',
 });
 
 export const ROUTE_TITLES = Object.freeze({
@@ -30,6 +31,7 @@ export const ROUTE_TITLES = Object.freeze({
     [ROUTES.ADVISORS]: 'Doradcy & Przypisania / Uprawnienia',
     [ROUTES.LOGIN]: 'Logowanie do Platformy',
     [ROUTES.ACCEPT_INVITATION]: 'Aktywacja Konta i Zaproszenie',
+    [ROUTES.NOT_FOUND]: '404 Nie Odnaleziono Zasobu',
 });
 
 export default ROUTES;

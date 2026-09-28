@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import apiClient from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
+import { ROUTES } from '../constants/routes';
 import { CsvDropzone } from '../components/import/CsvDropzone';
 import { CsvPreviewTable } from '../components/import/CsvPreviewTable';
 import { ImportJobProgress } from '../components/import/ImportJobProgress';
@@ -20,6 +22,15 @@ import {
 export const ImportView = () => {
     const { activeCompany } = useAuth();
     const { success, error, info } = useNotification();
+
+    let navigate = null;
+    try {
+        navigate = useNavigate();
+    } catch {
+        navigate = (to) => {
+            if (typeof window !== 'undefined') window.location.href = to;
+        };
+    }
 
     // Workflow states
     const [file, setFile] = useState(null);
@@ -133,8 +144,11 @@ export const ImportView = () => {
     };
 
     const handleNavigateRecords = () => {
-        // Dispatch navigation or route event
-        window.location.hash = '#records';
+        if (navigate) {
+            navigate(ROUTES.RECORDS);
+        } else if (typeof window !== 'undefined') {
+            window.location.href = ROUTES.RECORDS;
+        }
     };
 
     return (

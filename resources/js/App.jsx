@@ -18,6 +18,7 @@ import { DataRoomView } from './views/DataRoomView';
 import { ReportsView } from './views/ReportsView';
 import { AuditLogsView } from './views/AuditLogsView';
 import { AdvisorsManagementView } from './views/AdvisorsManagementView';
+import { NotFoundView } from './views/NotFoundView';
 
 /**
  * ProtectedLayout Shell
@@ -128,8 +129,11 @@ export const AppRoutes = () => {
                 />
             </Route>
 
+            {/* Explicit 404 Not Found Route */}
+            <Route path={ROUTES.NOT_FOUND} element={<NotFoundView />} />
+
             {/* Catch-all Fallback */}
-            <Route path="*" element={<Navigate to={ROUTES.DASHBOARD} replace />} />
+            <Route path="*" element={<NotFoundView />} />
         </Routes>
     );
 };
