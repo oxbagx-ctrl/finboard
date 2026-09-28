@@ -145,7 +145,7 @@ export const InvestmentPlanningView = () => {
     return (
         <div className="space-y-6 font-mono">
             {/* Top Bar: Title, Project Switcher, Action */}
-            <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
                 <div>
                     <div className="flex items-center gap-2 mb-1">
                         <Tooltip content="Moduł doradztwa transakcyjnego, modelowania nakładów CAPEX i project finance">
@@ -153,17 +153,17 @@ export const InvestmentPlanningView = () => {
                                 MODUŁ DEAL ADVISORY & PROJECT FINANCE
                             </span>
                         </Tooltip>
-                        <span className="text-zinc-600">//</span>
+                        <span className="text-zinc-400 dark:text-zinc-600">//</span>
                         <Tooltip content={`Aktywny profil podmiotu gospodarczego: ${activeCompany?.name || 'Spółka domyślna'}`}>
-                            <span className="text-[10px] text-emerald-400 font-semibold uppercase cursor-help">
+                            <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold uppercase cursor-help">
                                 {activeCompany?.code || 'PODMIOT'}
                             </span>
                         </Tooltip>
                     </div>
-                    <h1 className="text-base sm:text-lg font-bold text-zinc-100 tracking-tight flex items-center gap-2.5">
+                    <h1 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-zinc-100 tracking-tight flex items-center gap-2.5">
                         <Tooltip content="Silnik wyceny i inżynierii finansowej CAPEX">
                             <span className="inline-flex">
-                                <Calculator className="w-5 h-5 text-emerald-400" />
+                                <Calculator className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                             </span>
                         </Tooltip>
                         <span>Planowanie Inwestycji i Montaż Finansowy</span>
@@ -172,7 +172,7 @@ export const InvestmentPlanningView = () => {
                             size="sm"
                         />
                     </h1>
-                    <p className="text-xs text-zinc-400 mt-0.5">
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
                         Modelowanie 15-letnich nakładów CAPEX, amortyzacji KŚT, długu bankowego i wyceny DCF
                     </p>
                 </div>
@@ -180,18 +180,18 @@ export const InvestmentPlanningView = () => {
                 <div className="flex items-center gap-3 flex-wrap">
                     {/* Project Selector (if projects exist) */}
                     {projects.length > 0 && (
-                        <div className="flex items-center gap-2 bg-zinc-950 border border-zinc-800 rounded-md px-3 py-1.5">
-                            <span className="text-[11px] text-zinc-400 uppercase font-semibold">PROJEKT:</span>
+                        <div className="flex items-center gap-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-md px-3 py-1.5">
+                            <span className="text-[11px] text-zinc-500 dark:text-zinc-400 uppercase font-semibold">PROJEKT:</span>
                             <Tooltip content="Wybierz aktywny projekt inwestycyjny do analizy i edycji założeń">
                                 <select
                                     value={selectedProjectId || ''}
                                     onChange={(e) => selectProject(e.target.value)}
                                     aria-label="Wybierz projekt"
                                     data-testid="project-selector"
-                                    className="bg-transparent text-xs text-zinc-100 font-semibold focus:outline-none cursor-pointer max-w-[200px] truncate"
+                                    className="bg-transparent text-xs text-zinc-900 dark:text-zinc-100 font-semibold focus:outline-none cursor-pointer max-w-[200px] truncate"
                                 >
                                     {projects.map((p) => (
-                                        <option key={p.id} value={p.id} className="bg-zinc-900 text-zinc-100">
+                                        <option key={p.id} value={p.id} className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
                                             {p.name}
                                         </option>
                                     ))}
@@ -215,15 +215,15 @@ export const InvestmentPlanningView = () => {
 
             {/* Empty State when no projects exist */}
             {!loading && projects.length === 0 && (
-                <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-10 text-center max-w-2xl mx-auto shadow-sm my-8">
-                    <div className="w-12 h-12 rounded-full bg-zinc-800 border border-zinc-700 mx-auto flex items-center justify-center text-zinc-400 mb-4">
-                        <Calculator className="w-6 h-6 text-zinc-300" />
+                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-10 text-center max-w-2xl mx-auto shadow-sm my-8">
+                    <div className="w-12 h-12 rounded-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 mx-auto flex items-center justify-center text-zinc-500 dark:text-zinc-400 mb-4">
+                        <Calculator className="w-6 h-6 text-zinc-600 dark:text-zinc-300" />
                     </div>
-                    <h2 className="text-sm font-bold text-zinc-100 uppercase tracking-wide mb-2">
+                    <h2 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wide mb-2">
                         Brak zdefiniowanych projektów inwestycyjnych
                     </h2>
-                    <p className="text-xs text-zinc-400 max-w-md mx-auto mb-6 leading-relaxed">
-                        Dla podmiotu <strong className="text-zinc-200">{activeCompany?.name || 'wybranej spółki'}</strong> nie skonfigurowano jeszcze żadnego projektu inwestycyjnego. Zainicjalizuj projekt, aby rozpocząć definiowanie etapów CAPEX, montażu długu i symulacji 15-letnich sprawozdań.
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-md mx-auto mb-6 leading-relaxed">
+                        Dla podmiotu <strong className="text-zinc-800 dark:text-zinc-200">{activeCompany?.name || 'wybranej spółki'}</strong> nie skonfigurowano jeszcze żadnego projektu inwestycyjnego. Zainicjalizuj projekt, aby rozpocząć definiowanie etapów CAPEX, montażu długu i symulacji 15-letnich sprawozdań.
                     </p>
                     <Tooltip content="Otwórz konfigurator i zdefiniuj pierwszy projekt inwestycyjny dla spółki">
                         <Button
@@ -282,7 +282,7 @@ export const InvestmentPlanningView = () => {
                     </div>
 
                     {/* Sub-tabs Navigation */}
-                    <div className="border-b border-zinc-800">
+                    <div className="border-b border-zinc-200 dark:border-zinc-800">
                         <div className="flex items-center gap-2 overflow-x-auto pb-px">
                             {tabs.map((tab) => {
                                 const Icon = tab.icon;
@@ -294,11 +294,11 @@ export const InvestmentPlanningView = () => {
                                             aria-label={`${tab.label} - ${tab.sublabel}`}
                                             className={`flex items-center gap-2.5 px-4 py-3 border-b-2 text-xs font-semibold uppercase tracking-wider transition-all whitespace-nowrap cursor-pointer ${
                                                 isActive
-                                                    ? 'border-emerald-400 text-zinc-100 bg-zinc-900/40'
-                                                    : 'border-transparent text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/20'
+                                                    ? 'border-emerald-500 text-zinc-900 dark:text-zinc-100 bg-zinc-50 dark:bg-zinc-900/40'
+                                                    : 'border-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-zinc-900/20'
                                             }`}
                                         >
-                                            <Icon className={`w-4 h-4 ${isActive ? 'text-emerald-400' : 'text-zinc-500'}`} />
+                                            <Icon className={`w-4 h-4 ${isActive ? 'text-emerald-600 dark:text-emerald-400' : 'text-zinc-400 dark:text-zinc-500'}`} />
                                             <span>{tab.label}</span>
                                         </button>
                                     </Tooltip>
@@ -311,16 +311,16 @@ export const InvestmentPlanningView = () => {
                     <div className="mt-4">
                         {activeTab === 'assumptions' && (
                             <div className="space-y-6">
-                                <div className="p-4 bg-zinc-900/70 border border-zinc-800 rounded-lg flex items-center justify-between text-xs">
+                                <div className="p-4 bg-white dark:bg-zinc-900/70 border border-zinc-200 dark:border-zinc-800 rounded-lg flex items-center justify-between text-xs">
                                     <div className="flex items-center gap-3">
                                         <Tooltip content="Konfiguracja założeń wejściowych">
-                                            <div className="w-8 h-8 rounded bg-zinc-800 flex items-center justify-center text-emerald-400">
+                                            <div className="w-8 h-8 rounded bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
                                                 <Sliders className="w-4 h-4" />
                                             </div>
                                         </Tooltip>
                                         <div>
                                             <div className="flex items-center gap-2">
-                                                <span className="font-bold text-zinc-100 uppercase">
+                                                <span className="font-bold text-zinc-900 dark:text-zinc-100 uppercase">
                                                     Konfigurator Założeń Projektu Finance
                                                 </span>
                                                 <InfoTooltip
@@ -328,7 +328,7 @@ export const InvestmentPlanningView = () => {
                                                     size="xs"
                                                 />
                                             </div>
-                                            <p className="text-zinc-400 text-[11px] mt-0.5">
+                                            <p className="text-zinc-500 dark:text-zinc-400 text-[11px] mt-0.5">
                                                 Wprowadzaj etapy CAPEX z klasyfikacją KŚT, konfiguruj instrumenty dłużne i definiuj prognozy operacyjne.
                                             </p>
                                         </div>

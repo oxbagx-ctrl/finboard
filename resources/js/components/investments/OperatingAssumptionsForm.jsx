@@ -558,7 +558,7 @@ export const OperatingAssumptionsForm = () => {
 
   if (!selectedProject) {
     return (
-      <div className="p-8 text-center text-zinc-400 bg-zinc-900/40 border border-zinc-800 rounded-xl">
+      <div className="p-8 text-center text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 rounded-xl">
         Wybierz projekt inwestycyjny, aby skonfigurować założenia operacyjne.
       </div>
     );
@@ -567,19 +567,19 @@ export const OperatingAssumptionsForm = () => {
   return (
     <div className="space-y-6" data-testid="operating-assumptions-form">
       {/* Header & KPI Summary Strip */}
-      <div className="bg-zinc-900/60 border border-zinc-800 rounded-xl p-6 shadow-sm">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-zinc-800">
+      <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6 shadow-sm">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-zinc-200 dark:border-zinc-800">
           <div className="flex items-start gap-3">
             <Tooltip content="Wskaźniki operacyjne, przychody, koszty i podatki w fazie eksploatacji">
               <span
                 tabIndex={0}
-                className="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0 cursor-help focus:outline-none"
+                className="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0 cursor-help focus:outline-none"
               >
                 <Activity className="w-5 h-5" />
               </span>
             </Tooltip>
             <div>
-              <h3 className="text-lg font-semibold text-zinc-100 flex items-center gap-2">
+              <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
                 <span>Założenia Operacyjne & Model P&L</span>
                 <InfoTooltip
                   content="Parametryzacja modelu biznesowego po uruchomieniu komercyjnym (COD): cenniki, wolumeny, eskalacja kosztów, struktura zatrudnienia oraz tarcza podatkowa CIT."
@@ -587,7 +587,7 @@ export const OperatingAssumptionsForm = () => {
                   size="xs"
                 />
               </h3>
-              <p className="text-sm text-zinc-400">
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">
                 Konfiguracja strumieni przychodowych, driverów OPEX, rotacji
                 kapitału obrotowego (NWC) oraz matrycy zatrudnienia.
               </p>
@@ -598,9 +598,9 @@ export const OperatingAssumptionsForm = () => {
             <Tooltip content="Commercial Operation Date - planowana data rozpoczęcia fazy operacyjnej projektu">
               <span
                 tabIndex={0}
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-zinc-800 text-zinc-300 border border-zinc-700 cursor-help focus:outline-none"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 cursor-help focus:outline-none"
               >
-                <Clock className="w-3.5 h-3.5 text-emerald-400" />
+                <Clock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                 COD: {selectedProject.commercial_operation_date || "Nieustalona"}
               </span>
             </Tooltip>
@@ -609,9 +609,9 @@ export const OperatingAssumptionsForm = () => {
 
         {/* KPI Metrics */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-          <div className="bg-zinc-950/60 border border-zinc-800/80 rounded-lg p-3.5">
+          <div className="bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-200 dark:border-zinc-800/80 rounded-lg p-3.5">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-xs text-zinc-400">
+              <span className="text-xs text-zinc-500 dark:text-zinc-400">
                 Przychody Bazowe (Rok)
               </span>
               <InfoTooltip
@@ -620,14 +620,14 @@ export const OperatingAssumptionsForm = () => {
                 size="xs"
               />
             </div>
-            <span className="text-lg font-bold font-mono text-zinc-100">
+            <span className="text-lg font-bold font-mono text-zinc-900 dark:text-zinc-100">
               {formatCurrency(calculatedAnnualRevenueBase, currency)}
             </span>
           </div>
 
-          <div className="bg-zinc-950/60 border border-zinc-800/80 rounded-lg p-3.5">
+          <div className="bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-200 dark:border-zinc-800/80 rounded-lg p-3.5">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-xs text-zinc-400">
+              <span className="text-xs text-zinc-500 dark:text-zinc-400">
                 EBITDA Bazowa (Marża)
               </span>
               <InfoTooltip
@@ -637,18 +637,18 @@ export const OperatingAssumptionsForm = () => {
               />
             </div>
             <span
-              className={`text-lg font-bold font-mono ${calculatedEbitda >= 0 ? "text-emerald-400" : "text-rose-400"}`}
+              className={`text-lg font-bold font-mono ${calculatedEbitda >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}
             >
               {formatCurrency(calculatedEbitda, currency)}
-              <span className="text-xs font-normal text-zinc-400 ml-1.5">
+              <span className="text-xs font-normal text-zinc-500 dark:text-zinc-400 ml-1.5">
                 ({calculatedEbitdaMargin.toFixed(1)}%)
               </span>
             </span>
           </div>
 
-          <div className="bg-zinc-950/60 border border-zinc-800/80 rounded-lg p-3.5">
+          <div className="bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-200 dark:border-zinc-800/80 rounded-lg p-3.5">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-xs text-zinc-400">
+              <span className="text-xs text-zinc-500 dark:text-zinc-400">
                 Cykl Konwersji (CCC)
               </span>
               <InfoTooltip
@@ -658,15 +658,15 @@ export const OperatingAssumptionsForm = () => {
               />
             </div>
             <span
-              className={`text-lg font-bold font-mono ${cashConversionCycle <= 45 ? "text-emerald-400" : cashConversionCycle <= 90 ? "text-amber-400" : "text-rose-400"}`}
+              className={`text-lg font-bold font-mono ${cashConversionCycle <= 45 ? "text-emerald-600 dark:text-emerald-400" : cashConversionCycle <= 90 ? "text-amber-600 dark:text-amber-400" : "text-rose-600 dark:text-rose-400"}`}
             >
               {cashConversionCycle} dni
             </span>
           </div>
 
-          <div className="bg-zinc-950/60 border border-zinc-800/80 rounded-lg p-3.5">
+          <div className="bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-200 dark:border-zinc-800/80 rounded-lg p-3.5">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-xs text-zinc-400">
+              <span className="text-xs text-zinc-500 dark:text-zinc-400">
                 Zespół & Płace (FTE)
               </span>
               <InfoTooltip
@@ -675,9 +675,9 @@ export const OperatingAssumptionsForm = () => {
                 size="xs"
               />
             </div>
-            <span className="text-lg font-bold font-mono text-indigo-400">
+            <span className="text-lg font-bold font-mono text-indigo-600 dark:text-indigo-400">
               {totalFte} FTE
-              <span className="text-xs font-normal text-zinc-400 ml-1.5">
+              <span className="text-xs font-normal text-zinc-500 dark:text-zinc-400 ml-1.5">
                 ({formatCurrency(calculatedAnnualPayrollBase, currency)})
               </span>
             </span>
@@ -685,7 +685,7 @@ export const OperatingAssumptionsForm = () => {
         </div>
 
         {/* Sub-Tabs Navigation */}
-        <div className="flex border-b border-zinc-800 mt-6 gap-2 overflow-x-auto text-xs">
+        <div className="flex border-b border-zinc-200 dark:border-zinc-800 mt-6 gap-2 overflow-x-auto text-xs">
           {[
             {
               id: "revenues",
@@ -728,8 +728,8 @@ export const OperatingAssumptionsForm = () => {
                   aria-label={tab.label}
                   className={`flex items-center gap-1.5 px-3 py-2 border-b-2 font-medium transition-colors whitespace-nowrap ${
                     isActive
-                      ? "border-emerald-500 text-emerald-400 bg-emerald-500/10"
-                      : "border-transparent text-zinc-400 hover:text-zinc-200 hover:border-zinc-700"
+                      ? "border-emerald-500 text-emerald-600 dark:text-emerald-400 bg-emerald-500/10"
+                      : "border-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 hover:border-zinc-300 dark:hover:border-zinc-700"
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5" />
@@ -743,7 +743,7 @@ export const OperatingAssumptionsForm = () => {
 
       {/* Sub-Tab 1: Revenues & Ramp-up */}
       {activeSubTab === "revenues" && (
-        <div className="bg-zinc-900/60 border border-zinc-800 rounded-xl p-6 space-y-6">
+        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6 space-y-6 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
               <h4 className="font-semibold text-zinc-100 flex items-center gap-2 text-sm">
@@ -770,8 +770,8 @@ export const OperatingAssumptionsForm = () => {
 
           {/* Revenue Lines Table */}
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-zinc-300">
-              <thead className="bg-zinc-950/80 text-zinc-400 border-b border-zinc-800 font-mono">
+            <table className="w-full text-left text-xs text-zinc-600 dark:text-zinc-300">
+              <thead className="bg-zinc-50 dark:bg-zinc-950/80 text-zinc-500 dark:text-zinc-400 border-b border-zinc-200 dark:border-zinc-800 font-mono">
                 <tr>
                   <th className="py-2.5 px-3">
                     <Tooltip content="Nazwa lub kategoria źródła przychodów operacyjnych">
@@ -805,13 +805,13 @@ export const OperatingAssumptionsForm = () => {
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-800/60 font-mono">
+              <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800/60 font-mono">
                 {revenueLines.length === 0 ? (
                   <tr>
                     <td colSpan={6} className="py-8 text-center text-zinc-500">
                       <div className="flex flex-col items-center justify-center gap-1.5">
-                        <TrendingUp className="w-6 h-6 text-zinc-600 mb-1" />
-                        <p className="font-semibold text-zinc-400 text-xs">
+                        <TrendingUp className="w-6 h-6 text-zinc-400 dark:text-zinc-600 mb-1" />
+                        <p className="font-semibold text-zinc-600 dark:text-zinc-400 text-xs">
                           Brak zdefiniowanych strumieni przychodowych
                         </p>
                         <p className="text-[11px] text-zinc-500">
@@ -823,7 +823,7 @@ export const OperatingAssumptionsForm = () => {
                   </tr>
                 ) : (
                   revenueLines.map((line) => (
-                    <tr key={line.id} className="hover:bg-zinc-850/40">
+                    <tr key={line.id} className="hover:bg-zinc-50 dark:hover:bg-zinc-850/40">
                       <td className="py-2 px-3">
                         <input
                           type="text"
@@ -836,7 +836,7 @@ export const OperatingAssumptionsForm = () => {
                               e.target.value,
                             )
                           }
-                          className="w-full bg-zinc-950 border border-zinc-700 rounded px-2 py-1 text-zinc-100 text-xs focus:outline-none focus:border-emerald-500"
+                          className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded px-2 py-1 text-zinc-900 dark:text-zinc-100 text-xs focus:outline-none focus:border-emerald-500"
                         />
                       </td>
                       <td className="py-2 px-3">
@@ -851,7 +851,7 @@ export const OperatingAssumptionsForm = () => {
                               e.target.value,
                             )
                           }
-                          className="w-full bg-zinc-950 border border-zinc-700 rounded px-2 py-1 text-zinc-100 text-xs focus:outline-none focus:border-emerald-500"
+                          className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded px-2 py-1 text-zinc-900 dark:text-zinc-100 text-xs focus:outline-none focus:border-emerald-500"
                         />
                       </td>
                       <td className="py-2 px-3">
@@ -866,7 +866,7 @@ export const OperatingAssumptionsForm = () => {
                               e.target.value,
                             )
                           }
-                          className="w-full bg-zinc-950 border border-zinc-700 rounded px-2 py-1 text-zinc-100 text-xs focus:outline-none focus:border-emerald-500"
+                          className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded px-2 py-1 text-zinc-900 dark:text-zinc-100 text-xs focus:outline-none focus:border-emerald-500"
                         />
                       </td>
                       <td className="py-2 px-3">
@@ -882,10 +882,10 @@ export const OperatingAssumptionsForm = () => {
                               e.target.value,
                             )
                           }
-                          className="w-full bg-zinc-950 border border-zinc-700 rounded px-2 py-1 text-zinc-100 text-xs focus:outline-none focus:border-emerald-500"
+                          className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded px-2 py-1 text-zinc-900 dark:text-zinc-100 text-xs focus:outline-none focus:border-emerald-500"
                         />
                       </td>
-                      <td className="py-2 px-3 text-right font-bold text-emerald-400">
+                      <td className="py-2 px-3 text-right font-bold text-emerald-600 dark:text-emerald-400">
                         {formatCurrency(line.total, currency)}
                       </td>
                       <td className="py-2 px-2 text-center">
@@ -894,7 +894,7 @@ export const OperatingAssumptionsForm = () => {
                             type="button"
                             aria-label="Usuń linię"
                             onClick={() => handleRemoveRevenueLine(line.id)}
-                            className="p-1 text-zinc-500 hover:text-rose-400 transition-colors"
+                            className="p-1 text-zinc-400 dark:text-zinc-500 hover:text-rose-500 dark:hover:text-rose-400 transition-colors"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -904,15 +904,15 @@ export const OperatingAssumptionsForm = () => {
                   ))
                 )}
               </tbody>
-              <tfoot className="bg-zinc-950/90 border-t border-zinc-800 font-mono">
+              <tfoot className="bg-zinc-50 dark:bg-zinc-950/90 border-t border-zinc-200 dark:border-zinc-800 font-mono">
                 <tr>
                   <td
                     colSpan={4}
-                    className="py-2.5 px-3 text-right font-semibold text-zinc-300"
+                    className="py-2.5 px-3 text-right font-semibold text-zinc-700 dark:text-zinc-300"
                   >
                     Łączna Baza Przychodów COD:
                   </td>
-                  <td className="py-2.5 px-3 text-right font-bold text-emerald-400 text-sm">
+                  <td className="py-2.5 px-3 text-right font-bold text-emerald-600 dark:text-emerald-400 text-sm">
                     {formatCurrency(calculatedAnnualRevenueBase, currency)}
                   </td>
                   <td />
@@ -922,9 +922,9 @@ export const OperatingAssumptionsForm = () => {
           </div>
 
           {/* Ramp-up & Growth Rate */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-zinc-800">
-            <div className="bg-zinc-950/60 p-4 rounded-lg border border-zinc-800/80 space-y-3">
-              <label className="text-xs text-zinc-300 font-medium flex justify-between items-center">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-zinc-200 dark:border-zinc-800">
+            <div className="bg-zinc-50 dark:bg-zinc-950/60 p-4 rounded-lg border border-zinc-200 dark:border-zinc-800/80 space-y-3">
+              <label className="text-xs text-zinc-700 dark:text-zinc-300 font-medium flex justify-between items-center">
                 <span className="flex items-center gap-1.5">
                   <span>Roczna Stopa Wzrostu Przychodów (%)</span>
                   <InfoTooltip
@@ -933,7 +933,7 @@ export const OperatingAssumptionsForm = () => {
                     size="xs"
                   />
                 </span>
-                <span className="font-mono text-emerald-400">
+                <span className="font-mono text-emerald-600 dark:text-emerald-400">
                   {revenueGrowthRate.toFixed(1)}%
                 </span>
               </label>
@@ -955,36 +955,36 @@ export const OperatingAssumptionsForm = () => {
 
               {/* Live Projection Feedback for Revenue Growth */}
               <div
-                className="p-3 bg-zinc-900/80 rounded-lg border border-zinc-800/90 space-y-2 mt-2"
+                className="p-3 bg-zinc-100/60 dark:bg-zinc-900/80 rounded-lg border border-zinc-200 dark:border-zinc-800/90 space-y-2 mt-2"
                 data-testid="revenue-projection-panel"
               >
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-zinc-300 font-medium flex items-center gap-1.5">
-                    <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />
+                  <span className="text-zinc-700 dark:text-zinc-300 font-medium flex items-center gap-1.5">
+                    <TrendingUp className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                     Szacowane Przychody Wieloletnie:
                   </span>
-                  <span className="text-[11px] text-emerald-400 font-mono font-medium">
+                  <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-mono font-medium">
                     R1 COD: {formatCurrency(revenueProjection.year1, currency)}
                   </span>
                 </div>
                 <div className="grid grid-cols-2 gap-2 text-xs font-mono">
-                  <div className="bg-zinc-950/70 p-2 rounded border border-zinc-800/80">
-                    <span className="text-[10px] text-zinc-400 block mb-0.5">
+                  <div className="bg-white dark:bg-zinc-950/70 p-2 rounded border border-zinc-200 dark:border-zinc-800/80">
+                    <span className="text-[10px] text-zinc-500 dark:text-zinc-400 block mb-0.5">
                       Rok 5 ({capacityRampUp[3] || 100}% Ramp-Up)
                     </span>
                     <span
-                      className="text-zinc-100 font-semibold block truncate"
+                      className="text-zinc-900 dark:text-zinc-100 font-semibold block truncate"
                       title={formatCurrency(revenueProjection.year5, currency)}
                     >
                       {formatCurrency(revenueProjection.year5, currency)}
                     </span>
                   </div>
-                  <div className="bg-zinc-950/70 p-2 rounded border border-zinc-800/80">
-                    <span className="text-[10px] text-zinc-400 block mb-0.5">
+                  <div className="bg-white dark:bg-zinc-950/70 p-2 rounded border border-zinc-200 dark:border-zinc-800/80">
+                    <span className="text-[10px] text-zinc-500 dark:text-zinc-400 block mb-0.5">
                       Rok 10 ({capacityRampUp[3] || 100}% Ramp-Up)
                     </span>
                     <span
-                      className="text-zinc-100 font-semibold block truncate"
+                      className="text-zinc-900 dark:text-zinc-100 font-semibold block truncate"
                       title={formatCurrency(revenueProjection.year10, currency)}
                     >
                       {formatCurrency(revenueProjection.year10, currency)}
@@ -994,9 +994,9 @@ export const OperatingAssumptionsForm = () => {
               </div>
             </div>
 
-            <div className="bg-zinc-950/60 p-4 rounded-lg border border-zinc-800/80 space-y-3">
+            <div className="bg-zinc-50 dark:bg-zinc-950/60 p-4 rounded-lg border border-zinc-200 dark:border-zinc-800/80 space-y-3">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-xs text-zinc-300 font-medium">
+                <span className="text-xs text-zinc-700 dark:text-zinc-300 font-medium">
                   Profil Dojścia do Pełnej Mocy (Ramp-Up %)
                 </span>
                 <InfoTooltip
@@ -1010,7 +1010,7 @@ export const OperatingAssumptionsForm = () => {
                   <span className="text-[11px] text-zinc-500 block mb-1">
                     Rok 1 (COD)
                   </span>
-                  <div className="flex items-center gap-1 bg-zinc-900 border border-zinc-700 rounded px-2 py-1">
+                  <div className="flex items-center gap-1 bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded px-2 py-1">
                     <input
                       type="number"
                       min={10}
@@ -1022,7 +1022,7 @@ export const OperatingAssumptionsForm = () => {
                           1: parseInt(e.target.value, 10) || 0,
                         })
                       }
-                      className="w-full bg-transparent text-zinc-100 text-xs focus:outline-none"
+                      className="w-full bg-transparent text-zinc-900 dark:text-zinc-100 text-xs focus:outline-none"
                     />
                     <span className="text-zinc-500 text-[10px]">%</span>
                   </div>
@@ -1031,7 +1031,7 @@ export const OperatingAssumptionsForm = () => {
                   <span className="text-[11px] text-zinc-500 block mb-1">
                     Rok 2
                   </span>
-                  <div className="flex items-center gap-1 bg-zinc-900 border border-zinc-700 rounded px-2 py-1">
+                  <div className="flex items-center gap-1 bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded px-2 py-1">
                     <input
                       type="number"
                       min={10}
@@ -1043,7 +1043,7 @@ export const OperatingAssumptionsForm = () => {
                           2: parseInt(e.target.value, 10) || 0,
                         })
                       }
-                      className="w-full bg-transparent text-zinc-100 text-xs focus:outline-none"
+                      className="w-full bg-transparent text-zinc-900 dark:text-zinc-100 text-xs focus:outline-none"
                     />
                     <span className="text-zinc-500 text-[10px]">%</span>
                   </div>
@@ -1052,7 +1052,7 @@ export const OperatingAssumptionsForm = () => {
                   <span className="text-[11px] text-zinc-500 block mb-1">
                     Rok 3+
                   </span>
-                  <div className="flex items-center gap-1 bg-zinc-900 border border-zinc-700 rounded px-2 py-1">
+                  <div className="flex items-center gap-1 bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded px-2 py-1">
                     <input
                       type="number"
                       min={10}
@@ -1064,7 +1064,7 @@ export const OperatingAssumptionsForm = () => {
                           3: parseInt(e.target.value, 10) || 0,
                         })
                       }
-                      className="w-full bg-transparent text-zinc-100 text-xs focus:outline-none"
+                      className="w-full bg-transparent text-zinc-900 dark:text-zinc-100 text-xs focus:outline-none"
                     />
                     <span className="text-zinc-500 text-[10px]">%</span>
                   </div>
@@ -1077,13 +1077,13 @@ export const OperatingAssumptionsForm = () => {
 
       {/* Sub-Tab 2: OPEX Drivers */}
       {activeSubTab === "opex" && (
-        <div className="bg-zinc-900/60 border border-zinc-800 rounded-xl p-6 space-y-6">
+        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6 space-y-6 shadow-sm">
           <div>
-            <h4 className="font-semibold text-zinc-100 flex items-center gap-2 text-sm">
-              <Sliders className="w-4 h-4 text-amber-400" />
+            <h4 className="font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2 text-sm">
+              <Sliders className="w-4 h-4 text-amber-500 dark:text-amber-400" />
               Drivery Kosztów Operacyjnych (OPEX)
             </h4>
-            <p className="text-xs text-zinc-400 mt-0.5">
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
               Parametryzacja kosztów zmiennych bezpośrednich oraz bazy kosztów
               stałych operacji (O&M, ubezpieczenia, podatki od nieruchomości).
             </p>
@@ -1091,10 +1091,10 @@ export const OperatingAssumptionsForm = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Variable Costs */}
-            <div className="bg-zinc-950/60 p-5 rounded-lg border border-zinc-800/80 space-y-4">
+            <div className="bg-zinc-50 dark:bg-zinc-950/60 p-5 rounded-lg border border-zinc-200 dark:border-zinc-800/80 space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-xs font-semibold text-zinc-200">
+                  <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200">
                     Koszty Zmienne (% Przychodów)
                   </span>
                   <InfoTooltip
@@ -1103,7 +1103,7 @@ export const OperatingAssumptionsForm = () => {
                     size="xs"
                   />
                 </div>
-                <span className="font-mono text-amber-400 font-bold text-sm">
+                <span className="font-mono text-amber-600 dark:text-amber-400 font-bold text-sm">
                   {variableCostPercent.toFixed(1)}%
                 </span>
               </div>
@@ -1118,11 +1118,11 @@ export const OperatingAssumptionsForm = () => {
                 }
                 className="w-full accent-amber-500 cursor-pointer"
               />
-              <div className="p-3 bg-zinc-900/60 rounded border border-zinc-800/80 text-xs flex justify-between items-center">
-                <span className="text-zinc-400">
+              <div className="p-3 bg-zinc-100/50 dark:bg-zinc-900/60 rounded border border-zinc-200 dark:border-zinc-800/80 text-xs flex justify-between items-center">
+                <span className="text-zinc-500 dark:text-zinc-400">
                   Szacowane koszty zmienne COD:
                 </span>
-                <span className="font-mono font-bold text-zinc-200">
+                <span className="font-mono font-bold text-zinc-900 dark:text-zinc-200">
                   {formatCurrency(calculatedVariableCosts, currency)}
                 </span>
               </div>
@@ -1134,10 +1134,10 @@ export const OperatingAssumptionsForm = () => {
             </div>
 
             {/* Fixed Costs */}
-            <div className="bg-zinc-950/60 p-5 rounded-lg border border-zinc-800/80 space-y-4">
+            <div className="bg-zinc-50 dark:bg-zinc-950/60 p-5 rounded-lg border border-zinc-200 dark:border-zinc-800/80 space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-xs font-semibold text-zinc-200">
+                  <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200">
                     Roczne Koszty Stałe Bazowe
                   </span>
                   <InfoTooltip
@@ -1146,7 +1146,7 @@ export const OperatingAssumptionsForm = () => {
                     size="xs"
                   />
                 </div>
-                <span className="font-mono text-zinc-100 font-bold text-sm">
+                <span className="font-mono text-zinc-900 dark:text-zinc-100 font-bold text-sm">
                   {formatCurrency(annualFixedCostsBase, currency)}
                 </span>
               </div>
@@ -1159,11 +1159,11 @@ export const OperatingAssumptionsForm = () => {
                     Math.max(0, parseFloat(e.target.value) || 0),
                   )
                 }
-                className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-zinc-100 font-mono text-sm focus:outline-none focus:border-amber-500"
+                className="w-full bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-zinc-900 dark:text-zinc-100 font-mono text-sm focus:outline-none focus:border-amber-500"
               />
 
-              <div className="pt-2 border-t border-zinc-800 space-y-2">
-                <label className="text-xs text-zinc-400 flex justify-between items-center">
+              <div className="pt-2 border-t border-zinc-200 dark:border-zinc-800 space-y-2">
+                <label className="text-xs text-zinc-500 dark:text-zinc-400 flex justify-between items-center">
                   <span className="flex items-center gap-1.5">
                     <span>Eskalacja Inflacyjna Kosztów Stałych (%)</span>
                     <InfoTooltip
@@ -1172,7 +1172,7 @@ export const OperatingAssumptionsForm = () => {
                       size="xs"
                     />
                   </span>
-                  <span className="font-mono text-amber-400">
+                  <span className="font-mono text-amber-600 dark:text-amber-400">
                     {fixedCostGrowthRate.toFixed(1)}%
                   </span>
                 </label>
@@ -1191,19 +1191,19 @@ export const OperatingAssumptionsForm = () => {
 
               {/* Live Compounding & Multi-Year Projection Feedback */}
               <div
-                className="p-3.5 bg-zinc-900/80 rounded-lg border border-zinc-800/90 space-y-3"
+                className="p-3.5 bg-zinc-100/60 dark:bg-zinc-900/80 rounded-lg border border-zinc-200 dark:border-zinc-800/90 space-y-3"
                 data-testid="fixed-cost-projection-panel"
               >
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-zinc-300 font-medium flex items-center gap-1.5">
-                    <TrendingUp className="w-3.5 h-3.5 text-amber-400" />
+                  <span className="text-zinc-700 dark:text-zinc-300 font-medium flex items-center gap-1.5">
+                    <TrendingUp className="w-3.5 h-3.5 text-amber-500 dark:text-amber-400" />
                     Projekcja Eskalacji Kosztów Stałych (15 lat):
                   </span>
                   <span
                     className={`font-mono text-[11px] px-2 py-0.5 rounded font-semibold ${
                       fixedCostGrowthRate > 0
-                        ? "bg-amber-500/10 text-amber-400 border border-amber-500/20"
-                        : "bg-zinc-800 text-zinc-400"
+                        ? "bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20"
+                        : "bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400"
                     }`}
                   >
                     +{fixedCostProjection.growthPercent15Y.toFixed(1)}% w R15
@@ -1211,12 +1211,12 @@ export const OperatingAssumptionsForm = () => {
                 </div>
 
                 <div className="grid grid-cols-3 gap-2 text-xs font-mono">
-                  <div className="bg-zinc-950/70 p-2 rounded border border-zinc-800/80">
-                    <span className="text-[10px] text-zinc-400 block mb-0.5">
+                  <div className="bg-white dark:bg-zinc-950/70 p-2 rounded border border-zinc-200 dark:border-zinc-800/80">
+                    <span className="text-[10px] text-zinc-500 dark:text-zinc-400 block mb-0.5">
                       Rok 5 (+{fixedCostProjection.growthPercent5Y.toFixed(1)}%)
                     </span>
                     <span
-                      className="text-zinc-100 font-semibold block truncate"
+                      className="text-zinc-900 dark:text-zinc-100 font-semibold block truncate"
                       title={formatCurrency(
                         fixedCostProjection.year5,
                         currency,
@@ -1225,13 +1225,13 @@ export const OperatingAssumptionsForm = () => {
                       {formatCurrency(fixedCostProjection.year5, currency)}
                     </span>
                   </div>
-                  <div className="bg-zinc-950/70 p-2 rounded border border-zinc-800/80">
-                    <span className="text-[10px] text-zinc-400 block mb-0.5">
+                  <div className="bg-white dark:bg-zinc-950/70 p-2 rounded border border-zinc-200 dark:border-zinc-800/80">
+                    <span className="text-[10px] text-zinc-500 dark:text-zinc-400 block mb-0.5">
                       Rok 10 (+{fixedCostProjection.growthPercent10Y.toFixed(1)}
                       %)
                     </span>
                     <span
-                      className="text-zinc-100 font-semibold block truncate"
+                      className="text-zinc-900 dark:text-zinc-100 font-semibold block truncate"
                       title={formatCurrency(
                         fixedCostProjection.year10,
                         currency,
@@ -1240,12 +1240,12 @@ export const OperatingAssumptionsForm = () => {
                       {formatCurrency(fixedCostProjection.year10, currency)}
                     </span>
                   </div>
-                  <div className="bg-zinc-950/70 p-2 rounded border border-zinc-800/80">
-                    <span className="text-[10px] text-amber-400/90 block mb-0.5">
+                  <div className="bg-white dark:bg-zinc-950/70 p-2 rounded border border-zinc-200 dark:border-zinc-800/80">
+                    <span className="text-[10px] text-amber-600 dark:text-amber-400/90 block mb-0.5">
                       Narzut 15L (&Sigma;)
                     </span>
                     <span
-                      className="text-amber-400 font-bold block truncate"
+                      className="text-amber-600 dark:text-amber-400 font-bold block truncate"
                       title={formatCurrency(
                         fixedCostProjection.inflationSurcharge15Y,
                         currency,
@@ -1260,12 +1260,12 @@ export const OperatingAssumptionsForm = () => {
                   </div>
                 </div>
 
-                <div className="flex items-start gap-1.5 text-[11px] text-zinc-400 leading-relaxed pt-1 border-t border-zinc-800/60">
-                  <Info className="w-3.5 h-3.5 text-amber-400/80 shrink-0 mt-0.5" />
+                <div className="flex items-start gap-1.5 text-[11px] text-zinc-500 dark:text-zinc-400 leading-relaxed pt-1 border-t border-zinc-200 dark:border-zinc-800/60">
+                  <Info className="w-3.5 h-3.5 text-amber-500 dark:text-amber-400/80 shrink-0 mt-0.5" />
                   <span>
                     Stopa eskalacji indeksuje koszty stałe (O&M, podatki,
                     ubezpieczenia) w latach operacyjnych Y2–Y15 wg formuły{" "}
-                    <code className="text-zinc-300 font-mono bg-zinc-800 px-1 py-0.5 rounded text-[10px]">
+                    <code className="text-zinc-800 dark:text-zinc-300 font-mono bg-zinc-100 dark:bg-zinc-800 px-1 py-0.5 rounded text-[10px]">
                       Baza &times; (1 + r)^(t-1)
                     </code>
                     . Wpływa na wieloletni RZiS, marże EBITDA, wskaźniki DSCR i
@@ -1280,13 +1280,13 @@ export const OperatingAssumptionsForm = () => {
 
       {/* Sub-Tab 3: Working Capital (NWC) */}
       {activeSubTab === "nwc" && (
-        <div className="bg-zinc-900/60 border border-zinc-800 rounded-xl p-6 space-y-6">
+        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6 space-y-6 shadow-sm">
           <div>
-            <h4 className="font-semibold text-zinc-100 flex items-center gap-2 text-sm">
-              <Clock className="w-4 h-4 text-sky-400" />
+            <h4 className="font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2 text-sm">
+              <Clock className="w-4 h-4 text-sky-500 dark:text-sky-400" />
               Cykl Rotacji Kapitału Obrotowego (NWC)
             </h4>
-            <p className="text-xs text-zinc-400 mt-0.5">
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
               Dni rotacji należności (DSO), zobowiązań handlowych (DPO) oraz
               zapasów (DIO) determinujące zapotrzebowanie na kapitał obrotowy w
               bilansie.
@@ -1295,10 +1295,10 @@ export const OperatingAssumptionsForm = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* DSO */}
-            <div className="bg-zinc-950/60 p-4 rounded-lg border border-zinc-800/80 space-y-3">
+            <div className="bg-zinc-50 dark:bg-zinc-950/60 p-4 rounded-lg border border-zinc-200 dark:border-zinc-800/80 space-y-3">
               <div className="flex justify-between items-center text-xs">
                 <div className="flex items-center gap-1.5">
-                  <span className="font-semibold text-zinc-200">
+                  <span className="font-semibold text-zinc-800 dark:text-zinc-200">
                     DSO (Należności)
                   </span>
                   <InfoTooltip
@@ -1307,7 +1307,7 @@ export const OperatingAssumptionsForm = () => {
                     size="xs"
                   />
                 </div>
-                <span className="font-mono text-sky-400 font-bold">
+                <span className="font-mono text-sky-600 dark:text-sky-400 font-bold">
                   {dso} dni
                 </span>
               </div>
@@ -1326,10 +1326,10 @@ export const OperatingAssumptionsForm = () => {
             </div>
 
             {/* DPO */}
-            <div className="bg-zinc-950/60 p-4 rounded-lg border border-zinc-800/80 space-y-3">
+            <div className="bg-zinc-50 dark:bg-zinc-950/60 p-4 rounded-lg border border-zinc-200 dark:border-zinc-800/80 space-y-3">
               <div className="flex justify-between items-center text-xs">
                 <div className="flex items-center gap-1.5">
-                  <span className="font-semibold text-zinc-200">
+                  <span className="font-semibold text-zinc-800 dark:text-zinc-200">
                     DPO (Zobowiązania)
                   </span>
                   <InfoTooltip
@@ -1338,7 +1338,7 @@ export const OperatingAssumptionsForm = () => {
                     size="xs"
                   />
                 </div>
-                <span className="font-mono text-emerald-400 font-bold">
+                <span className="font-mono text-emerald-600 dark:text-emerald-400 font-bold">
                   {dpo} dni
                 </span>
               </div>
@@ -1357,10 +1357,10 @@ export const OperatingAssumptionsForm = () => {
             </div>
 
             {/* DIO */}
-            <div className="bg-zinc-950/60 p-4 rounded-lg border border-zinc-800/80 space-y-3">
+            <div className="bg-zinc-50 dark:bg-zinc-950/60 p-4 rounded-lg border border-zinc-200 dark:border-zinc-800/80 space-y-3">
               <div className="flex justify-between items-center text-xs">
                 <div className="flex items-center gap-1.5">
-                  <span className="font-semibold text-zinc-200">
+                  <span className="font-semibold text-zinc-800 dark:text-zinc-200">
                     DIO (Zapasy)
                   </span>
                   <InfoTooltip
@@ -1369,7 +1369,7 @@ export const OperatingAssumptionsForm = () => {
                     size="xs"
                   />
                 </div>
-                <span className="font-mono text-amber-400 font-bold">
+                <span className="font-mono text-amber-600 dark:text-amber-400 font-bold">
                   {dio} dni
                 </span>
               </div>
@@ -1389,10 +1389,10 @@ export const OperatingAssumptionsForm = () => {
           </div>
 
           {/* Cash Conversion Cycle Display */}
-          <div className="p-4 bg-zinc-950 rounded-lg border border-zinc-800/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="p-4 bg-zinc-50 dark:bg-zinc-950 rounded-lg border border-zinc-200 dark:border-zinc-800/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="space-y-1">
-              <span className="text-xs font-semibold text-zinc-200 flex items-center gap-1.5">
-                <Info className="w-4 h-4 text-indigo-400" />
+              <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 flex items-center gap-1.5">
+                <Info className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
                 Cykl Konwersji Gotówki (Cash Conversion Cycle):
               </span>
               <p className="text-[11px] text-zinc-500">
@@ -1402,7 +1402,7 @@ export const OperatingAssumptionsForm = () => {
             </div>
             <div className="text-right font-mono">
               <span
-                className={`text-xl font-bold ${cashConversionCycle <= 45 ? "text-emerald-400" : "text-amber-400"}`}
+                className={`text-xl font-bold ${cashConversionCycle <= 45 ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400"}`}
               >
                 {cashConversionCycle} dni
               </span>
@@ -1418,14 +1418,14 @@ export const OperatingAssumptionsForm = () => {
 
       {/* Sub-Tab 4: Headcount Matrix & Payroll */}
       {activeSubTab === "payroll" && (
-        <div className="bg-zinc-900/60 border border-zinc-800 rounded-xl p-6 space-y-6">
+        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6 space-y-6 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
-              <h4 className="font-semibold text-zinc-100 flex items-center gap-2 text-sm">
-                <Users className="w-4 h-4 text-indigo-400" />
+              <h4 className="font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2 text-sm">
+                <Users className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
                 Matryca Etatów & Koszty Wynagrodzeń (Payroll)
               </h4>
-              <p className="text-xs text-zinc-400 mt-0.5">
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
                 Struktura zatrudnienia, płace brutto oraz narzuty ubezpieczeń
                 społecznych pracodawcy (ZUS / PPK).
               </p>
@@ -1445,8 +1445,8 @@ export const OperatingAssumptionsForm = () => {
 
           {/* Headcount Table */}
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-zinc-300">
-              <thead className="bg-zinc-950/80 text-zinc-400 border-b border-zinc-800 font-mono">
+            <table className="w-full text-left text-xs text-zinc-600 dark:text-zinc-300">
+              <thead className="bg-zinc-50 dark:bg-zinc-950/80 text-zinc-500 dark:text-zinc-400 border-b border-zinc-200 dark:border-zinc-800 font-mono">
                 <tr>
                   <th className="py-2.5 px-3">
                     <Tooltip content="Stanowisko lub rola w zespole operacyjnym">
@@ -1480,13 +1480,13 @@ export const OperatingAssumptionsForm = () => {
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-800/60 font-mono">
+              <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800/60 font-mono">
                 {headcountMatrix.length === 0 ? (
                   <tr>
                     <td colSpan={6} className="py-8 text-center text-zinc-500">
                       <div className="flex flex-col items-center justify-center gap-1.5">
-                        <Users className="w-6 h-6 text-zinc-600 mb-1" />
-                        <p className="font-semibold text-zinc-400 text-xs">
+                        <Users className="w-6 h-6 text-zinc-400 dark:text-zinc-600 mb-1" />
+                        <p className="font-semibold text-zinc-600 dark:text-zinc-400 text-xs">
                           Brak zdefiniowanych stanowisk operacyjnych
                         </p>
                         <p className="text-[11px] text-zinc-500">
@@ -1498,7 +1498,7 @@ export const OperatingAssumptionsForm = () => {
                   </tr>
                 ) : (
                   headcountMatrix.map((role) => (
-                    <tr key={role.id} className="hover:bg-zinc-850/40">
+                    <tr key={role.id} className="hover:bg-zinc-50 dark:hover:bg-zinc-850/40">
                       <td className="py-2 px-3">
                         <input
                           type="text"
@@ -1511,7 +1511,7 @@ export const OperatingAssumptionsForm = () => {
                               e.target.value,
                             )
                           }
-                          className="w-full bg-zinc-950 border border-zinc-700 rounded px-2 py-1 text-zinc-100 text-xs focus:outline-none focus:border-indigo-500"
+                          className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded px-2 py-1 text-zinc-900 dark:text-zinc-100 text-xs focus:outline-none focus:border-indigo-500"
                         />
                       </td>
                       <td className="py-2 px-3">
@@ -1528,7 +1528,7 @@ export const OperatingAssumptionsForm = () => {
                               e.target.value,
                             )
                           }
-                          className="w-full bg-zinc-950 border border-zinc-700 rounded px-2 py-1 text-zinc-100 text-xs focus:outline-none focus:border-indigo-500"
+                          className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded px-2 py-1 text-zinc-900 dark:text-zinc-100 text-xs focus:outline-none focus:border-indigo-500"
                         />
                       </td>
                       <td className="py-2 px-3">
@@ -1543,7 +1543,7 @@ export const OperatingAssumptionsForm = () => {
                               e.target.value,
                             )
                           }
-                          className="w-full bg-zinc-950 border border-zinc-700 rounded px-2 py-1 text-zinc-100 text-xs focus:outline-none focus:border-indigo-500"
+                          className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded px-2 py-1 text-zinc-900 dark:text-zinc-100 text-xs focus:outline-none focus:border-indigo-500"
                         />
                       </td>
                       <td className="py-2 px-3">
@@ -1559,10 +1559,10 @@ export const OperatingAssumptionsForm = () => {
                               e.target.value,
                             )
                           }
-                          className="w-full bg-zinc-950 border border-zinc-700 rounded px-2 py-1 text-zinc-100 text-xs focus:outline-none focus:border-indigo-500"
+                          className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded px-2 py-1 text-zinc-900 dark:text-zinc-100 text-xs focus:outline-none focus:border-indigo-500"
                         />
                       </td>
-                      <td className="py-2 px-3 text-right font-bold text-indigo-300">
+                      <td className="py-2 px-3 text-right font-bold text-indigo-600 dark:text-indigo-300">
                         {formatCurrency(role.annualCost, currency)}
                       </td>
                       <td className="py-2 px-2 text-center">
@@ -1571,7 +1571,7 @@ export const OperatingAssumptionsForm = () => {
                             type="button"
                             aria-label="Usuń stanowisko"
                             onClick={() => handleRemoveHeadcountRole(role.id)}
-                            className="p-1 text-zinc-500 hover:text-rose-400 transition-colors"
+                            className="p-1 text-zinc-400 dark:text-zinc-500 hover:text-rose-500 dark:hover:text-rose-400 transition-colors"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -1581,18 +1581,18 @@ export const OperatingAssumptionsForm = () => {
                   ))
                 )}
               </tbody>
-              <tfoot className="bg-zinc-950/90 border-t border-zinc-800 font-mono">
+              <tfoot className="bg-zinc-50 dark:bg-zinc-950/90 border-t border-zinc-200 dark:border-zinc-800 font-mono">
                 <tr>
-                  <td className="py-2.5 px-3 font-semibold text-zinc-300">
+                  <td className="py-2.5 px-3 font-semibold text-zinc-700 dark:text-zinc-300">
                     Razem: {totalFte} FTE
                   </td>
                   <td
                     colSpan={3}
-                    className="py-2.5 px-3 text-right font-semibold text-zinc-300"
+                    className="py-2.5 px-3 text-right font-semibold text-zinc-700 dark:text-zinc-300"
                   >
                     Łączny Roczny Fundusz Płac:
                   </td>
-                  <td className="py-2.5 px-3 text-right font-bold text-indigo-400 text-sm">
+                  <td className="py-2.5 px-3 text-right font-bold text-indigo-600 dark:text-indigo-400 text-sm">
                     {formatCurrency(calculatedAnnualPayrollBase, currency)}
                   </td>
                   <td />
@@ -1602,8 +1602,8 @@ export const OperatingAssumptionsForm = () => {
           </div>
 
           {/* Payroll Escalation */}
-          <div className="bg-zinc-950/60 p-4 rounded-lg border border-zinc-800/80 space-y-3">
-            <label className="text-xs text-zinc-300 font-medium flex justify-between items-center">
+          <div className="bg-zinc-50 dark:bg-zinc-950/60 p-4 rounded-lg border border-zinc-200 dark:border-zinc-800/80 space-y-3">
+            <label className="text-xs text-zinc-700 dark:text-zinc-300 font-medium flex justify-between items-center">
               <span className="flex items-center gap-1.5">
                 <span>Roczna Stopa Wzrostu Wynagrodzeń (%)</span>
                 <InfoTooltip
@@ -1612,7 +1612,7 @@ export const OperatingAssumptionsForm = () => {
                   size="xs"
                 />
               </span>
-              <span className="font-mono text-indigo-400">
+              <span className="font-mono text-indigo-600 dark:text-indigo-400">
                 {payrollGrowthRate.toFixed(1)}%
               </span>
             </label>
@@ -1637,22 +1637,22 @@ export const OperatingAssumptionsForm = () => {
 
       {/* Sub-Tab 5: Taxes & CIT */}
       {activeSubTab === "taxes" && (
-        <div className="bg-zinc-900/60 border border-zinc-800 rounded-xl p-6 space-y-6">
+        <div className="bg-white dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6 space-y-6 shadow-sm">
           <div>
-            <h4 className="font-semibold text-zinc-100 flex items-center gap-2 text-sm">
-              <Receipt className="w-4 h-4 text-emerald-400" />
+            <h4 className="font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2 text-sm">
+              <Receipt className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               Podatek Dochodowy (CIT) & Tarcza Podatkowa
             </h4>
-            <p className="text-xs text-zinc-400 mt-0.5">
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
               Parametry fiskalne kalkulacji podatku dochodowego CIT, tryb rozliczania strat podatkowych oraz wieloletnia trajektoria tarczy (art. 7 ust. 5 i art. 25 ust. 1 CIT).
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* CIT Rate */}
-            <div className="bg-zinc-950/60 p-5 rounded-lg border border-zinc-800/80 space-y-4">
+            <div className="bg-zinc-50 dark:bg-zinc-950/60 p-5 rounded-lg border border-zinc-200 dark:border-zinc-800/80 space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-zinc-200 block">
+                <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 block">
                   Stawka Podatku CIT
                 </span>
                 <InfoTooltip
@@ -1681,14 +1681,14 @@ export const OperatingAssumptionsForm = () => {
                       aria-label={option.label}
                       className={`p-3 rounded-lg border text-left transition-all w-full ${
                         citRatePercent === option.rate
-                          ? "bg-emerald-500/20 border-emerald-500 text-emerald-300"
-                          : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:border-zinc-700"
+                          ? "bg-emerald-50 dark:bg-emerald-500/20 border-emerald-500 text-emerald-700 dark:text-emerald-300"
+                          : "bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:border-zinc-300 dark:hover:border-zinc-700"
                       }`}
                     >
                       <div className="font-bold font-mono text-sm">
                         {option.label}
                       </div>
-                      <div className="text-[11px] text-zinc-500 mt-1">
+                      <div className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1">
                         {option.desc}
                       </div>
                     </button>
@@ -1698,33 +1698,33 @@ export const OperatingAssumptionsForm = () => {
 
               {/* WACC Tax Shield Synchronization Info */}
               <div
-                className="p-3.5 bg-zinc-900/80 rounded-lg border border-zinc-800/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
+                className="p-3.5 bg-white dark:bg-zinc-900/80 rounded-lg border border-zinc-200 dark:border-zinc-800/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-xs"
                 data-testid="wacc-tax-shield-info"
               >
-                <div className="flex items-center gap-2 text-zinc-300">
-                  <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+                <div className="flex items-center gap-2 text-zinc-700 dark:text-zinc-300">
+                  <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                   <span>
                     <strong>Synchronizacja Tarczy Podatkowej WACC:</strong>{" "}
                     Efektywny koszt długu po opodatkowaniu wynosi{" "}
-                    <span className="font-mono text-emerald-400 font-semibold">
+                    <span className="font-mono text-emerald-600 dark:text-emerald-400 font-semibold">
                       Kd × (1 - {citRatePercent}%) = Kd ×{" "}
                       {((100 - citRatePercent) / 100).toFixed(2)}
                     </span>{" "}
                     w modelu DCF i wycenie projektowej.
                   </span>
                 </div>
-                <span className="font-mono text-xs px-2.5 py-1 rounded bg-zinc-950 border border-zinc-700/80 text-emerald-400 shrink-0 font-semibold">
+                <span className="font-mono text-xs px-2.5 py-1 rounded bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-700/80 text-emerald-600 dark:text-emerald-400 shrink-0 font-semibold">
                   Tarcza: {citRatePercent}%
                 </span>
               </div>
             </div>
 
             {/* Tax Loss Carry Forward & Settlement Mode */}
-            <div className="bg-zinc-950/60 p-5 rounded-lg border border-zinc-800/80 space-y-4">
+            <div className="bg-zinc-50 dark:bg-zinc-950/60 p-5 rounded-lg border border-zinc-200 dark:border-zinc-800/80 space-y-4">
               <div className="flex items-center justify-between">
                 <div>
                   <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-semibold text-zinc-200 block">
+                    <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 block">
                       Rozliczanie Strat Podatkowych
                     </span>
                     <InfoTooltip
@@ -1733,7 +1733,7 @@ export const OperatingAssumptionsForm = () => {
                       size="xs"
                     />
                   </div>
-                  <span className="text-[11px] text-zinc-400">
+                  <span className="text-[11px] text-zinc-500 dark:text-zinc-400">
                     Aktywuj tarczę podatkową z etapu budowy / CAPEX
                   </span>
                 </div>
@@ -1746,15 +1746,15 @@ export const OperatingAssumptionsForm = () => {
                       aria-label="Włącz rozliczanie strat podatkowych"
                       className="sr-only peer"
                     />
-                    <div className="w-9 h-5 bg-zinc-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500" />
+                    <div className="w-9 h-5 bg-zinc-300 dark:bg-zinc-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500" />
                   </label>
                 </Tooltip>
               </div>
 
-              <div className={`space-y-4 pt-2 border-t border-zinc-800/80 ${!taxLossCarryForward ? "opacity-50" : ""}`}>
+              <div className={`space-y-4 pt-2 border-t border-zinc-200 dark:border-zinc-800/80 ${!taxLossCarryForward ? "opacity-50" : ""}`}>
                 <div>
                   <div className="flex items-center gap-1.5 mb-2">
-                    <label className="text-xs font-semibold text-zinc-300 block">
+                    <label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 block">
                       Ustawowy Tryb Rozliczenia Strat (art. 7 ust. 5 CIT)
                     </label>
                     <InfoTooltip
@@ -1792,17 +1792,17 @@ export const OperatingAssumptionsForm = () => {
                           aria-label={mode.title}
                           className={`p-2.5 rounded-lg border text-left transition-all disabled:cursor-not-allowed w-full ${
                             taxLossSettlementMode === mode.id
-                              ? "bg-emerald-500/20 border-emerald-500 text-emerald-300 shadow-sm"
-                              : "bg-zinc-900/80 border-zinc-800 text-zinc-400 hover:border-zinc-700"
+                              ? "bg-emerald-50 dark:bg-emerald-500/20 border-emerald-500 text-emerald-700 dark:text-emerald-300 shadow-sm"
+                              : "bg-white dark:bg-zinc-900/80 border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:border-zinc-300 dark:hover:border-zinc-700"
                           }`}
                         >
-                          <div className="font-semibold text-xs text-zinc-200">
+                          <div className="font-semibold text-xs text-zinc-800 dark:text-zinc-200">
                             {mode.title}
                           </div>
-                          <div className="text-[10px] text-emerald-400/90 font-mono mt-0.5">
+                          <div className="text-[10px] text-emerald-600 dark:text-emerald-400/90 font-mono mt-0.5">
                             {mode.art}
                           </div>
-                          <div className="text-[10px] text-zinc-500 mt-1 line-clamp-2">
+                          <div className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-2">
                             {mode.desc}
                           </div>
                         </button>
@@ -1813,10 +1813,10 @@ export const OperatingAssumptionsForm = () => {
 
                 {/* Mode specific configuration */}
                 {taxLossSettlementMode === "one_off_5m" ? (
-                  <div className="space-y-2 p-3 bg-zinc-900/60 rounded-lg border border-zinc-800">
+                  <div className="space-y-2 p-3 bg-white dark:bg-zinc-900/60 rounded-lg border border-zinc-200 dark:border-zinc-800">
                     <div className="flex items-center justify-between text-xs">
                       <div className="flex items-center gap-1.5">
-                        <span className="text-zinc-300 font-medium">
+                        <span className="text-zinc-700 dark:text-zinc-300 font-medium">
                           Limit Odliczenia Jednorazowego (PLN):
                         </span>
                         <InfoTooltip
@@ -1825,7 +1825,7 @@ export const OperatingAssumptionsForm = () => {
                           size="xs"
                         />
                       </div>
-                      <span className="font-mono text-emerald-400 font-bold text-xs">
+                      <span className="font-mono text-emerald-600 dark:text-emerald-400 font-bold text-xs">
                         {formatCurrency(taxLossOneOffCapAmount, currency)}
                       </span>
                     </div>
@@ -1841,15 +1841,15 @@ export const OperatingAssumptionsForm = () => {
                           Math.max(0, parseFloat(e.target.value) || 0),
                         )
                       }
-                      className="w-full bg-zinc-950 border border-zinc-700 rounded-lg px-3 py-2 text-zinc-100 font-mono text-xs focus:outline-none focus:border-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-zinc-900 dark:text-zinc-100 font-mono text-xs focus:outline-none focus:border-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
                     />
-                    <p className="text-[11px] text-zinc-500">
+                    <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
                       Zgodnie z art. 7 ust. 5 pkt 2 ustawy o CIT, kwota straty do 5 mln zł może zostać odliczona jednorazowo w całości w jednym z 5 lat podatkowych.
                     </p>
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    <label className="text-xs text-zinc-400 flex justify-between items-center">
+                    <label className="text-xs text-zinc-600 dark:text-zinc-400 flex justify-between items-center">
                       <span className="flex items-center gap-1.5">
                         <span>Limit Rocznego Odliczenia Straty (%)</span>
                         <InfoTooltip
@@ -1858,7 +1858,7 @@ export const OperatingAssumptionsForm = () => {
                           size="xs"
                         />
                       </span>
-                      <span className="font-mono text-emerald-400 font-bold">
+                      <span className="font-mono text-emerald-600 dark:text-emerald-400 font-bold">
                         {taxLossOffsetCap.toFixed(0)}%
                       </span>
                     </label>
@@ -1875,7 +1875,7 @@ export const OperatingAssumptionsForm = () => {
                       }
                       className="w-full accent-emerald-500 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                     />
-                    <p className="text-[11px] text-zinc-500 leading-relaxed">
+                    <p className="text-[11px] text-zinc-500 dark:text-zinc-400 leading-relaxed">
                       Zgodnie z art. 7 ust. 5 pkt 1 ustawy o CIT, kwota odliczenia straty z danego rocznika nie może przekroczyć 50% kwoty tej straty w jednym roku podatkowym.
                     </p>
                   </div>
@@ -1886,73 +1886,73 @@ export const OperatingAssumptionsForm = () => {
 
           {/* Live Tax Loss Roll-Forward Trajectory Schedule */}
           <div
-            className="p-5 bg-zinc-950/70 rounded-xl border border-zinc-800/90 space-y-4"
+            className="p-5 bg-zinc-50 dark:bg-zinc-950/70 rounded-xl border border-zinc-200 dark:border-zinc-800/90 space-y-4"
             data-testid="tax-loss-rollforward-panel"
           >
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-800/80 pb-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-200 dark:border-zinc-800/80 pb-3">
               <div>
-                <h5 className="font-semibold text-zinc-100 flex items-center gap-2 text-sm">
-                  <TrendingUp className="w-4 h-4 text-emerald-400" />
+                <h5 className="font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2 text-sm">
+                  <TrendingUp className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                   Trajektoria Tarczy Podatkowej & Rozliczenie Strat (Tax Loss Roll-Forward)
                 </h5>
-                <p className="text-xs text-zinc-400 mt-0.5">
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
                   Projekcja wykorzystania i wygaszania strat w 15-letnim horyzoncie z uwzględnieniem 5-letniego okna ustawowego (art. 7 ust. 5 CIT).
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-[11px] px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800 text-zinc-300 font-mono">
-                  Tryb: <strong className="text-emerald-400">{taxLossSettlementMode === "one_off_5m" ? "Jednorazowo 5M" : taxLossSettlementMode === "ebt_cap" ? "Limit EBT" : "Standard 50%"}</strong>
+                <span className="text-[11px] px-2.5 py-1 rounded bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 font-mono">
+                  Tryb: <strong className="text-emerald-600 dark:text-emerald-400">{taxLossSettlementMode === "one_off_5m" ? "Jednorazowo 5M" : taxLossSettlementMode === "ebt_cap" ? "Limit EBT" : "Standard 50%"}</strong>
                 </span>
               </div>
             </div>
 
             {/* KPI Cards */}
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-              <div className="p-3 bg-zinc-900/60 rounded-lg border border-zinc-800/80">
+              <div className="p-3 bg-white dark:bg-zinc-900/60 rounded-lg border border-zinc-200 dark:border-zinc-800/80">
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] text-zinc-400 block">Wygenerowane Straty</span>
+                  <span className="text-[11px] text-zinc-500 dark:text-zinc-400 block">Wygenerowane Straty</span>
                   <InfoTooltip
                     content="Suma ujemnych wyników brutto (EBT) wygenerowanych w fazie inwestycyjnej lub pierwszych latach rozruchu."
                     ariaLabel="Informacje o wygenerowanych stratach"
                     size="xs"
                   />
                 </div>
-                <span className="font-mono text-sm font-bold text-rose-400 mt-1 block">
+                <span className="font-mono text-sm font-bold text-rose-600 dark:text-rose-400 mt-1 block">
                   {formatCurrency(taxRollForwardTrajectory?.totalLossesGenerated, currency)}
                 </span>
               </div>
 
-              <div className="p-3 bg-zinc-900/60 rounded-lg border border-zinc-800/80">
+              <div className="p-3 bg-white dark:bg-zinc-900/60 rounded-lg border border-zinc-200 dark:border-zinc-800/80">
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] text-zinc-400 block">Wykorzystana Tarcza</span>
+                  <span className="text-[11px] text-zinc-500 dark:text-zinc-400 block">Wykorzystana Tarcza</span>
                   <InfoTooltip
                     content="Łączna kwota strat odliczona od podstawy opodatkowania w całym 15-letnim okresie projekcji."
                     ariaLabel="Informacje o wykorzystanej tarczy"
                     size="xs"
                   />
                 </div>
-                <span className="font-mono text-sm font-bold text-emerald-400 mt-1 block">
+                <span className="font-mono text-sm font-bold text-emerald-600 dark:text-emerald-400 mt-1 block">
                   {formatCurrency(taxRollForwardTrajectory?.totalLossesUsed, currency)}
                 </span>
               </div>
 
-              <div className="p-3 bg-zinc-900/60 rounded-lg border border-zinc-800/80">
+              <div className="p-3 bg-white dark:bg-zinc-900/60 rounded-lg border border-zinc-200 dark:border-zinc-800/80">
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] text-zinc-400 block">Oszczędność CIT</span>
+                  <span className="text-[11px] text-zinc-500 dark:text-zinc-400 block">Oszczędność CIT</span>
                   <InfoTooltip
                     content="Efektywna korzyść finansowa wynikająca z obniżenia należnego podatku dochodowego CIT (Straty × Stawka CIT)."
                     ariaLabel="Informacje o oszczędności CIT"
                     size="xs"
                   />
                 </div>
-                <span className="font-mono text-sm font-bold text-emerald-300 mt-1 block">
+                <span className="font-mono text-sm font-bold text-emerald-600 dark:text-emerald-300 mt-1 block">
                   {formatCurrency(taxRollForwardTrajectory?.totalTaxSaved, currency)}
                 </span>
               </div>
 
-              <div className="p-3 bg-zinc-900/60 rounded-lg border border-zinc-800/80">
+              <div className="p-3 bg-white dark:bg-zinc-900/60 rounded-lg border border-zinc-200 dark:border-zinc-800/80">
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] text-zinc-400 block">Wygasłe Straty (T+5)</span>
+                  <span className="text-[11px] text-zinc-500 dark:text-zinc-400 block">Wygasłe Straty (T+5)</span>
                   <InfoTooltip
                     content="Straty nieodliczone w ustawowym 5-letnim oknie czasowym (art. 7 ust. 5 CIT), które bezpowrotnie przepadły."
                     ariaLabel="Informacje o wygasłych stratach"
@@ -1960,31 +1960,31 @@ export const OperatingAssumptionsForm = () => {
                   />
                 </div>
                 <span className={`font-mono text-sm font-bold mt-1 block ${
-                  (taxRollForwardTrajectory?.totalLossesExpired || 0) > 0 ? "text-rose-400" : "text-zinc-500"
+                  (taxRollForwardTrajectory?.totalLossesExpired || 0) > 0 ? "text-rose-600 dark:text-rose-400" : "text-zinc-400 dark:text-zinc-500"
                 }`}>
                   {formatCurrency(taxRollForwardTrajectory?.totalLossesExpired, currency)}
                 </span>
               </div>
 
-              <div className="p-3 bg-zinc-900/60 rounded-lg border border-zinc-800/80 col-span-2 sm:col-span-1">
+              <div className="p-3 bg-white dark:bg-zinc-900/60 rounded-lg border border-zinc-200 dark:border-zinc-800/80 col-span-2 sm:col-span-1">
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] text-zinc-400 block">Saldo Końcowe Tarczy</span>
+                  <span className="text-[11px] text-zinc-500 dark:text-zinc-400 block">Saldo Końcowe Tarczy</span>
                   <InfoTooltip
                     content="Pozostała pula nierozliczonych strat podatkowych na koniec 15. roku operacji."
                     ariaLabel="Informacje o saldzie końcowym"
                     size="xs"
                   />
                 </div>
-                <span className="font-mono text-sm font-bold text-amber-400 mt-1 block">
+                <span className="font-mono text-sm font-bold text-amber-600 dark:text-amber-400 mt-1 block">
                   {formatCurrency(taxRollForwardTrajectory?.closingPool, currency)}
                 </span>
               </div>
             </div>
 
             {/* Roll-Forward Table */}
-            <div className="overflow-x-auto border border-zinc-800/80 rounded-lg">
+            <div className="overflow-x-auto border border-zinc-200 dark:border-zinc-800/80 rounded-lg">
               <table className="w-full text-left text-xs font-mono">
-                <thead className="bg-zinc-900/90 text-zinc-400 border-b border-zinc-800">
+                <thead className="bg-zinc-100 dark:bg-zinc-900/90 text-zinc-600 dark:text-zinc-400 border-b border-zinc-200 dark:border-zinc-800">
                   <tr>
                     <th className="py-2 px-3">
                       <Tooltip content="Kolejny rok w 15-letniej projekcji finansowej">
@@ -2028,7 +2028,7 @@ export const OperatingAssumptionsForm = () => {
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-zinc-800/50">
+                <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800/50">
                   {taxRollForwardTrajectory?.annualPeriods && taxRollForwardTrajectory.annualPeriods.length > 0 ? (
                     taxRollForwardTrajectory.annualPeriods.map((period) => {
                       const hasExpired = (period.taxLossExpired || 0) > 0;
@@ -2038,52 +2038,52 @@ export const OperatingAssumptionsForm = () => {
                       return (
                         <tr
                           key={period.year}
-                          className={`hover:bg-zinc-900/40 transition-colors ${
+                          className={`hover:bg-zinc-100/50 dark:hover:bg-zinc-900/40 transition-colors ${
                             isLossYear
-                              ? "bg-rose-950/10"
+                              ? "bg-rose-50/50 dark:bg-rose-950/10"
                               : hasLossUsed
-                              ? "bg-emerald-950/10"
+                              ? "bg-emerald-50/50 dark:bg-emerald-950/10"
                               : ""
                           }`}
                         >
-                          <td className="py-2 px-3 font-semibold text-zinc-300">
+                          <td className="py-2 px-3 font-semibold text-zinc-800 dark:text-zinc-300">
                             Rok {period.year}
                           </td>
-                          <td className="py-2 px-3 text-right text-zinc-400">
+                          <td className="py-2 px-3 text-right text-zinc-600 dark:text-zinc-400">
                             {formatCurrency(period.taxLossCarryForwardOpening ?? 0, currency)}
                           </td>
                           <td
                             className={`py-2 px-3 text-right font-medium ${
-                              isLossYear ? "text-rose-400" : "text-zinc-200"
+                              isLossYear ? "text-rose-600 dark:text-rose-400" : "text-zinc-800 dark:text-zinc-200"
                             }`}
                           >
                             {formatCurrency(period.ebt, currency)}
                           </td>
                           <td
                             className={`py-2 px-3 text-right ${
-                              hasExpired ? "text-rose-400 font-bold" : "text-zinc-600"
+                              hasExpired ? "text-rose-600 dark:text-rose-400 font-bold" : "text-zinc-400 dark:text-zinc-600"
                             }`}
                           >
                             {hasExpired ? `-${formatCurrency(period.taxLossExpired, currency)}` : "-"}
                           </td>
                           <td
                             className={`py-2 px-3 text-right font-semibold ${
-                              hasLossUsed ? "text-emerald-400" : "text-zinc-600"
+                              hasLossUsed ? "text-emerald-600 dark:text-emerald-400" : "text-zinc-400 dark:text-zinc-600"
                             }`}
                           >
                             {hasLossUsed ? formatCurrency(period.taxLossUsed, currency) : "-"}
                           </td>
-                          <td className="py-2 px-3 text-right text-zinc-300">
+                          <td className="py-2 px-3 text-right text-zinc-700 dark:text-zinc-300">
                             {formatCurrency(period.taxableIncome ?? 0, currency)}
                           </td>
                           <td
                             className={`py-2 px-3 text-right font-semibold ${
-                              period.cit > 0 ? "text-amber-400" : "text-zinc-500"
+                              period.cit > 0 ? "text-amber-600 dark:text-amber-400" : "text-zinc-400 dark:text-zinc-500"
                             }`}
                           >
                             {formatCurrency(period.cit, currency)}
                           </td>
-                          <td className="py-2 px-3 text-right text-amber-300/90 font-medium">
+                          <td className="py-2 px-3 text-right text-amber-600 dark:text-amber-300/90 font-medium">
                             {formatCurrency(period.taxLossCarryForwardClosing ?? 0, currency)}
                           </td>
                         </tr>
@@ -2091,7 +2091,7 @@ export const OperatingAssumptionsForm = () => {
                     })
                   ) : (
                     <tr>
-                      <td colSpan={8} className="py-4 text-center text-zinc-500">
+                      <td colSpan={8} className="py-4 text-center text-zinc-500 dark:text-zinc-400">
                         Brak danych projekcji wieloletniej.
                       </td>
                     </tr>
@@ -2104,16 +2104,16 @@ export const OperatingAssumptionsForm = () => {
       )}
 
       {/* Bottom Actions Bar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-zinc-900/60 border border-zinc-800 rounded-xl">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-white dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm">
         <div className="flex items-center gap-2">
           {saveSuccess && (
-            <span className="text-sm text-emerald-400 flex items-center gap-1.5 animate-fadeIn">
+            <span className="text-sm text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5 animate-fadeIn">
               <CheckCircle2 className="w-4 h-4" />
               Założenia operacyjne zostały pomyślnie zapisane.
             </span>
           )}
           {saveError && (
-            <span className="text-sm text-rose-400 flex items-center gap-1.5 animate-fadeIn">
+            <span className="text-sm text-rose-600 dark:text-rose-400 flex items-center gap-1.5 animate-fadeIn">
               <AlertCircle className="w-4 h-4" />
               {saveError}
             </span>
@@ -2127,7 +2127,7 @@ export const OperatingAssumptionsForm = () => {
               onClick={handleReset}
               disabled={isSaving}
               aria-label="Resetuj założenia operacyjne"
-              className="px-4 py-2 text-sm text-zinc-400 hover:text-zinc-200 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50"
+              className="px-4 py-2 text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 rounded-lg transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50"
             >
               <RotateCcw className="w-4 h-4" />
               Resetuj

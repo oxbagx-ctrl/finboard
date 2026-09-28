@@ -98,26 +98,26 @@ export const TestMailModal = ({
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-xs font-mono">
-            <div className="bg-zinc-900 border border-zinc-750 rounded-lg shadow-2xl max-w-lg w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150 flex flex-col max-h-[90vh]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/60 dark:bg-zinc-950/80 backdrop-blur-xs font-mono">
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-2xl max-w-lg w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150 flex flex-col max-h-[90vh]">
                 {/* Modal Header */}
-                <div className="px-5 py-3.5 bg-zinc-950 border-b border-zinc-800 flex items-center justify-between shrink-0">
+                <div className="px-5 py-3.5 bg-zinc-50 dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between shrink-0">
                     <div className="flex items-center gap-2.5">
                         <Tooltip content="Wysyłka testowa i badanie opóźnienia transportu pocztowego SMTP">
                             <div
                                 tabIndex={0}
                                 role="img"
                                 aria-label="Diagnostyka połączenia SMTP"
-                                className="w-7 h-7 rounded bg-blue-950/60 border border-blue-700/60 flex items-center justify-center text-blue-400 focus:outline-none focus:ring-1 focus:ring-zinc-400"
+                                className="w-7 h-7 rounded bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-700/60 flex items-center justify-center text-blue-600 dark:text-blue-400 focus:outline-none focus:ring-1 focus:ring-zinc-400"
                             >
                                 <Send className="w-4 h-4" />
                             </div>
                         </Tooltip>
                         <div>
-                            <h2 className="text-xs font-bold uppercase tracking-wider text-zinc-100">
+                            <h2 className="text-xs font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
                                 Diagnostyka Połączenia SMTP
                             </h2>
-                            <p className="text-[10px] text-zinc-500 mt-0.5">
+                            <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">
                                 TEST TRANSPORTU POCZTY & HANDSHAKE TLS/SSL
                             </p>
                         </div>
@@ -126,7 +126,7 @@ export const TestMailModal = ({
                         <button
                             type="button"
                             onClick={onClose}
-                            className="p-1 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors cursor-pointer"
+                            className="p-1 rounded text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
                             title="Zamknij"
                             aria-label="Zamknij okno testu SMTP"
                         >
@@ -137,9 +137,9 @@ export const TestMailModal = ({
 
                 {/* Modal Body */}
                 <form onSubmit={handleSendTest} noValidate className="p-5 space-y-4 overflow-y-auto">
-                    <div className="p-3 rounded bg-zinc-850/70 border border-zinc-750/70 flex items-start gap-2.5">
-                        <Server className="w-4 h-4 text-zinc-400 shrink-0 mt-0.5" />
-                        <div className="text-[11px] text-zinc-300 leading-relaxed flex-1">
+                    <div className="p-3 rounded bg-zinc-50 dark:bg-zinc-850/70 border border-zinc-200 dark:border-zinc-750/70 flex items-start gap-2.5">
+                        <Server className="w-4 h-4 text-zinc-500 dark:text-zinc-400 shrink-0 mt-0.5" />
+                        <div className="text-[11px] text-zinc-700 dark:text-zinc-300 leading-relaxed flex-1">
                             Narzędzie wykonuje autentyczny handshake z serwerem pocztowym (TLS port 587 lub SSL port 465), autoryzuje poświadczenia i wysyła szablon diagnostyczny Deal Advisory z pomiarem opóźnienia.
                         </div>
                         <InfoTooltip
@@ -152,8 +152,8 @@ export const TestMailModal = ({
                     {/* Email Input */}
                     <div>
                         <div className="flex items-center justify-between mb-1.5">
-                            <label className="block text-[11px] font-semibold text-zinc-300 uppercase tracking-wider">
-                                Adres E-mail Odbiorcy Testu <span className="text-rose-400">*</span>
+                            <label className="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">
+                                Adres E-mail Odbiorcy Testu <span className="text-rose-600 dark:text-rose-400">*</span>
                             </label>
                             <InfoTooltip
                                 content="Wpisz adres e-mail, na który ma dotrzeć testowy pakiet weryfikacyjny Deal Advisory."
@@ -162,7 +162,7 @@ export const TestMailModal = ({
                             />
                         </div>
                         <div className="relative">
-                            <Mail className="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                            <Mail className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
                             <input
                                 type="email"
                                 autoFocus
@@ -172,14 +172,14 @@ export const TestMailModal = ({
                                     if (validationError) setValidationError('');
                                 }}
                                 placeholder="np. admin@helvest.com"
-                                className={`w-full pl-9 pr-3 py-2 text-xs bg-zinc-950 border rounded text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-brand ${
-                                    validationError ? 'border-rose-500/80' : 'border-zinc-750'
+                                className={`w-full pl-9 pr-3 py-2 text-xs bg-white dark:bg-zinc-950 border rounded text-zinc-900 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-brand ${
+                                    validationError ? 'border-rose-500' : 'border-zinc-300 dark:border-zinc-800'
                                 }`}
                                 disabled={submitting}
                             />
                         </div>
                         {validationError && (
-                            <p className="text-[10px] text-rose-400 mt-1">{validationError}</p>
+                            <p className="text-[10px] text-rose-600 dark:text-rose-400 mt-1">{validationError}</p>
                         )}
                     </div>
 
@@ -188,15 +188,15 @@ export const TestMailModal = ({
                         <div
                             className={`p-3 rounded border text-xs space-y-2 animate-in fade-in duration-150 ${
                                 testResult.success
-                                    ? 'bg-emerald-950/30 border-emerald-500/40 text-emerald-300'
-                                    : 'bg-rose-950/30 border-rose-500/40 text-rose-300'
+                                    ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-500/40 text-emerald-800 dark:text-emerald-300'
+                                    : 'bg-rose-50 dark:bg-rose-950/30 border-rose-200 dark:border-rose-500/40 text-rose-800 dark:text-rose-300'
                             }`}
                         >
                             <div className="flex items-start gap-2.5">
                                 {testResult.success ? (
-                                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                                    <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
                                 ) : (
-                                    <XCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                                    <XCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
                                 )}
                                 <div className="space-y-1 flex-1">
                                     <div className="font-semibold text-xs">
@@ -206,17 +206,17 @@ export const TestMailModal = ({
                                         {testResult.message}
                                     </div>
                                     {testResult.latency_ms !== null && (
-                                        <div className="flex items-center gap-1.5 text-[10px] font-mono mt-1 text-zinc-400">
-                                            <Clock className="w-3 h-3 text-zinc-500" />
-                                            <span>Czas odpowiedzi transportu: <strong className="text-zinc-200">{testResult.latency_ms} ms</strong></span>
+                                        <div className="flex items-center gap-1.5 text-[10px] font-mono mt-1 text-zinc-500 dark:text-zinc-400">
+                                            <Clock className="w-3 h-3 text-zinc-400 dark:text-zinc-500" />
+                                            <span>Czas odpowiedzi transportu: <strong className="text-zinc-800 dark:text-zinc-200">{testResult.latency_ms} ms</strong></span>
                                         </div>
                                     )}
                                 </div>
                             </div>
 
                             {!testResult.success && (
-                                <div className="mt-2 pt-2 border-t border-rose-500/20 text-[10px] text-rose-300/80 flex items-start gap-1.5">
-                                    <ShieldAlert className="w-3.5 h-3.5 text-rose-400 shrink-0 mt-0.5" />
+                                <div className="mt-2 pt-2 border-t border-rose-200 dark:border-rose-500/20 text-[10px] text-rose-700 dark:text-rose-300/80 flex items-start gap-1.5">
+                                    <ShieldAlert className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
                                     <span>
                                         Wskazówka: W środowisku chmurowym (Oracle Cloud OCI) upewnij się, że port 25 nie jest używany (jest blokowany przez OCI) oraz że Security List zezwala na ruch wychodzący TCP dla portu 587 / 465.
                                     </span>
@@ -226,7 +226,7 @@ export const TestMailModal = ({
                     )}
 
                     {/* Footer Actions */}
-                    <div className="flex items-center justify-end gap-2 pt-2 border-t border-zinc-800">
+                    <div className="flex items-center justify-end gap-2 pt-2 border-t border-zinc-200 dark:border-zinc-800">
                         <Tooltip content="Zamknij okno diagnostyki SMTP">
                             <Button
                                 type="button"

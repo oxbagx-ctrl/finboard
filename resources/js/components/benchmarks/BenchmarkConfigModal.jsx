@@ -90,7 +90,7 @@ const METRIC_DEFAULTS = [
 
 export const evaluateStatusChip = (actualVal, targetVal, warningVal, higherIsBetter = true) => {
     if (actualVal == null || isNaN(actualVal)) {
-        return { status: 'STD', label: 'Standard', className: 'text-zinc-400 bg-zinc-800 border-zinc-700' };
+        return { status: 'STD', label: 'Standard', className: 'text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700' };
     }
     const val = Number(actualVal);
     const target = Number(targetVal);
@@ -98,20 +98,20 @@ export const evaluateStatusChip = (actualVal, targetVal, warningVal, higherIsBet
 
     if (higherIsBetter) {
         if (val >= target) {
-            return { status: 'OPT', label: 'Optymalny', className: 'text-emerald-400 bg-emerald-950/60 border-emerald-800/80' };
+            return { status: 'OPT', label: 'Optymalny', className: 'text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border-emerald-200 dark:border-emerald-800/80' };
         }
         if (val >= warning) {
-            return { status: 'WARN', label: 'Ostrzeżenie', className: 'text-amber-400 bg-amber-950/60 border-amber-800/80' };
+            return { status: 'WARN', label: 'Ostrzeżenie', className: 'text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 border-amber-200 dark:border-amber-800/80' };
         }
-        return { status: 'CRIT', label: 'Krytyczny', className: 'text-rose-400 bg-rose-950/60 border-rose-800/80' };
+        return { status: 'CRIT', label: 'Krytyczny', className: 'text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/60 border-rose-200 dark:border-rose-800/80' };
     } else {
         if (val <= target) {
-            return { status: 'OPT', label: 'Optymalny', className: 'text-emerald-400 bg-emerald-950/60 border-emerald-800/80' };
+            return { status: 'OPT', label: 'Optymalny', className: 'text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border-emerald-200 dark:border-emerald-800/80' };
         }
         if (val <= warning) {
-            return { status: 'WARN', label: 'Ostrzeżenie', className: 'text-amber-400 bg-amber-950/60 border-amber-800/80' };
+            return { status: 'WARN', label: 'Ostrzeżenie', className: 'text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 border-amber-200 dark:border-amber-800/80' };
         }
-        return { status: 'CRIT', label: 'Krytyczny', className: 'text-rose-400 bg-rose-950/60 border-rose-800/80' };
+        return { status: 'CRIT', label: 'Krytyczny', className: 'text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/60 border-rose-200 dark:border-rose-800/80' };
     }
 };
 
@@ -239,26 +239,26 @@ export const BenchmarkConfigModal = ({ isOpen, onClose, onSaved, currentMetrics 
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-sm animate-in fade-in duration-150">
-            <div className="bg-zinc-900 border border-zinc-800 rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col font-mono">
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col font-mono">
                 {/* Header */}
-                <div className="p-4 bg-zinc-950 border-b border-zinc-800 flex items-center justify-between">
+                <div className="p-4 bg-zinc-50 dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded bg-zinc-800 border border-zinc-700 flex items-center justify-center text-zinc-200">
-                            <Sliders className="w-4 h-4 text-emerald-400" />
+                        <div className="w-8 h-8 rounded bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-zinc-700 dark:text-zinc-200">
+                            <Sliders className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                         </div>
                         <div>
-                            <h2 className="text-sm font-bold uppercase tracking-wider text-zinc-100 flex items-center gap-2">
+                            <h2 className="text-sm font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
                                 <span>Konfigurator Celów i Benchmarków M&A</span>
                                 <Badge variant="default" size="sm">{activeCompany?.code || 'PODMIOT'}</Badge>
                             </h2>
-                            <p className="text-[11px] text-zinc-500 mt-0.5">
-                                Spółka: <strong className="text-zinc-300 font-medium">{activeCompany?.name}</strong> | Standardy Due Diligence & Deal Advisory
+                            <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">
+                                Spółka: <strong className="text-zinc-800 dark:text-zinc-300 font-medium">{activeCompany?.name}</strong> | Standardy Due Diligence & Deal Advisory
                             </p>
                         </div>
                     </div>
                     <button
                         onClick={onClose}
-                        className="text-zinc-500 hover:text-zinc-300 p-1.5 rounded transition-colors"
+                        className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 p-1.5 rounded transition-colors"
                         title="Zamknij"
                     >
                         <X className="w-4 h-4" />
@@ -266,9 +266,9 @@ export const BenchmarkConfigModal = ({ isOpen, onClose, onSaved, currentMetrics 
                 </div>
 
                 {/* Subheader info / role banner */}
-                <div className="px-4 py-2 bg-zinc-950/50 border-b border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between text-xs text-zinc-400 gap-2">
+                <div className="px-4 py-2 bg-zinc-100/60 dark:bg-zinc-950/50 border-b border-zinc-200 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between text-xs text-zinc-600 dark:text-zinc-400 gap-2">
                     <div className="flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                        <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
                         <span>
                             {canEdit
                                 ? 'Tryb edycji Doradcy M&A: Zdefiniuj progi docelowe i ostrzegawcze'
@@ -280,7 +280,7 @@ export const BenchmarkConfigModal = ({ isOpen, onClose, onSaved, currentMetrics 
                             type="button"
                             onClick={handleResetDefaults}
                             disabled={resetting || saving}
-                            className="inline-flex items-center gap-1.5 text-[11px] text-zinc-400 hover:text-amber-400 transition-colors"
+                            className="inline-flex items-center gap-1.5 text-[11px] text-zinc-500 hover:text-amber-600 dark:text-zinc-400 dark:hover:text-amber-400 transition-colors"
                         >
                             <RotateCcw className="w-3 h-3" />
                             <span>Przywróć domyślne rynkowe</span>
@@ -291,7 +291,7 @@ export const BenchmarkConfigModal = ({ isOpen, onClose, onSaved, currentMetrics 
                 {/* Form Body / Metric Rows */}
                 <div className="p-4 overflow-y-auto flex-1 space-y-3">
                     {loading ? (
-                        <div className="py-12 text-center text-zinc-500 text-xs">
+                        <div className="py-12 text-center text-zinc-500 dark:text-zinc-400 text-xs">
                             Ładowanie konfiguracji progów benchmarkowych...
                         </div>
                     ) : (
@@ -302,27 +302,27 @@ export const BenchmarkConfigModal = ({ isOpen, onClose, onSaved, currentMetrics 
                             return (
                                 <div
                                     key={item.metric_type}
-                                    className="p-3.5 bg-zinc-950/40 border border-zinc-800/80 rounded-lg hover:border-zinc-700 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs"
+                                    className="p-3.5 bg-zinc-50/60 dark:bg-zinc-950/40 border border-zinc-200 dark:border-zinc-800/80 rounded-lg hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs"
                                 >
                                     {/* Left: Metric Info */}
                                     <div className="md:w-5/12">
                                         <div className="flex items-center gap-2">
-                                            <span className="font-bold text-zinc-200">{item.label}</span>
+                                            <span className="font-bold text-zinc-900 dark:text-zinc-200">{item.label}</span>
                                             {item.is_custom ? (
-                                                <span className="text-[9px] px-1 py-0.2 rounded bg-sky-950/60 border border-sky-800/60 text-sky-400 font-bold uppercase">
+                                                <span className="text-[9px] px-1 py-0.2 rounded bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800/60 text-sky-700 dark:text-sky-400 font-bold uppercase">
                                                     CEL DORADCY
                                                 </span>
                                             ) : (
-                                                <span className="text-[9px] px-1 py-0.2 rounded bg-zinc-850 border border-zinc-750 text-zinc-400 font-bold uppercase">
+                                                <span className="text-[9px] px-1 py-0.2 rounded bg-zinc-100 dark:bg-zinc-850 border border-zinc-200 dark:border-zinc-750 text-zinc-600 dark:text-zinc-400 font-bold uppercase">
                                                     STANDARD
                                                 </span>
                                             )}
                                         </div>
-                                        <div className="text-[10px] text-zinc-500 mt-1 flex items-center gap-3">
-                                            <span>Jednostka: <strong className="text-zinc-400">{item.unit}</strong></span>
-                                            <span>Relacja: <strong className="text-zinc-400">{item.higher_is_better ? 'Większy = Lepszy (>=)' : 'Mniejszy = Lepszy (<=)'}</strong></span>
+                                        <div className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-1 flex items-center gap-3">
+                                            <span>Jednostka: <strong className="text-zinc-700 dark:text-zinc-400">{item.unit}</strong></span>
+                                            <span>Relacja: <strong className="text-zinc-700 dark:text-zinc-400">{item.higher_is_better ? 'Większy = Lepszy (>=)' : 'Mniejszy = Lepszy (<=)'}</strong></span>
                                             {actual != null && (
-                                                <span>Aktualnie: <strong className="text-zinc-200">{Number(actual).toFixed(2)}{item.unit}</strong></span>
+                                                <span>Aktualnie: <strong className="text-zinc-900 dark:text-zinc-200">{Number(actual).toFixed(2)}{item.unit}</strong></span>
                                             )}
                                         </div>
                                     </div>
@@ -330,7 +330,7 @@ export const BenchmarkConfigModal = ({ isOpen, onClose, onSaved, currentMetrics 
                                     {/* Middle: Inputs */}
                                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 md:w-5/12">
                                         <div>
-                                            <label className="block text-[10px] uppercase text-zinc-500 mb-1">
+                                            <label className="block text-[10px] uppercase text-zinc-500 dark:text-zinc-400 mb-1">
                                                 Cel Docelowy
                                             </label>
                                             <div className="relative">
@@ -340,16 +340,16 @@ export const BenchmarkConfigModal = ({ isOpen, onClose, onSaved, currentMetrics 
                                                     value={item.target_value}
                                                     disabled={!canEdit || saving}
                                                     onChange={(e) => handleFieldChange(item.metric_type, 'target_value', e.target.value)}
-                                                    className="w-full bg-zinc-900 border border-zinc-750 rounded px-2.5 py-1.5 text-xs text-zinc-100 font-mono text-right pr-6 focus:border-emerald-500 focus:outline-none disabled:opacity-60"
+                                                    className="w-full bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-750 rounded px-2.5 py-1.5 text-xs text-zinc-900 dark:text-zinc-100 font-mono text-right pr-6 focus:border-emerald-500 focus:outline-none disabled:opacity-60"
                                                 />
-                                                <span className="absolute right-2 top-1.5 text-[10px] text-zinc-500 pointer-events-none">
+                                                <span className="absolute right-2 top-1.5 text-[10px] text-zinc-400 pointer-events-none">
                                                     {item.unit}
                                                 </span>
                                             </div>
                                         </div>
 
                                         <div>
-                                            <label className="block text-[10px] uppercase text-zinc-500 mb-1">
+                                            <label className="block text-[10px] uppercase text-zinc-500 dark:text-zinc-400 mb-1">
                                                 Próg Ostrzegawczy
                                             </label>
                                             <div className="relative">
@@ -359,16 +359,16 @@ export const BenchmarkConfigModal = ({ isOpen, onClose, onSaved, currentMetrics 
                                                     value={item.warning_threshold}
                                                     disabled={!canEdit || saving}
                                                     onChange={(e) => handleFieldChange(item.metric_type, 'warning_threshold', e.target.value)}
-                                                    className="w-full bg-zinc-900 border border-zinc-750 rounded px-2.5 py-1.5 text-xs text-zinc-100 font-mono text-right pr-6 focus:border-amber-500 focus:outline-none disabled:opacity-60"
+                                                    className="w-full bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-750 rounded px-2.5 py-1.5 text-xs text-zinc-900 dark:text-zinc-100 font-mono text-right pr-6 focus:border-amber-500 focus:outline-none disabled:opacity-60"
                                                 />
-                                                <span className="absolute right-2 top-1.5 text-[10px] text-zinc-500 pointer-events-none">
+                                                <span className="absolute right-2 top-1.5 text-[10px] text-zinc-400 pointer-events-none">
                                                     {item.unit}
                                                 </span>
                                             </div>
                                         </div>
 
                                         <div className="hidden sm:block">
-                                            <label className="block text-[10px] uppercase text-zinc-500 mb-1">
+                                            <label className="block text-[10px] uppercase text-zinc-500 dark:text-zinc-400 mb-1">
                                                 Próg Krytyczny
                                             </label>
                                             <div className="relative">
@@ -379,9 +379,9 @@ export const BenchmarkConfigModal = ({ isOpen, onClose, onSaved, currentMetrics 
                                                     disabled={!canEdit || saving}
                                                     onChange={(e) => handleFieldChange(item.metric_type, 'critical_threshold', e.target.value)}
                                                     placeholder="Opcjonalny"
-                                                    className="w-full bg-zinc-900 border border-zinc-750 rounded px-2.5 py-1.5 text-xs text-zinc-100 font-mono text-right pr-6 focus:border-rose-500 focus:outline-none disabled:opacity-60 placeholder:text-zinc-600"
+                                                    className="w-full bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-750 rounded px-2.5 py-1.5 text-xs text-zinc-900 dark:text-zinc-100 font-mono text-right pr-6 focus:border-rose-500 focus:outline-none disabled:opacity-60 placeholder:text-zinc-400 dark:placeholder:text-zinc-600"
                                                 />
-                                                <span className="absolute right-2 top-1.5 text-[10px] text-zinc-500 pointer-events-none">
+                                                <span className="absolute right-2 top-1.5 text-[10px] text-zinc-400 pointer-events-none">
                                                     {item.unit}
                                                 </span>
                                             </div>
@@ -391,7 +391,7 @@ export const BenchmarkConfigModal = ({ isOpen, onClose, onSaved, currentMetrics 
                                     {/* Right: Dynamic Status Chip */}
                                     <div className="md:w-2/12 flex items-center justify-end gap-2">
                                         <div className="text-right">
-                                            <div className="text-[9px] uppercase text-zinc-500 mb-0.5">Podgląd Statusu</div>
+                                            <div className="text-[9px] uppercase text-zinc-500 dark:text-zinc-400 mb-0.5">Podgląd Statusu</div>
                                             <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${chip.className}`}>
                                                 {chip.status} – {chip.label}
                                             </span>
@@ -404,8 +404,8 @@ export const BenchmarkConfigModal = ({ isOpen, onClose, onSaved, currentMetrics 
                 </div>
 
                 {/* Footer Controls */}
-                <div className="p-4 bg-zinc-950 border-t border-zinc-800 flex items-center justify-between">
-                    <div className="text-[11px] text-zinc-500">
+                <div className="p-4 bg-zinc-50 dark:bg-zinc-950 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
+                    <div className="text-[11px] text-zinc-500 dark:text-zinc-400">
                         * Modyfikacje progów natychmiastowo aktualizują semafory statusów na Pulpicie Zarządczym i w Analityce.
                     </div>
                     <div className="flex items-center gap-2">

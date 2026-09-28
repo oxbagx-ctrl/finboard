@@ -87,18 +87,18 @@ export const CreateProjectModal = ({ isOpen, onClose, onSubmit }) => {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-xs font-mono">
-            <div className="bg-zinc-900 border border-zinc-800 rounded-lg w-full max-w-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg w-full max-w-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
                 {/* Header */}
-                <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800 bg-zinc-950">
+                <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950">
                     <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded bg-zinc-800 border border-zinc-700 flex items-center justify-center text-zinc-100">
-                            <Calculator className="w-4 h-4 text-emerald-400" />
+                        <div className="w-8 h-8 rounded bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-zinc-900 dark:text-zinc-100">
+                            <Calculator className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                         </div>
                         <div>
-                            <h2 className="text-sm font-bold text-zinc-100 uppercase tracking-wide">
+                            <h2 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wide">
                                 Nowy Projekt Inwestycyjny
                             </h2>
-                            <p className="text-[11px] text-zinc-400">
+                            <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
                                 Inicjalizacja modelu Project Finance & CAPEX
                             </p>
                         </div>
@@ -109,7 +109,7 @@ export const CreateProjectModal = ({ isOpen, onClose, onSubmit }) => {
                             onClick={handleClose}
                             disabled={submitting}
                             aria-label="Zamknij formularz"
-                            className="text-zinc-500 hover:text-zinc-300 transition-colors p-1 rounded hover:bg-zinc-800 cursor-pointer"
+                            className="text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300 transition-colors p-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
                         >
                             <X className="w-4 h-4" />
                         </button>
@@ -119,7 +119,7 @@ export const CreateProjectModal = ({ isOpen, onClose, onSubmit }) => {
                 {/* Form */}
                 <form onSubmit={handleSubmit} className="p-6 space-y-4">
                     {errors.general && (
-                        <div className="p-3 bg-rose-950/60 border border-rose-800/80 rounded text-rose-300 text-xs">
+                        <div className="p-3 bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800/80 rounded text-rose-700 dark:text-rose-300 text-xs">
                             {errors.general}
                         </div>
                     )}
@@ -127,7 +127,7 @@ export const CreateProjectModal = ({ isOpen, onClose, onSubmit }) => {
                     {/* Name */}
                     <div>
                         <div className="flex items-center justify-between mb-1">
-                            <label htmlFor="project-name" className="text-xs font-semibold text-zinc-300 uppercase">
+                            <label htmlFor="project-name" className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 uppercase">
                                 Nazwa Projektu *
                             </label>
                             <InfoTooltip size="xs" content="Oficjalna nazwa projektu inwestycyjnego prezentowana w raportach i dossier PDF" />
@@ -138,18 +138,18 @@ export const CreateProjectModal = ({ isOpen, onClose, onSubmit }) => {
                             value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                             placeholder="np. Budowa Centrum Dystrybucyjnego Logistics Hub"
-                            className={`w-full px-3 py-2 bg-zinc-950 border rounded text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-400 ${
-                                errors.name ? 'border-rose-600' : 'border-zinc-800'
+                            className={`w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border rounded text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-emerald-500 ${
+                                errors.name ? 'border-rose-600' : 'border-zinc-300 dark:border-zinc-800'
                             }`}
                         />
-                        {errors.name && <p className="text-[10px] text-rose-400 mt-1">{errors.name}</p>}
+                        {errors.name && <p className="text-[10px] text-rose-500 dark:text-rose-400 mt-1">{errors.name}</p>}
                     </div>
 
                     {/* Row: Start Date, Horizon, Currency */}
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <div>
                             <div className="flex items-center justify-between mb-1">
-                                <label htmlFor="project-start-date" className="text-xs font-semibold text-zinc-300 uppercase">
+                                <label htmlFor="project-start-date" className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 uppercase">
                                     Data Startu *
                                 </label>
                                 <InfoTooltip size="xs" content="Data rozpoczęcia pierwszych prac budowlanych lub wydatków CAPEX" />
@@ -159,16 +159,16 @@ export const CreateProjectModal = ({ isOpen, onClose, onSubmit }) => {
                                 type="date"
                                 value={formData.start_date}
                                 onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
-                                className={`w-full px-3 py-2 bg-zinc-950 border rounded text-xs text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 ${
-                                    errors.start_date ? 'border-rose-600' : 'border-zinc-800'
+                                className={`w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border rounded text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-emerald-500 ${
+                                    errors.start_date ? 'border-rose-600' : 'border-zinc-300 dark:border-zinc-800'
                                 }`}
                             />
-                            {errors.start_date && <p className="text-[10px] text-rose-400 mt-1">{errors.start_date}</p>}
+                            {errors.start_date && <p className="text-[10px] text-rose-500 dark:text-rose-400 mt-1">{errors.start_date}</p>}
                         </div>
 
                         <div>
                             <div className="flex items-center justify-between mb-1">
-                                <label htmlFor="project-horizon" className="text-xs font-semibold text-zinc-300 uppercase">
+                                <label htmlFor="project-horizon" className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 uppercase">
                                     Horyzont (Lata)
                                 </label>
                                 <InfoTooltip size="xs" content="Liczba lat prognozy finansowej modelu 3-Statement (od 1 do 30 lat)" />
@@ -180,16 +180,16 @@ export const CreateProjectModal = ({ isOpen, onClose, onSubmit }) => {
                                 max="30"
                                 value={formData.planning_horizon_years}
                                 onChange={(e) => setFormData({ ...formData, planning_horizon_years: e.target.value })}
-                                className={`w-full px-3 py-2 bg-zinc-950 border rounded text-xs text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 ${
-                                    errors.planning_horizon_years ? 'border-rose-600' : 'border-zinc-800'
+                                className={`w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border rounded text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-emerald-500 ${
+                                    errors.planning_horizon_years ? 'border-rose-600' : 'border-zinc-300 dark:border-zinc-800'
                                 }`}
                             />
-                            {errors.planning_horizon_years && <p className="text-[10px] text-rose-400 mt-1">{errors.planning_horizon_years}</p>}
+                            {errors.planning_horizon_years && <p className="text-[10px] text-rose-500 dark:text-rose-400 mt-1">{errors.planning_horizon_years}</p>}
                         </div>
 
                         <div>
                             <div className="flex items-center justify-between mb-1">
-                                <label htmlFor="project-currency" className="text-xs font-semibold text-zinc-300 uppercase">
+                                <label htmlFor="project-currency" className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 uppercase">
                                     Waluta
                                 </label>
                                 <InfoTooltip size="xs" content="Waluta bazowa kalkulacji nakładów, przepływów DCF i długu" />
@@ -198,12 +198,12 @@ export const CreateProjectModal = ({ isOpen, onClose, onSubmit }) => {
                                 id="project-currency"
                                 value={formData.currency}
                                 onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
-                                className="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded text-xs text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 cursor-pointer"
+                                className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-emerald-500 cursor-pointer"
                             >
-                                <option value="PLN">PLN (złoty)</option>
-                                <option value="EUR">EUR (euro)</option>
-                                <option value="USD">USD (dolar)</option>
-                                <option value="GBP">GBP (funt)</option>
+                                <option value="PLN" className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">PLN (złoty)</option>
+                                <option value="EUR" className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">EUR (euro)</option>
+                                <option value="USD" className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">USD (dolar)</option>
+                                <option value="GBP" className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">GBP (funt)</option>
                             </select>
                         </div>
                     </div>
@@ -212,7 +212,7 @@ export const CreateProjectModal = ({ isOpen, onClose, onSubmit }) => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
                             <div className="flex items-center justify-between mb-1">
-                                <label className="text-xs font-semibold text-zinc-300 uppercase">
+                                <label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 uppercase">
                                     Wkład Własny (Equity)
                                 </label>
                                 <InfoTooltip size="xs" content="Środki własne sponsorów projektu przeznaczone na sfinansowanie nakładów CAPEX" />
@@ -224,13 +224,13 @@ export const CreateProjectModal = ({ isOpen, onClose, onSubmit }) => {
                                 placeholder="np. 2000000"
                                 value={formData.equity_contribution}
                                 onChange={(e) => setFormData({ ...formData, equity_contribution: e.target.value })}
-                                className="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
+                                className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-emerald-500 font-mono"
                             />
                         </div>
 
                         <div>
                             <div className="flex items-center justify-between mb-1">
-                                <label className="text-xs font-semibold text-zinc-300 uppercase">
+                                <label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 uppercase">
                                     Kredyt Bankowy (Dług)
                                 </label>
                                 <InfoTooltip size="xs" content="Projektowany wolumen długu uprzywilejowanego (Senior Debt) zaciągniętego na inwestycję" />
@@ -242,7 +242,7 @@ export const CreateProjectModal = ({ isOpen, onClose, onSubmit }) => {
                                 placeholder="np. 5000000"
                                 value={formData.bank_loan_principal}
                                 onChange={(e) => setFormData({ ...formData, bank_loan_principal: e.target.value })}
-                                className="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
+                                className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-emerald-500 font-mono"
                             />
                         </div>
                     </div>
@@ -250,7 +250,7 @@ export const CreateProjectModal = ({ isOpen, onClose, onSubmit }) => {
                     {/* Description */}
                     <div>
                         <div className="flex items-center justify-between mb-1">
-                            <label className="text-xs font-semibold text-zinc-300 uppercase">
+                            <label className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 uppercase">
                                 Opis / Założenia Strategiczne
                             </label>
                             <InfoTooltip size="xs" content="Zwięzły opis celu inwestycji, planowanej skali operacji oraz kluczowych ryzyk" />
@@ -260,12 +260,12 @@ export const CreateProjectModal = ({ isOpen, onClose, onSubmit }) => {
                             value={formData.description}
                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                             placeholder="Zwięzły opis celu inwestycji, planowanej skali operacji oraz kluczowych ryzyk..."
-                            className="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono resize-none"
+                            className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-emerald-500 font-mono resize-none"
                         />
                     </div>
 
                     {/* Footer buttons */}
-                    <div className="flex items-center justify-end gap-3 pt-3 border-t border-zinc-800">
+                    <div className="flex items-center justify-end gap-3 pt-3 border-t border-zinc-200 dark:border-zinc-800">
                         <Tooltip content="Odrzuć zmiany i zamknij formularz tworzenia projektu">
                             <Button
                                 type="button"

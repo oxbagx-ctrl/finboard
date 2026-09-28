@@ -154,15 +154,15 @@ export const ImportView = () => {
     return (
         <div className="space-y-6 font-mono">
             {/* Header Strip */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-zinc-900 border border-zinc-800 rounded-lg p-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-3">
                 <div className="flex items-center gap-3">
                     <Tooltip content="Moduł wsadowego importu wyciągów bankowych i zbiorów danych CSV">
-                        <div className="w-8 h-8 rounded bg-zinc-850 border border-zinc-750 flex items-center justify-center text-zinc-300 cursor-help">
+                        <div className="w-8 h-8 rounded bg-zinc-100 dark:bg-zinc-850 border border-zinc-200 dark:border-zinc-750 flex items-center justify-center text-zinc-600 dark:text-zinc-300 cursor-help">
                             <FileSpreadsheet className="w-4 h-4" />
                         </div>
                     </Tooltip>
                     <div>
-                        <div className="text-xs font-bold text-zinc-100 flex items-center gap-2">
+                        <div className="text-xs font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
                             <span>Asynchroniczny Import Danych CSV</span>
                             <Tooltip content={`Podmiot docelowy importu: ${activeCompany?.name || 'Spółka portfelowa'} (${activeCompany?.code || 'PODMIOT'})`}>
                                 <span>
@@ -176,23 +176,23 @@ export const ImportView = () => {
                                 content="Moduł umożliwia bezpieczne masowe ładowanie wyciągów bankowych i zestawień operacji. Dane podlegają weryfikacji Dry-Run, po czym przetwarzane są w tle przez asynchroniczną kolejkę Redis Worker."
                             />
                         </div>
-                        <p className="text-[10px] text-zinc-500 mt-0.5">
+                        <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">
                             Kolejkowanie asynchroniczne Redis (financial-imports) | Podmiot docelowy: {activeCompany?.name}
                         </p>
                     </div>
                 </div>
 
-                <div className="flex items-center gap-2 text-xs text-zinc-400">
+                <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
                     <Tooltip content="Kolejka asynchroniczna Redis Worker (financial-imports) jest aktywna i gotowa do przetwarzania wsadowego">
                         <span className="flex items-center gap-1 cursor-help">
-                            <Server className="w-3.5 h-3.5 text-emerald-400" />
+                            <Server className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                             Worker: Aktywny
                         </span>
                     </Tooltip>
                     <span>•</span>
                     <Tooltip content="Każdy plik CSV jest wstępnie weryfikowany bez modyfikacji bazy danych pod kątem poprawności nagłówków, kwot i kategorii">
                         <span className="flex items-center gap-1 cursor-help">
-                            <ShieldCheck className="w-3.5 h-3.5 text-sky-400" />
+                            <ShieldCheck className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
                             Walidacja Dry-Run
                         </span>
                     </Tooltip>
@@ -218,9 +218,9 @@ export const ImportView = () => {
                     />
 
                     {validating && (
-                        <div className="p-8 bg-zinc-900 border border-zinc-800 rounded-lg text-center space-y-2">
-                            <div className="w-6 h-6 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin mx-auto" />
-                            <div className="text-xs font-bold text-zinc-200 flex items-center justify-center gap-1.5">
+                        <div className="p-8 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg text-center space-y-2">
+                            <div className="w-6 h-6 border-2 border-emerald-500 dark:border-emerald-400 border-t-transparent rounded-full animate-spin mx-auto" />
+                            <div className="text-xs font-bold text-zinc-800 dark:text-zinc-200 flex items-center justify-center gap-1.5">
                                 <span>Weryfikacja struktury pliku CSV (Dry-Run Preview)...</span>
                                 <InfoTooltip
                                     size="xs"
@@ -229,7 +229,7 @@ export const ImportView = () => {
                                     content="Proces symulacyjny testuje integralność danych, mapowanie kolumn, formaty numeryczne i istnienie kategorii w planie kont przed zaksięgowaniem."
                                 />
                             </div>
-                            <p className="text-[10px] text-zinc-500">
+                            <p className="text-[10px] text-zinc-500 dark:text-zinc-400">
                                 Parsowanie nagłówków, formatów walutowych oraz poprawności identyfikatorów kategorii
                             </p>
                         </div>

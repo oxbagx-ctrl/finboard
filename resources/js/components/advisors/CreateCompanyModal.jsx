@@ -203,32 +203,32 @@ export const CreateCompanyModal = ({
 
     return (
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-xs font-mono"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/60 dark:bg-zinc-950/80 backdrop-blur-xs font-mono"
             onClick={(e) => {
                 if (e.target === e.currentTarget) {
                     onClose();
                 }
             }}
         >
-            <div className="bg-zinc-900 border border-zinc-750 rounded-lg shadow-2xl max-w-lg w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150 flex flex-col max-h-[90vh]">
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-2xl max-w-lg w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150 flex flex-col max-h-[90vh]">
                 {/* Header */}
-                <div className="px-5 py-3.5 bg-zinc-950 border-b border-zinc-800 flex items-center justify-between shrink-0">
+                <div className="px-5 py-3.5 bg-zinc-50 dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between shrink-0">
                     <div className="flex items-center gap-2.5">
                         <Tooltip content="Rejestracja nowego podmiotu gospodarczego w architekturze Multi-Tenant">
                             <div
                                 tabIndex={0}
                                 role="img"
                                 aria-label="Rejestracja nowej spółki portfelowej"
-                                className="w-7 h-7 rounded bg-zinc-850 border border-zinc-750 flex items-center justify-center text-zinc-300 focus:outline-none focus:ring-1 focus:ring-zinc-400"
+                                className="w-7 h-7 rounded bg-zinc-100 dark:bg-zinc-850 border border-zinc-300 dark:border-zinc-750 flex items-center justify-center text-zinc-700 dark:text-zinc-300 focus:outline-none focus:ring-1 focus:ring-zinc-400"
                             >
-                                <Building2 className="w-4 h-4 text-emerald-400" />
+                                <Building2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                             </div>
                         </Tooltip>
                         <div>
-                            <h2 className="text-xs font-bold uppercase tracking-wider text-zinc-100">
+                            <h2 className="text-xs font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
                                 Dodaj Nową Spółkę Portfelową
                             </h2>
-                            <p className="text-[10px] text-zinc-500 mt-0.5">
+                            <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">
                                 REJESTRACJA PODMIOTU GOSPODARCZEGO & MULTI-TENANT ISOLATION
                             </p>
                         </div>
@@ -237,7 +237,7 @@ export const CreateCompanyModal = ({
                         <button
                             type="button"
                             onClick={onClose}
-                            className="p-1 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors cursor-pointer"
+                            className="p-1 rounded text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
                             title="Zamknij (Esc)"
                             aria-label="Zamknij formularz rejestracji spółki"
                         >
@@ -250,19 +250,19 @@ export const CreateCompanyModal = ({
                 <form onSubmit={handleSubmit} noValidate className="flex-1 overflow-y-auto p-5 space-y-4">
                     {/* General Error Banner */}
                     {generalError && (
-                        <div className="p-3 rounded bg-rose-950/40 border border-rose-800/80 flex items-start gap-2.5">
-                            <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
-                            <div className="text-[11px] text-rose-200 leading-relaxed">
+                        <div className="p-3 rounded bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/80 flex items-start gap-2.5">
+                            <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
+                            <div className="text-[11px] text-rose-700 dark:text-rose-200 leading-relaxed">
                                 {generalError}
                             </div>
                         </div>
                     )}
 
                     {/* Information Strip */}
-                    <div className="p-3 rounded bg-blue-950/30 border border-blue-800/60 flex items-start gap-2.5">
-                        <Info className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
-                        <div className="text-[11px] text-zinc-300 leading-relaxed flex-1">
-                            <span className="font-semibold text-blue-300">Izolacja Danych Najemcy: </span>
+                    <div className="p-3 rounded bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800/60 flex items-start gap-2.5">
+                        <Info className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+                        <div className="text-[11px] text-zinc-700 dark:text-zinc-300 leading-relaxed flex-1">
+                            <span className="font-semibold text-blue-700 dark:text-blue-300">Izolacja Danych Najemcy: </span>
                             Nowo zarejestrowana spółka uzyska unikalny identyfikator portfelowy. Przypisani doradcy uzyskają natychmiastowy dostęp analityczny do jej sprawozdań i wskaźników.
                         </div>
                         <InfoTooltip
@@ -275,8 +275,8 @@ export const CreateCompanyModal = ({
                     {/* Company Name */}
                     <div>
                         <div className="flex items-center justify-between mb-1.5">
-                            <label className="block text-[11px] font-semibold text-zinc-300 uppercase tracking-wider">
-                                Pełna Nazwa Podmiotu <span className="text-rose-400">*</span>
+                            <label className="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">
+                                Pełna Nazwa Podmiotu <span className="text-rose-600 dark:text-rose-400">*</span>
                             </label>
                             <InfoTooltip
                                 content="Wprowadź oficjalną nazwę prawną podmiotu gospodarczego zarejestrowaną w KRS / CEIDG."
@@ -285,7 +285,7 @@ export const CreateCompanyModal = ({
                             />
                         </div>
                         <div className="relative">
-                            <Building2 className="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                            <Building2 className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
                             <input
                                 type="text"
                                 autoFocus
@@ -297,15 +297,15 @@ export const CreateCompanyModal = ({
                                     }
                                 }}
                                 placeholder="np. Acme Manufacturing S.A."
-                                className={`w-full bg-zinc-950 border ${
-                                    validationErrors.name ? 'border-rose-500' : 'border-zinc-750'
-                                } rounded pl-9 pr-3 py-2 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono`}
+                                className={`w-full bg-white dark:bg-zinc-950 border ${
+                                    validationErrors.name ? 'border-rose-500' : 'border-zinc-300 dark:border-zinc-800'
+                                } rounded pl-9 pr-3 py-2 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono`}
                             />
                         </div>
                         {validationErrors.name ? (
-                            <p className="text-[10px] text-rose-400 mt-1">{validationErrors.name}</p>
+                            <p className="text-[10px] text-rose-600 dark:text-rose-400 mt-1">{validationErrors.name}</p>
                         ) : (
-                            <p className="text-[10px] text-zinc-500 mt-1">
+                            <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-1">
                                 Oficjalna nazwa prawna podmiotu gospodarczego (2-255 znaków).
                             </p>
                         )}
@@ -316,8 +316,8 @@ export const CreateCompanyModal = ({
                         {/* Company Code / Ticker */}
                         <div>
                             <div className="flex items-center justify-between mb-1.5">
-                                <label className="block text-[11px] font-semibold text-zinc-300 uppercase tracking-wider">
-                                    Kod / Ticker <span className="text-rose-400">*</span>
+                                <label className="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">
+                                    Kod / Ticker <span className="text-rose-600 dark:text-rose-400">*</span>
                                 </label>
                                 <InfoTooltip
                                     content="Unikalny identyfikator podmiotu (np. ACME), używany w raportach, tabelach przestawnych i selektorze spółek."
@@ -326,22 +326,22 @@ export const CreateCompanyModal = ({
                                 />
                             </div>
                             <div className="relative">
-                                <Hash className="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                                <Hash className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
                                 <input
                                     type="text"
                                     value={code}
                                     onChange={handleCodeChange}
                                     placeholder="np. ACME"
                                     maxLength={16}
-                                    className={`w-full bg-zinc-950 border ${
-                                        validationErrors.code ? 'border-rose-500' : 'border-zinc-750'
-                                    } rounded pl-9 pr-3 py-2 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono uppercase`}
+                                    className={`w-full bg-white dark:bg-zinc-950 border ${
+                                        validationErrors.code ? 'border-rose-500' : 'border-zinc-300 dark:border-zinc-800'
+                                    } rounded pl-9 pr-3 py-2 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono uppercase`}
                                 />
                             </div>
                             {validationErrors.code ? (
-                                <p className="text-[10px] text-rose-400 mt-1">{validationErrors.code}</p>
+                                <p className="text-[10px] text-rose-600 dark:text-rose-400 mt-1">{validationErrors.code}</p>
                             ) : (
-                                <p className="text-[10px] text-zinc-500 mt-1">
+                                <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-1">
                                     Unikalny identyfikator (2-16 znaków, A-Z, 0-9, _, -).
                                 </p>
                             )}
@@ -350,8 +350,8 @@ export const CreateCompanyModal = ({
                         {/* Tax ID (NIP) */}
                         <div>
                             <div className="flex items-center justify-between mb-1.5">
-                                <label className="block text-[11px] font-semibold text-zinc-300 uppercase tracking-wider">
-                                    NIP / Tax ID <span className="text-zinc-500 text-[10px] lowercase font-normal">(opcjonalny)</span>
+                                <label className="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">
+                                    NIP / Tax ID <span className="text-zinc-500 dark:text-zinc-400 text-[10px] lowercase font-normal">(opcjonalny)</span>
                                 </label>
                                 <InfoTooltip
                                     content="Numer Identyfikacji Podatkowej (NIP / VAT-UE). Pomaga w automatycznym kojarzeniu wyciągów bankowych oraz integracjach zewnętrznych."
@@ -360,7 +360,7 @@ export const CreateCompanyModal = ({
                                 />
                             </div>
                             <div className="relative">
-                                <FileText className="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                                <FileText className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
                                 <input
                                     type="text"
                                     value={taxId}
@@ -372,15 +372,15 @@ export const CreateCompanyModal = ({
                                     }}
                                     placeholder="np. PL5250011222"
                                     maxLength={32}
-                                    className={`w-full bg-zinc-950 border ${
-                                        validationErrors.tax_id ? 'border-rose-500' : 'border-zinc-750'
-                                    } rounded pl-9 pr-3 py-2 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono`}
+                                    className={`w-full bg-white dark:bg-zinc-950 border ${
+                                        validationErrors.tax_id ? 'border-rose-500' : 'border-zinc-300 dark:border-zinc-800'
+                                    } rounded pl-9 pr-3 py-2 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono`}
                                 />
                             </div>
                             {validationErrors.tax_id ? (
-                                <p className="text-[10px] text-rose-400 mt-1">{validationErrors.tax_id}</p>
+                                <p className="text-[10px] text-rose-600 dark:text-rose-400 mt-1">{validationErrors.tax_id}</p>
                             ) : (
-                                <p className="text-[10px] text-zinc-500 mt-1">
+                                <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-1">
                                     Numer identyfikacji podatkowej (max 32 znaki).
                                 </p>
                             )}
@@ -388,13 +388,13 @@ export const CreateCompanyModal = ({
                     </div>
 
                     {/* Advisor Assignment Section */}
-                    <div className="space-y-2 pt-1 border-t border-zinc-800">
+                    <div className="space-y-2 pt-1 border-t border-zinc-200 dark:border-zinc-800">
                         <div className="flex items-center justify-between">
                             <div>
-                                <label className="block text-[11px] font-semibold text-zinc-300 uppercase tracking-wider">
+                                <label className="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">
                                     Początkowe Przypisanie Doradców M&A
                                 </label>
-                                <p className="text-[10px] text-zinc-500 mt-0.5">
+                                <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">
                                     Opcjonalne natychmiastowe przypisanie doradców do spółki
                                 </p>
                             </div>
@@ -405,18 +405,18 @@ export const CreateCompanyModal = ({
                                             type="button"
                                             onClick={handleSelectAllAdvisors}
                                             aria-label="Przypisz wszystkich doradców"
-                                            className="text-zinc-400 hover:text-zinc-200 underline cursor-pointer"
+                                            className="text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200 underline cursor-pointer"
                                         >
                                             Wszyscy
                                         </button>
                                     </Tooltip>
-                                    <span className="text-zinc-600">•</span>
+                                    <span className="text-zinc-400 dark:text-zinc-600">•</span>
                                     <Tooltip content="Wyczyść zaznaczenie doradców">
                                         <button
                                             type="button"
                                             onClick={handleDeselectAllAdvisors}
                                             aria-label="Odznacz wszystkich doradców"
-                                            className="text-zinc-400 hover:text-zinc-200 underline cursor-pointer"
+                                            className="text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200 underline cursor-pointer"
                                         >
                                             Wyczyść
                                         </button>
@@ -428,29 +428,29 @@ export const CreateCompanyModal = ({
                         {/* Search advisors */}
                         {advisors.length > 3 && (
                             <div className="relative">
-                                <Search className="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                                <Search className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
                                 <input
                                     type="text"
                                     value={advisorSearch}
                                     onChange={(e) => setAdvisorSearch(e.target.value)}
                                     placeholder="Filtruj doradców po nazwisku lub emailu..."
-                                    className="w-full bg-zinc-950 border border-zinc-750 rounded pl-9 pr-3 py-1.5 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
+                                    className="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded pl-9 pr-3 py-1.5 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
                                 />
                             </div>
                         )}
 
                         {/* Advisors checklist */}
-                        <div className="max-h-40 overflow-y-auto space-y-1 p-2 bg-zinc-950/60 border border-zinc-800 rounded">
+                        <div className="max-h-40 overflow-y-auto space-y-1 p-2 bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-200 dark:border-zinc-800 rounded">
                             {loadingAdvisors ? (
-                                <div className="py-4 text-center text-xs text-zinc-500">
+                                <div className="py-4 text-center text-xs text-zinc-500 dark:text-zinc-400">
                                     Ładowanie listy doradców Deal Advisory...
                                 </div>
                             ) : advisors.length === 0 ? (
-                                <div className="py-4 text-center text-xs text-zinc-500">
+                                <div className="py-4 text-center text-xs text-zinc-500 dark:text-zinc-400">
                                     Brak dostępnych doradców M&A w systemie. Spółka może zostać przypisana w późniejszym terminie.
                                 </div>
                             ) : filteredAdvisors.length === 0 ? (
-                                <div className="py-4 text-center text-xs text-zinc-500">
+                                <div className="py-4 text-center text-xs text-zinc-500 dark:text-zinc-400">
                                     Brak doradców pasujących do wyszukiwania.
                                 </div>
                             ) : (
@@ -470,18 +470,18 @@ export const CreateCompanyModal = ({
                                                 aria-label={`${adv.name} (${adv.email}) - ${isChecked ? 'przypisany' : 'nieprzypisany'}`}
                                                 className={`w-full text-left p-2 rounded text-xs flex items-center justify-between cursor-pointer transition-colors ${
                                                     isChecked
-                                                        ? 'bg-zinc-800 text-zinc-100 border border-zinc-700'
-                                                        : 'hover:bg-zinc-900 text-zinc-400 border border-transparent'
+                                                        ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border border-zinc-300 dark:border-zinc-700'
+                                                        : 'hover:bg-zinc-100 dark:hover:bg-zinc-900 text-zinc-600 dark:text-zinc-400 border border-transparent'
                                                 }`}
                                             >
                                                 <div className="flex items-center gap-2 truncate">
                                                     {isChecked ? (
-                                                        <CheckSquare className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                                                        <CheckSquare className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                                                     ) : (
-                                                        <Square className="w-3.5 h-3.5 text-zinc-600 shrink-0" />
+                                                        <Square className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-600 shrink-0" />
                                                     )}
-                                                    <span className="font-semibold text-zinc-200 truncate">{adv.name}</span>
-                                                    <span className="text-[10px] text-zinc-500 truncate hidden sm:inline">
+                                                    <span className="font-semibold text-zinc-800 dark:text-zinc-200 truncate">{adv.name}</span>
+                                                    <span className="text-[10px] text-zinc-500 dark:text-zinc-400 truncate hidden sm:inline">
                                                         ({adv.email})
                                                     </span>
                                                 </div>
@@ -494,16 +494,16 @@ export const CreateCompanyModal = ({
                                 })
                             )}
                         </div>
-                        <div className="text-[10px] text-zinc-500 flex items-center justify-between">
-                            <span>Wybrano doradców: <strong className="text-zinc-200 font-bold">{assignedAdvisorIds.length}</strong></span>
+                        <div className="text-[10px] text-zinc-500 dark:text-zinc-400 flex items-center justify-between">
+                            <span>Wybrano doradców: <strong className="text-zinc-800 dark:text-zinc-200 font-bold">{assignedAdvisorIds.length}</strong></span>
                             {validationErrors.assigned_advisor_ids && (
-                                <span className="text-rose-400">{validationErrors.assigned_advisor_ids}</span>
+                                <span className="text-rose-600 dark:text-rose-400">{validationErrors.assigned_advisor_ids}</span>
                             )}
                         </div>
                     </div>
 
                     {/* Footer buttons */}
-                    <div className="pt-3 border-t border-zinc-800 flex items-center justify-between">
+                    <div className="pt-3 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
                         <Tooltip content="Anuluj i zamknij bez rejestrowania spółki">
                             <Button
                                 type="button"

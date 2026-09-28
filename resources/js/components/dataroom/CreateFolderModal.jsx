@@ -120,18 +120,18 @@ export const CreateFolderModal = ({
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-xs font-mono">
-            <div className="bg-zinc-900 border border-zinc-750 rounded-lg shadow-2xl max-w-lg w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-750 rounded-lg shadow-2xl max-w-lg w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
                 {/* Header */}
-                <div className="px-5 py-3.5 bg-zinc-950 border-b border-zinc-800 flex items-center justify-between">
+                <div className="px-5 py-3.5 bg-zinc-50 dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded bg-zinc-850 border border-zinc-750 flex items-center justify-center text-zinc-300">
-                            <FolderPlus className="w-3.5 h-3.5 text-emerald-400" />
+                        <div className="w-6 h-6 rounded bg-zinc-100 dark:bg-zinc-850 border border-zinc-200 dark:border-zinc-750 flex items-center justify-center text-zinc-700 dark:text-zinc-300">
+                            <FolderPlus className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                         </div>
                         <div>
-                            <h2 className="text-xs font-bold uppercase tracking-wider text-zinc-100">
+                            <h2 className="text-xs font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
                                 Nowy Folder Transakcyjny (Dewey)
                             </h2>
-                            <p className="text-[10px] text-zinc-500">
+                            <p className="text-[10px] text-zinc-500 dark:text-zinc-400">
                                 HIERARCHIA STRUKTURY DUE DILIGENCE M&A
                             </p>
                         </div>
@@ -142,7 +142,7 @@ export const CreateFolderModal = ({
                             onClick={onClose}
                             disabled={saving}
                             aria-label="Zamknij formularz"
-                            className="p-1 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors disabled:opacity-50"
+                            className="p-1 rounded text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors disabled:opacity-50"
                         >
                             <X className="w-4 h-4" />
                         </button>
@@ -153,8 +153,8 @@ export const CreateFolderModal = ({
                 <form onSubmit={handleSubmit} className="p-5 space-y-4 text-xs">
                     {/* Parent Folder selection */}
                     <div>
-                        <label className="block text-[11px] font-semibold text-zinc-300 mb-1 flex items-center gap-1.5">
-                            <FolderTree className="w-3.5 h-3.5 text-zinc-400" />
+                        <label className="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1 flex items-center gap-1.5">
+                            <FolderTree className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" />
                             Folder Nadrzędny (Katalog)
                             <InfoTooltip
                                 size="xs"
@@ -167,7 +167,7 @@ export const CreateFolderModal = ({
                             value={parentId}
                             onChange={handleParentChange}
                             disabled={saving}
-                            className="w-full bg-zinc-950 border border-zinc-800 rounded px-3 py-2 text-zinc-200 focus:outline-none focus:ring-1 focus:ring-zinc-400"
+                            className="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded px-3 py-2 text-zinc-900 dark:text-zinc-200 focus:outline-none focus:ring-1 focus:ring-zinc-400"
                         >
                             <option value="">— Kategoria Główna (Root) —</option>
                             {flattenedFolders.map(f => (
@@ -176,7 +176,7 @@ export const CreateFolderModal = ({
                                 </option>
                             ))}
                         </select>
-                        <p className="text-[10px] text-zinc-500 mt-1">
+                        <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-1">
                             Wybierz folder rodzica, aby utworzyć podkategorię w drzewie.
                         </p>
                     </div>
@@ -184,8 +184,8 @@ export const CreateFolderModal = ({
                     {/* Dewey Index Code & Sort Order row */}
                     <div className="grid grid-cols-2 gap-3">
                         <div>
-                            <label className="block text-[11px] font-semibold text-zinc-300 mb-1 flex items-center gap-1.5">
-                                <Hash className="w-3.5 h-3.5 text-indigo-400" />
+                            <label className="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1 flex items-center gap-1.5">
+                                <Hash className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                                 Kod Dewey *
                                 <InfoTooltip
                                     size="xs"
@@ -200,14 +200,14 @@ export const CreateFolderModal = ({
                                 onChange={(e) => setIndexCode(e.target.value)}
                                 placeholder="np. 01.00 lub 01.01.02"
                                 disabled={saving}
-                                className={`w-full bg-zinc-950 border rounded px-3 py-2 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-1 ${
+                                className={`w-full bg-white dark:bg-zinc-950 border rounded px-3 py-2 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-1 ${
                                     errors.index_code
                                         ? 'border-rose-500 focus:ring-rose-400'
-                                        : 'border-zinc-800 focus:ring-zinc-400'
+                                        : 'border-zinc-300 dark:border-zinc-800 focus:ring-zinc-400'
                                 }`}
                             />
                             {errors.index_code && (
-                                <p className="text-[10px] text-rose-400 mt-1 flex items-center gap-1">
+                                <p className="text-[10px] text-rose-500 dark:text-rose-400 mt-1 flex items-center gap-1">
                                     <AlertCircle className="w-3 h-3 shrink-0" />
                                     {Array.isArray(errors.index_code) ? errors.index_code[0] : errors.index_code}
                                 </p>
@@ -215,7 +215,7 @@ export const CreateFolderModal = ({
                         </div>
 
                         <div>
-                            <label className="block text-[11px] font-semibold text-zinc-300 mb-1">
+                            <label className="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">
                                 Kolejność Sortowania
                             </label>
                             <input
@@ -225,15 +225,15 @@ export const CreateFolderModal = ({
                                 min="0"
                                 max="999"
                                 disabled={saving}
-                                className="w-full bg-zinc-950 border border-zinc-800 rounded px-3 py-2 text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400"
+                                className="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded px-3 py-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400"
                             />
                         </div>
                     </div>
 
                     {/* Folder Name */}
                     <div>
-                        <label className="block text-[11px] font-semibold text-zinc-300 mb-1 flex items-center gap-1.5">
-                            <FileText className="w-3.5 h-3.5 text-emerald-400" />
+                        <label className="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1 flex items-center gap-1.5">
+                            <FileText className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                             Nazwa Folderu *
                         </label>
                         <input
@@ -242,14 +242,14 @@ export const CreateFolderModal = ({
                             onChange={(e) => setName(e.target.value)}
                             placeholder="np. Umowy Finansowania i Kredyty"
                             disabled={saving}
-                            className={`w-full bg-zinc-950 border rounded px-3 py-2 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-1 ${
+                            className={`w-full bg-white dark:bg-zinc-950 border rounded px-3 py-2 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-1 ${
                                 errors.name
                                     ? 'border-rose-500 focus:ring-rose-400'
-                                    : 'border-zinc-800 focus:ring-zinc-400'
+                                    : 'border-zinc-300 dark:border-zinc-800 focus:ring-zinc-400'
                             }`}
                         />
                         {errors.name && (
-                            <p className="text-[10px] text-rose-400 mt-1 flex items-center gap-1">
+                            <p className="text-[10px] text-rose-500 dark:text-rose-400 mt-1 flex items-center gap-1">
                                 <AlertCircle className="w-3 h-3 shrink-0" />
                                 {Array.isArray(errors.name) ? errors.name[0] : errors.name}
                             </p>
@@ -258,7 +258,7 @@ export const CreateFolderModal = ({
 
                     {/* Description */}
                     <div>
-                        <label className="block text-[11px] font-semibold text-zinc-300 mb-1">
+                        <label className="block text-[11px] font-semibold text-zinc-700 dark:text-zinc-300 mb-1">
                             Opis / Zakres Dokumentów (opcjonalny)
                         </label>
                         <textarea
@@ -267,12 +267,12 @@ export const CreateFolderModal = ({
                             placeholder="Krótki opis przeznaczenia folderu transakcyjnego..."
                             rows={2}
                             disabled={saving}
-                            className="w-full bg-zinc-950 border border-zinc-800 rounded px-3 py-2 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-400 resize-none"
+                            className="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded px-3 py-2 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-400 resize-none"
                         />
                     </div>
 
                     {/* Actions */}
-                    <div className="flex items-center justify-end gap-2 pt-3 border-t border-zinc-800">
+                    <div className="flex items-center justify-end gap-2 pt-3 border-t border-zinc-200 dark:border-zinc-800">
                         <Tooltip content="Anuluj i zamknij okno tworzenia folderu">
                             <span>
                                 <Button

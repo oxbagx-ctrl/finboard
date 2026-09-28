@@ -348,7 +348,7 @@ export const RecordsView = () => {
             case 'income':
                 return (
                     <Tooltip content="Przychód operacyjny zwiększający wynik finansowy">
-                        <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-950 border border-emerald-800 text-emerald-400 cursor-help">
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-50 dark:bg-emerald-950 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 cursor-help">
                             PRZYCHÓD
                         </span>
                     </Tooltip>
@@ -356,7 +356,7 @@ export const RecordsView = () => {
             case 'expense':
                 return (
                     <Tooltip content="Koszt operacyjny (OPEX) obciążający marżę spółki">
-                        <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-rose-950 border border-rose-800 text-rose-400 cursor-help">
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-rose-50 dark:bg-rose-950 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-400 cursor-help">
                             KOSZT OPEX
                         </span>
                     </Tooltip>
@@ -364,7 +364,7 @@ export const RecordsView = () => {
             case 'asset':
                 return (
                     <Tooltip content="Pozycja bilansowa zwiększająca aktywa trwałe lub obrotowe">
-                        <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-sky-950 border border-sky-800 text-sky-400 cursor-help">
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-sky-50 dark:bg-sky-950 border border-sky-200 dark:border-sky-800 text-sky-700 dark:text-sky-400 cursor-help">
                             AKTYWA
                         </span>
                     </Tooltip>
@@ -372,7 +372,7 @@ export const RecordsView = () => {
             case 'liability':
                 return (
                     <Tooltip content="Zobowiązanie bilansowe lub pasywa obce spółki">
-                        <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-950 border border-amber-800 text-amber-400 cursor-help">
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400 cursor-help">
                             PASYWA
                         </span>
                     </Tooltip>
@@ -380,7 +380,7 @@ export const RecordsView = () => {
             default:
                 return (
                     <Tooltip content={`Typ operacji: ${type}`}>
-                        <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-zinc-800 text-zinc-300 cursor-help">
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 cursor-help">
                             {type}
                         </span>
                     </Tooltip>
@@ -391,15 +391,15 @@ export const RecordsView = () => {
     return (
         <div className="space-y-4 font-mono">
             {/* Top Ribbon */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-zinc-900 border border-zinc-800 rounded-lg p-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-3">
                 <div className="flex items-center gap-3">
                     <Tooltip content="Moduł memoriałowej księgi transakcji i planu kont">
-                        <div className="w-8 h-8 rounded bg-zinc-850 border border-zinc-750 flex items-center justify-center text-zinc-300 cursor-help">
+                        <div className="w-8 h-8 rounded bg-zinc-100 dark:bg-zinc-850 border border-zinc-200 dark:border-zinc-750 flex items-center justify-center text-zinc-700 dark:text-zinc-300 cursor-help">
                             <TableProperties className="w-4 h-4" />
                         </div>
                     </Tooltip>
                     <div>
-                        <div className="text-xs font-bold text-zinc-100 flex items-center gap-2">
+                        <div className="text-xs font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
                             <span>Księga Operacji Finansowych (General Ledger)</span>
                             <InfoTooltip
                                 size="xs"
@@ -411,7 +411,7 @@ export const RecordsView = () => {
                                 </span>
                             </Tooltip>
                         </div>
-                        <p className="text-[10px] text-zinc-500 mt-0.5">
+                        <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">
                             Podmiot: {activeCompany?.name} | Rejestr transakcji memoriałowych
                         </p>
                     </div>
@@ -445,63 +445,63 @@ export const RecordsView = () => {
 
             {/* Quick Metrics Bar for View */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-                <div className="p-2.5 rounded-lg bg-zinc-900 border border-zinc-800" data-testid="summary-card-total">
-                    <div className="text-[10px] text-zinc-500 uppercase flex items-center justify-between">
+                <div className="p-2.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800" data-testid="summary-card-total">
+                    <div className="text-[10px] text-zinc-500 dark:text-zinc-400 uppercase flex items-center justify-between">
                         <span>Łącznie Pozycji</span>
                         <InfoTooltip size="xs" content="Całkowita liczba transakcji memoriałowych spełniających kryteria aktywnego filtra" />
                     </div>
-                    <div className="text-sm font-bold text-zinc-100 tabular-nums mt-0.5" data-testid="summary-total-value">
+                    <div className="text-sm font-bold text-zinc-900 dark:text-zinc-100 tabular-nums mt-0.5" data-testid="summary-total-value">
                         {meta.total} <span className="text-[10px] text-zinc-500 font-normal">wpisów</span>
                     </div>
                 </div>
 
-                <div className="p-2.5 rounded-lg bg-zinc-900 border border-zinc-800" data-testid="summary-card-income">
-                    <div className="text-[10px] text-zinc-500 uppercase flex items-center justify-between">
+                <div className="p-2.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800" data-testid="summary-card-income">
+                    <div className="text-[10px] text-zinc-500 dark:text-zinc-400 uppercase flex items-center justify-between">
                         <span className="flex items-center gap-1">
-                            <ArrowUpRight className="w-3 h-3 text-emerald-400" />
+                            <ArrowUpRight className="w-3 h-3 text-emerald-500 dark:text-emerald-400" />
                             Przychody (Strona)
                         </span>
                         <InfoTooltip size="xs" content="Suma operacji przychodowych (REVENUE / INCOME) w bieżącym okresie obrachunkowym" />
                     </div>
-                    <div className="text-sm font-bold text-emerald-400 tabular-nums mt-0.5" data-testid="summary-income-value">
+                    <div className="text-sm font-bold text-emerald-600 dark:text-emerald-400 tabular-nums mt-0.5" data-testid="summary-income-value">
                         {formatCurrency(summary.income, currency)}
                     </div>
                 </div>
 
-                <div className="p-2.5 rounded-lg bg-zinc-900 border border-zinc-800" data-testid="summary-card-expense">
-                    <div className="text-[10px] text-zinc-500 uppercase flex items-center justify-between">
+                <div className="p-2.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800" data-testid="summary-card-expense">
+                    <div className="text-[10px] text-zinc-500 dark:text-zinc-400 uppercase flex items-center justify-between">
                         <span className="flex items-center gap-1">
-                            <ArrowDownRight className="w-3 h-3 text-rose-400" />
+                            <ArrowDownRight className="w-3 h-3 text-rose-500 dark:text-rose-400" />
                             Koszty OPEX (Strona)
                         </span>
                         <InfoTooltip size="xs" content="Suma kosztów operacyjnych (EXPENSE) pomniejszających wynik finansowy okresu" />
                     </div>
-                    <div className="text-sm font-bold text-rose-400 tabular-nums mt-0.5" data-testid="summary-expense-value">
+                    <div className="text-sm font-bold text-rose-600 dark:text-rose-400 tabular-nums mt-0.5" data-testid="summary-expense-value">
                         {formatCurrency(summary.expense, currency)}
                     </div>
                 </div>
 
-                <div className="p-2.5 rounded-lg bg-zinc-900 border border-zinc-800" data-testid="summary-card-balance">
-                    <div className="text-[10px] text-zinc-500 uppercase flex items-center justify-between">
+                <div className="p-2.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800" data-testid="summary-card-balance">
+                    <div className="text-[10px] text-zinc-500 dark:text-zinc-400 uppercase flex items-center justify-between">
                         <span className="flex items-center gap-1">
-                            <DollarSign className="w-3 h-3 text-zinc-400" />
+                            <DollarSign className="w-3 h-3 text-zinc-500 dark:text-zinc-400" />
                             Saldo Operacji (Netto)
                         </span>
                         <InfoTooltip size="xs" content="Różnica między operacjami przychodowymi a kosztami operacyjnymi (Spread memoriałowy)" />
                     </div>
-                    <div className={`text-sm font-bold tabular-nums mt-0.5 ${summary.balance >= 0 ? 'text-zinc-100' : 'text-rose-400'}`} data-testid="summary-balance-value">
+                    <div className={`text-sm font-bold tabular-nums mt-0.5 ${summary.balance >= 0 ? 'text-zinc-100 text-zinc-900 dark:text-zinc-100' : 'text-rose-400 text-rose-600 dark:text-rose-400'}`} data-testid="summary-balance-value">
                         {formatCurrency(summary.balance, currency)}
                     </div>
                 </div>
             </div>
 
             {/* Filter Bar */}
-            <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3 space-y-2.5">
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-3 space-y-2.5">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5">
                     {/* Search query */}
                     <div className="relative lg:col-span-2">
                         <Tooltip content="Wyszukaj operacje po opisie, tytule przelewu, kontrahencie lub numerze faktury">
-                            <span className="absolute left-3 top-1/2 -translate-y-1/2 cursor-help text-zinc-500">
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 cursor-help text-zinc-400 dark:text-zinc-500">
                                 <Search className="w-3.5 h-3.5" />
                             </span>
                         </Tooltip>
@@ -514,7 +514,7 @@ export const RecordsView = () => {
                             }}
                             placeholder="Szukaj po opisie, kontrahencie, fakturze..."
                             aria-label="Szukaj po opisie, kontrahencie, fakturze"
-                            className="w-full bg-zinc-950 border border-zinc-750 rounded pl-8 pr-3 py-1.5 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
+                            className="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-750 rounded pl-8 pr-3 py-1.5 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 font-mono"
                         />
                     </div>
 
@@ -529,7 +529,7 @@ export const RecordsView = () => {
                                     setPage(1);
                                 }}
                                 aria-label="Filtruj według typu transakcji"
-                                className="w-full bg-zinc-950 border border-zinc-750 rounded px-2.5 py-1.5 text-xs text-zinc-200 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono cursor-pointer"
+                                className="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-750 rounded px-2.5 py-1.5 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 font-mono cursor-pointer"
                             >
                                 <option value="">Wszystkie typy</option>
                                 <option value="revenue">Przychody (REVENUE)</option>
@@ -550,7 +550,7 @@ export const RecordsView = () => {
                                     setPage(1);
                                 }}
                                 aria-label="Filtruj według kategorii analitycznej"
-                                className="w-full bg-zinc-950 border border-zinc-750 rounded px-2.5 py-1.5 text-xs text-zinc-200 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono truncate cursor-pointer"
+                                className="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-750 rounded px-2.5 py-1.5 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 font-mono truncate cursor-pointer"
                             >
                                 <option value="">Wszystkie kategorie</option>
                                 {categories.map((c) => (
@@ -580,9 +580,9 @@ export const RecordsView = () => {
                 </div>
 
                 {/* Date range sub-filter */}
-                <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-zinc-850 text-[11px] text-zinc-400">
+                <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-zinc-200 dark:border-zinc-850 text-[11px] text-zinc-600 dark:text-zinc-400">
                     <Tooltip content="Filtruj operacje według daty księgowania w zadanym przedziale czasowym">
-                        <span className="flex items-center gap-1 text-zinc-500 cursor-help">
+                        <span className="flex items-center gap-1 text-zinc-500 dark:text-zinc-400 cursor-help">
                             <Calendar className="w-3 h-3" />
                             ZAKRES DAT:
                         </span>
@@ -596,7 +596,7 @@ export const RecordsView = () => {
                                 setStartDate(e.target.value);
                                 setPage(1);
                             }}
-                            className="bg-zinc-950 border border-zinc-800 rounded px-2 py-0.5 text-xs text-zinc-200 focus:outline-none"
+                            className="bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded px-2 py-0.5 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none"
                         />
                     </Tooltip>
                     <span>do</span>
@@ -609,18 +609,18 @@ export const RecordsView = () => {
                                 setEndDate(e.target.value);
                                 setPage(1);
                             }}
-                            className="bg-zinc-950 border border-zinc-800 rounded px-2 py-0.5 text-xs text-zinc-200 focus:outline-none"
+                            className="bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded px-2 py-0.5 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none"
                         />
                     </Tooltip>
                 </div>
             </div>
 
             {/* Financial Ledger Table */}
-            <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden shadow-2xl">
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden shadow-2xl">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse font-mono text-xs">
                         <thead>
-                            <tr className="bg-zinc-950 border-b border-zinc-800 text-[10px] text-zinc-400 uppercase tracking-wider">
+                            <tr className="bg-zinc-50 dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800 text-[10px] text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
                                 <th className="py-2.5 px-3 w-10 text-center">
                                     <Tooltip content="Zaznacz lub odznacz wszystkie transakcje na bieżącej stronie">
                                         <span className="inline-flex">
@@ -633,7 +633,7 @@ export const RecordsView = () => {
                                                 onChange={handleToggleSelectAll}
                                                 aria-label="Zaznacz wszystkie transakcje na stronie"
                                                 data-testid="batch-master-checkbox"
-                                                className="rounded border-zinc-750 bg-zinc-900 text-emerald-500 focus:ring-emerald-500/20 focus:ring-offset-0 cursor-pointer w-3.5 h-3.5 accent-emerald-500 align-middle"
+                                                className="rounded border-zinc-300 dark:border-zinc-750 bg-white dark:bg-zinc-900 text-emerald-500 focus:ring-emerald-500/20 focus:ring-offset-0 cursor-pointer w-3.5 h-3.5 accent-emerald-500 align-middle"
                                             />
                                         </span>
                                     </Tooltip>
@@ -670,7 +670,7 @@ export const RecordsView = () => {
                                 </th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-zinc-850">
+                        <tbody className="divide-y divide-zinc-200 dark:divide-zinc-850">
                             {loading ? (
                                 <tr>
                                     <td colSpan={7} className="py-12 text-center text-zinc-500">
@@ -692,8 +692,8 @@ export const RecordsView = () => {
                                     return (
                                         <tr
                                             key={record.id}
-                                            className={`hover:bg-zinc-850/50 transition-colors group ${
-                                                isSelected ? 'bg-emerald-950/20' : ''
+                                            className={`hover:bg-zinc-50 dark:hover:bg-zinc-850/50 transition-colors group ${
+                                                isSelected ? 'bg-emerald-50/50 dark:bg-emerald-950/20' : ''
                                             }`}
                                         >
                                             <td className="py-2.5 px-3 text-center whitespace-nowrap">
@@ -705,12 +705,12 @@ export const RecordsView = () => {
                                                             onChange={() => handleToggleSelectRow(record)}
                                                             aria-label={`Zaznacz transakcję ${record.description}`}
                                                             data-testid={`record-checkbox-${record.id}`}
-                                                            className="rounded border-zinc-750 bg-zinc-900 text-emerald-500 focus:ring-emerald-500/20 focus:ring-offset-0 cursor-pointer w-3.5 h-3.5 accent-emerald-500 align-middle"
+                                                            className="rounded border-zinc-300 dark:border-zinc-750 bg-white dark:bg-zinc-900 text-emerald-500 focus:ring-emerald-500/20 focus:ring-offset-0 cursor-pointer w-3.5 h-3.5 accent-emerald-500 align-middle"
                                                         />
                                                     </span>
                                                 </Tooltip>
                                             </td>
-                                            <td className="py-2.5 px-3.5 text-zinc-400 text-[11px] whitespace-nowrap">
+                                            <td className="py-2.5 px-3.5 text-zinc-600 dark:text-zinc-400 text-[11px] whitespace-nowrap">
                                                 <Tooltip content={`Data księgowa: ${record.record_date}`}>
                                                     <span className="cursor-help">{record.record_date}</span>
                                                 </Tooltip>
@@ -719,10 +719,10 @@ export const RecordsView = () => {
                                             <td className="py-2.5 px-3.5 whitespace-nowrap">
                                                 <Tooltip content={`Kategoria: ${record.category?.name || 'Inne'} [${record.category?.code || 'N/A'}]`}>
                                                     <div className="cursor-help">
-                                                        <span className="font-semibold text-zinc-200">
+                                                        <span className="font-semibold text-zinc-800 dark:text-zinc-200">
                                                             [{record.category?.code || 'N/A'}]
                                                         </span>
-                                                        <span className="text-[10px] text-zinc-500 block truncate max-w-[130px]">
+                                                        <span className="text-[10px] text-zinc-500 dark:text-zinc-400 block truncate max-w-[130px]">
                                                             {record.category?.name || 'Inne'}
                                                         </span>
                                                     </div>
@@ -731,11 +731,11 @@ export const RecordsView = () => {
 
                                             <td className="py-2.5 px-3.5">
                                                 <Tooltip content={record.description}>
-                                                    <div className="text-zinc-100 font-medium truncate max-w-md cursor-help">
+                                                    <div className="text-zinc-900 dark:text-zinc-100 font-medium truncate max-w-md cursor-help">
                                                         {record.description}
                                                     </div>
                                                 </Tooltip>
-                                                <div className="text-[10px] text-zinc-500 flex items-center gap-2 mt-0.5">
+                                                <div className="text-[10px] text-zinc-500 dark:text-zinc-400 flex items-center gap-2 mt-0.5">
                                                     <Tooltip content={`Pochodzenie zapisu: ${record.source?.toUpperCase() === 'MANUAL' ? 'Wprowadzony ręcznie' : 'Zaimportowany z pliku CSV'}`}>
                                                         <span className="cursor-help">ŹRÓDŁO: {record.source?.toUpperCase() || 'MANUAL'}</span>
                                                     </Tooltip>
@@ -752,7 +752,7 @@ export const RecordsView = () => {
 
                                             <td className="py-2.5 px-3.5 text-right whitespace-nowrap">
                                                 <span className={`font-bold tabular-nums ${
-                                                    isIncome ? 'text-emerald-400' : 'text-zinc-100'
+                                                    isIncome ? 'text-emerald-600 dark:text-emerald-400' : 'text-zinc-900 dark:text-zinc-100'
                                                 }`}>
                                                     {formatCurrency(convertedAmt, currency)}
                                                 </span>
@@ -764,7 +764,7 @@ export const RecordsView = () => {
                                                         <button
                                                             onClick={() => handleOpenEdit(record)}
                                                             aria-label={`Edytuj zapis: ${record.description}`}
-                                                            className="p-1 rounded text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 transition-colors cursor-pointer"
+                                                            className="p-1 rounded text-zinc-400 dark:text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
                                                         >
                                                             <Edit2 className="w-3.5 h-3.5" />
                                                         </button>
@@ -773,7 +773,7 @@ export const RecordsView = () => {
                                                         <button
                                                             onClick={() => handleOpenDelete(record)}
                                                             aria-label={`Usuń zapis: ${record.description}`}
-                                                            className="p-1 rounded text-zinc-500 hover:text-rose-400 hover:bg-zinc-800 transition-colors cursor-pointer"
+                                                            className="p-1 rounded text-zinc-400 dark:text-zinc-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
                                                         >
                                                             <Trash2 className="w-3.5 h-3.5" />
                                                         </button>
@@ -789,10 +789,10 @@ export const RecordsView = () => {
                 </div>
 
                 {/* Pagination Footer */}
-                <div className="px-4 py-3 bg-zinc-950 border-t border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-                    <div className="flex items-center gap-4 text-zinc-400 text-[11px]">
+                <div className="px-4 py-3 bg-zinc-50 dark:bg-zinc-950 border-t border-zinc-200 dark:border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                    <div className="flex items-center gap-4 text-zinc-500 dark:text-zinc-400 text-[11px]">
                         <span>
-                            POZYCJE: <strong className="text-zinc-200">{meta.from}</strong> - <strong className="text-zinc-200">{meta.to}</strong> z <strong className="text-zinc-200">{meta.total}</strong>
+                            POZYCJE: <strong className="text-zinc-800 dark:text-zinc-200">{meta.from}</strong> - <strong className="text-zinc-800 dark:text-zinc-200">{meta.to}</strong> z <strong className="text-zinc-800 dark:text-zinc-200">{meta.total}</strong>
                         </span>
 
                         <div className="flex items-center gap-1.5">
@@ -805,7 +805,7 @@ export const RecordsView = () => {
                                         setPage(1);
                                     }}
                                     aria-label="Liczba transakcji na stronie"
-                                    className="bg-zinc-900 border border-zinc-750 rounded px-1.5 py-0.5 text-zinc-200 text-xs focus:outline-none cursor-pointer"
+                                    className="bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-750 rounded px-1.5 py-0.5 text-zinc-800 dark:text-zinc-200 text-xs focus:outline-none cursor-pointer"
                                 >
                                     <option value={10}>10</option>
                                     <option value={25}>25</option>
@@ -831,7 +831,7 @@ export const RecordsView = () => {
                         </Tooltip>
 
                         <Tooltip content={`Bieżąca strona ${meta.current_page} z łącznej liczby stron ${meta.last_page || 1}`}>
-                            <span className="px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800 text-zinc-300 font-mono text-xs cursor-help">
+                            <span className="px-2.5 py-1 rounded bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 font-mono text-xs cursor-help">
                                 {meta.current_page} / {meta.last_page || 1}
                             </span>
                         </Tooltip>

@@ -98,24 +98,24 @@ export const AdvisorAssignmentModal = ({ isOpen, onClose, advisor, onSaved, comp
     if (!isOpen || !advisor) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-xs font-mono">
-            <div className="bg-zinc-900 border border-zinc-750 rounded-lg shadow-2xl max-w-xl w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150 flex flex-col max-h-[90vh]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/60 dark:bg-zinc-950/80 backdrop-blur-xs font-mono">
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-2xl max-w-xl w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150 flex flex-col max-h-[90vh]">
                 {/* Header */}
-                <div className="px-5 py-3.5 bg-zinc-950 border-b border-zinc-800 flex items-center justify-between shrink-0">
+                <div className="px-5 py-3.5 bg-zinc-50 dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between shrink-0">
                     <div className="flex items-center gap-2.5">
                         <Tooltip content="Zarządzanie zakresem dostępu doradcy do spółek portfelowych">
                             <div
                                 tabIndex={0}
                                 role="img"
                                 aria-label="Zarządzanie zakresem dostępu doradcy do spółek portfelowych"
-                                className="w-7 h-7 rounded bg-zinc-850 border border-zinc-750 flex items-center justify-center text-zinc-300 focus:outline-none focus:ring-1 focus:ring-zinc-400"
+                                className="w-7 h-7 rounded bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 flex items-center justify-center text-zinc-700 dark:text-zinc-300 focus:outline-none focus:ring-1 focus:ring-zinc-400"
                             >
                                 <Briefcase className="w-4 h-4" />
                             </div>
                         </Tooltip>
                         <div>
                             <div className="flex items-center gap-2">
-                                <h2 className="text-xs font-bold uppercase tracking-wider text-zinc-100">
+                                <h2 className="text-xs font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
                                     Przypisanie Spółek Portfelowych
                                 </h2>
                                 <Tooltip content={`Rola systemowa: ${advisor.role.toUpperCase()}`}>
@@ -126,8 +126,8 @@ export const AdvisorAssignmentModal = ({ isOpen, onClose, advisor, onSaved, comp
                                     </span>
                                 </Tooltip>
                             </div>
-                            <p className="text-[10px] text-zinc-500 mt-0.5">
-                                DORADCA: <span className="text-zinc-300 font-semibold">{advisor.name}</span> ({advisor.email})
+                            <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">
+                                DORADCA: <span className="text-zinc-800 dark:text-zinc-200 font-semibold">{advisor.name}</span> ({advisor.email})
                             </p>
                         </div>
                     </div>
@@ -136,7 +136,7 @@ export const AdvisorAssignmentModal = ({ isOpen, onClose, advisor, onSaved, comp
                             type="button"
                             onClick={onClose}
                             aria-label="Zamknij"
-                            className="p-1 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors cursor-pointer"
+                            className="p-1 rounded text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
                         >
                             <X className="w-4 h-4" />
                         </button>
@@ -144,23 +144,23 @@ export const AdvisorAssignmentModal = ({ isOpen, onClose, advisor, onSaved, comp
                 </div>
 
                 {/* Sub-bar: Search & Selection Controls */}
-                <div className="p-3 bg-zinc-950/60 border-b border-zinc-800 space-y-2 shrink-0">
+                <div className="p-3 bg-zinc-50 dark:bg-zinc-950/60 border-b border-zinc-200 dark:border-zinc-800 space-y-2 shrink-0">
                     <div className="relative">
-                        <Search className="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                        <Search className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
                         <input
                             type="text"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             placeholder="Filtruj spółki po nazwie, tickerze lub NIP..."
-                            className="w-full bg-zinc-950 border border-zinc-750 rounded pl-9 pr-3 py-1.5 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
+                            className="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded pl-9 pr-3 py-1.5 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
                         />
                     </div>
 
-                    <div className="flex items-center justify-between text-[10px] text-zinc-400">
+                    <div className="flex items-center justify-between text-[10px] text-zinc-500 dark:text-zinc-400">
                         <div className="flex items-center gap-2">
                             <span>ZAZNACZONO:</span>
                             <Tooltip content="Liczba spółek wybranych do przypisania dla tego doradcy">
-                                <span tabIndex={0} className="font-bold text-zinc-100 bg-zinc-800 px-1.5 py-0.5 rounded border border-zinc-700 cursor-help focus:outline-none focus:ring-1 focus:ring-zinc-400">
+                                <span tabIndex={0} className="font-bold text-zinc-800 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded border border-zinc-300 dark:border-zinc-700 cursor-help focus:outline-none focus:ring-1 focus:ring-zinc-400">
                                     {selectedCompanyIds.length} / {companies.length}
                                 </span>
                             </Tooltip>
@@ -171,7 +171,7 @@ export const AdvisorAssignmentModal = ({ isOpen, onClose, advisor, onSaved, comp
                                     type="button"
                                     onClick={handleSelectAll}
                                     aria-label="Zaznacz wszystkie spółki"
-                                    className="text-zinc-400 hover:text-zinc-200 underline cursor-pointer"
+                                    className="text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200 underline cursor-pointer"
                                 >
                                     Zaznacz wszystkie
                                 </button>
@@ -182,7 +182,7 @@ export const AdvisorAssignmentModal = ({ isOpen, onClose, advisor, onSaved, comp
                                     type="button"
                                     onClick={handleDeselectAll}
                                     aria-label="Odznacz wszystkie spółki"
-                                    className="text-zinc-400 hover:text-zinc-200 underline cursor-pointer"
+                                    className="text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200 underline cursor-pointer"
                                 >
                                     Odznacz wszystkie
                                 </button>
@@ -194,11 +194,11 @@ export const AdvisorAssignmentModal = ({ isOpen, onClose, advisor, onSaved, comp
                 {/* Companies Checklist List */}
                 <div className="flex-1 overflow-y-auto p-3 space-y-1.5 min-h-[220px]">
                     {loading ? (
-                        <div className="py-12 text-center text-xs text-zinc-500">
+                        <div className="py-12 text-center text-xs text-zinc-500 dark:text-zinc-400">
                             Ładowanie podmiotów portfelowych...
                         </div>
                     ) : filteredCompanies.length === 0 ? (
-                        <div className="py-12 text-center text-xs text-zinc-500">
+                        <div className="py-12 text-center text-xs text-zinc-500 dark:text-zinc-400">
                             Brak spółek spełniających kryteria filtra.
                         </div>
                     ) : (
@@ -219,25 +219,25 @@ export const AdvisorAssignmentModal = ({ isOpen, onClose, advisor, onSaved, comp
                                         aria-label={`${comp.name} (${comp.code}) - ${isSelected ? 'przypisana' : 'nieprzypisana'}`}
                                         className={`w-full text-left p-2.5 rounded border transition-all flex items-center justify-between cursor-pointer ${
                                             isSelected
-                                                ? 'bg-zinc-850/90 border-zinc-600 text-zinc-100 shadow-xs'
-                                                : 'bg-zinc-950/40 border-zinc-800/80 text-zinc-400 hover:bg-zinc-900 hover:border-zinc-700'
+                                                ? 'bg-zinc-100 dark:bg-zinc-850/90 border-zinc-300 dark:border-zinc-600 text-zinc-900 dark:text-zinc-100 shadow-xs'
+                                                : 'bg-white dark:bg-zinc-950/40 border-zinc-200 dark:border-zinc-800/80 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-900 hover:border-zinc-300 dark:hover:border-zinc-700'
                                         }`}
                                     >
                                         <div className="flex items-center gap-3 min-w-0">
-                                            <div className="shrink-0 text-zinc-400">
+                                            <div className="shrink-0 text-zinc-400 dark:text-zinc-500">
                                                 {isSelected ? (
-                                                    <CheckSquare className="w-4 h-4 text-emerald-400" />
+                                                    <CheckSquare className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                                                 ) : (
-                                                    <Square className="w-4 h-4 text-zinc-600" />
+                                                    <Square className="w-4 h-4 text-zinc-400 dark:text-zinc-600" />
                                                 )}
                                             </div>
 
                                             <div className="min-w-0">
                                                 <div className="text-xs font-semibold flex items-center gap-2 truncate">
-                                                    <span className="truncate text-zinc-100">{comp.name}</span>
+                                                    <span className="truncate text-zinc-900 dark:text-zinc-100">{comp.name}</span>
                                                     <Badge variant="default" size="sm">{comp.code}</Badge>
                                                 </div>
-                                                <div className="text-[10px] text-zinc-500 flex items-center gap-2 mt-0.5">
+                                                <div className="text-[10px] text-zinc-500 dark:text-zinc-400 flex items-center gap-2 mt-0.5">
                                                     <span>NIP: {comp.tax_id || 'Brak NIP'}</span>
                                                     <span>•</span>
                                                     <span>Doradców: {comp.assigned_advisors_count || 0}</span>
@@ -260,9 +260,9 @@ export const AdvisorAssignmentModal = ({ isOpen, onClose, advisor, onSaved, comp
                 </div>
 
                 {/* Footer Controls */}
-                <div className="px-5 py-3 bg-zinc-950 border-t border-zinc-800 flex items-center justify-between shrink-0">
+                <div className="px-5 py-3 bg-zinc-50 dark:bg-zinc-950 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between shrink-0">
                     <Tooltip content="Wszelkie modyfikacje przypisań doradców są utrwalane w niezmiennym rejestrze audytowym WORM">
-                        <div tabIndex={0} className="text-[10px] text-zinc-500 cursor-help focus:outline-none focus:underline">
+                        <div tabIndex={0} className="text-[10px] text-zinc-500 dark:text-zinc-400 cursor-help focus:outline-none focus:underline">
                             AUDYT: Rejestracja zdarzeń Tenant / RBAC
                         </div>
                     </Tooltip>

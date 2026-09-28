@@ -26,25 +26,25 @@ export const CsvPreviewTable = ({
             {/* Status Summary Banner */}
             <div className={`p-4 rounded-lg border flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
                 valid
-                    ? 'bg-emerald-950/40 border-emerald-800 text-emerald-300'
-                    : 'bg-rose-950/40 border-rose-800 text-rose-300'
+                    ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300'
+                    : 'bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300'
             }`}>
                 <div className="flex items-start sm:items-center gap-3">
                     {valid ? (
                         <Tooltip content="Weryfikacja symulacyjna powiodła się - brak błędów formalnych w strukturze pliku CSV">
-                            <div className="w-8 h-8 rounded bg-emerald-950 border border-emerald-700 flex items-center justify-center text-emerald-400 shrink-0 cursor-help">
+                            <div className="w-8 h-8 rounded bg-emerald-100 dark:bg-emerald-950 border border-emerald-300 dark:border-emerald-700 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0 cursor-help">
                                 <CheckCircle2 className="w-5 h-5" />
                             </div>
                         </Tooltip>
                     ) : (
                         <Tooltip content="Plik CSV zawiera błędy walidacji uniemożliwiające bezpieczny import do bazy danych">
-                            <div className="w-8 h-8 rounded bg-rose-950 border border-rose-700 flex items-center justify-center text-rose-400 shrink-0 cursor-help">
+                            <div className="w-8 h-8 rounded bg-rose-100 dark:bg-rose-950 border border-rose-300 dark:border-rose-700 flex items-center justify-center text-rose-600 dark:text-rose-400 shrink-0 cursor-help">
                                 <AlertTriangle className="w-5 h-5" />
                             </div>
                         </Tooltip>
                     )}
                     <div>
-                        <div className="text-xs font-bold uppercase tracking-wider flex items-center gap-2">
+                        <div className="text-xs font-bold uppercase tracking-wider flex items-center gap-2 text-zinc-900 dark:text-zinc-100">
                             <span>
                                 {valid
                                     ? 'Weryfikacja Pliku Zakończona Sukcesem (Dry-Run Pass)'
@@ -57,7 +57,7 @@ export const CsvPreviewTable = ({
                                 content="Weryfikacja Dry-Run symuluje przetwarzanie pliku: sprawdza formaty dat, poprawność kodów kategorii w planie kont oraz wartości kwotowe bez modyfikacji bazy danych."
                             />
                         </div>
-                        <div className="text-[11px] opacity-80 mt-0.5">
+                        <div className="text-[11px] opacity-80 mt-0.5 text-zinc-600 dark:text-zinc-300">
                             Łącznie wierszy: <strong className="font-bold">{total_rows}</strong> | Poprawnych: <strong className="font-bold">{valid_count}</strong> | Błędnych: <strong className="font-bold">{error_count}</strong>
                         </div>
                     </div>
@@ -95,8 +95,8 @@ export const CsvPreviewTable = ({
 
             {/* Error Details List if any */}
             {!valid && errors.length > 0 && (
-                <div className="bg-zinc-950 border border-rose-900/60 rounded-lg p-3 space-y-2">
-                    <div className="text-[11px] font-bold text-rose-400 flex items-center gap-1.5 uppercase">
+                <div className="bg-rose-50 dark:bg-zinc-950 border border-rose-200 dark:border-rose-900/60 rounded-lg p-3 space-y-2">
+                    <div className="text-[11px] font-bold text-rose-600 dark:text-rose-400 flex items-center gap-1.5 uppercase">
                         <AlertCircle className="w-3.5 h-3.5" />
                         <span>Rejestr Wykrytych Niespójności Walidacyjnych (Pierwsze {Math.min(errors.length, 10)}):</span>
                         <InfoTooltip
@@ -106,21 +106,21 @@ export const CsvPreviewTable = ({
                             content="Lista wykrytych niespójności z numerami linii i nazwami kolumn. Wymaga korekty w arkuszu kalkulacyjnym przed ponownym przesłaniem pliku."
                         />
                     </div>
-                    <div className="max-h-40 overflow-y-auto space-y-1 text-[11px] divide-y divide-zinc-900">
+                    <div className="max-h-40 overflow-y-auto space-y-1 text-[11px] divide-y divide-rose-100 dark:divide-zinc-900">
                         {errors.slice(0, 10).map((err, idx) => (
-                            <div key={idx} className="pt-1 flex items-start gap-2 text-zinc-300">
+                            <div key={idx} className="pt-1 flex items-start gap-2 text-zinc-700 dark:text-zinc-300">
                                 <Tooltip content={`Błąd zlokalizowany w wierszu ${err.line || 'N/A'} pliku źródłowego`}>
-                                    <span className="text-rose-400 font-bold shrink-0 cursor-help">
+                                    <span className="text-rose-600 dark:text-rose-400 font-bold shrink-0 cursor-help">
                                         [Linia {err.line || 'N/A'}]:
                                     </span>
                                 </Tooltip>
-                                <span className="text-zinc-400 truncate">
+                                <span className="text-zinc-600 dark:text-zinc-400 truncate">
                                     {err.column ? `Kolumna "${err.column}" - ` : ''}{err.message}
                                 </span>
                             </div>
                         ))}
                     </div>
-                    <div className="text-[10px] text-zinc-500 pt-1 border-t border-zinc-900">
+                    <div className="text-[10px] text-zinc-500 dark:text-zinc-400 pt-1 border-t border-rose-200 dark:border-zinc-900">
                         Popraw błędy w pliku źródłowym i prześlij go ponownie, aby umożliwić zaksięgowanie.
                     </div>
                 </div>
@@ -128,10 +128,10 @@ export const CsvPreviewTable = ({
 
             {/* Sample Records Table */}
             {sample_records.length > 0 && (
-                <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden shadow-xl">
-                    <div className="px-3.5 py-2.5 bg-zinc-950 border-b border-zinc-800 flex items-center justify-between text-xs">
+                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden shadow-xl">
+                    <div className="px-3.5 py-2.5 bg-zinc-50 dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between text-xs">
                         <div className="flex items-center gap-1.5">
-                            <span className="font-bold text-zinc-300 uppercase tracking-wider text-[11px]">
+                            <span className="font-bold text-zinc-800 dark:text-zinc-300 uppercase tracking-wider text-[11px]">
                                 Podgląd Wygenerowanych Zapisów (Pierwsze {sample_records.length} Wierszy)
                             </span>
                             <InfoTooltip
@@ -142,7 +142,7 @@ export const CsvPreviewTable = ({
                             />
                         </div>
                         <Tooltip content="Kanał wprowadzania danych oznaczony w rejestrze audytowym flagą csv_import">
-                            <span className="text-[10px] text-zinc-500 cursor-help">
+                            <span className="text-[10px] text-zinc-500 dark:text-zinc-400 cursor-help">
                                 Źródło: csv_import
                             </span>
                         </Tooltip>
@@ -150,7 +150,7 @@ export const CsvPreviewTable = ({
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse text-xs">
                             <thead>
-                                <tr className="bg-zinc-950/80 border-b border-zinc-800 text-[10px] text-zinc-400 uppercase tracking-wider">
+                                <tr className="bg-zinc-50/80 dark:bg-zinc-950/80 border-b border-zinc-200 dark:border-zinc-800 text-[10px] text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
                                     <th className="py-2 px-3.5 font-semibold w-28">
                                         <Tooltip content="Data księgowania operacji w formacie RRRR-MM-DD">
                                             <span className="cursor-help">Data</span>
@@ -178,30 +178,30 @@ export const CsvPreviewTable = ({
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-zinc-850">
+                            <tbody className="divide-y divide-zinc-200 dark:divide-zinc-850">
                                 {sample_records.map((rec, index) => (
-                                    <tr key={index} className="hover:bg-zinc-850/40 transition-colors">
-                                        <td className="py-2 px-3.5 text-zinc-400 whitespace-nowrap text-[11px]">
+                                    <tr key={index} className="hover:bg-zinc-50 dark:hover:bg-zinc-850/40 transition-colors">
+                                        <td className="py-2 px-3.5 text-zinc-600 dark:text-zinc-400 whitespace-nowrap text-[11px]">
                                             <Tooltip content={`Data operacji: ${rec.record_date}`}>
                                                 <span className="cursor-help">{rec.record_date}</span>
                                             </Tooltip>
                                         </td>
-                                        <td className="py-2 px-3.5 text-zinc-200 font-semibold whitespace-nowrap">
+                                        <td className="py-2 px-3.5 text-zinc-800 dark:text-zinc-200 font-semibold whitespace-nowrap">
                                             <Tooltip content={`Kategoria analityczna: ${rec.category_id}`}>
                                                 <span className="cursor-help">{rec.category_id}</span>
                                             </Tooltip>
                                         </td>
-                                        <td className="py-2 px-3.5 text-zinc-300 truncate max-w-sm">
+                                        <td className="py-2 px-3.5 text-zinc-700 dark:text-zinc-300 truncate max-w-sm">
                                             <Tooltip content={rec.description}>
                                                 <span className="truncate block cursor-help">{rec.description}</span>
                                             </Tooltip>
                                         </td>
-                                        <td className="py-2 px-3.5 text-zinc-400 text-center whitespace-nowrap">
+                                        <td className="py-2 px-3.5 text-zinc-500 dark:text-zinc-400 text-center whitespace-nowrap">
                                             <Tooltip content={`Waluta: ${rec.currency || 'PLN'}`}>
                                                 <span className="cursor-help">{rec.currency || 'PLN'}</span>
                                             </Tooltip>
                                         </td>
-                                        <td className="py-2 px-3.5 text-right font-bold text-zinc-100 tabular-nums whitespace-nowrap">
+                                        <td className="py-2 px-3.5 text-right font-bold text-zinc-900 dark:text-zinc-100 tabular-nums whitespace-nowrap">
                                             <Tooltip content={`Wartość nominalna: ${formatCurrency(Number(rec.amount), rec.currency || 'PLN')}`}>
                                                 <span className="cursor-help">{formatCurrency(Number(rec.amount), rec.currency || 'PLN')}</span>
                                             </Tooltip>

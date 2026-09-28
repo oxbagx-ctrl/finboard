@@ -357,11 +357,11 @@ export const ThreeStatementGrid = ({
                 subtitle="RZiS, Bilans i Cash Flow w pełnej integracji matematycznej"
             >
                 <div className="py-12 text-center font-mono">
-                    <FileSpreadsheet className="w-12 h-12 text-zinc-600 mx-auto mb-3" />
-                    <p className="font-semibold text-zinc-300 uppercase tracking-wide">
+                    <FileSpreadsheet className="w-12 h-12 text-zinc-400 dark:text-zinc-600 mx-auto mb-3" />
+                    <p className="font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wide">
                         Brak Wybranego Projektu Inwestycyjnego
                     </p>
-                    <p className="text-[11px] text-zinc-500 mt-1">
+                    <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1">
                         Wybierz projekt z selektora powyżej, aby wygenerować 15-letnie sprawozdania finansowe.
                     </p>
                 </div>
@@ -372,20 +372,20 @@ export const ThreeStatementGrid = ({
     return (
         <div data-testid="three-statement-grid" className={`space-y-4 font-mono ${className}`}>
             {/* Top Toolbar: Statement Type Tabs, Granularity, Scale & Actions */}
-            <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3 sm:p-4 shadow-sm flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-3 sm:p-4 shadow-sm flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
                 {/* Statement Type Segmented Control */}
-                <div className="flex flex-wrap items-center gap-1.5 bg-zinc-950 p-1.5 rounded-lg border border-zinc-800">
+                <div className="flex flex-wrap items-center gap-1.5 bg-zinc-100 dark:bg-zinc-950 p-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800">
                     <Tooltip content="Rachunek Zysków i Strat (P&L): Przychody, EBITDA, EBIT, EBT, Zysk Netto">
                         <button
                             type="button"
                             onClick={() => setStatementType('pnl')}
                             className={`flex items-center gap-1.5 px-3 py-1.5 text-xs rounded transition-all cursor-pointer ${
                                 statementType === 'pnl'
-                                    ? 'bg-zinc-800 text-zinc-100 border border-zinc-700 shadow-xs font-bold'
-                                    : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900 border border-transparent'
+                                    ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border border-zinc-300 dark:border-zinc-700 shadow-xs font-bold'
+                                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-200/50 dark:hover:bg-zinc-900 border border-transparent'
                             }`}
                         >
-                            <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />
+                            <TrendingUp className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                             <span>RZiS (P&L)</span>
                         </button>
                     </Tooltip>
@@ -396,11 +396,11 @@ export const ThreeStatementGrid = ({
                             onClick={() => setStatementType('balancesheet')}
                             className={`flex items-center gap-1.5 px-3 py-1.5 text-xs rounded transition-all cursor-pointer ${
                                 statementType === 'balancesheet'
-                                    ? 'bg-zinc-800 text-zinc-100 border border-zinc-700 shadow-xs font-bold'
-                                    : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900 border border-transparent'
+                                    ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border border-zinc-300 dark:border-zinc-700 shadow-xs font-bold'
+                                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-200/50 dark:hover:bg-zinc-900 border border-transparent'
                             }`}
                         >
-                            <Building2 className="w-3.5 h-3.5 text-blue-400" />
+                            <Building2 className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
                             <span>Bilans</span>
                         </button>
                     </Tooltip>
@@ -411,11 +411,11 @@ export const ThreeStatementGrid = ({
                             onClick={() => setStatementType('cashflow')}
                             className={`flex items-center gap-1.5 px-3 py-1.5 text-xs rounded transition-all cursor-pointer ${
                                 statementType === 'cashflow'
-                                    ? 'bg-zinc-800 text-zinc-100 border border-zinc-700 shadow-xs font-bold'
-                                    : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900 border border-transparent'
+                                    ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border border-zinc-300 dark:border-zinc-700 shadow-xs font-bold'
+                                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-200/50 dark:hover:bg-zinc-900 border border-transparent'
                             }`}
                         >
-                            <Coins className="w-3.5 h-3.5 text-amber-400" />
+                            <Coins className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
                             <span>Cash Flow</span>
                         </button>
                     </Tooltip>
@@ -426,11 +426,11 @@ export const ThreeStatementGrid = ({
                             onClick={() => setStatementType('all')}
                             className={`flex items-center gap-1.5 px-3 py-1.5 text-xs rounded transition-all cursor-pointer ${
                                 statementType === 'all'
-                                    ? 'bg-zinc-800 text-zinc-100 border border-zinc-700 shadow-xs font-bold'
-                                    : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900 border border-transparent'
+                                    ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border border-zinc-300 dark:border-zinc-700 shadow-xs font-bold'
+                                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-200/50 dark:hover:bg-zinc-900 border border-transparent'
                             }`}
                         >
-                            <Layers className="w-3.5 h-3.5 text-purple-400" />
+                            <Layers className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
                             <span>Wszystkie (Zbiorczy)</span>
                         </button>
                     </Tooltip>
@@ -439,14 +439,14 @@ export const ThreeStatementGrid = ({
                 {/* Granularity & Secondary Controls */}
                 <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto justify-between lg:justify-end">
                     {/* Time Granularity Toggle */}
-                    <div className="flex items-center gap-1 bg-zinc-950 p-1 rounded-lg border border-zinc-800">
+                    <div className="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-950 p-1 rounded-lg border border-zinc-200 dark:border-zinc-800">
                         <button
                             type="button"
                             onClick={() => setGranularity('annual')}
                             className={`px-2.5 py-1 text-xs rounded transition-all cursor-pointer ${
                                 granularity === 'annual'
-                                    ? 'bg-zinc-800 text-zinc-100 font-bold'
-                                    : 'text-zinc-400 hover:text-zinc-200'
+                                    ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-bold shadow-xs border border-zinc-300 dark:border-transparent'
+                                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
                             }`}
                         >
                             15 Lat (Rocznie)
@@ -456,8 +456,8 @@ export const ThreeStatementGrid = ({
                             onClick={() => setGranularity('monthly')}
                             className={`px-2.5 py-1 text-xs rounded transition-all cursor-pointer ${
                                 granularity === 'monthly'
-                                    ? 'bg-zinc-800 text-zinc-100 font-bold'
-                                    : 'text-zinc-400 hover:text-zinc-200'
+                                    ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-bold shadow-xs border border-zinc-300 dark:border-transparent'
+                                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
                             }`}
                         >
                             180 M (Miesięcznie)
@@ -465,26 +465,26 @@ export const ThreeStatementGrid = ({
                     </div>
 
                     {/* Scale Selector */}
-                    <div className="flex items-center gap-1 bg-zinc-950 p-1 rounded-lg border border-zinc-800 text-xs">
+                    <div className="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-950 p-1 rounded-lg border border-zinc-200 dark:border-zinc-800 text-xs">
                         <span className="text-[10px] text-zinc-500 uppercase px-1">Skala:</span>
                         <button
                             type="button"
                             onClick={() => setScale('full')}
-                            className={`px-2 py-0.5 rounded text-[11px] ${scale === 'full' ? 'bg-zinc-800 text-zinc-100 font-bold' : 'text-zinc-400 hover:text-zinc-200'}`}
+                            className={`px-2 py-0.5 rounded text-[11px] ${scale === 'full' ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-bold shadow-xs border border-zinc-300 dark:border-transparent' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'}`}
                         >
                             PLN
                         </button>
                         <button
                             type="button"
                             onClick={() => setScale('thousands')}
-                            className={`px-2 py-0.5 rounded text-[11px] ${scale === 'thousands' ? 'bg-zinc-800 text-zinc-100 font-bold' : 'text-zinc-400 hover:text-zinc-200'}`}
+                            className={`px-2 py-0.5 rounded text-[11px] ${scale === 'thousands' ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-bold shadow-xs border border-zinc-300 dark:border-transparent' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'}`}
                         >
                             tys.
                         </button>
                         <button
                             type="button"
                             onClick={() => setScale('millions')}
-                            className={`px-2 py-0.5 rounded text-[11px] ${scale === 'millions' ? 'bg-zinc-800 text-zinc-100 font-bold' : 'text-zinc-400 hover:text-zinc-200'}`}
+                            className={`px-2 py-0.5 rounded text-[11px] ${scale === 'millions' ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-bold shadow-xs border border-zinc-300 dark:border-transparent' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'}`}
                         >
                             mln
                         </button>
@@ -507,33 +507,33 @@ export const ThreeStatementGrid = ({
             </div>
 
             {/* Sub-bar: Search, Folding Controls & Zero-Variance Verification */}
-            <div className="bg-zinc-900/60 border border-zinc-800/80 rounded-lg p-3 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs">
+            <div className="bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800/80 rounded-lg p-3 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs">
                 {/* Search Bar */}
                 <div className="relative w-full md:w-64">
-                    <Search className="w-3.5 h-3.5 text-zinc-500 absolute left-2.5 top-1/2 -translate-y-1/2" />
+                    <Search className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500 absolute left-2.5 top-1/2 -translate-y-1/2" />
                     <input
                         type="text"
                         placeholder="Szukaj pozycji w sprawozdaniu..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full bg-zinc-950 border border-zinc-800 rounded pl-8 pr-3 py-1.5 text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-zinc-700"
+                        className="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded pl-8 pr-3 py-1.5 text-xs text-zinc-900 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-zinc-500 dark:focus:border-zinc-700"
                     />
                 </div>
 
                 {/* Monthly Year Filter (if monthly granularity active) */}
                 {granularity === 'monthly' && (
-                    <div className="flex items-center gap-1.5 text-xs bg-zinc-950 px-2 py-1 rounded border border-zinc-800">
-                        <Calendar className="w-3.5 h-3.5 text-zinc-400" />
+                    <div className="flex items-center gap-1.5 text-xs bg-white dark:bg-zinc-950 px-2 py-1 rounded border border-zinc-300 dark:border-zinc-800">
+                        <Calendar className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-400" />
                         <span className="text-[10px] text-zinc-500 uppercase">Filtr roku:</span>
                         <select
                             value={yearFilter}
                             onChange={(e) => setYearFilter(e.target.value)}
                             aria-label="Wybierz rok do wyświetlenia"
-                            className="bg-transparent text-xs text-zinc-200 font-semibold focus:outline-none cursor-pointer"
+                            className="bg-transparent text-xs text-zinc-800 dark:text-zinc-200 font-semibold focus:outline-none cursor-pointer"
                         >
-                            <option value="all" className="bg-zinc-900 text-zinc-200">Wszystkie 15 lat (180M)</option>
+                            <option value="all" className="bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">Wszystkie 15 lat (180M)</option>
                             {Array.from({ length: 15 }, (_, i) => i + 1).map((y) => (
-                                <option key={y} value={y.toString()} className="bg-zinc-900 text-zinc-200">
+                                <option key={y} value={y.toString()} className="bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">
                                     Rok {y} (M{(y - 1) * 12 + 1} - M{y * 12})
                                 </option>
                             ))}
@@ -547,15 +547,15 @@ export const ThreeStatementGrid = ({
                         <button
                             type="button"
                             onClick={expandAll}
-                            className="text-[11px] text-zinc-400 hover:text-zinc-200 underline"
+                            className="text-[11px] text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 underline"
                         >
                             Rozwiń wszystko
                         </button>
-                        <span className="text-zinc-600">/</span>
+                        <span className="text-zinc-400 dark:text-zinc-600">/</span>
                         <button
                             type="button"
                             onClick={collapseAll}
-                            className="text-[11px] text-zinc-400 hover:text-zinc-200 underline"
+                            className="text-[11px] text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 underline"
                         >
                             Zwiń wszystko
                         </button>
@@ -567,18 +567,18 @@ export const ThreeStatementGrid = ({
                             data-testid="balance-integrity-badge"
                             className={`flex items-center gap-1.5 px-2.5 py-1 rounded border text-[11px] font-semibold cursor-help ${
                                 isModelGloballyBalanced
-                                    ? 'bg-emerald-950/40 text-emerald-300 border-emerald-800/60'
-                                    : 'bg-rose-950/40 text-rose-300 border-rose-800/60'
+                                    ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800/60'
+                                    : 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border-rose-300 dark:border-rose-800/60'
                             }`}
                         >
                         {isModelGloballyBalanced ? (
                             <>
-                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                                 <span>BILANS: ZERO VARIANCE (Δ = 0,00)</span>
                             </>
                         ) : (
                             <>
-                                <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
+                                <AlertTriangle className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
                                 <span>ODCHYLENIE BILANSU (Δ ≠ 0)</span>
                             </>
                         )}
@@ -588,37 +588,37 @@ export const ThreeStatementGrid = ({
             </div>
 
             {/* Main Interactive 3-Statement Grid Table Container */}
-            <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden shadow-sm">
-                <div className="overflow-x-auto max-h-[750px] relative scrollbar-thin scrollbar-thumb-zinc-700">
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden shadow-sm">
+                <div className="overflow-x-auto max-h-[750px] relative scrollbar-thin scrollbar-thumb-zinc-300 dark:scrollbar-thumb-zinc-700">
                     <table className="w-full text-left border-collapse text-xs">
                         {/* Table Header with Frozen Columns */}
-                        <thead className="bg-zinc-950 sticky top-0 z-20 border-b border-zinc-800 text-[11px]">
+                        <thead className="bg-zinc-100 dark:bg-zinc-950 sticky top-0 z-20 border-b border-zinc-200 dark:border-zinc-800 text-[11px]">
                             <tr>
-                                <th className="py-2.5 px-4 sticky left-0 z-30 bg-zinc-950 min-w-[280px] text-zinc-400 font-bold uppercase tracking-wider border-r border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.4)]">
+                                <th className="py-2.5 px-4 sticky left-0 z-30 bg-zinc-100 dark:bg-zinc-950 min-w-[280px] text-zinc-600 dark:text-zinc-400 font-bold uppercase tracking-wider border-r border-zinc-200 dark:border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.05)] dark:shadow-[2px_0_5px_rgba(0,0,0,0.4)]">
                                     Pozycja Sprawozdania ({currency})
                                 </th>
                                 {columns.map((col) => (
                                     <th
                                         key={col.id}
-                                        className="py-2.5 px-3 min-w-[110px] text-right font-bold text-zinc-300 border-r border-zinc-850"
+                                        className="py-2.5 px-3 min-w-[110px] text-right font-bold text-zinc-700 dark:text-zinc-300 border-r border-zinc-200 dark:border-zinc-850"
                                     >
-                                        <div className="font-mono text-zinc-200">{col.label}</div>
+                                        <div className="font-mono text-zinc-800 dark:text-zinc-200">{col.label}</div>
                                         <div className="text-[10px] text-zinc-500 font-normal font-sans">{col.sublabel}</div>
                                     </th>
                                 ))}
                             </tr>
                         </thead>
 
-                        <tbody className="divide-y divide-zinc-850 font-mono text-zinc-300">
+                        <tbody className="divide-y divide-zinc-200 dark:divide-zinc-850 font-mono text-zinc-700 dark:text-zinc-300">
                             {/* ========================================================================= */}
                             {/* 1. RACHUNEK ZYSKÓW I STRAT (P&L)                                         */}
                             {/* ========================================================================= */}
                             {(statementType === 'pnl' || statementType === 'all') && (
                                 <>
-                                    <tr className="bg-zinc-950/80 font-bold text-zinc-200">
+                                    <tr className="bg-zinc-100 dark:bg-zinc-950/80 font-bold text-zinc-800 dark:text-zinc-200">
                                         <td
                                             colSpan={columns.length + 1}
-                                            className="py-2 px-4 text-xs uppercase tracking-wider text-emerald-400 border-t border-b border-zinc-800"
+                                            className="py-2 px-4 text-xs uppercase tracking-wider text-emerald-600 dark:text-emerald-400 border-t border-b border-zinc-200 dark:border-zinc-800"
                                         >
                                             1. Rachunek Zysków i Strat (Income Statement / P&L)
                                         </td>
@@ -626,13 +626,13 @@ export const ThreeStatementGrid = ({
 
                                     {/* Przychody ze Sprzedaży */}
                                     {matchesSearch('Przychody ze Sprzedaży') && (
-                                        <tr className="bg-zinc-900/40 hover:bg-zinc-850/50">
-                                            <td className="py-2 px-4 sticky left-0 z-10 bg-zinc-900 font-semibold text-zinc-100 flex items-center justify-between border-r border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
+                                        <tr className="bg-zinc-50/50 dark:bg-zinc-900/40 hover:bg-zinc-100/70 dark:hover:bg-zinc-850/50">
+                                            <td className="py-2 px-4 sticky left-0 z-10 bg-white dark:bg-zinc-900 font-semibold text-zinc-900 dark:text-zinc-100 flex items-center justify-between border-r border-zinc-200 dark:border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.03)] dark:shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
                                                 <span>Przychody ze Sprzedaży</span>
                                                 <button
                                                     type="button"
                                                     onClick={() => toggleSection('revenue_breakdown')}
-                                                    className="p-1 hover:text-zinc-100 text-zinc-400"
+                                                    className="p-1 hover:text-zinc-900 dark:hover:text-zinc-100 text-zinc-400"
                                                 >
                                                     {expandedSections.revenue_breakdown ? (
                                                         <ChevronDown className="w-3.5 h-3.5" />
@@ -642,7 +642,7 @@ export const ThreeStatementGrid = ({
                                                 </button>
                                             </td>
                                             {columns.map((c) => (
-                                                <td key={c.id} className="py-2 px-3 text-right text-emerald-400 font-semibold border-r border-zinc-850">
+                                                <td key={c.id} className="py-2 px-3 text-right text-emerald-600 dark:text-emerald-400 font-semibold border-r border-zinc-200 dark:border-zinc-850">
                                                     {formatValue(c.data.revenue)}
                                                 </td>
                                             ))}
@@ -651,12 +651,12 @@ export const ThreeStatementGrid = ({
 
                                     {/* Expanded: Revenue Details */}
                                     {expandedSections.revenue_breakdown && matchesSearch('Przychody ze Sprzedaży') && (
-                                        <tr className="text-zinc-400 bg-zinc-950/20 text-[11px]">
-                                            <td className="py-1.5 px-4 pl-8 sticky left-0 z-10 bg-zinc-950/80 border-r border-zinc-800 italic">
+                                        <tr className="text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-950/20 text-[11px]">
+                                            <td className="py-1.5 px-4 pl-8 sticky left-0 z-10 bg-zinc-50/90 dark:bg-zinc-950/80 border-r border-zinc-200 dark:border-zinc-800 italic">
                                                 ↳ Sprzedaż Podstawowa (Nominal Capacity)
                                             </td>
                                             {columns.map((c) => (
-                                                <td key={c.id} className="py-1.5 px-3 text-right border-r border-zinc-850 text-zinc-400">
+                                                <td key={c.id} className="py-1.5 px-3 text-right border-r border-zinc-200 dark:border-zinc-850 text-zinc-600 dark:text-zinc-400">
                                                     {formatValue(c.data.revenue)}
                                                 </td>
                                             ))}
@@ -665,13 +665,13 @@ export const ThreeStatementGrid = ({
 
                                     {/* Koszty Operacyjne (OPEX) */}
                                     {matchesSearch('Koszty Operacyjne') && (
-                                        <tr className="bg-zinc-900/30 hover:bg-zinc-850/50">
-                                            <td className="py-2 px-4 sticky left-0 z-10 bg-zinc-900 font-medium text-zinc-200 flex items-center justify-between border-r border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
+                                        <tr className="bg-zinc-50/30 dark:bg-zinc-900/30 hover:bg-zinc-100/70 dark:hover:bg-zinc-850/50">
+                                            <td className="py-2 px-4 sticky left-0 z-10 bg-white dark:bg-zinc-900 font-medium text-zinc-800 dark:text-zinc-200 flex items-center justify-between border-r border-zinc-200 dark:border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.03)] dark:shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
                                                 <span>(-) Koszty Operacyjne (OPEX)</span>
                                                 <button
                                                     type="button"
                                                     onClick={() => toggleSection('opex_breakdown')}
-                                                    className="p-1 hover:text-zinc-100 text-zinc-400"
+                                                    className="p-1 hover:text-zinc-900 dark:hover:text-zinc-100 text-zinc-400"
                                                 >
                                                     {expandedSections.opex_breakdown ? (
                                                         <ChevronDown className="w-3.5 h-3.5" />
@@ -681,7 +681,7 @@ export const ThreeStatementGrid = ({
                                                 </button>
                                             </td>
                                             {columns.map((c) => (
-                                                <td key={c.id} className="py-2 px-3 text-right text-zinc-300 border-r border-zinc-850">
+                                                <td key={c.id} className="py-2 px-3 text-right text-zinc-700 dark:text-zinc-300 border-r border-zinc-200 dark:border-zinc-850">
                                                     {formatValue(-c.data.totalOpex)}
                                                 </td>
                                             ))}
@@ -692,36 +692,36 @@ export const ThreeStatementGrid = ({
                                     {expandedSections.opex_breakdown && (
                                         <>
                                             {matchesSearch('Koszty Zmienne') && (
-                                                <tr className="text-zinc-400 bg-zinc-950/20 text-[11px]">
-                                                    <td className="py-1.5 px-4 pl-8 sticky left-0 z-10 bg-zinc-950/80 border-r border-zinc-800">
+                                                <tr className="text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-950/20 text-[11px]">
+                                                    <td className="py-1.5 px-4 pl-8 sticky left-0 z-10 bg-zinc-50/90 dark:bg-zinc-950/80 border-r border-zinc-200 dark:border-zinc-800">
                                                         ↳ Koszty Zmienne (Media, Surowce, Prowizje)
                                                     </td>
                                                     {columns.map((c) => (
-                                                        <td key={c.id} className="py-1.5 px-3 text-right border-r border-zinc-850 text-zinc-400">
+                                                        <td key={c.id} className="py-1.5 px-3 text-right border-r border-zinc-200 dark:border-zinc-850 text-zinc-600 dark:text-zinc-400">
                                                             {formatValue(-c.data.variableCosts)}
                                                         </td>
                                                     ))}
                                                 </tr>
                                             )}
                                             {matchesSearch('Koszty Stałe') && (
-                                                <tr className="text-zinc-400 bg-zinc-950/20 text-[11px]">
-                                                    <td className="py-1.5 px-4 pl-8 sticky left-0 z-10 bg-zinc-950/80 border-r border-zinc-800">
+                                                <tr className="text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-950/20 text-[11px]">
+                                                    <td className="py-1.5 px-4 pl-8 sticky left-0 z-10 bg-zinc-50/90 dark:bg-zinc-950/80 border-r border-zinc-200 dark:border-zinc-800">
                                                         ↳ Koszty Stałe OPEX (Serwis, Najem, Ubezpieczenia)
                                                     </td>
                                                     {columns.map((c) => (
-                                                        <td key={c.id} className="py-1.5 px-3 text-right border-r border-zinc-850 text-zinc-400">
+                                                        <td key={c.id} className="py-1.5 px-3 text-right border-r border-zinc-200 dark:border-zinc-850 text-zinc-600 dark:text-zinc-400">
                                                             {formatValue(-c.data.fixedCosts)}
                                                         </td>
                                                     ))}
                                                 </tr>
                                             )}
                                             {matchesSearch('Fundusz Płac') && (
-                                                <tr className="text-zinc-400 bg-zinc-950/20 text-[11px]">
-                                                    <td className="py-1.5 px-4 pl-8 sticky left-0 z-10 bg-zinc-950/80 border-r border-zinc-800">
+                                                <tr className="text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-950/20 text-[11px]">
+                                                    <td className="py-1.5 px-4 pl-8 sticky left-0 z-10 bg-zinc-50/90 dark:bg-zinc-950/80 border-r border-zinc-200 dark:border-zinc-800">
                                                         ↳ Fundusz Płac & Wynagrodzenia (Payroll)
                                                     </td>
                                                     {columns.map((c) => (
-                                                        <td key={c.id} className="py-1.5 px-3 text-right border-r border-zinc-850 text-zinc-400">
+                                                        <td key={c.id} className="py-1.5 px-3 text-right border-r border-zinc-200 dark:border-zinc-850 text-zinc-600 dark:text-zinc-400">
                                                             {formatValue(-c.data.payrollCosts)}
                                                         </td>
                                                     ))}
@@ -732,12 +732,12 @@ export const ThreeStatementGrid = ({
 
                                     {/* EBITDA */}
                                     {matchesSearch('EBITDA') && (
-                                        <tr className="bg-emerald-950/30 font-bold border-t border-b border-emerald-900/50">
-                                            <td className="py-2.5 px-4 sticky left-0 z-10 bg-emerald-950/90 text-emerald-300 uppercase border-r border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.4)]">
+                                        <tr className="bg-emerald-500/10 dark:bg-emerald-950/30 font-bold border-t border-b border-emerald-500/20 dark:border-emerald-900/50">
+                                            <td className="py-2.5 px-4 sticky left-0 z-10 bg-emerald-50 dark:bg-emerald-950/90 text-emerald-800 dark:text-emerald-300 uppercase border-r border-zinc-200 dark:border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.05)] dark:shadow-[2px_0_5px_rgba(0,0,0,0.4)]">
                                                 EBITDA (Zysk Operacyjny Gotówkowy)
                                             </td>
                                             {columns.map((c) => (
-                                                <td key={c.id} className="py-2.5 px-3 text-right text-emerald-300 font-bold border-r border-zinc-850">
+                                                <td key={c.id} className="py-2.5 px-3 text-right text-emerald-700 dark:text-emerald-300 font-bold border-r border-zinc-200 dark:border-zinc-850">
                                                     {formatValue(c.data.ebitda)}
                                                 </td>
                                             ))}
@@ -746,12 +746,12 @@ export const ThreeStatementGrid = ({
 
                                     {/* Marża EBITDA % */}
                                     {matchesSearch('Marża EBITDA') && (
-                                        <tr className="text-[11px] text-zinc-400 bg-zinc-900/20">
-                                            <td className="py-1 px-4 sticky left-0 z-10 bg-zinc-950/80 border-r border-zinc-800 italic">
+                                        <tr className="text-[11px] text-zinc-500 dark:text-zinc-400 bg-zinc-50/30 dark:bg-zinc-900/20">
+                                            <td className="py-1 px-4 sticky left-0 z-10 bg-zinc-50/90 dark:bg-zinc-950/80 border-r border-zinc-200 dark:border-zinc-800 italic">
                                                 % Marża EBITDA
                                             </td>
                                             {columns.map((c) => (
-                                                <td key={c.id} className="py-1 px-3 text-right text-emerald-400/90 border-r border-zinc-850">
+                                                <td key={c.id} className="py-1 px-3 text-right text-emerald-600 dark:text-emerald-400/90 border-r border-zinc-200 dark:border-zinc-850">
                                                     {formatValue(c.data.ebitdaMarginPercent ?? (c.data.revenue > 0 ? (c.data.ebitda / c.data.revenue) * 100 : 0), true)}
                                                 </td>
                                             ))}
@@ -760,12 +760,12 @@ export const ThreeStatementGrid = ({
 
                                     {/* Amortyzacja KŚT */}
                                     {matchesSearch('Amortyzacja') && (
-                                        <tr className="hover:bg-zinc-850/50">
-                                            <td className="py-2 px-4 sticky left-0 z-10 bg-zinc-900 text-zinc-300 border-r border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
+                                        <tr className="hover:bg-zinc-100/70 dark:hover:bg-zinc-850/50">
+                                            <td className="py-2 px-4 sticky left-0 z-10 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 border-r border-zinc-200 dark:border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.03)] dark:shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
                                                 (-) Amortyzacja Środków Trwałych KŚT
                                             </td>
                                             {columns.map((c) => (
-                                                <td key={c.id} className="py-2 px-3 text-right text-zinc-400 border-r border-zinc-850">
+                                                <td key={c.id} className="py-2 px-3 text-right text-zinc-500 dark:text-zinc-400 border-r border-zinc-200 dark:border-zinc-850">
                                                     {formatValue(-c.data.depreciation)}
                                                 </td>
                                             ))}
@@ -774,12 +774,12 @@ export const ThreeStatementGrid = ({
 
                                     {/* EBIT */}
                                     {matchesSearch('EBIT') && (
-                                        <tr className="bg-zinc-950/50 font-bold border-t border-zinc-800">
-                                            <td className="py-2 px-4 sticky left-0 z-10 bg-zinc-950 text-zinc-100 uppercase border-r border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
+                                        <tr className="bg-zinc-100/60 dark:bg-zinc-950/50 font-bold border-t border-zinc-200 dark:border-zinc-800">
+                                            <td className="py-2 px-4 sticky left-0 z-10 bg-zinc-100 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 uppercase border-r border-zinc-200 dark:border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.03)] dark:shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
                                                 EBIT (Zysk Operacyjny)
                                             </td>
                                             {columns.map((c) => (
-                                                <td key={c.id} className="py-2 px-3 text-right text-zinc-100 font-semibold border-r border-zinc-850">
+                                                <td key={c.id} className="py-2 px-3 text-right text-zinc-900 dark:text-zinc-100 font-semibold border-r border-zinc-200 dark:border-zinc-850">
                                                     {formatValue(c.data.ebit)}
                                                 </td>
                                             ))}
@@ -788,12 +788,12 @@ export const ThreeStatementGrid = ({
 
                                     {/* Odsetki i Koszty Finansowe */}
                                     {matchesSearch('Koszty Finansowe') && (
-                                        <tr className="hover:bg-zinc-850/50">
-                                            <td className="py-2 px-4 sticky left-0 z-10 bg-zinc-900 text-zinc-300 border-r border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
+                                        <tr className="hover:bg-zinc-100/70 dark:hover:bg-zinc-850/50">
+                                            <td className="py-2 px-4 sticky left-0 z-10 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 border-r border-zinc-200 dark:border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.03)] dark:shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
                                                 (-) Koszty Finansowe (Odsetki od Kredytu)
                                             </td>
                                             {columns.map((c) => (
-                                                <td key={c.id} className="py-2 px-3 text-right text-rose-400/90 border-r border-zinc-850">
+                                                <td key={c.id} className="py-2 px-3 text-right text-rose-600 dark:text-rose-400/90 border-r border-zinc-200 dark:border-zinc-850">
                                                     {formatValue(-c.data.interestExpense)}
                                                 </td>
                                             ))}
@@ -802,12 +802,12 @@ export const ThreeStatementGrid = ({
 
                                     {/* EBT */}
                                     {matchesSearch('EBT') && (
-                                        <tr className="bg-zinc-950/30 font-semibold border-t border-zinc-800">
-                                            <td className="py-2 px-4 sticky left-0 z-10 bg-zinc-950 text-zinc-200 border-r border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
+                                        <tr className="bg-zinc-100/40 dark:bg-zinc-950/30 font-semibold border-t border-zinc-200 dark:border-zinc-800">
+                                            <td className="py-2 px-4 sticky left-0 z-10 bg-zinc-100 dark:bg-zinc-950 text-zinc-800 dark:text-zinc-200 border-r border-zinc-200 dark:border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.03)] dark:shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
                                                 EBT (Zysk Brutto)
                                             </td>
                                             {columns.map((c) => (
-                                                <td key={c.id} className="py-2 px-3 text-right text-zinc-200 border-r border-zinc-850">
+                                                <td key={c.id} className="py-2 px-3 text-right text-zinc-800 dark:text-zinc-200 border-r border-zinc-200 dark:border-zinc-850">
                                                     {formatValue(c.data.ebt)}
                                                 </td>
                                             ))}
@@ -816,14 +816,14 @@ export const ThreeStatementGrid = ({
 
                                     {/* Podatek CIT */}
                                     {matchesSearch('Podatek CIT') && (
-                                        <tr className="hover:bg-zinc-850/50">
-                                            <td className="py-2 px-4 sticky left-0 z-10 bg-zinc-900 text-zinc-400 flex items-center justify-between border-r border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
+                                        <tr className="hover:bg-zinc-100/70 dark:hover:bg-zinc-850/50">
+                                            <td className="py-2 px-4 sticky left-0 z-10 bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 flex items-center justify-between border-r border-zinc-200 dark:border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.03)] dark:shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
                                                 <span>(-) Podatek Dochodowy CIT (Tarcza Strat)</span>
                                                 <Tooltip content={expandedSections.tax_breakdown ? "Zwiń rozliczenie podatkowe CIT" : "Rozwiń rozliczenie podatkowe CIT (straty i tarcza)"}>
                                                     <button
                                                         type="button"
                                                         onClick={() => toggleSection('tax_breakdown')}
-                                                        className="p-1 hover:text-zinc-100 text-zinc-400"
+                                                        className="p-1 hover:text-zinc-900 dark:hover:text-zinc-100 text-zinc-400"
                                                         aria-label="Rozwiń rozliczenie podatkowe CIT"
                                                     >
                                                     {expandedSections.tax_breakdown ? (
@@ -835,7 +835,7 @@ export const ThreeStatementGrid = ({
                                                 </Tooltip>
                                             </td>
                                             {columns.map((c) => (
-                                                <td key={c.id} className="py-2 px-3 text-right text-rose-400/80 border-r border-zinc-850 font-mono">
+                                                <td key={c.id} className="py-2 px-3 text-right text-rose-600 dark:text-rose-400/80 border-r border-zinc-200 dark:border-zinc-850 font-mono">
                                                     {formatValue(-c.data.cit)}
                                                 </td>
                                             ))}
@@ -845,52 +845,52 @@ export const ThreeStatementGrid = ({
                                     {/* Expanded: Tax Details */}
                                     {expandedSections.tax_breakdown && matchesSearch('Podatek CIT') && (
                                         <>
-                                            <tr className="text-zinc-400 bg-zinc-950/20 text-[11px]">
-                                                <td className="py-1.5 px-4 pl-8 sticky left-0 z-10 bg-zinc-950/80 border-r border-zinc-800 italic">
+                                            <tr className="text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-950/20 text-[11px]">
+                                                <td className="py-1.5 px-4 pl-8 sticky left-0 z-10 bg-zinc-50/90 dark:bg-zinc-950/80 border-r border-zinc-200 dark:border-zinc-800 italic">
                                                     ↳ Saldo Otwarcia Tarczy Podatkowej (Opening Pool)
                                                 </td>
                                                 {columns.map((c) => (
-                                                    <td key={c.id} className="py-1.5 px-3 text-right border-r border-zinc-850 text-zinc-400 font-mono">
+                                                    <td key={c.id} className="py-1.5 px-3 text-right border-r border-zinc-200 dark:border-zinc-850 text-zinc-600 dark:text-zinc-400 font-mono">
                                                         {formatValue(c.data.taxLossCarryForwardOpening ?? 0)}
                                                     </td>
                                                 ))}
                                             </tr>
-                                            <tr className="text-zinc-400 bg-zinc-950/20 text-[11px]">
-                                                <td className="py-1.5 px-4 pl-8 sticky left-0 z-10 bg-zinc-950/80 border-r border-zinc-800 italic">
+                                            <tr className="text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-950/20 text-[11px]">
+                                                <td className="py-1.5 px-4 pl-8 sticky left-0 z-10 bg-zinc-50/90 dark:bg-zinc-950/80 border-r border-zinc-200 dark:border-zinc-800 italic">
                                                     ↳ Wygasłe Straty Podatkowe (Przedawnienie T+5)
                                                 </td>
                                                 {columns.map((c) => (
-                                                    <td key={c.id} className="py-1.5 px-3 text-right border-r border-zinc-850 text-rose-400/90 font-mono">
+                                                    <td key={c.id} className="py-1.5 px-3 text-right border-r border-zinc-200 dark:border-zinc-850 text-rose-600 dark:text-rose-400/90 font-mono">
                                                         {formatValue(c.data.taxLossExpired ? -c.data.taxLossExpired : 0)}
                                                     </td>
                                                 ))}
                                             </tr>
-                                            <tr className="text-zinc-400 bg-zinc-950/20 text-[11px]">
-                                                <td className="py-1.5 px-4 pl-8 sticky left-0 z-10 bg-zinc-950/80 border-r border-zinc-800 italic">
+                                            <tr className="text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-950/20 text-[11px]">
+                                                <td className="py-1.5 px-4 pl-8 sticky left-0 z-10 bg-zinc-50/90 dark:bg-zinc-950/80 border-r border-zinc-200 dark:border-zinc-800 italic">
                                                     ↳ Odliczona Tarcza Podatkowa (Rozliczone Straty)
                                                 </td>
                                                 {columns.map((c) => (
-                                                    <td key={c.id} className="py-1.5 px-3 text-right border-r border-zinc-850 text-emerald-400/90 font-mono">
+                                                    <td key={c.id} className="py-1.5 px-3 text-right border-r border-zinc-200 dark:border-zinc-850 text-emerald-600 dark:text-emerald-400/90 font-mono">
                                                         {formatValue(c.data.taxLossUsed ?? 0)}
                                                     </td>
                                                 ))}
                                             </tr>
-                                            <tr className="text-zinc-400 bg-zinc-950/20 text-[11px]">
-                                                <td className="py-1.5 px-4 pl-8 sticky left-0 z-10 bg-zinc-950/80 border-r border-zinc-800 italic">
+                                            <tr className="text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-950/20 text-[11px]">
+                                                <td className="py-1.5 px-4 pl-8 sticky left-0 z-10 bg-zinc-50/90 dark:bg-zinc-950/80 border-r border-zinc-200 dark:border-zinc-800 italic">
                                                     ↳ Podstawa Opodatkowania CIT (Taxable Income)
                                                 </td>
                                                 {columns.map((c) => (
-                                                    <td key={c.id} className="py-1.5 px-3 text-right border-r border-zinc-850 text-zinc-300 font-mono">
+                                                    <td key={c.id} className="py-1.5 px-3 text-right border-r border-zinc-200 dark:border-zinc-850 text-zinc-700 dark:text-zinc-300 font-mono">
                                                         {formatValue(c.data.taxableIncome ?? 0)}
                                                     </td>
                                                 ))}
                                             </tr>
-                                            <tr className="text-zinc-400 bg-zinc-950/20 text-[11px]">
-                                                <td className="py-1.5 px-4 pl-8 sticky left-0 z-10 bg-zinc-950/80 border-r border-zinc-800 italic">
+                                            <tr className="text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-950/20 text-[11px]">
+                                                <td className="py-1.5 px-4 pl-8 sticky left-0 z-10 bg-zinc-50/90 dark:bg-zinc-950/80 border-r border-zinc-200 dark:border-zinc-800 italic">
                                                     ↳ Saldo Zamknięcia Tarczy Podatkowej (Closing Pool)
                                                 </td>
                                                 {columns.map((c) => (
-                                                    <td key={c.id} className="py-1.5 px-3 text-right border-r border-zinc-850 text-amber-400/80 font-mono">
+                                                    <td key={c.id} className="py-1.5 px-3 text-right border-r border-zinc-200 dark:border-zinc-850 text-amber-600 dark:text-amber-400/80 font-mono">
                                                         {formatValue(c.data.taxLossCarryForwardClosing ?? 0)}
                                                     </td>
                                                 ))}
@@ -900,12 +900,12 @@ export const ThreeStatementGrid = ({
 
                                     {/* Zysk Netto */}
                                     {matchesSearch('Zysk Netto') && (
-                                        <tr className="bg-blue-950/30 font-bold border-t-2 border-b-2 border-blue-900/60">
-                                            <td className="py-2.5 px-4 sticky left-0 z-10 bg-blue-950/90 text-blue-200 uppercase tracking-wide border-r border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.4)]">
+                                        <tr className="bg-blue-500/10 dark:bg-blue-950/30 font-bold border-t-2 border-b-2 border-blue-500/20 dark:border-blue-900/60">
+                                            <td className="py-2.5 px-4 sticky left-0 z-10 bg-blue-50 dark:bg-blue-950/90 text-blue-800 dark:text-blue-200 uppercase tracking-wide border-r border-zinc-200 dark:border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.05)] dark:shadow-[2px_0_5px_rgba(0,0,0,0.4)]">
                                                 Wynik Finansowy Netto (Zysk Netto)
                                             </td>
                                             {columns.map((c) => (
-                                                <td key={c.id} className="py-2.5 px-3 text-right text-blue-200 font-bold border-r border-zinc-850">
+                                                <td key={c.id} className="py-2.5 px-3 text-right text-blue-700 dark:text-blue-200 font-bold border-r border-zinc-200 dark:border-zinc-850">
                                                     {formatValue(c.data.netIncome)}
                                                 </td>
                                             ))}
@@ -914,12 +914,12 @@ export const ThreeStatementGrid = ({
 
                                     {/* Marża Netto % */}
                                     {matchesSearch('Marża Netto') && (
-                                        <tr className="text-[11px] text-zinc-400 bg-zinc-900/20">
-                                            <td className="py-1 px-4 sticky left-0 z-10 bg-zinc-950/80 border-r border-zinc-800 italic">
+                                        <tr className="text-[11px] text-zinc-500 dark:text-zinc-400 bg-zinc-50/30 dark:bg-zinc-900/20">
+                                            <td className="py-1 px-4 sticky left-0 z-10 bg-zinc-50/90 dark:bg-zinc-950/80 border-r border-zinc-200 dark:border-zinc-800 italic">
                                                 % Marża Netto
                                             </td>
                                             {columns.map((c) => (
-                                                <td key={c.id} className="py-1 px-3 text-right text-blue-400/90 border-r border-zinc-850">
+                                                <td key={c.id} className="py-1 px-3 text-right text-blue-600 dark:text-blue-400/90 border-r border-zinc-200 dark:border-zinc-850">
                                                     {formatValue(c.data.netMarginPercent ?? (c.data.revenue > 0 ? (c.data.netIncome / c.data.revenue) * 100 : 0), true)}
                                                 </td>
                                             ))}
@@ -933,10 +933,10 @@ export const ThreeStatementGrid = ({
                             {/* ========================================================================= */}
                             {(statementType === 'balancesheet' || statementType === 'all') && (
                                 <>
-                                    <tr className="bg-zinc-950/80 font-bold text-zinc-200">
+                                    <tr className="bg-zinc-100 dark:bg-zinc-950/80 font-bold text-zinc-800 dark:text-zinc-200">
                                         <td
                                             colSpan={columns.length + 1}
-                                            className="py-2 px-4 text-xs uppercase tracking-wider text-blue-400 border-t border-b border-zinc-800"
+                                            className="py-2 px-4 text-xs uppercase tracking-wider text-blue-600 dark:text-blue-400 border-t border-b border-zinc-200 dark:border-zinc-800"
                                         >
                                             2. Bilans (Balance Sheet - Aktywa & Pasywa)
                                         </td>
@@ -944,13 +944,13 @@ export const ThreeStatementGrid = ({
 
                                     {/* AKTYWA TRWAŁE */}
                                     {matchesSearch('Aktywa Trwałe') && (
-                                        <tr className="bg-zinc-900/40 hover:bg-zinc-850/50">
-                                            <td className="py-2 px-4 sticky left-0 z-10 bg-zinc-900 font-semibold text-zinc-200 flex items-center justify-between border-r border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
+                                        <tr className="bg-zinc-50/50 dark:bg-zinc-900/40 hover:bg-zinc-100/70 dark:hover:bg-zinc-850/50">
+                                            <td className="py-2 px-4 sticky left-0 z-10 bg-white dark:bg-zinc-900 font-semibold text-zinc-800 dark:text-zinc-200 flex items-center justify-between border-r border-zinc-200 dark:border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.03)] dark:shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
                                                 <span>Rzeczowe Aktywa Trwałe Netto (Net PPE)</span>
                                                 <button
                                                     type="button"
                                                     onClick={() => toggleSection('assets_breakdown')}
-                                                    className="p-1 hover:text-zinc-100 text-zinc-400"
+                                                    className="p-1 hover:text-zinc-900 dark:hover:text-zinc-100 text-zinc-400"
                                                 >
                                                     {expandedSections.assets_breakdown ? (
                                                         <ChevronDown className="w-3.5 h-3.5" />
@@ -960,7 +960,7 @@ export const ThreeStatementGrid = ({
                                                 </button>
                                             </td>
                                             {columns.map((c, idx) => (
-                                                <td key={c.id} className="py-2 px-3 text-right text-zinc-200 border-r border-zinc-850">
+                                                <td key={c.id} className="py-2 px-3 text-right text-zinc-800 dark:text-zinc-200 border-r border-zinc-200 dark:border-zinc-850">
                                                     {formatValue(balanceSheetData[idx]?.netPpe)}
                                                 </td>
                                             ))}
@@ -971,24 +971,24 @@ export const ThreeStatementGrid = ({
                                     {expandedSections.assets_breakdown && (
                                         <>
                                             {matchesSearch('Wartość Brutto KŚT') && (
-                                                <tr className="text-zinc-400 bg-zinc-950/20 text-[11px]">
-                                                    <td className="py-1.5 px-4 pl-8 sticky left-0 z-10 bg-zinc-950/80 border-r border-zinc-800">
+                                                <tr className="text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-950/20 text-[11px]">
+                                                    <td className="py-1.5 px-4 pl-8 sticky left-0 z-10 bg-zinc-50/90 dark:bg-zinc-950/80 border-r border-zinc-200 dark:border-zinc-800">
                                                         ↳ Wartość Początkowa KŚT (Gross PPE)
                                                     </td>
                                                     {columns.map((c, idx) => (
-                                                        <td key={c.id} className="py-1.5 px-3 text-right border-r border-zinc-850 text-zinc-400">
+                                                        <td key={c.id} className="py-1.5 px-3 text-right border-r border-zinc-200 dark:border-zinc-850 text-zinc-600 dark:text-zinc-400">
                                                             {formatValue(balanceSheetData[idx]?.grossPpe)}
                                                         </td>
                                                     ))}
                                                 </tr>
                                             )}
                                             {matchesSearch('Skumulowane Umorzenie') && (
-                                                <tr className="text-zinc-400 bg-zinc-950/20 text-[11px]">
-                                                    <td className="py-1.5 px-4 pl-8 sticky left-0 z-10 bg-zinc-950/80 border-r border-zinc-800">
+                                                <tr className="text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-950/20 text-[11px]">
+                                                    <td className="py-1.5 px-4 pl-8 sticky left-0 z-10 bg-zinc-50/90 dark:bg-zinc-950/80 border-r border-zinc-200 dark:border-zinc-800">
                                                         ↳ (-) Skumulowane Odpisy Umorzeniowe KŚT
                                                     </td>
                                                     {columns.map((c, idx) => (
-                                                        <td key={c.id} className="py-1.5 px-3 text-right border-r border-zinc-850 text-zinc-400">
+                                                        <td key={c.id} className="py-1.5 px-3 text-right border-r border-zinc-200 dark:border-zinc-850 text-zinc-600 dark:text-zinc-400">
                                                             {formatValue(-balanceSheetData[idx]?.accumulatedDepreciation)}
                                                         </td>
                                                     ))}
@@ -999,12 +999,12 @@ export const ThreeStatementGrid = ({
 
                                     {/* Aktywa Obrotowe */}
                                     {matchesSearch('Należności Handlowe') && (
-                                        <tr className="hover:bg-zinc-850/50">
-                                            <td className="py-2 px-4 sticky left-0 z-10 bg-zinc-900 text-zinc-300 border-r border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
+                                        <tr className="hover:bg-zinc-100/70 dark:hover:bg-zinc-850/50">
+                                            <td className="py-2 px-4 sticky left-0 z-10 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 border-r border-zinc-200 dark:border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.03)] dark:shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
                                                 Należności Handlowe (DSO)
                                             </td>
                                             {columns.map((c, idx) => (
-                                                <td key={c.id} className="py-2 px-3 text-right text-zinc-300 border-r border-zinc-850">
+                                                <td key={c.id} className="py-2 px-3 text-right text-zinc-700 dark:text-zinc-300 border-r border-zinc-200 dark:border-zinc-850">
                                                     {formatValue(balanceSheetData[idx]?.receivables)}
                                                 </td>
                                             ))}
@@ -1012,12 +1012,12 @@ export const ThreeStatementGrid = ({
                                     )}
 
                                     {matchesSearch('Zapasy') && (
-                                        <tr className="hover:bg-zinc-850/50">
-                                            <td className="py-2 px-4 sticky left-0 z-10 bg-zinc-900 text-zinc-300 border-r border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
+                                        <tr className="hover:bg-zinc-100/70 dark:hover:bg-zinc-850/50">
+                                            <td className="py-2 px-4 sticky left-0 z-10 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 border-r border-zinc-200 dark:border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.03)] dark:shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
                                                 Zapasy Operacyjne (DIO)
                                             </td>
                                             {columns.map((c, idx) => (
-                                                <td key={c.id} className="py-2 px-3 text-right text-zinc-300 border-r border-zinc-850">
+                                                <td key={c.id} className="py-2 px-3 text-right text-zinc-700 dark:text-zinc-300 border-r border-zinc-200 dark:border-zinc-850">
                                                     {formatValue(balanceSheetData[idx]?.inventory)}
                                                 </td>
                                             ))}
@@ -1025,12 +1025,12 @@ export const ThreeStatementGrid = ({
                                     )}
 
                                     {matchesSearch('Środki Pieniężne') && (
-                                        <tr className="hover:bg-zinc-850/50 bg-emerald-950/10">
-                                            <td className="py-2 px-4 sticky left-0 z-10 bg-zinc-900 text-emerald-300 font-semibold border-r border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
+                                        <tr className="hover:bg-zinc-100/70 dark:hover:bg-zinc-850/50 bg-emerald-500/5 dark:bg-emerald-950/10">
+                                            <td className="py-2 px-4 sticky left-0 z-10 bg-white dark:bg-zinc-900 text-emerald-700 dark:text-emerald-300 font-semibold border-r border-zinc-200 dark:border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.03)] dark:shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
                                                 Środki Pieniężne na Koniec Okresu (Cash)
                                             </td>
                                             {columns.map((c, idx) => (
-                                                <td key={c.id} className="py-2 px-3 text-right text-emerald-300 font-semibold border-r border-zinc-850">
+                                                <td key={c.id} className="py-2 px-3 text-right text-emerald-700 dark:text-emerald-300 font-semibold border-r border-zinc-200 dark:border-zinc-850">
                                                     {formatValue(balanceSheetData[idx]?.cash)}
                                                 </td>
                                             ))}
@@ -1039,12 +1039,12 @@ export const ThreeStatementGrid = ({
 
                                     {/* SUMA AKTYWÓW */}
                                     {matchesSearch('SUMA AKTYWÓW') && (
-                                        <tr className="bg-zinc-950 font-bold border-t-2 border-b-2 border-zinc-700">
-                                            <td className="py-2.5 px-4 sticky left-0 z-10 bg-zinc-950 text-zinc-100 uppercase tracking-wide border-r border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.4)]">
+                                        <tr className="bg-zinc-100 dark:bg-zinc-950 font-bold border-t-2 border-b-2 border-zinc-300 dark:border-zinc-700">
+                                            <td className="py-2.5 px-4 sticky left-0 z-10 bg-zinc-100 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 uppercase tracking-wide border-r border-zinc-200 dark:border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.05)] dark:shadow-[2px_0_5px_rgba(0,0,0,0.4)]">
                                                 SUMA AKTYWÓW (TOTAL ASSETS)
                                             </td>
                                             {columns.map((c, idx) => (
-                                                <td key={c.id} className="py-2.5 px-3 text-right text-zinc-100 font-bold border-r border-zinc-850">
+                                                <td key={c.id} className="py-2.5 px-3 text-right text-zinc-900 dark:text-zinc-100 font-bold border-r border-zinc-200 dark:border-zinc-850">
                                                     {formatValue(balanceSheetData[idx]?.totalAssets)}
                                                 </td>
                                             ))}
@@ -1053,13 +1053,13 @@ export const ThreeStatementGrid = ({
 
                                     {/* KAPITAŁ WŁASNY */}
                                     {matchesSearch('Kapitał Własny') && (
-                                        <tr className="bg-zinc-900/40 hover:bg-zinc-850/50">
-                                            <td className="py-2 px-4 sticky left-0 z-10 bg-zinc-900 font-semibold text-zinc-200 flex items-center justify-between border-r border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
+                                        <tr className="bg-zinc-50/50 dark:bg-zinc-900/40 hover:bg-zinc-100/70 dark:hover:bg-zinc-850/50">
+                                            <td className="py-2 px-4 sticky left-0 z-10 bg-white dark:bg-zinc-900 font-semibold text-zinc-800 dark:text-zinc-200 flex items-center justify-between border-r border-zinc-200 dark:border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.03)] dark:shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
                                                 <span>Kapitał Własny (Total Equity)</span>
                                                 <button
                                                     type="button"
                                                     onClick={() => toggleSection('liabilities_breakdown')}
-                                                    className="p-1 hover:text-zinc-100 text-zinc-400"
+                                                    className="p-1 hover:text-zinc-900 dark:hover:text-zinc-100 text-zinc-400"
                                                 >
                                                     {expandedSections.liabilities_breakdown ? (
                                                         <ChevronDown className="w-3.5 h-3.5" />
@@ -1069,7 +1069,7 @@ export const ThreeStatementGrid = ({
                                                 </button>
                                             </td>
                                             {columns.map((c, idx) => (
-                                                <td key={c.id} className="py-2 px-3 text-right text-purple-300 font-semibold border-r border-zinc-850">
+                                                <td key={c.id} className="py-2 px-3 text-right text-purple-700 dark:text-purple-300 font-semibold border-r border-zinc-200 dark:border-zinc-850">
                                                     {formatValue(balanceSheetData[idx]?.totalEquity)}
                                                 </td>
                                             ))}
@@ -1080,24 +1080,24 @@ export const ThreeStatementGrid = ({
                                     {expandedSections.liabilities_breakdown && (
                                         <>
                                             {matchesSearch('Wkład Własny') && (
-                                                <tr className="text-zinc-400 bg-zinc-950/20 text-[11px]">
-                                                    <td className="py-1.5 px-4 pl-8 sticky left-0 z-10 bg-zinc-950/80 border-r border-zinc-800">
+                                                <tr className="text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-950/20 text-[11px]">
+                                                    <td className="py-1.5 px-4 pl-8 sticky left-0 z-10 bg-zinc-50/90 dark:bg-zinc-950/80 border-r border-zinc-200 dark:border-zinc-800">
                                                         ↳ Kapitał Początkowy Inwestorów
                                                     </td>
                                                     {columns.map((c, idx) => (
-                                                        <td key={c.id} className="py-1.5 px-3 text-right border-r border-zinc-850 text-zinc-400">
+                                                        <td key={c.id} className="py-1.5 px-3 text-right border-r border-zinc-200 dark:border-zinc-850 text-zinc-600 dark:text-zinc-400">
                                                             {formatValue(balanceSheetData[idx]?.initialEquity)}
                                                         </td>
                                                     ))}
                                                 </tr>
                                             )}
                                             {matchesSearch('Zyski Zatrzymane') && (
-                                                <tr className="text-zinc-400 bg-zinc-950/20 text-[11px]">
-                                                    <td className="py-1.5 px-4 pl-8 sticky left-0 z-10 bg-zinc-950/80 border-r border-zinc-800">
+                                                <tr className="text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-950/20 text-[11px]">
+                                                    <td className="py-1.5 px-4 pl-8 sticky left-0 z-10 bg-zinc-50/90 dark:bg-zinc-950/80 border-r border-zinc-200 dark:border-zinc-800">
                                                         ↳ Zyski Zatrzymane (Skumulowany Wynik Netto)
                                                     </td>
                                                     {columns.map((c, idx) => (
-                                                        <td key={c.id} className="py-1.5 px-3 text-right border-r border-zinc-850 text-zinc-400">
+                                                        <td key={c.id} className="py-1.5 px-3 text-right border-r border-zinc-200 dark:border-zinc-850 text-zinc-600 dark:text-zinc-400">
                                                             {formatValue(balanceSheetData[idx]?.retainedEarnings)}
                                                         </td>
                                                     ))}
@@ -1108,12 +1108,12 @@ export const ThreeStatementGrid = ({
 
                                     {/* Zobowiązania Długoterminowe (Senior Debt) */}
                                     {matchesSearch('Kredyt Bankowy') && (
-                                        <tr className="hover:bg-zinc-850/50">
-                                            <td className="py-2 px-4 sticky left-0 z-10 bg-zinc-900 text-zinc-300 border-r border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
+                                        <tr className="hover:bg-zinc-100/70 dark:hover:bg-zinc-850/50">
+                                            <td className="py-2 px-4 sticky left-0 z-10 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 border-r border-zinc-200 dark:border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.03)] dark:shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
                                                 Zadłużenie Kredytowe (Senior Debt Closing)
                                             </td>
                                             {columns.map((c, idx) => (
-                                                <td key={c.id} className="py-2 px-3 text-right text-rose-400/90 border-r border-zinc-850">
+                                                <td key={c.id} className="py-2 px-3 text-right text-rose-600 dark:text-rose-400/90 border-r border-zinc-200 dark:border-zinc-850">
                                                     {formatValue(balanceSheetData[idx]?.debt)}
                                                 </td>
                                             ))}
@@ -1122,12 +1122,12 @@ export const ThreeStatementGrid = ({
 
                                     {/* Zobowiązania Bieżące (Payables) */}
                                     {matchesSearch('Zobowiązania Handlowe') && (
-                                        <tr className="hover:bg-zinc-850/50">
-                                            <td className="py-2 px-4 sticky left-0 z-10 bg-zinc-900 text-zinc-300 border-r border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
+                                        <tr className="hover:bg-zinc-100/70 dark:hover:bg-zinc-850/50">
+                                            <td className="py-2 px-4 sticky left-0 z-10 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 border-r border-zinc-200 dark:border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.03)] dark:shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
                                                 Zobowiązania Handlowe (DPO)
                                             </td>
                                             {columns.map((c, idx) => (
-                                                <td key={c.id} className="py-2 px-3 text-right text-zinc-300 border-r border-zinc-850">
+                                                <td key={c.id} className="py-2 px-3 text-right text-zinc-700 dark:text-zinc-300 border-r border-zinc-200 dark:border-zinc-850">
                                                     {formatValue(balanceSheetData[idx]?.payables)}
                                                 </td>
                                             ))}
@@ -1136,12 +1136,12 @@ export const ThreeStatementGrid = ({
 
                                     {/* SUMA PASYWÓW */}
                                     {matchesSearch('SUMA PASYWÓW') && (
-                                        <tr className="bg-zinc-950 font-bold border-t-2 border-b-2 border-zinc-700">
-                                            <td className="py-2.5 px-4 sticky left-0 z-10 bg-zinc-950 text-zinc-100 uppercase tracking-wide border-r border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.4)]">
+                                        <tr className="bg-zinc-100 dark:bg-zinc-950 font-bold border-t-2 border-b-2 border-zinc-300 dark:border-zinc-700">
+                                            <td className="py-2.5 px-4 sticky left-0 z-10 bg-zinc-100 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 uppercase tracking-wide border-r border-zinc-200 dark:border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.05)] dark:shadow-[2px_0_5px_rgba(0,0,0,0.4)]">
                                                 SUMA PASYWÓW (TOTAL LIABILITIES & EQUITY)
                                             </td>
                                             {columns.map((c, idx) => (
-                                                <td key={c.id} className="py-2.5 px-3 text-right text-zinc-100 font-bold border-r border-zinc-850">
+                                                <td key={c.id} className="py-2.5 px-3 text-right text-zinc-900 dark:text-zinc-100 font-bold border-r border-zinc-200 dark:border-zinc-850">
                                                     {formatValue(balanceSheetData[idx]?.totalLiabilitiesAndEquity)}
                                                 </td>
                                             ))}
@@ -1149,15 +1149,15 @@ export const ThreeStatementGrid = ({
                                     )}
 
                                     {/* TEST ZBILANSOWANIA (ZERO VARIANCE DELTA) */}
-                                    <tr className="bg-emerald-950/20 font-bold border-b border-zinc-800">
-                                        <td className="py-2 px-4 sticky left-0 z-10 bg-emerald-950/80 text-emerald-400 uppercase text-[11px] border-r border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.4)]">
+                                    <tr className="bg-emerald-500/10 dark:bg-emerald-950/20 font-bold border-b border-zinc-200 dark:border-zinc-800">
+                                        <td className="py-2 px-4 sticky left-0 z-10 bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 uppercase text-[11px] border-r border-zinc-200 dark:border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.05)] dark:shadow-[2px_0_5px_rgba(0,0,0,0.4)]">
                                             Test Zbilansowania (Zero Variance: Aktywa - Pasywa)
                                         </td>
                                         {columns.map((c, idx) => (
                                             <td
                                                 key={c.id}
-                                                className={`py-2 px-3 text-right font-bold text-[11px] border-r border-zinc-850 ${
-                                                    balanceSheetData[idx]?.isBalanced ? 'text-emerald-400' : 'text-rose-400 animate-pulse'
+                                                className={`py-2 px-3 text-right font-bold text-[11px] border-r border-zinc-200 dark:border-zinc-850 ${
+                                                    balanceSheetData[idx]?.isBalanced ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400 animate-pulse'
                                                 }`}
                                             >
                                                 {formatValue(balanceSheetData[idx]?.delta)}
@@ -1172,10 +1172,10 @@ export const ThreeStatementGrid = ({
                             {/* ========================================================================= */}
                             {(statementType === 'cashflow' || statementType === 'all') && (
                                 <>
-                                    <tr className="bg-zinc-950/80 font-bold text-zinc-200">
+                                    <tr className="bg-zinc-100 dark:bg-zinc-950/80 font-bold text-zinc-800 dark:text-zinc-200">
                                         <td
                                             colSpan={columns.length + 1}
-                                            className="py-2 px-4 text-xs uppercase tracking-wider text-amber-400 border-t border-b border-zinc-800"
+                                            className="py-2 px-4 text-xs uppercase tracking-wider text-amber-600 dark:text-amber-400 border-t border-b border-zinc-200 dark:border-zinc-800"
                                         >
                                             3. Rachunek Przepływów Pieniężnych (Cash Flow Statement)
                                         </td>
@@ -1183,13 +1183,13 @@ export const ThreeStatementGrid = ({
 
                                     {/* Działalność Operacyjna */}
                                     {matchesSearch('Przepływy Operacyjne') && (
-                                        <tr className="bg-zinc-900/40 hover:bg-zinc-850/50 font-semibold">
-                                            <td className="py-2 px-4 sticky left-0 z-10 bg-zinc-900 text-zinc-100 flex items-center justify-between border-r border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
+                                        <tr className="bg-zinc-50/50 dark:bg-zinc-900/40 hover:bg-zinc-100/70 dark:hover:bg-zinc-850/50 font-semibold">
+                                            <td className="py-2 px-4 sticky left-0 z-10 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 flex items-center justify-between border-r border-zinc-200 dark:border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.03)] dark:shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
                                                 <span>Przepływy z Działalności Operacyjnej (OCF)</span>
                                                 <button
                                                     type="button"
                                                     onClick={() => toggleSection('cf_breakdown')}
-                                                    className="p-1 hover:text-zinc-100 text-zinc-400"
+                                                    className="p-1 hover:text-zinc-900 dark:hover:text-zinc-100 text-zinc-400"
                                                 >
                                                     {expandedSections.cf_breakdown ? (
                                                         <ChevronDown className="w-3.5 h-3.5" />
@@ -1199,7 +1199,7 @@ export const ThreeStatementGrid = ({
                                                 </button>
                                             </td>
                                             {columns.map((c) => (
-                                                <td key={c.id} className="py-2 px-3 text-right text-emerald-400 font-semibold border-r border-zinc-850">
+                                                <td key={c.id} className="py-2 px-3 text-right text-emerald-600 dark:text-emerald-400 font-semibold border-r border-zinc-200 dark:border-zinc-850">
                                                     {formatValue(c.data.operatingCashFlow)}
                                                 </td>
                                             ))}
@@ -1210,36 +1210,36 @@ export const ThreeStatementGrid = ({
                                     {expandedSections.cf_breakdown && (
                                         <>
                                             {matchesSearch('Zysk Netto OCF') && (
-                                                <tr className="text-zinc-400 bg-zinc-950/20 text-[11px]">
-                                                    <td className="py-1.5 px-4 pl-8 sticky left-0 z-10 bg-zinc-950/80 border-r border-zinc-800">
+                                                <tr className="text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-950/20 text-[11px]">
+                                                    <td className="py-1.5 px-4 pl-8 sticky left-0 z-10 bg-zinc-50/90 dark:bg-zinc-950/80 border-r border-zinc-200 dark:border-zinc-800">
                                                         ↳ Wynik Finansowy Netto
                                                     </td>
                                                     {columns.map((c) => (
-                                                        <td key={c.id} className="py-1.5 px-3 text-right border-r border-zinc-850 text-zinc-400">
+                                                        <td key={c.id} className="py-1.5 px-3 text-right border-r border-zinc-200 dark:border-zinc-850 text-zinc-600 dark:text-zinc-400">
                                                             {formatValue(c.data.netIncome)}
                                                         </td>
                                                     ))}
                                                 </tr>
                                             )}
                                             {matchesSearch('Korekta o Amortyzację') && (
-                                                <tr className="text-zinc-400 bg-zinc-950/20 text-[11px]">
-                                                    <td className="py-1.5 px-4 pl-8 sticky left-0 z-10 bg-zinc-950/80 border-r border-zinc-800">
+                                                <tr className="text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-950/20 text-[11px]">
+                                                    <td className="py-1.5 px-4 pl-8 sticky left-0 z-10 bg-zinc-50/90 dark:bg-zinc-950/80 border-r border-zinc-200 dark:border-zinc-800">
                                                         ↳ (+) Amortyzacja Środków Trwałych
                                                     </td>
                                                     {columns.map((c) => (
-                                                        <td key={c.id} className="py-1.5 px-3 text-right border-r border-zinc-850 text-zinc-400">
+                                                        <td key={c.id} className="py-1.5 px-3 text-right border-r border-zinc-200 dark:border-zinc-850 text-zinc-600 dark:text-zinc-400">
                                                             {formatValue(c.data.depreciation)}
                                                         </td>
                                                     ))}
                                                 </tr>
                                             )}
                                             {matchesSearch('Zmiana NWC') && (
-                                                <tr className="text-zinc-400 bg-zinc-950/20 text-[11px]">
-                                                    <td className="py-1.5 px-4 pl-8 sticky left-0 z-10 bg-zinc-950/80 border-r border-zinc-800">
+                                                <tr className="text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-950/20 text-[11px]">
+                                                    <td className="py-1.5 px-4 pl-8 sticky left-0 z-10 bg-zinc-50/90 dark:bg-zinc-950/80 border-r border-zinc-200 dark:border-zinc-800">
                                                         ↳ (+/-) Zmiana Kapitału Obrotowego Netto (ΔNWC)
                                                     </td>
                                                     {columns.map((c) => (
-                                                        <td key={c.id} className="py-1.5 px-3 text-right border-r border-zinc-850 text-zinc-400">
+                                                        <td key={c.id} className="py-1.5 px-3 text-right border-r border-zinc-200 dark:border-zinc-850 text-zinc-600 dark:text-zinc-400">
                                                             {formatValue(c.data.changeInNwc)}
                                                         </td>
                                                     ))}
@@ -1250,12 +1250,12 @@ export const ThreeStatementGrid = ({
 
                                     {/* Działalność Inwestycyjna */}
                                     {matchesSearch('Przepływy Inwestycyjne') && (
-                                        <tr className="hover:bg-zinc-850/50">
-                                            <td className="py-2 px-4 sticky left-0 z-10 bg-zinc-900 font-semibold text-zinc-200 border-r border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
+                                        <tr className="hover:bg-zinc-100/70 dark:hover:bg-zinc-850/50">
+                                            <td className="py-2 px-4 sticky left-0 z-10 bg-white dark:bg-zinc-900 font-semibold text-zinc-800 dark:text-zinc-200 border-r border-zinc-200 dark:border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.03)] dark:shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
                                                 Przepływy z Działalności Inwestycyjnej (ICF / CAPEX)
                                             </td>
                                             {columns.map((c) => (
-                                                <td key={c.id} className="py-2 px-3 text-right text-rose-400/90 font-semibold border-r border-zinc-850">
+                                                <td key={c.id} className="py-2 px-3 text-right text-rose-600 dark:text-rose-400/90 font-semibold border-r border-zinc-200 dark:border-zinc-850">
                                                     {formatValue(c.data.investingCashFlow)}
                                                 </td>
                                             ))}
@@ -1264,12 +1264,12 @@ export const ThreeStatementGrid = ({
 
                                     {/* Działalność Finansowa */}
                                     {matchesSearch('Przepływy Finansowe') && (
-                                        <tr className="hover:bg-zinc-850/50">
-                                            <td className="py-2 px-4 sticky left-0 z-10 bg-zinc-900 font-semibold text-zinc-200 border-r border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
+                                        <tr className="hover:bg-zinc-100/70 dark:hover:bg-zinc-850/50">
+                                            <td className="py-2 px-4 sticky left-0 z-10 bg-white dark:bg-zinc-900 font-semibold text-zinc-800 dark:text-zinc-200 border-r border-zinc-200 dark:border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.03)] dark:shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
                                                 Przepływy z Działalności Finansowej (FCF / Kredyt)
                                             </td>
                                             {columns.map((c) => (
-                                                <td key={c.id} className="py-2 px-3 text-right text-purple-300 font-semibold border-r border-zinc-850">
+                                                <td key={c.id} className="py-2 px-3 text-right text-purple-700 dark:text-purple-300 font-semibold border-r border-zinc-200 dark:border-zinc-850">
                                                     {formatValue(c.data.financingCashFlow)}
                                                 </td>
                                             ))}
@@ -1278,12 +1278,12 @@ export const ThreeStatementGrid = ({
 
                                     {/* PRZEPŁYW PIENIĘŻNY NETTO */}
                                     {matchesSearch('Przepływ Pieniężny Netto') && (
-                                        <tr className="bg-amber-950/30 font-bold border-t border-b border-amber-900/50">
-                                            <td className="py-2.5 px-4 sticky left-0 z-10 bg-amber-950/90 text-amber-300 uppercase border-r border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.4)]">
+                                        <tr className="bg-amber-500/10 dark:bg-amber-950/30 font-bold border-t border-b border-amber-500/20 dark:border-amber-900/50">
+                                            <td className="py-2.5 px-4 sticky left-0 z-10 bg-amber-50 dark:bg-amber-950/90 text-amber-800 dark:text-amber-300 uppercase border-r border-zinc-200 dark:border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.05)] dark:shadow-[2px_0_5px_rgba(0,0,0,0.4)]">
                                                 Przepływ Pieniężny Netto (Net Cash Flow)
                                             </td>
                                             {columns.map((c) => (
-                                                <td key={c.id} className="py-2.5 px-3 text-right text-amber-300 font-bold border-r border-zinc-850">
+                                                <td key={c.id} className="py-2.5 px-3 text-right text-amber-700 dark:text-amber-300 font-bold border-r border-zinc-200 dark:border-zinc-850">
                                                     {formatValue(c.data.netCashFlow)}
                                                 </td>
                                             ))}
@@ -1292,12 +1292,12 @@ export const ThreeStatementGrid = ({
 
                                     {/* Stan Gotówki Zamykający */}
                                     {matchesSearch('Stan Gotówki') && (
-                                        <tr className="bg-zinc-950 font-bold border-b border-zinc-800">
-                                            <td className="py-2 px-4 sticky left-0 z-10 bg-zinc-950 text-emerald-400 border-r border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
+                                        <tr className="bg-zinc-100/60 dark:bg-zinc-950 font-bold border-b border-zinc-200 dark:border-zinc-800">
+                                            <td className="py-2 px-4 sticky left-0 z-10 bg-zinc-100 dark:bg-zinc-950 text-emerald-700 dark:text-emerald-400 border-r border-zinc-200 dark:border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.03)] dark:shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
                                                 Środki Pieniężne na Koniec Okresu (Closing Cash)
                                             </td>
                                             {columns.map((c) => (
-                                                <td key={c.id} className="py-2 px-3 text-right text-emerald-400 font-bold border-r border-zinc-850">
+                                                <td key={c.id} className="py-2 px-3 text-right text-emerald-700 dark:text-emerald-400 font-bold border-r border-zinc-200 dark:border-zinc-850">
                                                     {formatValue(c.data.closingCash)}
                                                 </td>
                                             ))}
@@ -1306,12 +1306,12 @@ export const ThreeStatementGrid = ({
 
                                     {/* Metryki Wyceny: FCFF i FCFE */}
                                     {matchesSearch('Free Cash Flow to Firm') && (
-                                        <tr className="hover:bg-zinc-850/50 text-[11px] bg-zinc-900/30">
-                                            <td className="py-1.5 px-4 sticky left-0 z-10 bg-zinc-950 text-cyan-300 font-semibold border-r border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
+                                        <tr className="hover:bg-zinc-100/70 dark:hover:bg-zinc-850/50 text-[11px] bg-zinc-50/50 dark:bg-zinc-900/30">
+                                            <td className="py-1.5 px-4 sticky left-0 z-10 bg-zinc-50 dark:bg-zinc-950 text-cyan-700 dark:text-cyan-300 font-semibold border-r border-zinc-200 dark:border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.03)] dark:shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
                                                 Free Cash Flow to Firm (FCFF - Wycena Projektu)
                                             </td>
                                             {columns.map((c) => (
-                                                <td key={c.id} className="py-1.5 px-3 text-right text-cyan-300 font-semibold border-r border-zinc-850">
+                                                <td key={c.id} className="py-1.5 px-3 text-right text-cyan-700 dark:text-cyan-300 font-semibold border-r border-zinc-200 dark:border-zinc-850">
                                                     {formatValue(c.data.fcff)}
                                                 </td>
                                             ))}
@@ -1319,12 +1319,12 @@ export const ThreeStatementGrid = ({
                                     )}
 
                                     {matchesSearch('Free Cash Flow to Equity') && (
-                                        <tr className="hover:bg-zinc-850/50 text-[11px] bg-zinc-900/30">
-                                            <td className="py-1.5 px-4 sticky left-0 z-10 bg-zinc-950 text-purple-300 font-semibold border-r border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
+                                        <tr className="hover:bg-zinc-100/70 dark:hover:bg-zinc-850/50 text-[11px] bg-zinc-50/50 dark:bg-zinc-900/30">
+                                            <td className="py-1.5 px-4 sticky left-0 z-10 bg-zinc-50 dark:bg-zinc-950 text-purple-700 dark:text-purple-300 font-semibold border-r border-zinc-200 dark:border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.03)] dark:shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
                                                 Free Cash Flow to Equity (FCFE - Wycena Udziałowców)
                                             </td>
                                             {columns.map((c) => (
-                                                <td key={c.id} className="py-1.5 px-3 text-right text-purple-300 font-semibold border-r border-zinc-850">
+                                                <td key={c.id} className="py-1.5 px-3 text-right text-purple-700 dark:text-purple-300 font-semibold border-r border-zinc-200 dark:border-zinc-850">
                                                     {formatValue(c.data.fcfe)}
                                                 </td>
                                             ))}
@@ -1332,8 +1332,8 @@ export const ThreeStatementGrid = ({
                                     )}
 
                                     {matchesSearch('DSCR') && (
-                                        <tr className="hover:bg-zinc-850/50 text-[11px] bg-zinc-900/40 border-b border-zinc-800">
-                                            <td className="py-1.5 px-4 sticky left-0 z-10 bg-zinc-950 text-zinc-300 font-semibold border-r border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
+                                        <tr className="hover:bg-zinc-100/70 dark:hover:bg-zinc-850/50 text-[11px] bg-zinc-50/70 dark:bg-zinc-900/40 border-b border-zinc-200 dark:border-zinc-800">
+                                            <td className="py-1.5 px-4 sticky left-0 z-10 bg-zinc-50 dark:bg-zinc-950 text-zinc-800 dark:text-zinc-300 font-semibold border-r border-zinc-200 dark:border-zinc-800 shadow-[2px_0_5px_rgba(0,0,0,0.03)] dark:shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
                                                 Kowenant DSCR (Wskaźnik Obsługi Długu)
                                             </td>
                                             {columns.map((c) => {
@@ -1342,12 +1342,12 @@ export const ThreeStatementGrid = ({
                                                 return (
                                                     <td
                                                         key={c.id}
-                                                        className={`py-1.5 px-3 text-right font-bold border-r border-zinc-850 ${
+                                                        className={`py-1.5 px-3 text-right font-bold border-r border-zinc-200 dark:border-zinc-850 ${
                                                             d === null || d === undefined
-                                                                ? 'text-zinc-600'
+                                                                ? 'text-zinc-400 dark:text-zinc-600'
                                                                 : isRisk
-                                                                ? 'text-amber-400'
-                                                                : 'text-emerald-400'
+                                                                ? 'text-amber-600 dark:text-amber-400'
+                                                                : 'text-emerald-600 dark:text-emerald-400'
                                                         }`}
                                                     >
                                                         {d ? `${d.toFixed(2)}x` : '—'}
@@ -1363,29 +1363,29 @@ export const ThreeStatementGrid = ({
                 </div>
 
                 {/* Table Footer Telemetry Strip */}
-                <div className="bg-zinc-950 border-t border-zinc-800 p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-[11px] text-zinc-400 font-mono">
+                <div className="bg-zinc-50 dark:bg-zinc-950 border-t border-zinc-200 dark:border-zinc-800 p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-[11px] text-zinc-500 dark:text-zinc-400 font-mono">
                     <div className="flex items-center gap-3">
                         <span className="flex items-center gap-1.5">
-                            <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                            Kolumny: <strong className="text-zinc-200">{columns.length}</strong>
+                            <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                            Kolumny: <strong className="text-zinc-800 dark:text-zinc-200">{columns.length}</strong>
                         </span>
-                        <span className="text-zinc-700">|</span>
+                        <span className="text-zinc-300 dark:text-zinc-700">|</span>
                         <span>
-                            Waluta: <strong className="text-zinc-200">{currency}</strong>
+                            Waluta: <strong className="text-zinc-800 dark:text-zinc-200">{currency}</strong>
                         </span>
-                        <span className="text-zinc-700">|</span>
+                        <span className="text-zinc-300 dark:text-zinc-700">|</span>
                         <span>
-                            Prezentacja: <strong className="text-zinc-200">{granularity === 'annual' ? 'Roczna (15L)' : 'Miesięczna (180M)'}</strong>
+                            Prezentacja: <strong className="text-zinc-800 dark:text-zinc-200">{granularity === 'annual' ? 'Roczna (15L)' : 'Miesięczna (180M)'}</strong>
                         </span>
                     </div>
 
                     <div className="flex items-center gap-2">
                         {executionTimeMs !== null && (
                             <span className="text-zinc-500">
-                                Czas kompilacji modelu: <strong className="text-zinc-300">{executionTimeMs} ms</strong>
+                                Czas kompilacji modelu: <strong className="text-zinc-700 dark:text-zinc-300">{executionTimeMs} ms</strong>
                             </span>
                         )}
-                        <span className="inline-flex items-center px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-[10px] text-zinc-400">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-[10px] text-zinc-600 dark:text-zinc-400">
                             STANDARD IFRS / PROJECT FINANCE
                         </span>
                     </div>

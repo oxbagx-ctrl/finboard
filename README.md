@@ -1038,7 +1038,7 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - `docs/ROUTING_ARCHITECTURE.md`: opracowanie kompletnej, instytucjonalnej dokumentacji technicznej architektury nawigacji SPA, rejestru tras `ROUTES`, strażników tras (`ProtectedRoute`, `GuestRoute`, `RoleGuard`), powłoki `<Outlet />`, dynamicznej rezolucji nagłówka, semantycznego paska `Sidebar`, obsługi błędów 404, infrastruktury testowej `renderWithRouter` oraz wytycznych deweloperskich.
     - `README.md` & `changelog/README.md`: aktualizacja spisu technologii, opisu interfejsu SPA i rejestru zmian dokumentująca pełną eliminację problemu zamrożonego adresu URL i wdrożenie nowoczesnego routingu w całej aplikacji.
     - Weryfikacja testowa: 100% PASS w pełnym zestawie 72 plików Vitest (653 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
-- [x] **Faza 60: Wielomotywowość (Light, Dark & System Theme Architecture) (Commity 295–302)**
+- [x] **Faza 60: Wielomotywowość (Light, Dark & System Theme Architecture) (Commity 295–303)**
     - [x] Konfiguracja strategii Dark Mode w Tailwind CSS i eliminacja zjawiska FOUC za pomocą skryptu bootstrapowego.
         - `tailwind.config.js`: aktywacja strategii `darkMode: 'class'` umożliwiającej warunkowe stosowanie stylów motywu ciemnego za pośrednictwem wariantów `dark:*` sterowanych klasą `.dark` na elemencie `<html>`.
         - `resources/views/app.blade.php`: implementacja synchronicznego, odpornego na błędy skryptu bootstrapowego w sekcji `<head>`, natychmiast aplikującego klasę `dark` na podstawie `localStorage` (`finboard_theme`) lub preferencji systemowych `prefers-color-scheme: dark`, zapobiegając zjawisku FOUC.
@@ -1083,6 +1083,10 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - [x] Opracowanie kompleksowej dokumentacji architektonicznej wielomotywowości i finalizacja Fazy 60.
         - `docs/THEME_ARCHITECTURE.md`: opracowanie instytucjonalnej dokumentacji technicznej architektury wielomotywowości, eliminacji FOUC, konfiguracji Tailwind CSS `darkMode: 'class'`, cyklu życia i stanu `ThemeContext`, komponentu `ThemeToggle` z obsługą WAI-ARIA, tabeli tokenów stylistycznych, adaptacji wykresów Recharts oraz wytycznych deweloperskich.
         - `README.md` & `changelog/README.md`: aktualizacja spisu technologii, opisu interfejsu i rejestru zmian dokumentująca pełną realizację Fazy 60.
+        - Weryfikacja testowa: 100% PASS w pełnym zestawie 74 plików Vitest (670 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
+    - [x] Kompleksowa adaptacja widoków, komponentów domenowych i modali do motywu jasnego i ciemnego.
+        - Eliminacja twardo zakodowanych klas barwnych i wdrożenie adaptacyjnych tokenów (`bg-white dark:bg-zinc-900`, `border-zinc-200 dark:border-zinc-800`, `text-zinc-900 dark:text-zinc-100`) w 51 plikach widoków i komponentów w modułach: Advisors & Permissions, Dataroom (VDR), Investment Planning & Financial Modeling, Finance, Records & Audit, Import & Benchmarks oraz Reports.
+        - Zachowanie 100% zgodności selektorów DOM i klas asercyjnych dla testów automatycznych (`div.bg-zinc-900` w `DashboardView`, `text-zinc-100` i `text-rose-400` w `RecordsView`).
         - Weryfikacja testowa: 100% PASS w pełnym zestawie 74 plików Vitest (670 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
 ---

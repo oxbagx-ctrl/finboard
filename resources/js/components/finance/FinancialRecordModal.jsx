@@ -124,18 +124,18 @@ export const FinancialRecordModal = ({
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-xs font-mono">
-            <div className="bg-zinc-900 border border-zinc-750 rounded-lg shadow-2xl max-w-lg w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-750 rounded-lg shadow-2xl max-w-lg w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
                 {/* Modal Header */}
-                <div className="px-5 py-3.5 bg-zinc-950 border-b border-zinc-800 flex items-center justify-between">
+                <div className="px-5 py-3.5 bg-zinc-50 dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded bg-zinc-850 border border-zinc-750 flex items-center justify-center text-zinc-300">
+                        <div className="w-6 h-6 rounded bg-zinc-100 dark:bg-zinc-850 border border-zinc-200 dark:border-zinc-750 flex items-center justify-center text-zinc-600 dark:text-zinc-300">
                             <FileText className="w-3.5 h-3.5" />
                         </div>
                         <div>
-                            <h2 className="text-xs font-bold uppercase tracking-wider text-zinc-100">
+                            <h2 className="text-xs font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
                                 {isEdit ? 'Edycja Zapisów Księgowych' : 'Nowy Zapis Księgowy'}
                             </h2>
-                            <p className="text-[10px] text-zinc-500">
+                            <p className="text-[10px] text-zinc-500 dark:text-zinc-400">
                                 {isEdit ? `ID: ${recordToEdit?.id}` : 'REJESTRACJA OPERACJI W KSIĘDZE GŁÓWNEJ'}
                             </p>
                         </div>
@@ -143,7 +143,7 @@ export const FinancialRecordModal = ({
                     <Tooltip content="Zamknij formularz zapisu">
                         <button
                             onClick={onClose}
-                            className="p-1 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors"
+                            className="p-1 rounded text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                             aria-label="Zamknij formularz zapisu"
                         >
                             <X className="w-4 h-4" />
@@ -156,8 +156,8 @@ export const FinancialRecordModal = ({
                     {/* Category Selection */}
                     <div>
                         <div className="flex items-center justify-between mb-1">
-                            <label className="text-[10px] uppercase font-semibold text-zinc-400 flex items-center gap-1.5">
-                                <Tag className="w-3 h-3 text-zinc-500" />
+                            <label className="text-[10px] uppercase font-semibold text-zinc-600 dark:text-zinc-400 flex items-center gap-1.5">
+                                <Tag className="w-3 h-3 text-zinc-400 dark:text-zinc-500" />
                                 Kategoria Finansowa
                             </label>
                             <InfoTooltip size="xs" content="Przyporządkowanie analityczne do pozycji planu kont P&L lub bilansu" />
@@ -165,12 +165,12 @@ export const FinancialRecordModal = ({
                         <select
                             value={categoryId}
                             onChange={(e) => setCategoryId(e.target.value)}
-                            className="w-full bg-zinc-950 border border-zinc-750 rounded px-3 py-2 text-xs text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
+                            className="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-750 rounded px-3 py-2 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 font-mono"
                         >
                             {Object.entries(groupedCategories).map(([typeKey, cats]) => (
-                                <optgroup key={typeKey} label={typeLabels[typeKey] || typeKey} className="bg-zinc-900 text-zinc-400">
+                                <optgroup key={typeKey} label={typeLabels[typeKey] || typeKey} className="bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-400">
                                     {cats.map((c) => (
-                                        <option key={c.id} value={c.id} className="bg-zinc-950 text-zinc-100">
+                                        <option key={c.id} value={c.id} className="bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100">
                                             [{c.code}] {c.name}
                                         </option>
                                     ))}
@@ -178,7 +178,7 @@ export const FinancialRecordModal = ({
                             ))}
                         </select>
                         {errors.categoryId && (
-                            <div className="text-[10px] text-rose-400 mt-1 flex items-center gap-1">
+                            <div className="text-[10px] text-rose-500 dark:text-rose-400 mt-1 flex items-center gap-1">
                                 <AlertCircle className="w-3 h-3" />
                                 {errors.categoryId}
                             </div>
@@ -189,8 +189,8 @@ export const FinancialRecordModal = ({
                     <div className="grid grid-cols-3 gap-3">
                         <div className="col-span-2">
                             <div className="flex items-center justify-between mb-1">
-                                <label className="text-[10px] uppercase font-semibold text-zinc-400 flex items-center gap-1.5">
-                                    <DollarSign className="w-3 h-3 text-zinc-500" />
+                                <label className="text-[10px] uppercase font-semibold text-zinc-600 dark:text-zinc-400 flex items-center gap-1.5">
+                                    <DollarSign className="w-3 h-3 text-zinc-400 dark:text-zinc-500" />
                                     Kwota Transakcji
                                 </label>
                                 <InfoTooltip size="xs" content="Nominalna wartość operacji gospodarczej w wybranej walucie" />
@@ -203,10 +203,10 @@ export const FinancialRecordModal = ({
                                 value={amount}
                                 onChange={(e) => setAmount(e.target.value)}
                                 placeholder="0.00"
-                                className="w-full bg-zinc-950 border border-zinc-750 rounded px-3 py-2 text-xs text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono text-right tabular-nums"
+                                className="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-750 rounded px-3 py-2 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 font-mono text-right tabular-nums"
                             />
                             {errors.amount && (
-                                <div className="text-[10px] text-rose-400 mt-1 flex items-center gap-1">
+                                <div className="text-[10px] text-rose-500 dark:text-rose-400 mt-1 flex items-center gap-1">
                                     <AlertCircle className="w-3 h-3" />
                                     {errors.amount}
                                 </div>
@@ -215,7 +215,7 @@ export const FinancialRecordModal = ({
 
                         <div>
                             <div className="flex items-center justify-between mb-1">
-                                <label className="text-[10px] uppercase font-semibold text-zinc-400">
+                                <label className="text-[10px] uppercase font-semibold text-zinc-600 dark:text-zinc-400">
                                     Waluta
                                 </label>
                                 <InfoTooltip size="xs" content="Waluta pierwotna transakcji" />
@@ -223,7 +223,7 @@ export const FinancialRecordModal = ({
                             <select
                                 value={currency}
                                 onChange={(e) => setCurrency(e.target.value)}
-                                className="w-full bg-zinc-950 border border-zinc-750 rounded px-3 py-2 text-xs text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
+                                className="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-750 rounded px-3 py-2 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 font-mono"
                             >
                                 <option value="PLN">PLN</option>
                                 <option value="EUR">EUR</option>
@@ -236,8 +236,8 @@ export const FinancialRecordModal = ({
                     {/* Date */}
                     <div>
                         <div className="flex items-center justify-between mb-1">
-                            <label className="text-[10px] uppercase font-semibold text-zinc-400 flex items-center gap-1.5">
-                                <Calendar className="w-3 h-3 text-zinc-500" />
+                            <label className="text-[10px] uppercase font-semibold text-zinc-600 dark:text-zinc-400 flex items-center gap-1.5">
+                                <Calendar className="w-3 h-3 text-zinc-400 dark:text-zinc-500" />
                                 Data Księgowania (YYYY-MM-DD)
                             </label>
                             <InfoTooltip size="xs" content="Data ujęcia memoriałowego operacji w księdze głównej" />
@@ -247,10 +247,10 @@ export const FinancialRecordModal = ({
                             required
                             value={recordDate}
                             onChange={(e) => setRecordDate(e.target.value)}
-                            className="w-full bg-zinc-950 border border-zinc-750 rounded px-3 py-2 text-xs text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
+                            className="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-750 rounded px-3 py-2 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 font-mono"
                         />
                         {errors.recordDate && (
-                            <div className="text-[10px] text-rose-400 mt-1 flex items-center gap-1">
+                            <div className="text-[10px] text-rose-500 dark:text-rose-400 mt-1 flex items-center gap-1">
                                 <AlertCircle className="w-3 h-3" />
                                 {errors.recordDate}
                             </div>
@@ -260,7 +260,7 @@ export const FinancialRecordModal = ({
                     {/* Description */}
                     <div>
                         <div className="flex items-center justify-between mb-1">
-                            <label className="text-[10px] uppercase font-semibold text-zinc-400">
+                            <label className="text-[10px] uppercase font-semibold text-zinc-600 dark:text-zinc-400">
                                 Tytuł / Opis Operacji (Kontrahent, Faktura, Ref.)
                             </label>
                             <InfoTooltip size="xs" content="Szczegółowy tytuł operacji, numer dokumentu źródłowego lub kontrahent" />
@@ -271,10 +271,10 @@ export const FinancialRecordModal = ({
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                             placeholder="np. FV/2026/01/992 - Dostawa komponentów produkcyjnych od ABC Logistyka"
-                            className="w-full bg-zinc-950 border border-zinc-750 rounded px-3 py-2 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono resize-none"
+                            className="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-750 rounded px-3 py-2 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 font-mono resize-none"
                         />
                         {errors.description && (
-                            <div className="text-[10px] text-rose-400 mt-1 flex items-center gap-1">
+                            <div className="text-[10px] text-rose-500 dark:text-rose-400 mt-1 flex items-center gap-1">
                                 <AlertCircle className="w-3 h-3" />
                                 {errors.description}
                             </div>
@@ -283,13 +283,13 @@ export const FinancialRecordModal = ({
 
                     {/* Audit Notice */}
                     <Tooltip content="Wszystkie mutacje zapisów księgowych są nieodwracalnie utrwalane w rejestrze audytowym WORM">
-                        <div className="p-2.5 bg-zinc-950 border border-zinc-800 rounded text-[10px] text-zinc-500 font-mono cursor-help">
+                        <div className="p-2.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded text-[10px] text-zinc-500 dark:text-zinc-400 font-mono cursor-help">
                             Zapis zostanie trwale zarejestrowany w dzienniku zdarzeń audytowych z podpisem operatora.
                         </div>
                     </Tooltip>
 
                     {/* Action Buttons */}
-                    <div className="pt-2 border-t border-zinc-800 flex items-center justify-end gap-2">
+                    <div className="pt-2 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-end gap-2">
                         <Button variant="secondary" size="sm" onClick={onClose} type="button">
                             Anuluj
                         </Button>

@@ -352,21 +352,21 @@ export const SensitivityCockpitView = () => {
     // Visual anchoring glow class for WACC-sensitive KPI metrics
     const waccGlowClass = isWaccHighlightActive
         ? 'ring-2 ring-blue-500/70 border-blue-500/80 shadow-[0_0_15px_rgba(59,130,246,0.35)]'
-        : 'border-zinc-800';
+        : 'border-zinc-200 dark:border-zinc-800';
 
     return (
         <div className="space-y-6 font-mono">
             {/* Header & Scenario Control Strip */}
-            <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-4 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                     <UiTooltip content="Moduł symulacji wielowariantowej What-If i analizy wrażliwości Project Finance">
-                        <div className="w-10 h-10 rounded bg-emerald-950/80 border border-emerald-800/80 flex items-center justify-center text-emerald-400">
+                        <div className="w-10 h-10 rounded bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-200 dark:border-emerald-800/80 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
                             <Activity className="w-5 h-5" />
                         </div>
                     </UiTooltip>
                     <div>
                         <div className="flex items-center gap-2">
-                            <h2 className="text-sm font-bold text-zinc-100 uppercase tracking-wide">
+                            <h2 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wide">
                                 Cockpit Analizy Wrażliwości & Symulator What-If
                             </h2>
                             <InfoTooltip
@@ -378,7 +378,7 @@ export const SensitivityCockpitView = () => {
                                 <Badge variant="brand">REAL-TIME</Badge>
                             </UiTooltip>
                         </div>
-                        <p className="text-[11px] text-zinc-400 mt-0.5">
+                        <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">
                             Reaktywny silnik Web Workera przeliczający 15-letni model (180 miesięcy) i wskaźniki bankowalności
                         </p>
                     </div>
@@ -387,10 +387,10 @@ export const SensitivityCockpitView = () => {
                 <div className="flex items-center gap-2">
                     {/* Execution Time Badge */}
                     <UiTooltip content="Czas wykonania pełnej symulacji 15-letniego modelu (180 miesięcy) przez dedykowanego Web Workera w przeglądarce">
-                        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-zinc-950 border border-zinc-800 text-[11px] text-zinc-400">
-                            <Zap className="w-3.5 h-3.5 text-amber-400" />
+                        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-[11px] text-zinc-600 dark:text-zinc-400">
+                            <Zap className="w-3.5 h-3.5 text-amber-500 dark:text-amber-400" />
                             <span>Worker:</span>
-                            <span className="font-bold text-zinc-200">{lastExecutionMs || 1.8} ms</span>
+                            <span className="font-bold text-zinc-800 dark:text-zinc-200">{lastExecutionMs || 1.8} ms</span>
                         </div>
                     </UiTooltip>
                 </div>
@@ -409,9 +409,9 @@ export const SensitivityCockpitView = () => {
                 {/* 1. Project NPV */}
                 <div
                     data-testid="kpi-project-npv"
-                    className={`bg-zinc-900 border rounded-lg p-4 relative overflow-hidden transition-all duration-300 ${waccGlowClass}`}
+                    className={`bg-white dark:bg-zinc-900 border rounded-lg p-4 relative overflow-hidden transition-all duration-300 shadow-sm ${waccGlowClass}`}
                 >
-                    <div className="flex items-center justify-between text-[10px] text-zinc-400 uppercase font-semibold mb-1">
+                    <div className="flex items-center justify-between text-[10px] text-zinc-500 dark:text-zinc-400 uppercase font-semibold mb-1">
                         <div className="flex items-center gap-1">
                             <span>PROJECT NPV</span>
                             <InfoTooltip
@@ -421,21 +421,21 @@ export const SensitivityCockpitView = () => {
                             />
                         </div>
                         <UiTooltip content="Wycena DCF nielewarowanych przepływów pieniężnych projektu">
-                            <DollarSign className="w-3.5 h-3.5 text-emerald-400" />
+                            <DollarSign className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                         </UiTooltip>
                     </div>
-                    <div className="text-base font-bold text-zinc-100">
+                    <div className="text-base font-bold text-zinc-900 dark:text-zinc-100">
                         {formatMoney(currentNpv)}
                     </div>
                     <div className="flex items-center gap-1.5 text-[10px] mt-1">
                         {deltas && deltas.npvDiff !== 0 ? (
                             <UiTooltip content={`Odchylenie wartości NPV wobec scenariusza bazowego: ${deltas.npvDiff > 0 ? '+' : ''}${formatMoney(deltas.npvDiff)}`}>
-                                <span className={deltas.npvDiff > 0 ? 'text-emerald-400 font-semibold' : 'text-rose-400 font-semibold'}>
+                                <span className={deltas.npvDiff > 0 ? 'text-emerald-600 dark:text-emerald-400 font-semibold' : 'text-rose-600 dark:text-rose-400 font-semibold'}>
                                     {deltas.npvDiff > 0 ? '+' : ''}{formatMoney(deltas.npvDiff)} ({deltas.npvDiffPct > 0 ? '+' : ''}{deltas.npvDiffPct.toFixed(1)}%)
                                 </span>
                             </UiTooltip>
                         ) : (
-                            <span className="text-zinc-500">Wobec scenariusza bazowego</span>
+                            <span className="text-zinc-400 dark:text-zinc-500">Wobec scenariusza bazowego</span>
                         )}
                     </div>
                 </div>
@@ -443,9 +443,9 @@ export const SensitivityCockpitView = () => {
                 {/* 2. Project IRR vs WACC */}
                 <div
                     data-testid="kpi-project-irr"
-                    className={`bg-zinc-900 border rounded-lg p-4 transition-all duration-300 ${waccGlowClass}`}
+                    className={`bg-white dark:bg-zinc-900 border rounded-lg p-4 transition-all duration-300 shadow-sm ${waccGlowClass}`}
                 >
-                    <div className="flex items-center justify-between text-[10px] text-zinc-400 uppercase font-semibold mb-1">
+                    <div className="flex items-center justify-between text-[10px] text-zinc-500 dark:text-zinc-400 uppercase font-semibold mb-1">
                         <div className="flex items-center gap-1">
                             <span>PROJECT IRR</span>
                             <InfoTooltip
@@ -455,19 +455,19 @@ export const SensitivityCockpitView = () => {
                             />
                         </div>
                         <UiTooltip content="Wewnętrzna stopa zwrotu projektu nielewarowanego">
-                            <TrendingUp className="w-3.5 h-3.5 text-blue-400" />
+                            <TrendingUp className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
                         </UiTooltip>
                     </div>
-                    <div className="text-base font-bold text-zinc-100">
+                    <div className="text-base font-bold text-zinc-900 dark:text-zinc-100">
                         {formatPercent(currentIrr)}
                     </div>
-                    <div className="text-[10px] text-zinc-500 mt-1 flex items-center justify-between">
+                    <div className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-1 flex items-center justify-between">
                         <UiTooltip content="Średni ważony koszt kapitału będący minimalną wymaganą stopą zwrotu">
                             <span>WACC: {formatPercent(currentWacc)}</span>
                         </UiTooltip>
                         {currentIrr !== null && (
                             <UiTooltip content={`Różnica pomiędzy stopą zwrotu projektu (IRR) a kosztem kapitału (WACC): ${(currentIrr - currentWacc).toFixed(2)} p.p.`}>
-                                <span className={currentIrr > currentWacc ? 'text-emerald-400 font-semibold' : 'text-rose-400 font-semibold'}>
+                                <span className={currentIrr > currentWacc ? 'text-emerald-600 dark:text-emerald-400 font-semibold' : 'text-rose-600 dark:text-rose-400 font-semibold'}>
                                     Spread: {(currentIrr - currentWacc).toFixed(2)} p.p.
                                 </span>
                             </UiTooltip>
@@ -478,9 +478,9 @@ export const SensitivityCockpitView = () => {
                 {/* 3. Equity MoIC */}
                 <div
                     data-testid="kpi-equity-moic"
-                    className={`bg-zinc-900 border rounded-lg p-4 transition-all duration-300 ${waccGlowClass}`}
+                    className={`bg-white dark:bg-zinc-900 border rounded-lg p-4 transition-all duration-300 shadow-sm ${waccGlowClass}`}
                 >
-                    <div className="flex items-center justify-between text-[10px] text-zinc-400 uppercase font-semibold mb-1">
+                    <div className="flex items-center justify-between text-[10px] text-zinc-500 dark:text-zinc-400 uppercase font-semibold mb-1">
                         <div className="flex items-center gap-1">
                             <span>EQUITY MoIC</span>
                             <InfoTooltip
@@ -490,22 +490,22 @@ export const SensitivityCockpitView = () => {
                             />
                         </div>
                         <UiTooltip content="Mnożnik zwrotu z kapitału własnego sponsorów">
-                            <Coins className="w-3.5 h-3.5 text-amber-400" />
+                            <Coins className="w-3.5 h-3.5 text-amber-500 dark:text-amber-400" />
                         </UiTooltip>
                     </div>
-                    <div className="text-base font-bold text-zinc-100">
+                    <div className="text-base font-bold text-zinc-900 dark:text-zinc-100">
                         {currentMoic.toFixed(2)}x
                     </div>
-                    <div className="text-[10px] text-zinc-500 mt-1">
+                    <div className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-1">
                         <UiTooltip content="Zdyskontowana wartość bieżąca wolnych przepływów pieniężnych dla sponsorów (FCFE) po pełnej obsłudze długu">
-                            <span>Equity NPV: <span className="text-zinc-300 font-semibold">{formatMoney(whatIfResult?.summary?.equityNpv ?? 0)}</span></span>
+                            <span>Equity NPV: <span className="text-zinc-700 dark:text-zinc-300 font-semibold">{formatMoney(whatIfResult?.summary?.equityNpv ?? 0)}</span></span>
                         </UiTooltip>
                     </div>
                 </div>
 
                 {/* 4. Payback Period */}
-                <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
-                    <div className="flex items-center justify-between text-[10px] text-zinc-400 uppercase font-semibold mb-1">
+                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-4 shadow-sm">
+                    <div className="flex items-center justify-between text-[10px] text-zinc-500 dark:text-zinc-400 uppercase font-semibold mb-1">
                         <div className="flex items-center gap-1">
                             <span>OKRES ZWROTU</span>
                             <InfoTooltip
@@ -515,22 +515,22 @@ export const SensitivityCockpitView = () => {
                             />
                         </div>
                         <UiTooltip content="Horyzont zwrotu nakładów początkowych">
-                            <Clock className="w-3.5 h-3.5 text-purple-400" />
+                            <Clock className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
                         </UiTooltip>
                     </div>
-                    <div className="text-base font-bold text-zinc-100">
+                    <div className="text-base font-bold text-zinc-900 dark:text-zinc-100">
                         {whatIfResult?.summary?.simplePaybackYears ? `${whatIfResult.summary.simplePaybackYears} lat` : '> 15 lat'}
                     </div>
-                    <div className="text-[10px] text-zinc-500 mt-1">
+                    <div className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-1">
                         <UiTooltip content="Zdyskontowany okres zwrotu (Discounted Payback Period) uwzględniający koszt kapitału WACC">
-                            <span>Zdyskontowany: <span className="text-zinc-300">{whatIfResult?.summary?.discountedPaybackYears ? `${whatIfResult.summary.discountedPaybackYears} lat` : '> 15 lat'}</span></span>
+                            <span>Zdyskontowany: <span className="text-zinc-700 dark:text-zinc-300">{whatIfResult?.summary?.discountedPaybackYears ? `${whatIfResult.summary.discountedPaybackYears} lat` : '> 15 lat'}</span></span>
                         </UiTooltip>
                     </div>
                 </div>
 
                 {/* 5. DSCR & Bankability */}
-                <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
-                    <div className="flex items-center justify-between text-[10px] text-zinc-400 uppercase font-semibold mb-1">
+                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-4 shadow-sm">
+                    <div className="flex items-center justify-between text-[10px] text-zinc-500 dark:text-zinc-400 uppercase font-semibold mb-1">
                         <div className="flex items-center gap-1">
                             <span>KOWENANT DSCR</span>
                             <InfoTooltip
@@ -541,14 +541,14 @@ export const SensitivityCockpitView = () => {
                         </div>
                         <UiTooltip content={isBankable ? 'Projekt bankowalny' : 'Ryzyko kredytowe'}>
                             {isBankable ? (
-                                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                             ) : (
-                                <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
+                                <AlertTriangle className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
                             )}
                         </UiTooltip>
                     </div>
                     <div className="flex items-center justify-between">
-                        <div className="text-base font-bold text-zinc-100">
+                        <div className="text-base font-bold text-zinc-900 dark:text-zinc-100">
                             {currentAvgDscr ? `${currentAvgDscr.toFixed(2)}x` : '—'}
                         </div>
                         <UiTooltip content={isBankable ? 'Projekt spełnia minimalny kowenant DSCR >= 1.20x narzucany przez banki' : 'Minimalny DSCR poniżej progu 1.20x - ryzyko naruszenia kowenantów'}>
@@ -557,22 +557,22 @@ export const SensitivityCockpitView = () => {
                             </Badge>
                         </UiTooltip>
                     </div>
-                    <div className="text-[10px] text-zinc-500 mt-1">
+                    <div className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-1">
                         <UiTooltip content="Najniższy roczny wskaźnik DSCR odnotowany w okresie spłaty kredytu">
-                            <span>Min DSCR: <span className={currentMinDscr && currentMinDscr >= 1.20 ? 'text-emerald-400' : 'text-amber-400'}>{currentMinDscr ? `${currentMinDscr.toFixed(2)}x` : '—'}</span></span>
+                            <span>Min DSCR: <span className={currentMinDscr && currentMinDscr >= 1.20 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}>{currentMinDscr ? `${currentMinDscr.toFixed(2)}x` : '—'}</span></span>
                         </UiTooltip>
                     </div>
                 </div>
             </div>
 
             {/* What-If Sliders Matrix */}
-            <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-5">
-                <div className="flex items-center justify-between mb-4 border-b border-zinc-800 pb-3">
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5 shadow-sm">
+                <div className="flex items-center justify-between mb-4 border-b border-zinc-200 dark:border-zinc-800 pb-3">
                     <div className="flex items-center gap-2">
                         <UiTooltip content="Regulacja kluczowych zmiennych modelu finansowego">
-                            <Sliders className="w-4 h-4 text-emerald-400" />
+                            <Sliders className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                         </UiTooltip>
-                        <h3 className="text-xs font-bold text-zinc-100 uppercase tracking-wide">
+                        <h3 className="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wide">
                             Suwaki Analizy Wrażliwości What-If (Kluczowe Drivery Modelu)
                         </h3>
                         <InfoTooltip
@@ -581,23 +581,23 @@ export const SensitivityCockpitView = () => {
                             ariaLabel="Informacje o suwakach analizy wrażliwości"
                         />
                     </div>
-                    <span className="text-[10px] text-zinc-500">
+                    <span className="text-[10px] text-zinc-500 dark:text-zinc-400">
                         Przeciągaj suwaki, aby w czasie rzeczywistym symulować wpływ zmian na rentowność i płynność
                     </span>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {/* 1. CAPEX Modifier */}
-                    <div className="space-y-2 p-3 bg-zinc-950 border border-zinc-850 rounded">
+                    <div className="space-y-2 p-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 rounded">
                         <div className="flex items-center justify-between text-xs">
-                            <div className="flex items-center gap-1.5 font-semibold text-zinc-300 uppercase">
+                            <div className="flex items-center gap-1.5 font-semibold text-zinc-700 dark:text-zinc-300 uppercase">
                                 <span>Nakłady CAPEX</span>
                                 <InfoTooltip
                                     content="Wstępne nakłady inwestycyjne (Faza 0–1). Zwiększenie CAPEX wydłuża Payback Period (DPB) oraz obniża NPV i IRR projektu."
                                     ariaLabel="Informacje o nakładach CAPEX"
                                 />
                             </div>
-                            <span className={`font-mono font-bold ${capexDelta > 0 ? 'text-rose-400' : capexDelta < 0 ? 'text-emerald-400' : 'text-zinc-300'}`}>
+                            <span className={`font-mono font-bold ${capexDelta > 0 ? 'text-rose-600 dark:text-rose-400' : capexDelta < 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-zinc-600 dark:text-zinc-300'}`}>
                                 {capexDelta > 0 ? `+${capexDelta}%` : `${capexDelta}%`}
                             </span>
                         </div>
@@ -612,11 +612,11 @@ export const SensitivityCockpitView = () => {
                                 setCapexDelta(parseInt(e.target.value, 10));
                                 setActiveScenario('custom');
                             }}
-                            className="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                            className="w-full h-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-emerald-500"
                         />
-                        <div className="flex items-center justify-between text-[10px] text-zinc-500 font-mono">
+                        <div className="flex items-center justify-between text-[10px] text-zinc-500 dark:text-zinc-400 font-mono">
                             <span>-30%</span>
-                            <span className="text-zinc-400">
+                            <span className="text-zinc-600 dark:text-zinc-400">
                                 {formatMoney(whatIfResult?.summary?.totalCapex ?? baseResult?.summary?.totalCapex ?? 0)}
                             </span>
                             <span>+50%</span>
@@ -624,16 +624,16 @@ export const SensitivityCockpitView = () => {
                     </div>
 
                     {/* 2. Revenue Modifier */}
-                    <div className="space-y-2 p-3 bg-zinc-950 border border-zinc-850 rounded">
+                    <div className="space-y-2 p-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 rounded">
                         <div className="flex items-center justify-between text-xs">
-                            <div className="flex items-center gap-1.5 font-semibold text-zinc-300 uppercase">
+                            <div className="flex items-center gap-1.5 font-semibold text-zinc-700 dark:text-zinc-300 uppercase">
                                 <span>Przychody ze Sprzedaży</span>
                                 <InfoTooltip
                                     content="Symulacja wahań popytu i cen sprzedaży (±30%). Przychody bezpośrednio determinują przepływy operacyjne OCF i wskaźnik pokrycia długu DSCR."
                                     ariaLabel="Informacje o przychodach ze sprzedaży"
                                 />
                             </div>
-                            <span className={`font-mono font-bold ${revenueDelta > 0 ? 'text-emerald-400' : revenueDelta < 0 ? 'text-rose-400' : 'text-zinc-300'}`}>
+                            <span className={`font-mono font-bold ${revenueDelta > 0 ? 'text-emerald-600 dark:text-emerald-400' : revenueDelta < 0 ? 'text-rose-600 dark:text-rose-400' : 'text-zinc-600 dark:text-zinc-300'}`}>
                                 {revenueDelta > 0 ? `+${revenueDelta}%` : `${revenueDelta}%`}
                             </span>
                         </div>
@@ -648,11 +648,11 @@ export const SensitivityCockpitView = () => {
                                 setRevenueDelta(parseInt(e.target.value, 10));
                                 setActiveScenario('custom');
                             }}
-                            className="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                            className="w-full h-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-emerald-500"
                         />
-                        <div className="flex items-center justify-between text-[10px] text-zinc-500 font-mono">
+                        <div className="flex items-center justify-between text-[10px] text-zinc-500 dark:text-zinc-400 font-mono">
                             <span>-30%</span>
-                            <span className="text-zinc-400">
+                            <span className="text-zinc-600 dark:text-zinc-400">
                                 Suma 15L: {formatMoney(whatIfResult?.summary?.totalRevenue15Y ?? 0)}
                             </span>
                             <span>+30%</span>
@@ -660,16 +660,16 @@ export const SensitivityCockpitView = () => {
                     </div>
 
                     {/* 3. Variable Costs Modifier */}
-                    <div className="space-y-2 p-3 bg-zinc-950 border border-zinc-850 rounded">
+                    <div className="space-y-2 p-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 rounded">
                         <div className="flex items-center justify-between text-xs">
-                            <div className="flex items-center gap-1.5 font-semibold text-zinc-300 uppercase">
+                            <div className="flex items-center gap-1.5 font-semibold text-zinc-700 dark:text-zinc-300 uppercase">
                                 <span>Koszty Zmienne (% Rev)</span>
                                 <InfoTooltip
                                     content="Koszty bezpośrednie (COGS / surowce / media technologiczne) skalujące się proporcjonalnie do wolumenu przychodów."
                                     ariaLabel="Informacje o kosztach zmiennych"
                                 />
                             </div>
-                            <span className={`font-mono font-bold ${varCostDelta > 0 ? 'text-rose-400' : varCostDelta < 0 ? 'text-emerald-400' : 'text-zinc-300'}`}>
+                            <span className={`font-mono font-bold ${varCostDelta > 0 ? 'text-rose-600 dark:text-rose-400' : varCostDelta < 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-zinc-600 dark:text-zinc-300'}`}>
                                 {varCostDelta > 0 ? `+${varCostDelta}%` : `${varCostDelta}%`}
                             </span>
                         </div>
@@ -684,11 +684,11 @@ export const SensitivityCockpitView = () => {
                                 setVarCostDelta(parseInt(e.target.value, 10));
                                 setActiveScenario('custom');
                             }}
-                            className="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                            className="w-full h-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-emerald-500"
                         />
-                        <div className="flex items-center justify-between text-[10px] text-zinc-500 font-mono">
+                        <div className="flex items-center justify-between text-[10px] text-zinc-500 dark:text-zinc-400 font-mono">
                             <span>-20%</span>
-                            <span className="text-zinc-400">
+                            <span className="text-zinc-600 dark:text-zinc-400">
                                 Mnożnik: {(1.0 + varCostDelta / 100).toFixed(2)}x
                             </span>
                             <span>+30%</span>
@@ -696,16 +696,16 @@ export const SensitivityCockpitView = () => {
                     </div>
 
                     {/* 4. Fixed Costs Modifier */}
-                    <div className="space-y-2 p-3 bg-zinc-950 border border-zinc-850 rounded">
+                    <div className="space-y-2 p-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 rounded">
                         <div className="flex items-center justify-between text-xs">
-                            <div className="flex items-center gap-1.5 font-semibold text-zinc-300 uppercase">
+                            <div className="flex items-center gap-1.5 font-semibold text-zinc-700 dark:text-zinc-300 uppercase">
                                 <span>Koszty Stałe OPEX</span>
                                 <InfoTooltip
                                     content="Roczna baza kosztów operacyjnych niezależnych od wolumenu (utrzymanie infrastruktury, podatki od nieruchomości, ubezpieczenia, IT)."
                                     ariaLabel="Informacje o kosztach stałych OPEX"
                                 />
                             </div>
-                            <span className={`font-mono font-bold ${fixedCostDelta > 0 ? 'text-rose-400' : fixedCostDelta < 0 ? 'text-emerald-400' : 'text-zinc-300'}`}>
+                            <span className={`font-mono font-bold ${fixedCostDelta > 0 ? 'text-rose-600 dark:text-rose-400' : fixedCostDelta < 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-zinc-600 dark:text-zinc-300'}`}>
                                 {fixedCostDelta > 0 ? `+${fixedCostDelta}%` : `${fixedCostDelta}%`}
                             </span>
                         </div>
@@ -720,11 +720,11 @@ export const SensitivityCockpitView = () => {
                                 setFixedCostDelta(parseInt(e.target.value, 10));
                                 setActiveScenario('custom');
                             }}
-                            className="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                            className="w-full h-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-emerald-500"
                         />
-                        <div className="flex items-center justify-between text-[10px] text-zinc-500 font-mono">
+                        <div className="flex items-center justify-between text-[10px] text-zinc-500 dark:text-zinc-400 font-mono">
                             <span>-20%</span>
-                            <span className="text-zinc-400">
+                            <span className="text-zinc-600 dark:text-zinc-400">
                                 Baza: {formatMoney(Number(selectedProject?.operating_assumptions?.annual_fixed_costs_base || 1400000) * (1 + fixedCostDelta / 100))}
                             </span>
                             <span>+30%</span>
@@ -732,16 +732,16 @@ export const SensitivityCockpitView = () => {
                     </div>
 
                     {/* 5. Payroll Costs Modifier */}
-                    <div className="space-y-2 p-3 bg-zinc-950 border border-zinc-850 rounded">
+                    <div className="space-y-2 p-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 rounded">
                         <div className="flex items-center justify-between text-xs">
-                            <div className="flex items-center gap-1.5 font-semibold text-zinc-300 uppercase">
+                            <div className="flex items-center gap-1.5 font-semibold text-zinc-700 dark:text-zinc-300 uppercase">
                                 <span>Fundusz Płac & Płace</span>
                                 <InfoTooltip
                                     content="Roczny narzut wynagrodzeń wraz ze składkami ZUS i świadczeniami pracowniczymi podlegający presji płacowej."
                                     ariaLabel="Informacje o funduszu płac"
                                 />
                             </div>
-                            <span className={`font-mono font-bold ${payrollDelta > 0 ? 'text-rose-400' : payrollDelta < 0 ? 'text-emerald-400' : 'text-zinc-300'}`}>
+                            <span className={`font-mono font-bold ${payrollDelta > 0 ? 'text-rose-600 dark:text-rose-400' : payrollDelta < 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-zinc-600 dark:text-zinc-300'}`}>
                                 {payrollDelta > 0 ? `+${payrollDelta}%` : `${payrollDelta}%`}
                             </span>
                         </div>
@@ -756,11 +756,11 @@ export const SensitivityCockpitView = () => {
                                 setPayrollDelta(parseInt(e.target.value, 10));
                                 setActiveScenario('custom');
                             }}
-                            className="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                            className="w-full h-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-emerald-500"
                         />
-                        <div className="flex items-center justify-between text-[10px] text-zinc-500 font-mono">
+                        <div className="flex items-center justify-between text-[10px] text-zinc-500 dark:text-zinc-400 font-mono">
                             <span>-15%</span>
-                            <span className="text-zinc-400">
+                            <span className="text-zinc-600 dark:text-zinc-400">
                                 Baza: {formatMoney(Number(selectedProject?.operating_assumptions?.annual_payroll_base || 2200000) * (1 + payrollDelta / 100))}
                             </span>
                             <span>+30%</span>
@@ -768,20 +768,20 @@ export const SensitivityCockpitView = () => {
                     </div>
 
                     {/* 6. WACC Discount Rate Override */}
-                    <div className="space-y-2 p-3 bg-zinc-950 border border-zinc-850 rounded">
+                    <div className="space-y-2 p-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 rounded">
                         <div className="flex items-center justify-between text-xs">
-                            <div className="flex items-center gap-1.5 font-semibold text-zinc-300 uppercase">
+                            <div className="flex items-center gap-1.5 font-semibold text-zinc-700 dark:text-zinc-300 uppercase">
                                 <span>Stopa Dyskontowa WACC</span>
                                 <InfoTooltip
                                     content="Średni ważony koszt kapitału (WACC). Bazowa stopa dyskontowa w modelu DCF odzwierciedlająca koszt długu i oczekiwaną stopę zwrotu z kapitału własnego (CAPM)."
                                     ariaLabel="Informacje o stopie dyskontowej WACC"
                                 />
                             </div>
-                            <span className="font-mono font-bold text-blue-400">
+                            <span className="font-mono font-bold text-blue-600 dark:text-blue-400">
                                 {waccOverride !== null ? `${waccOverride.toFixed(2)}% (Manual)` : `${formatPercent(baseResult?.appraisal?.waccPercent ?? 8.50)} (Model)`}
                             </span>
                         </div>
-                        <p className="text-[10px] text-zinc-400 leading-tight">
+                        <p className="text-[10px] text-zinc-500 dark:text-zinc-400 leading-tight">
                             Wpływa na wycenę DCF (karty KPI u góry) oraz na tryb zdyskontowany wykresu
                         </p>
                         <input
@@ -796,9 +796,9 @@ export const SensitivityCockpitView = () => {
                                 setActiveScenario('custom');
                                 triggerWaccHighlight();
                             }}
-                            className="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                            className="w-full h-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-blue-500"
                         />
-                        <div className="flex items-center justify-between text-[10px] text-zinc-500 font-mono">
+                        <div className="flex items-center justify-between text-[10px] text-zinc-500 dark:text-zinc-400 font-mono">
                             <span>4.0%</span>
                             {waccOverride !== null && (
                                 <UiTooltip content="Przywróć stopę WACC wyliczoną analitycznie na podstawie parametrów CAPM">
@@ -808,7 +808,7 @@ export const SensitivityCockpitView = () => {
                                             setWaccOverride(null);
                                             triggerWaccHighlight();
                                         }}
-                                        className="text-[10px] text-zinc-400 hover:text-zinc-200 underline cursor-pointer"
+                                        className="text-[10px] text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200 underline cursor-pointer"
                                         aria-label="Przywróć model WACC"
                                     >
                                         Przywróć model WACC
@@ -820,16 +820,16 @@ export const SensitivityCockpitView = () => {
                     </div>
 
                     {/* 7. Reinvestment CAPEX (A, B, C) Modifier */}
-                    <div className="space-y-2 p-3 bg-zinc-950 border border-zinc-850 rounded">
+                    <div className="space-y-2 p-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 rounded">
                         <div className="flex items-center justify-between text-xs">
-                            <div className="flex items-center gap-1.5 font-semibold text-zinc-300 uppercase">
+                            <div className="flex items-center gap-1.5 font-semibold text-zinc-700 dark:text-zinc-300 uppercase">
                                 <span>Reinvestment A, B, C</span>
                                 <InfoTooltip
                                     content="Cykliczne nakłady odtworzeniowe (Replacement CAPEX) w cyklach 5/10/15-letnich na modernizację parku maszynowego i infrastruktury."
                                     ariaLabel="Informacje o nakładach odtworzeniowych Reinvestment"
                                 />
                             </div>
-                            <span className={`font-mono font-bold ${reinvestmentDelta > 0 ? 'text-rose-400' : reinvestmentDelta < 0 ? 'text-emerald-400' : 'text-zinc-300'}`}>
+                            <span className={`font-mono font-bold ${reinvestmentDelta > 0 ? 'text-rose-600 dark:text-rose-400' : reinvestmentDelta < 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-zinc-600 dark:text-zinc-300'}`}>
                                 {reinvestmentsEnabled ? (reinvestmentDelta > 0 ? `+${reinvestmentDelta}%` : `${reinvestmentDelta}%`) : 'WYŁĄCZONY'}
                             </span>
                         </div>
@@ -845,9 +845,9 @@ export const SensitivityCockpitView = () => {
                                 setReinvestmentDelta(parseInt(e.target.value, 10));
                                 setActiveScenario('custom');
                             }}
-                            className="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-emerald-500 disabled:opacity-40"
+                            className="w-full h-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-emerald-500 disabled:opacity-40"
                         />
-                        <div className="flex items-center justify-between text-[10px] text-zinc-500 font-mono">
+                        <div className="flex items-center justify-between text-[10px] text-zinc-500 dark:text-zinc-400 font-mono">
                             <span>-50%</span>
                             <div className="flex items-center gap-2">
                                 <UiTooltip content="Włącz lub wyłącz uwzględnianie cyklicznych nakładów odtworzeniowych w przepływach pieniężnych">
@@ -860,16 +860,16 @@ export const SensitivityCockpitView = () => {
                                                 setReinvestmentsEnabled(e.target.checked);
                                                 setActiveScenario('custom');
                                             }}
-                                            className="w-3 h-3 rounded bg-zinc-900 border-zinc-700 text-emerald-500 focus:ring-0"
+                                            className="w-3 h-3 rounded bg-white dark:bg-zinc-900 border-zinc-300 dark:border-zinc-700 text-emerald-600 focus:ring-0"
                                         />
-                                        <span className="text-[10px] text-zinc-400">Aktywny</span>
+                                        <span className="text-[10px] text-zinc-600 dark:text-zinc-400">Aktywny</span>
                                     </label>
                                 </UiTooltip>
                                 <UiTooltip content={showReinvestmentDetails ? 'Zwiń szczegółowy panel konfiguracji programów odtworzeniowych A, B, C' : 'Rozwiń szczegółowy panel konfiguracji nakładów odtworzeniowych A, B, C'}>
                                     <button
                                         type="button"
                                         onClick={() => setShowReinvestmentDetails(prev => !prev)}
-                                        className="text-[10px] text-cyan-400 hover:text-cyan-300 underline font-bold cursor-pointer"
+                                        className="text-[10px] text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300 underline font-bold cursor-pointer"
                                         aria-label={showReinvestmentDetails ? 'Ukryj programy odtworzeniowe A, B, C' : 'Konfiguruj programy odtworzeniowe A, B, C'}
                                     >
                                         {showReinvestmentDetails ? 'Ukryj A, B, C' : 'Konfiguruj A, B, C'}
@@ -880,23 +880,23 @@ export const SensitivityCockpitView = () => {
                         </div>
 
                         {/* Aggregated 15Y Reinvestment Info & Empty State Handling */}
-                        <div className="pt-2 border-t border-zinc-850/60 flex items-center justify-between text-[10px] font-mono">
+                        <div className="pt-2 border-t border-zinc-200 dark:border-zinc-850/60 flex items-center justify-between text-[10px] font-mono">
                             {currentReinvestmentCapex > 0 ? (
                                 <UiTooltip content="Łączna wartość nakładów odtworzeniowych we wszystkich programach A, B, C w horyzoncie 15 lat">
-                                    <span className="text-zinc-400">
-                                        Suma 15-letnia: <span className="font-bold text-zinc-200">{formatReinvestmentSummary(currentReinvestmentCapex, selectedProject?.currency || 'PLN')}</span>
+                                    <span className="text-zinc-600 dark:text-zinc-400">
+                                        Suma 15-letnia: <span className="font-bold text-zinc-900 dark:text-zinc-200">{formatReinvestmentSummary(currentReinvestmentCapex, selectedProject?.currency || 'PLN')}</span>
                                     </span>
                                 </UiTooltip>
                             ) : (
                                 <div className="flex items-center justify-between w-full">
-                                    <span className="text-amber-400/90 font-medium">
+                                    <span className="text-amber-600 dark:text-amber-400/90 font-medium">
                                         Suma: 0,00 {selectedProject?.currency || 'PLN'} (brak aktywnych programów)
                                     </span>
                                     <UiTooltip content="Otwórz panel i zdefiniuj parametry cyklicznych nakładów odtworzeniowych dla projektu">
                                         <button
                                             type="button"
                                             onClick={() => setShowReinvestmentDetails(true)}
-                                            className="text-[10px] text-cyan-400 hover:text-cyan-300 underline font-bold cursor-pointer"
+                                            className="text-[10px] text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300 underline font-bold cursor-pointer"
                                             aria-label="Skonfiguruj A, B, C - nakłady odtworzeniowe"
                                         >
                                             Skonfiguruj A, B, C
@@ -939,14 +939,14 @@ export const SensitivityCockpitView = () => {
             />
 
             {/* 15-Year Financial Evolution Chart (Nominal vs Discounted DCF & NPV Modes) */}
-            <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-5">
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 mb-4 border-b border-zinc-800 pb-3">
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5 shadow-sm">
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 mb-4 border-b border-zinc-200 dark:border-zinc-800 pb-3">
                     <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                         <div className="flex items-center gap-2">
                             <UiTooltip content="Wielowymiarowy wykres 15-letniej projekcji finansowej">
-                                <BarChart3 className="w-4 h-4 text-emerald-400" />
+                                <BarChart3 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                             </UiTooltip>
-                            <h3 className="text-xs font-bold text-zinc-100 uppercase tracking-wide">
+                            <h3 className="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wide">
                                 15-letnia Ewolucja Wyników Finansowych (Scenariusz What-If)
                             </h3>
                             <InfoTooltip
@@ -957,7 +957,7 @@ export const SensitivityCockpitView = () => {
                         </div>
 
                         {/* Chart Mode Switcher (Segmented Control) */}
-                        <div className="inline-flex rounded-md p-0.5 bg-zinc-950 border border-zinc-800 text-[11px] self-start sm:self-auto">
+                        <div className="inline-flex rounded-md p-0.5 bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-[11px] self-start sm:self-auto">
                             <UiTooltip content="Prezentuj nominalne wielkości P&L (Przychody, OPEX, EBITDA) oraz wolne przepływy pieniężne (FCFF)">
                                 <button
                                     type="button"
@@ -965,7 +965,7 @@ export const SensitivityCockpitView = () => {
                                     className={`px-2.5 py-1 rounded transition-colors cursor-pointer ${
                                         chartMode === 'nominal'
                                             ? 'bg-emerald-600 text-white font-bold shadow-xs'
-                                            : 'text-zinc-400 hover:text-zinc-200'
+                                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
                                     }`}
                                     aria-label="Przełącz na widok nominalny P&L i CF"
                                 >
@@ -979,7 +979,7 @@ export const SensitivityCockpitView = () => {
                                     className={`px-2.5 py-1 rounded transition-colors cursor-pointer ${
                                         chartMode === 'discounted'
                                             ? 'bg-blue-600 text-white font-bold shadow-xs'
-                                            : 'text-zinc-400 hover:text-zinc-200'
+                                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
                                     }`}
                                     aria-label="Przełącz na widok zdyskontowany DCF i NPV"
                                 >
@@ -991,7 +991,7 @@ export const SensitivityCockpitView = () => {
 
                     {/* Chart Legend */}
                     {chartMode === 'nominal' ? (
-                        <div className="text-[11px] text-zinc-400 flex flex-wrap items-center gap-3">
+                        <div className="text-[11px] text-zinc-600 dark:text-zinc-400 flex flex-wrap items-center gap-3">
                             <UiTooltip content="Przychody operacyjne ze sprzedaży towarów i usług">
                                 <span className="flex items-center gap-1.5 cursor-help">
                                     <span className="w-2.5 h-2.5 bg-[#10b981] rounded-xs" /> Przychody
@@ -1019,7 +1019,7 @@ export const SensitivityCockpitView = () => {
                             </UiTooltip>
                         </div>
                     ) : (
-                        <div className="text-[11px] text-zinc-400 flex flex-wrap items-center gap-3">
+                        <div className="text-[11px] text-zinc-600 dark:text-zinc-400 flex flex-wrap items-center gap-3">
                             <UiTooltip content="Nielewarowane przepływy FCFF zdyskontowane stopą WACC na moment zero">
                                 <span className="flex items-center gap-1.5 cursor-help">
                                     <span className="w-2.5 h-2.5 bg-[#3b82f6] rounded-xs" /> Zdyskontowany FCFF
@@ -1031,7 +1031,7 @@ export const SensitivityCockpitView = () => {
                                 </span>
                             </UiTooltip>
                             <UiTooltip content="Stopa dyskontowa WACC zastosowana w kalkulacji DCF">
-                                <span className="text-[10px] text-zinc-500 bg-zinc-950 px-2 py-0.5 rounded border border-zinc-800">
+                                <span className="text-[10px] text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-950 px-2 py-0.5 rounded border border-zinc-200 dark:border-zinc-800">
                                     WACC: {currentWacc.toFixed(2)}%
                                 </span>
                             </UiTooltip>
@@ -1107,13 +1107,13 @@ export const SensitivityCockpitView = () => {
             </div>
 
             {/* Base vs What-If Comparison Grid */}
-            <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden">
-                <div className="p-4 border-b border-zinc-800 flex items-center justify-between">
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden shadow-sm">
+                <div className="p-4 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <UiTooltip content="Syntetyczne zestawienie analityczne wariantów">
-                            <Layers className="w-4 h-4 text-emerald-400" />
+                            <Layers className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                         </UiTooltip>
-                        <h3 className="text-xs font-bold text-zinc-100 uppercase tracking-wide">
+                        <h3 className="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wide">
                             Macierz Porównawcza Wpływu Wrażliwości (Base Case vs What-If)
                         </h3>
                         <InfoTooltip
@@ -1132,7 +1132,7 @@ export const SensitivityCockpitView = () => {
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-xs border-collapse">
                         <thead>
-                            <tr className="border-b border-zinc-800 text-[10px] text-zinc-400 uppercase tracking-wider bg-zinc-950/60">
+                            <tr className="border-b border-zinc-200 dark:border-zinc-800 text-[10px] text-zinc-500 dark:text-zinc-400 uppercase tracking-wider bg-zinc-50 dark:bg-zinc-950/60">
                                 <th className="py-3 px-4">
                                     <UiTooltip content="Wskaźnik finansowy, wielkość przepływów lub kowenant bankowy podlegający symulacji">
                                         <span className="cursor-help">METRYKA MODELU</span>
@@ -1160,20 +1160,20 @@ export const SensitivityCockpitView = () => {
                                 </th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-zinc-800/60 font-mono text-[11px]">
+                        <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800/60 font-mono text-[11px]">
                             {/* 1. Total CAPEX */}
-                            <tr className="hover:bg-zinc-850/40 transition-colors">
-                                <td className="py-3 px-4 font-semibold text-zinc-200">
+                            <tr className="hover:bg-zinc-50 dark:hover:bg-zinc-850/40 transition-colors">
+                                <td className="py-3 px-4 font-semibold text-zinc-800 dark:text-zinc-200">
                                     Łączne Nakłady CAPEX
                                 </td>
-                                <td className="py-3 px-4 text-right text-zinc-300">
+                                <td className="py-3 px-4 text-right text-zinc-600 dark:text-zinc-300">
                                     {formatMoney(baseResult?.summary?.totalCapex ?? 0)}
                                 </td>
-                                <td className="py-3 px-4 text-right font-bold text-zinc-100">
+                                <td className="py-3 px-4 text-right font-bold text-zinc-900 dark:text-zinc-100">
                                     {formatMoney(whatIfResult?.summary?.totalCapex ?? 0)}
                                 </td>
                                 <td className="py-3 px-4 text-right">
-                                    <span className={capexDelta > 0 ? 'text-rose-400' : capexDelta < 0 ? 'text-emerald-400' : 'text-zinc-400'}>
+                                    <span className={capexDelta > 0 ? 'text-rose-600 dark:text-rose-400' : capexDelta < 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-zinc-500 dark:text-zinc-400'}>
                                         {capexDelta > 0 ? '+' : ''}{formatMoney(deltas?.capexDiff ?? 0)} ({capexDelta}%)
                                     </span>
                                 </td>
@@ -1187,20 +1187,20 @@ export const SensitivityCockpitView = () => {
                             </tr>
 
                             {/* 1b. Cyclical Reinvestment CAPEX */}
-                            <tr className="hover:bg-zinc-850/40 transition-colors">
-                                <td className="py-3 px-4 font-semibold text-zinc-300 pl-6 flex items-center gap-1.5">
-                                    <span className="text-zinc-600">↳</span>
+                            <tr className="hover:bg-zinc-50 dark:hover:bg-zinc-850/40 transition-colors">
+                                <td className="py-3 px-4 font-semibold text-zinc-700 dark:text-zinc-300 pl-6 flex items-center gap-1.5">
+                                    <span className="text-zinc-400 dark:text-zinc-600">↳</span>
                                     <span>Reinvestment CAPEX (A, B, C)</span>
                                 </td>
-                                <td className="py-3 px-4 text-right text-zinc-400">
+                                <td className="py-3 px-4 text-right text-zinc-600 dark:text-zinc-400">
                                     {formatMoney(baseResult?.summary?.totalReinvestmentCapex ?? 0)}
                                 </td>
-                                <td className="py-3 px-4 text-right font-mono font-bold text-zinc-200">
+                                <td className="py-3 px-4 text-right font-mono font-bold text-zinc-800 dark:text-zinc-200">
                                     {formatMoney(whatIfResult?.summary?.totalReinvestmentCapex ?? 0)}
                                 </td>
                                 <td className="py-3 px-4 text-right">
                                     {baseResult && whatIfResult && (
-                                        <span className={(whatIfResult.summary?.totalReinvestmentCapex ?? 0) <= (baseResult.summary?.totalReinvestmentCapex ?? 0) ? 'text-emerald-400' : 'text-rose-400'}>
+                                        <span className={(whatIfResult.summary?.totalReinvestmentCapex ?? 0) <= (baseResult.summary?.totalReinvestmentCapex ?? 0) ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}>
                                             {formatMoney((whatIfResult.summary?.totalReinvestmentCapex ?? 0) - (baseResult.summary?.totalReinvestmentCapex ?? 0))}
                                         </span>
                                     )}
@@ -1215,18 +1215,18 @@ export const SensitivityCockpitView = () => {
                             </tr>
 
                             {/* 2. Total 15Y Revenue */}
-                            <tr className="hover:bg-zinc-850/40 transition-colors">
-                                <td className="py-3 px-4 font-semibold text-zinc-200">
+                            <tr className="hover:bg-zinc-50 dark:hover:bg-zinc-850/40 transition-colors">
+                                <td className="py-3 px-4 font-semibold text-zinc-800 dark:text-zinc-200">
                                     Suma Przychodów (15 Lat)
                                 </td>
-                                <td className="py-3 px-4 text-right text-zinc-300">
+                                <td className="py-3 px-4 text-right text-zinc-600 dark:text-zinc-300">
                                     {formatMoney(baseResult?.summary?.totalRevenue15Y ?? 0)}
                                 </td>
-                                <td className="py-3 px-4 text-right font-bold text-zinc-100">
+                                <td className="py-3 px-4 text-right font-bold text-zinc-900 dark:text-zinc-100">
                                     {formatMoney(whatIfResult?.summary?.totalRevenue15Y ?? 0)}
                                 </td>
                                 <td className="py-3 px-4 text-right">
-                                    <span className={revenueDelta > 0 ? 'text-emerald-400' : revenueDelta < 0 ? 'text-rose-400' : 'text-zinc-400'}>
+                                    <span className={revenueDelta > 0 ? 'text-emerald-600 dark:text-emerald-400' : revenueDelta < 0 ? 'text-rose-600 dark:text-rose-400' : 'text-zinc-500 dark:text-zinc-400'}>
                                         {revenueDelta > 0 ? `+${revenueDelta}%` : `${revenueDelta}%`}
                                     </span>
                                 </td>
@@ -1240,19 +1240,19 @@ export const SensitivityCockpitView = () => {
                             </tr>
 
                             {/* 3. Total 15Y EBITDA */}
-                            <tr className="hover:bg-zinc-850/40 transition-colors">
-                                <td className="py-3 px-4 font-semibold text-zinc-200">
+                            <tr className="hover:bg-zinc-50 dark:hover:bg-zinc-850/40 transition-colors">
+                                <td className="py-3 px-4 font-semibold text-zinc-800 dark:text-zinc-200">
                                     Suma Wyniku EBITDA (15 Lat)
                                 </td>
-                                <td className="py-3 px-4 text-right text-zinc-300">
+                                <td className="py-3 px-4 text-right text-zinc-600 dark:text-zinc-300">
                                     {formatMoney(baseResult?.summary?.totalEbitda15Y ?? 0)}
                                 </td>
-                                <td className="py-3 px-4 text-right font-bold text-zinc-100">
+                                <td className="py-3 px-4 text-right font-bold text-zinc-900 dark:text-zinc-100">
                                     {formatMoney(whatIfResult?.summary?.totalEbitda15Y ?? 0)}
                                 </td>
                                 <td className="py-3 px-4 text-right">
                                     {baseResult && whatIfResult && (
-                                        <span className={(whatIfResult.summary?.totalEbitda15Y ?? 0) >= (baseResult.summary?.totalEbitda15Y ?? 0) ? 'text-emerald-400' : 'text-rose-400'}>
+                                        <span className={(whatIfResult.summary?.totalEbitda15Y ?? 0) >= (baseResult.summary?.totalEbitda15Y ?? 0) ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}>
                                             {formatMoney((whatIfResult.summary?.totalEbitda15Y ?? 0) - (baseResult.summary?.totalEbitda15Y ?? 0))}
                                         </span>
                                     )}
@@ -1267,18 +1267,18 @@ export const SensitivityCockpitView = () => {
                             </tr>
 
                             {/* 4. Project NPV */}
-                            <tr className="hover:bg-zinc-850/40 transition-colors bg-zinc-950/20">
-                                <td className="py-3 px-4 font-bold text-emerald-400">
+                            <tr className="hover:bg-zinc-50 dark:hover:bg-zinc-850/40 transition-colors bg-emerald-50/30 dark:bg-zinc-950/20">
+                                <td className="py-3 px-4 font-bold text-emerald-600 dark:text-emerald-400">
                                     Wartość Bieżąca Netto (NPV Projektu)
                                 </td>
-                                <td className="py-3 px-4 text-right text-zinc-300">
+                                <td className="py-3 px-4 text-right text-zinc-600 dark:text-zinc-300">
                                     {formatMoney(baseResult?.summary?.projectNpv ?? 0)}
                                 </td>
-                                <td className="py-3 px-4 text-right font-bold text-emerald-300">
+                                <td className="py-3 px-4 text-right font-bold text-emerald-600 dark:text-emerald-300">
                                     {formatMoney(currentNpv)}
                                 </td>
                                 <td className="py-3 px-4 text-right font-bold">
-                                    <span className={deltas && deltas.npvDiff >= 0 ? 'text-emerald-400' : 'text-rose-400'}>
+                                    <span className={deltas && deltas.npvDiff >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}>
                                         {deltas && deltas.npvDiff > 0 ? '+' : ''}{formatMoney(deltas?.npvDiff ?? 0)}
                                     </span>
                                 </td>
@@ -1292,18 +1292,18 @@ export const SensitivityCockpitView = () => {
                             </tr>
 
                             {/* 5. Project IRR */}
-                            <tr className="hover:bg-zinc-850/40 transition-colors">
-                                <td className="py-3 px-4 font-semibold text-zinc-200">
+                            <tr className="hover:bg-zinc-50 dark:hover:bg-zinc-850/40 transition-colors">
+                                <td className="py-3 px-4 font-semibold text-zinc-800 dark:text-zinc-200">
                                     Wewnętrzna Stopa Zwrotu (Project IRR)
                                 </td>
-                                <td className="py-3 px-4 text-right text-zinc-300">
+                                <td className="py-3 px-4 text-right text-zinc-600 dark:text-zinc-300">
                                     {formatPercent(baseResult?.summary?.projectIrrPercent)}
                                 </td>
-                                <td className="py-3 px-4 text-right font-bold text-zinc-100">
+                                <td className="py-3 px-4 text-right font-bold text-zinc-900 dark:text-zinc-100">
                                     {formatPercent(currentIrr)}
                                 </td>
                                 <td className="py-3 px-4 text-right">
-                                    <span className={deltas && deltas.irrDiff >= 0 ? 'text-emerald-400' : 'text-rose-400'}>
+                                    <span className={deltas && deltas.irrDiff >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}>
                                         {deltas && deltas.irrDiff > 0 ? '+' : ''}{deltas?.irrDiff?.toFixed(2)} p.p.
                                     </span>
                                 </td>
@@ -1317,18 +1317,18 @@ export const SensitivityCockpitView = () => {
                             </tr>
 
                             {/* 6. Equity MoIC */}
-                            <tr className="hover:bg-zinc-850/40 transition-colors">
-                                <td className="py-3 px-4 font-semibold text-zinc-200">
+                            <tr className="hover:bg-zinc-50 dark:hover:bg-zinc-850/40 transition-colors">
+                                <td className="py-3 px-4 font-semibold text-zinc-800 dark:text-zinc-200">
                                     Mnożnik Kapitału Własnego (MoIC)
                                 </td>
-                                <td className="py-3 px-4 text-right text-zinc-300">
+                                <td className="py-3 px-4 text-right text-zinc-600 dark:text-zinc-300">
                                     {baseResult?.summary?.equityMoic?.toFixed(2)}x
                                 </td>
-                                <td className="py-3 px-4 text-right font-bold text-zinc-100">
+                                <td className="py-3 px-4 text-right font-bold text-zinc-900 dark:text-zinc-100">
                                     {currentMoic.toFixed(2)}x
                                 </td>
                                 <td className="py-3 px-4 text-right">
-                                    <span className={deltas && deltas.moicDiff >= 0 ? 'text-emerald-400' : 'text-rose-400'}>
+                                    <span className={deltas && deltas.moicDiff >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}>
                                         {deltas && deltas.moicDiff > 0 ? '+' : ''}{deltas?.moicDiff?.toFixed(2)}x
                                     </span>
                                 </td>
@@ -1342,18 +1342,18 @@ export const SensitivityCockpitView = () => {
                             </tr>
 
                             {/* 7. Minimum & Average DSCR */}
-                            <tr className="hover:bg-zinc-850/40 transition-colors">
-                                <td className="py-3 px-4 font-semibold text-zinc-200">
+                            <tr className="hover:bg-zinc-50 dark:hover:bg-zinc-850/40 transition-colors">
+                                <td className="py-3 px-4 font-semibold text-zinc-800 dark:text-zinc-200">
                                     Wskaźnik Pokrycia Obsługi Długu (DSCR)
                                 </td>
-                                <td className="py-3 px-4 text-right text-zinc-300">
+                                <td className="py-3 px-4 text-right text-zinc-600 dark:text-zinc-300">
                                     Min: {baseResult?.summary?.minDscr ? `${baseResult.summary.minDscr.toFixed(2)}x` : '—'} | Avg: {baseResult?.summary?.avgDscr ? `${baseResult.summary.avgDscr.toFixed(2)}x` : '—'}
                                 </td>
-                                <td className="py-3 px-4 text-right font-bold text-zinc-100">
+                                <td className="py-3 px-4 text-right font-bold text-zinc-900 dark:text-zinc-100">
                                     Min: {currentMinDscr ? `${currentMinDscr.toFixed(2)}x` : '—'} | Avg: {currentAvgDscr ? `${currentAvgDscr.toFixed(2)}x` : '—'}
                                 </td>
                                 <td className="py-3 px-4 text-right">
-                                    <span className={isBankable ? 'text-emerald-400' : 'text-rose-400 font-bold'}>
+                                    <span className={isBankable ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400 font-bold'}>
                                         {isBankable ? 'Zgodny z bankiem' : 'Naruszenie kowenantu'}
                                     </span>
                                 </td>
@@ -1367,18 +1367,18 @@ export const SensitivityCockpitView = () => {
                             </tr>
 
                             {/* 8. Debt Repayment Profile */}
-                            <tr className="hover:bg-zinc-850/40 transition-colors">
-                                <td className="py-3 px-4 font-semibold text-zinc-200">
+                            <tr className="hover:bg-zinc-50 dark:hover:bg-zinc-850/40 transition-colors">
+                                <td className="py-3 px-4 font-semibold text-zinc-800 dark:text-zinc-200">
                                     Profil Amortyzacji Długu (Formuła)
                                 </td>
-                                <td className="py-3 px-4 text-right text-zinc-300">
+                                <td className="py-3 px-4 text-right text-zinc-600 dark:text-zinc-300">
                                     {(selectedProject?.debt_facility?.repayment_type || 'annuity').toUpperCase()}
                                 </td>
-                                <td className="py-3 px-4 text-right font-bold text-zinc-100">
+                                <td className="py-3 px-4 text-right font-bold text-zinc-900 dark:text-zinc-100">
                                     {(repaymentTypeOverride || selectedProject?.debt_facility?.repayment_type || 'annuity').toUpperCase()}
                                 </td>
                                 <td className="py-3 px-4 text-right">
-                                    <span className={repaymentTypeOverride ? 'text-amber-400 font-semibold' : 'text-zinc-400'}>
+                                    <span className={repaymentTypeOverride ? 'text-amber-600 dark:text-amber-400 font-semibold' : 'text-zinc-500 dark:text-zinc-400'}>
                                         {repaymentTypeOverride ? 'ZMODYFIKOWANY' : 'ZGODNY Z UMOWĄ'}
                                     </span>
                                 </td>
@@ -1392,19 +1392,19 @@ export const SensitivityCockpitView = () => {
                             </tr>
 
                             {/* 9. Total 15Y Interest Expense */}
-                            <tr className="hover:bg-zinc-850/40 transition-colors">
-                                <td className="py-3 px-4 font-semibold text-zinc-200">
+                            <tr className="hover:bg-zinc-50 dark:hover:bg-zinc-850/40 transition-colors">
+                                <td className="py-3 px-4 font-semibold text-zinc-800 dark:text-zinc-200">
                                     Łączny Koszt Odsetek (15 Lat)
                                 </td>
-                                <td className="py-3 px-4 text-right text-zinc-300">
+                                <td className="py-3 px-4 text-right text-zinc-600 dark:text-zinc-300">
                                     {formatMoney(baseResult?.summary?.totalInterest15Y ?? 0)}
                                 </td>
-                                <td className="py-3 px-4 text-right font-bold text-zinc-100">
+                                <td className="py-3 px-4 text-right font-bold text-zinc-900 dark:text-zinc-100">
                                     {formatMoney(whatIfResult?.summary?.totalInterest15Y ?? 0)}
                                 </td>
                                 <td className="py-3 px-4 text-right">
                                     {baseResult && whatIfResult && (
-                                        <span className={(whatIfResult.summary?.totalInterest15Y ?? 0) <= (baseResult.summary?.totalInterest15Y ?? 0) ? 'text-emerald-400' : 'text-rose-400'}>
+                                        <span className={(whatIfResult.summary?.totalInterest15Y ?? 0) <= (baseResult.summary?.totalInterest15Y ?? 0) ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}>
                                             {(whatIfResult.summary?.totalInterest15Y ?? 0) > (baseResult.summary?.totalInterest15Y ?? 0) ? '+' : ''}
                                             {formatMoney((whatIfResult.summary?.totalInterest15Y ?? 0) - (baseResult.summary?.totalInterest15Y ?? 0))}
                                         </span>

@@ -281,7 +281,7 @@ export const InvestmentReadinessScorecard = ({
 
     if (!activeProject) {
         return (
-            <div className="p-8 bg-zinc-900 border border-zinc-800 rounded-lg text-xs text-zinc-500 font-mono text-center">
+            <div className="p-8 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs text-zinc-500 font-mono text-center">
                 Brak aktywnego projektu do oceny gotowości inwestycyjnej.
             </div>
         );
@@ -304,27 +304,27 @@ export const InvestmentReadinessScorecard = ({
                 return {
                     border: 'border-emerald-500/40',
                     bg: 'bg-emerald-500/10',
-                    text: 'text-emerald-400',
+                    text: 'text-emerald-600 dark:text-emerald-400',
                     progress: 'bg-emerald-500',
-                    badge: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40',
+                    badge: 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-500/40',
                     icon: CheckCircle2,
                 };
             case 'conditional':
                 return {
                     border: 'border-amber-500/40',
                     bg: 'bg-amber-500/10',
-                    text: 'text-amber-400',
+                    text: 'text-amber-600 dark:text-amber-400',
                     progress: 'bg-amber-500',
-                    badge: 'bg-amber-500/20 text-amber-300 border-amber-500/40',
+                    badge: 'bg-amber-500/20 text-amber-700 dark:text-amber-300 border-amber-500/40',
                     icon: AlertTriangle,
                 };
             case 'in_preparation':
                 return {
                     border: 'border-orange-500/40',
                     bg: 'bg-orange-500/10',
-                    text: 'text-orange-400',
+                    text: 'text-orange-600 dark:text-orange-400',
                     progress: 'bg-orange-500',
-                    badge: 'bg-orange-500/20 text-orange-300 border-orange-500/40',
+                    badge: 'bg-orange-500/20 text-orange-700 dark:text-orange-300 border-orange-500/40',
                     icon: Clock,
                 };
             case 'unbankable':
@@ -332,9 +332,9 @@ export const InvestmentReadinessScorecard = ({
                 return {
                     border: 'border-rose-500/40',
                     bg: 'bg-rose-500/10',
-                    text: 'text-rose-400',
+                    text: 'text-rose-600 dark:text-rose-400',
                     progress: 'bg-rose-500',
-                    badge: 'bg-rose-500/20 text-rose-300 border-rose-500/40',
+                    badge: 'bg-rose-500/20 text-rose-700 dark:text-rose-300 border-rose-500/40',
                     icon: XCircle,
                 };
         }
@@ -346,24 +346,24 @@ export const InvestmentReadinessScorecard = ({
     return (
         <div className={`space-y-6 font-mono ${className}`} data-testid="investment-readiness-scorecard">
             {/* Top Bar: Title, Presets, Actions */}
-            <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 sm:p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4 shadow-sm">
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-4 sm:p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4 shadow-sm">
                 <div className="flex items-center gap-3">
                     <Tooltip content="Audyt Bankowalności i Gotowości Inwestycyjnej LMA">
-                        <div className="w-10 h-10 rounded-md bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0 cursor-help">
+                        <div className="w-10 h-10 rounded-md bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0 cursor-help">
                             <ClipboardCheck className="w-5 h-5" />
                         </div>
                     </Tooltip>
                     <div>
                         <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                            <span className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
                                 AUDYT INWESTYCYJNY & BANKOWALNOŚĆ (LMA)
                             </span>
-                            <span className="text-zinc-600">//</span>
-                            <span className="text-[10px] text-emerald-400 font-semibold uppercase">
+                            <span className="text-zinc-400 dark:text-zinc-600">//</span>
+                            <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold uppercase">
                                 INVESTMENT READINESS SCORECARD
                             </span>
                         </div>
-                        <h2 className="text-sm sm:text-base font-bold text-zinc-100 flex items-center gap-2">
+                        <h2 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
                             <span>Karta Oceny Gotowości Inwestycyjnej</span>
                             <InfoTooltip
                                 size="sm"
@@ -377,7 +377,7 @@ export const InvestmentReadinessScorecard = ({
 
                 <div className="flex flex-wrap items-center gap-2.5">
                     {/* Preset Stage Selector */}
-                    <div className="flex items-center bg-zinc-950 border border-zinc-800 rounded-lg p-1 text-[11px]">
+                    <div className="flex items-center bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg p-1 text-[11px]">
                         <span className="text-[10px] text-zinc-500 uppercase px-1.5 flex items-center gap-1">
                             <span>Preset:</span>
                             <InfoTooltip
@@ -393,8 +393,8 @@ export const InvestmentReadinessScorecard = ({
                                     onClick={() => applyPreset(key)}
                                     className={`px-2 py-0.5 rounded transition-all cursor-pointer ${
                                         activePreset === key
-                                            ? 'bg-zinc-800 text-zinc-100 font-bold shadow-xs'
-                                            : 'text-zinc-400 hover:text-zinc-200'
+                                            ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-bold shadow-xs'
+                                            : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
                                     }`}
                                 >
                                     {p.label.split(' ')[0]}
@@ -408,9 +408,9 @@ export const InvestmentReadinessScorecard = ({
                         <button
                             type="button"
                             onClick={resetToDefaults}
-                            className="p-1.5 bg-zinc-950 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-800 rounded-md transition-colors cursor-pointer"
+                            className="p-1.5 bg-zinc-100 dark:bg-zinc-950 hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 border border-zinc-200 dark:border-zinc-800 rounded-md transition-colors cursor-pointer"
                             aria-label="Przywróć domyślne kryteria"
-                        title="Przywróć domyślne kryteria"
+                            title="Przywróć domyślne kryteria"
                         >
                             <RotateCcw className="w-4 h-4" />
                         </button>
@@ -448,12 +448,12 @@ export const InvestmentReadinessScorecard = ({
             </div>
 
             {/* Main Scorecard Institutional Banner */}
-            <div className={`p-5 sm:p-6 rounded-xl border ${statusTheme.border} ${statusTheme.bg} bg-opacity-40 shadow-xl transition-all`}>
+            <div className={`p-5 sm:p-6 rounded-xl border ${statusTheme.border} ${statusTheme.bg} bg-opacity-40 shadow-sm transition-all`}>
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                     {/* Left: Overall Score Dial & Status */}
                     <div className="flex items-center gap-5">
                         <Tooltip content={`Łączna punktacja ważona gotowości inwestycyjnej: ${overallScore}/100 pkt`}>
-                            <div data-testid="overall-score-dial" className="relative w-24 h-24 shrink-0 rounded-2xl bg-zinc-950 border border-zinc-800/80 flex flex-col items-center justify-center shadow-inner cursor-help">
+                            <div data-testid="overall-score-dial" className="relative w-24 h-24 shrink-0 rounded-2xl bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800/80 flex flex-col items-center justify-center shadow-xs cursor-help">
                                 <span className="text-[10px] uppercase font-bold text-zinc-500 tracking-wider">SCORE</span>
                                 <span className={`text-3xl font-extrabold tracking-tight ${statusTheme.text}`} data-testid="overall-score-display">
                                     {overallScore}
@@ -470,12 +470,12 @@ export const InvestmentReadinessScorecard = ({
                                         <span>{statusLabel}</span>
                                     </span>
                                 </Tooltip>
-                                <span className="text-[11px] text-zinc-400">
+                                <span className="text-[11px] text-zinc-500 dark:text-zinc-400">
                                     ({scorecardResult.totalEarnedPoints} / {scorecardResult.totalMaxPoints} pkt ważonych)
                                 </span>
                             </div>
 
-                            <p className="text-xs text-zinc-300 max-w-2xl leading-relaxed">
+                            <p className="text-xs text-zinc-700 dark:text-zinc-300 max-w-2xl leading-relaxed">
                                 {recommendation}
                             </p>
                         </div>
@@ -485,12 +485,12 @@ export const InvestmentReadinessScorecard = ({
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 shrink-0">
                         {/* Conditions Precedent Tile */}
                         <Tooltip content="Warunki zawieszające (Conditions Precedent): bezwzględnie wymagane przed uruchomieniem finansowania dłużnego">
-                            <div className="bg-zinc-950/80 border border-zinc-800 rounded-lg p-2.5 text-center min-w-[110px] cursor-help">
+                            <div className="bg-white dark:bg-zinc-950/80 border border-zinc-200 dark:border-zinc-800 rounded-lg p-2.5 text-center min-w-[110px] cursor-help shadow-xs">
                                 <div className="text-[10px] text-zinc-500 uppercase font-semibold">Warunki CP</div>
-                                <div className="text-sm font-bold text-zinc-100 mt-0.5">
+                                <div className="text-sm font-bold text-zinc-900 dark:text-zinc-100 mt-0.5">
                                     {conditionsPrecedent.passedCount} / {conditionsPrecedent.totalCount}
                                 </div>
-                                <div className={`text-[10px] mt-0.5 font-medium ${conditionsPrecedent.pendingCount === 0 ? 'text-emerald-400' : 'text-amber-400'}`}>
+                                <div className={`text-[10px] mt-0.5 font-medium ${conditionsPrecedent.pendingCount === 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`}>
                                     {conditionsPrecedent.pendingCount === 0 ? 'Wszystkie spełnione' : `${conditionsPrecedent.pendingCount} w toku / brak`}
                                 </div>
                             </div>
@@ -498,12 +498,12 @@ export const InvestmentReadinessScorecard = ({
 
                         {/* Critical Red Flags Tile */}
                         <Tooltip content="Krytyczne ryzyka i niespełnione kryteria blokujące zamknięcie finansowe (Financial Close)">
-                            <div className="bg-zinc-950/80 border border-zinc-800 rounded-lg p-2.5 text-center min-w-[110px] cursor-help">
+                            <div className="bg-white dark:bg-zinc-950/80 border border-zinc-200 dark:border-zinc-800 rounded-lg p-2.5 text-center min-w-[110px] cursor-help shadow-xs">
                                 <div className="text-[10px] text-zinc-500 uppercase font-semibold">Red Flags</div>
-                                <div className={`text-sm font-bold mt-0.5 ${redFlags.length === 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                                <div className={`text-sm font-bold mt-0.5 ${redFlags.length === 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
                                     {redFlags.length}
                                 </div>
-                                <div className="text-[10px] text-zinc-400 mt-0.5 font-medium">
+                                <div className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5 font-medium">
                                     {redFlags.length === 0 ? 'Brak blokad' : 'Krytyczne braki'}
                                 </div>
                             </div>
@@ -511,13 +511,13 @@ export const InvestmentReadinessScorecard = ({
 
                         {/* Automated Verification Status */}
                         <Tooltip content="Automatyczna synchronizacja wskaźników z modelem finansowym 15-letnim i bilansowaniem zero-variance">
-                            <div className="bg-zinc-950/80 border border-zinc-800 rounded-lg p-2.5 text-center min-w-[110px] col-span-2 sm:col-span-1 cursor-help">
+                            <div className="bg-white dark:bg-zinc-950/80 border border-zinc-200 dark:border-zinc-800 rounded-lg p-2.5 text-center min-w-[110px] col-span-2 sm:col-span-1 cursor-help shadow-xs">
                                 <div className="text-[10px] text-zinc-500 uppercase font-semibold">Model 3-State</div>
-                                <div className="text-sm font-bold text-emerald-400 mt-0.5 flex items-center justify-center gap-1">
+                                <div className="text-sm font-bold text-emerald-600 dark:text-emerald-400 mt-0.5 flex items-center justify-center gap-1">
                                     <Sparkles className="w-3.5 h-3.5" />
                                     <span>LMA Sync</span>
                                 </div>
-                                <div className="text-[10px] text-zinc-400 mt-0.5">
+                                <div className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">
                                     Zero-Variance OK
                                 </div>
                             </div>
@@ -527,15 +527,15 @@ export const InvestmentReadinessScorecard = ({
 
                 {/* Progress Bar under Banner */}
                 <Tooltip content={`Ogólny stopień dojrzałości inwestycyjnej projektu: ${overallScore}%`}>
-                    <div className="mt-5 pt-4 border-t border-zinc-800/80 flex items-center gap-4 cursor-help">
+                    <div className="mt-5 pt-4 border-t border-zinc-200 dark:border-zinc-800/80 flex items-center gap-4 cursor-help">
                         <span className="text-[10px] uppercase font-bold text-zinc-500 shrink-0">POSTĘP DOJRZAŁOŚCI:</span>
-                        <div className="w-full bg-zinc-950 rounded-full h-2.5 overflow-hidden border border-zinc-800/60 flex">
+                        <div className="w-full bg-zinc-200 dark:bg-zinc-950 rounded-full h-2.5 overflow-hidden border border-zinc-300 dark:border-zinc-800/60 flex">
                             <div
                                 className={`h-full transition-all duration-300 ${statusTheme.progress}`}
                                 style={{ width: `${overallScore}%` }}
                             />
                         </div>
-                        <span className="text-xs font-bold text-zinc-200 shrink-0">{overallScore}%</span>
+                        <span className="text-xs font-bold text-zinc-900 dark:text-zinc-200 shrink-0">{overallScore}%</span>
                     </div>
                 </Tooltip>
             </div>
@@ -566,27 +566,27 @@ export const InvestmentReadinessScorecard = ({
                                 onClick={() => setActivePillarFilter(activePillarFilter === pKey ? 'all' : pKey)}
                                 className={`p-4 rounded-xl border transition-all cursor-pointer ${
                                     activePillarFilter === pKey
-                                        ? 'bg-zinc-850 border-emerald-500/50 shadow-md ring-1 ring-emerald-500/30'
-                                        : 'bg-zinc-900 border-zinc-800 hover:border-zinc-700'
+                                        ? 'bg-white dark:bg-zinc-850 border-emerald-500 shadow-sm ring-1 ring-emerald-500/30'
+                                        : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 shadow-xs'
                                 }`}
                             >
                                 <div className="flex items-center justify-between mb-2">
                                     <div className="flex items-center gap-2">
                                         <div className={`w-7 h-7 rounded-md flex items-center justify-center ${
-                                            isCompliant ? 'bg-emerald-500/10 text-emerald-400' : isWarning ? 'bg-amber-500/10 text-amber-400' : 'bg-rose-500/10 text-rose-400'
+                                            isCompliant ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : isWarning ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400' : 'bg-rose-500/10 text-rose-600 dark:text-rose-400'
                                         }`}>
                                             <PIcon className="w-4 h-4" />
                                         </div>
-                                        <span className="text-xs font-bold text-zinc-200 uppercase tracking-wide">
+                                        <span className="text-xs font-bold text-zinc-900 dark:text-zinc-200 uppercase tracking-wide">
                                             {pKey}
                                         </span>
                                     </div>
-                                    <span className={`text-xs font-extrabold ${isCompliant ? 'text-emerald-400' : isWarning ? 'text-amber-400' : 'text-rose-400'}`}>
+                                    <span className={`text-xs font-extrabold ${isCompliant ? 'text-emerald-600 dark:text-emerald-400' : isWarning ? 'text-amber-600 dark:text-amber-400' : 'text-rose-600 dark:text-rose-400'}`}>
                                         {pScore.percentage}%
                                     </span>
                                 </div>
 
-                                <div className="text-[11px] font-semibold text-zinc-300 truncate mb-1">
+                                <div className="text-[11px] font-semibold text-zinc-800 dark:text-zinc-300 truncate mb-1">
                                     {pScore.title.split(' ')[0]}
                                 </div>
 
@@ -595,7 +595,7 @@ export const InvestmentReadinessScorecard = ({
                                     <span>Spełnione: {pScore.passedCount}/{pScore.criteriaCount}</span>
                                 </div>
 
-                                <div className="w-full bg-zinc-950 rounded-full h-1.5 overflow-hidden">
+                                <div className="w-full bg-zinc-200 dark:bg-zinc-950 rounded-full h-1.5 overflow-hidden">
                                     <div
                                         className={`h-full transition-all duration-300 ${
                                             isCompliant ? 'bg-emerald-500' : isWarning ? 'bg-amber-500' : 'bg-rose-500'
@@ -610,9 +610,9 @@ export const InvestmentReadinessScorecard = ({
             </div>
 
             {/* Interactive Criteria Audit Section */}
-            <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden shadow-lg">
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden shadow-sm dark:shadow-lg">
                 {/* Section Controls Toolbar */}
-                <div className="p-4 bg-zinc-950/60 border-b border-zinc-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="p-4 bg-zinc-50 dark:bg-zinc-950/60 border-b border-zinc-200 dark:border-zinc-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="flex flex-wrap items-center gap-1.5">
                         <Tooltip content="Pokaż wszystkie kryteria ze wszystkich 4 filarów">
                             <button
@@ -620,8 +620,8 @@ export const InvestmentReadinessScorecard = ({
                                 onClick={() => setActivePillarFilter('all')}
                                 className={`px-2.5 py-1 text-xs rounded transition-all cursor-pointer ${
                                     activePillarFilter === 'all'
-                                        ? 'bg-zinc-800 text-zinc-100 font-bold shadow-xs'
-                                        : 'text-zinc-400 hover:text-zinc-200'
+                                        ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-bold shadow-xs border border-zinc-300 dark:border-transparent'
+                                        : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
                                 }`}
                             >
                                 Wszystkie ({criteria.length})
@@ -633,8 +633,8 @@ export const InvestmentReadinessScorecard = ({
                                 onClick={() => setActivePillarFilter('legal')}
                                 className={`px-2.5 py-1 text-xs rounded transition-all cursor-pointer ${
                                     activePillarFilter === 'legal'
-                                        ? 'bg-zinc-800 text-zinc-100 font-bold shadow-xs'
-                                        : 'text-zinc-400 hover:text-zinc-200'
+                                        ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-bold shadow-xs border border-zinc-300 dark:border-transparent'
+                                        : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
                                 }`}
                             >
                                 Formalno-Prawne (4)
@@ -646,8 +646,8 @@ export const InvestmentReadinessScorecard = ({
                                 onClick={() => setActivePillarFilter('technical')}
                                 className={`px-2.5 py-1 text-xs rounded transition-all cursor-pointer ${
                                     activePillarFilter === 'technical'
-                                        ? 'bg-zinc-800 text-zinc-100 font-bold shadow-xs'
-                                        : 'text-zinc-400 hover:text-zinc-200'
+                                        ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-bold shadow-xs border border-zinc-300 dark:border-transparent'
+                                        : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
                                 }`}
                             >
                                 Techniczne (4)
@@ -659,8 +659,8 @@ export const InvestmentReadinessScorecard = ({
                                 onClick={() => setActivePillarFilter('market')}
                                 className={`px-2.5 py-1 text-xs rounded transition-all cursor-pointer ${
                                     activePillarFilter === 'market'
-                                        ? 'bg-zinc-800 text-zinc-100 font-bold shadow-xs'
-                                        : 'text-zinc-400 hover:text-zinc-200'
+                                        ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-bold shadow-xs border border-zinc-300 dark:border-transparent'
+                                        : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
                                 }`}
                             >
                                 Rynkowe (4)
@@ -672,8 +672,8 @@ export const InvestmentReadinessScorecard = ({
                                 onClick={() => setActivePillarFilter('financial')}
                                 className={`px-2.5 py-1 text-xs rounded transition-all cursor-pointer ${
                                     activePillarFilter === 'financial'
-                                        ? 'bg-zinc-800 text-zinc-100 font-bold shadow-xs'
-                                        : 'text-zinc-400 hover:text-zinc-200'
+                                        ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-bold shadow-xs border border-zinc-300 dark:border-transparent'
+                                        : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
                                 }`}
                             >
                                 Finansowe (4)
@@ -685,8 +685,8 @@ export const InvestmentReadinessScorecard = ({
                                 onClick={() => setActivePillarFilter('cp_only')}
                                 className={`px-2.5 py-1 text-xs rounded transition-all cursor-pointer flex items-center gap-1 ${
                                     activePillarFilter === 'cp_only'
-                                        ? 'bg-amber-950/60 text-amber-300 font-bold border border-amber-800/80'
-                                        : 'text-amber-400/80 hover:text-amber-300'
+                                        ? 'bg-amber-500/10 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 font-bold border border-amber-300 dark:border-amber-800/80'
+                                        : 'text-amber-600 dark:text-amber-400/80 hover:text-amber-700 dark:hover:text-amber-300'
                                 }`}
                             >
                                 <ShieldCheck className="w-3.5 h-3.5" />
@@ -699,8 +699,8 @@ export const InvestmentReadinessScorecard = ({
                                 onClick={() => setActivePillarFilter('gaps_only')}
                                 className={`px-2.5 py-1 text-xs rounded transition-all cursor-pointer flex items-center gap-1 ${
                                     activePillarFilter === 'gaps_only'
-                                        ? 'bg-rose-950/60 text-rose-300 font-bold border border-rose-800/80'
-                                        : 'text-rose-400/80 hover:text-rose-300'
+                                        ? 'bg-rose-500/10 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 font-bold border border-rose-300 dark:border-rose-800/80'
+                                        : 'text-rose-600 dark:text-rose-400/80 hover:text-rose-700 dark:hover:text-rose-300'
                                 }`}
                             >
                                 <AlertTriangle className="w-3.5 h-3.5" />
@@ -711,14 +711,14 @@ export const InvestmentReadinessScorecard = ({
 
                     {/* Search Input */}
                     <div className="relative w-full md:w-64">
-                        <Search className="w-3.5 h-3.5 text-zinc-500 absolute left-2.5 top-1/2 -translate-y-1/2" />
+                        <Search className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500 absolute left-2.5 top-1/2 -translate-y-1/2" />
                         <input
                             type="text"
                             placeholder="Szukaj kryterium audytowego..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             aria-label="Szukaj kryterium audytowego"
-                            className="w-full bg-zinc-950 border border-zinc-800 rounded pl-8 pr-3 py-1.5 text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-zinc-700"
+                            className="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded pl-8 pr-3 py-1.5 text-xs text-zinc-900 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-zinc-500 dark:focus:border-zinc-700"
                         />
                     </div>
                 </div>
@@ -726,7 +726,7 @@ export const InvestmentReadinessScorecard = ({
                 {/* Criteria Table */}
                 <div className="overflow-x-auto">
                     <table data-testid="criteria-table" className="w-full text-left border-collapse text-xs font-mono">
-                        <thead className="bg-zinc-950 text-zinc-400 uppercase text-[10px] tracking-wider border-b border-zinc-800">
+                        <thead className="bg-zinc-100 dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400 uppercase text-[10px] tracking-wider border-b border-zinc-200 dark:border-zinc-800">
                             <tr>
                                 <th className="py-2.5 px-3 w-12 text-center">#</th>
                                 <th className="py-2.5 px-3 min-w-[240px]">Kryterium / Wymóg Audytowy</th>
@@ -738,10 +738,10 @@ export const InvestmentReadinessScorecard = ({
                             </tr>
                         </thead>
 
-                        <tbody className="divide-y divide-zinc-855 text-zinc-300">
+                        <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800 text-zinc-700 dark:text-zinc-300">
                             {filteredCriteria.length === 0 ? (
                                 <tr>
-                                    <td colSpan={7} className="py-8 text-center text-zinc-500">
+                                    <td colSpan={7} className="py-8 text-center text-zinc-500 dark:text-zinc-400">
                                         Brak kryteriów odpowiadających wybranym filtrom.
                                     </td>
                                 </tr>
@@ -751,16 +751,16 @@ export const InvestmentReadinessScorecard = ({
 
                                     return (
                                         <React.Fragment key={item.id}>
-                                            <tr className="hover:bg-zinc-850/40 transition-colors">
+                                            <tr className="hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition-colors">
                                                 {/* Index & Pillar tag */}
-                                                <td className="py-3 px-3 text-center text-zinc-500 text-[11px]">
+                                                <td className="py-3 px-3 text-center text-zinc-400 dark:text-zinc-500 text-[11px]">
                                                     {idx + 1}
                                                 </td>
 
                                                 {/* Name */}
-                                                <td className="py-3 px-3 font-semibold text-zinc-100">
+                                                <td className="py-3 px-3 font-semibold text-zinc-900 dark:text-zinc-100">
                                                     <div className="flex items-center gap-2">
-                                                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400 uppercase">
+                                                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 uppercase">
                                                             {item.pillar}
                                                         </span>
                                                         <span>{item.name}</span>
@@ -768,11 +768,11 @@ export const InvestmentReadinessScorecard = ({
                                                 </td>
 
                                                 {/* Description */}
-                                                <td className="py-3 px-3 text-zinc-400 text-[11px] leading-relaxed">
+                                                <td className="py-3 px-3 text-zinc-600 dark:text-zinc-400 text-[11px] leading-relaxed">
                                                     {item.description}
                                                     {item.autoKey && (
                                                         <Tooltip content="Kryterium ewaluowane automatycznie na podstawie wskaźników modelu 15-letniego i struktury finansowania">
-                                                            <span className="inline-flex items-center gap-1 ml-2 text-[10px] text-emerald-400 bg-emerald-950/40 px-1.5 py-0.5 rounded border border-emerald-800/50 cursor-help">
+                                                            <span className="inline-flex items-center gap-1 ml-2 text-[10px] text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-1.5 py-0.5 rounded border border-emerald-300 dark:border-emerald-800/50 cursor-help">
                                                                 <Sparkles className="w-2.5 h-2.5" />
                                                                 Auto-Sync
                                                             </span>
@@ -781,7 +781,7 @@ export const InvestmentReadinessScorecard = ({
                                                 </td>
 
                                                 {/* Weight */}
-                                                <td className="py-3 px-3 text-center font-bold text-zinc-300">
+                                                <td className="py-3 px-3 text-center font-bold text-zinc-800 dark:text-zinc-200">
                                                     <Tooltip content={`Waga kryterium w scorecardzie: ${item.weight} pkt`}>
                                                         <span className="cursor-help">{item.weight} pkt</span>
                                                     </Tooltip>
@@ -791,19 +791,19 @@ export const InvestmentReadinessScorecard = ({
                                                 <td className="py-3 px-3 text-center">
                                                     {item.isConditionPrecedent ? (
                                                         <Tooltip content="Kluczowy warunek zawieszający (Condition Precedent) przed wypłatą kredytu">
-                                                            <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded bg-amber-950/60 text-amber-300 border border-amber-800/80 cursor-help">
+                                                            <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-800/80 cursor-help">
                                                                 <ShieldCheck className="w-3 h-3" />
                                                                 CP
                                                             </span>
                                                         </Tooltip>
                                                     ) : (
-                                                        <span className="text-zinc-600 text-[10px]">—</span>
+                                                        <span className="text-zinc-400 dark:text-zinc-600 text-[10px]">—</span>
                                                     )}
                                                 </td>
 
                                                 {/* Status Selector Buttons */}
                                                 <td className="py-3 px-3 text-center">
-                                                    <div className="inline-flex items-center bg-zinc-950 p-1 rounded-lg border border-zinc-800 gap-1">
+                                                    <div className="inline-flex items-center bg-zinc-100 dark:bg-zinc-950 p-1 rounded-lg border border-zinc-200 dark:border-zinc-800 gap-1">
                                                         <Tooltip content="Spełniony (100% punktów wagi kryterium)">
                                                             <button
                                                                 type="button"
@@ -811,7 +811,7 @@ export const InvestmentReadinessScorecard = ({
                                                                 className={`px-2 py-1 text-[11px] font-semibold rounded transition-all cursor-pointer ${
                                                                     item.status === 'passed'
                                                                         ? 'bg-emerald-600 text-white shadow-xs'
-                                                                        : 'text-zinc-400 hover:text-emerald-300'
+                                                                        : 'text-zinc-600 dark:text-zinc-400 hover:text-emerald-600 dark:hover:text-emerald-300'
                                                                 }`}
                                                             >
                                                                 Spełniony
@@ -824,7 +824,7 @@ export const InvestmentReadinessScorecard = ({
                                                                 className={`px-2 py-1 text-[11px] font-semibold rounded transition-all cursor-pointer ${
                                                                     item.status === 'in_progress'
                                                                         ? 'bg-amber-600 text-white shadow-xs'
-                                                                        : 'text-zinc-400 hover:text-amber-300'
+                                                                        : 'text-zinc-600 dark:text-zinc-400 hover:text-amber-600 dark:hover:text-amber-300'
                                                                 }`}
                                                             >
                                                                 W toku
@@ -837,7 +837,7 @@ export const InvestmentReadinessScorecard = ({
                                                                 className={`px-2 py-1 text-[11px] font-semibold rounded transition-all cursor-pointer ${
                                                                     item.status === 'failed'
                                                                         ? 'bg-rose-600 text-white shadow-xs'
-                                                                        : 'text-zinc-400 hover:text-rose-300'
+                                                                        : 'text-zinc-600 dark:text-zinc-400 hover:text-rose-600 dark:hover:text-rose-300'
                                                                 }`}
                                                             >
                                                                 Brak
@@ -849,8 +849,8 @@ export const InvestmentReadinessScorecard = ({
                                                                 onClick={() => handleStatusChange(item.id, 'na')}
                                                                 className={`px-2 py-1 text-[11px] font-semibold rounded transition-all cursor-pointer ${
                                                                     item.status === 'na'
-                                                                        ? 'bg-zinc-700 text-zinc-100 shadow-xs'
-                                                                        : 'text-zinc-500 hover:text-zinc-300'
+                                                                        ? 'bg-zinc-300 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-100 shadow-xs'
+                                                                        : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300'
                                                                 }`}
                                                             >
                                                                 N/D
@@ -866,7 +866,7 @@ export const InvestmentReadinessScorecard = ({
                                                             type="button"
                                                             onClick={() => toggleNotesExpanded(item.id)}
                                                             className={`p-1.5 rounded transition-colors cursor-pointer ${
-                                                                item.notes ? 'text-emerald-400 bg-emerald-950/30' : 'text-zinc-500 hover:text-zinc-300'
+                                                                item.notes ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30' : 'text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
                                                             }`}
                                                             aria-label="Notatka audytowa kryterium"
                                                             title="Dodaj lub edytuj notatkę audytową"
@@ -879,10 +879,10 @@ export const InvestmentReadinessScorecard = ({
 
                                             {/* Expandable Notes Sub-row */}
                                             {isNotesOpen && (
-                                                <tr className="bg-zinc-950/60 border-t border-b border-zinc-800/60">
+                                                <tr className="bg-zinc-50 dark:bg-zinc-950/60 border-t border-b border-zinc-200 dark:border-zinc-800/60">
                                                     <td colSpan={7} className="py-2.5 px-4">
                                                         <div className="flex items-center gap-3">
-                                                            <span className="text-[11px] text-zinc-400 shrink-0 uppercase font-semibold">
+                                                            <span className="text-[11px] text-zinc-600 dark:text-zinc-400 shrink-0 uppercase font-semibold">
                                                                 Notatka Audytora / Komitetu:
                                                             </span>
                                                             <input
@@ -891,7 +891,7 @@ export const InvestmentReadinessScorecard = ({
                                                                 value={item.notes || ''}
                                                                 onChange={(e) => handleNotesChange(item.id, e.target.value)}
                                                                 aria-label={`Notatka do kryterium ${item.name}`}
-                                                                className="w-full bg-zinc-900 border border-zinc-700 rounded px-3 py-1 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-emerald-500"
+                                                                className="w-full bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded px-3 py-1 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-emerald-500"
                                                             />
                                                         </div>
                                                     </td>
@@ -907,17 +907,17 @@ export const InvestmentReadinessScorecard = ({
             </div>
 
             {/* Conditions Precedent (CPs) Checklist Summary Card */}
-            <div className="bg-zinc-900/90 border border-zinc-800 rounded-xl p-5 shadow-sm">
+            <div className="bg-white dark:bg-zinc-900/90 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 shadow-sm">
                 <div className="flex items-center justify-between gap-4 mb-3 flex-wrap">
                     <div className="flex items-center gap-2.5">
                         <Tooltip content="Weryfikacja kompletu warunków zawieszających LMA">
-                            <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 cursor-help">
+                            <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-600 dark:text-amber-400 cursor-help">
                                 <ShieldCheck className="w-4 h-4" />
                             </div>
                         </Tooltip>
                         <div>
                             <div className="flex items-center gap-2">
-                                <h3 className="text-sm font-bold text-zinc-100">
+                                <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
                                     Warunki Zawieszające przed Wypłatą Finansowania (Conditions Precedent - CPs)
                                 </h3>
                                 <InfoTooltip
@@ -926,16 +926,16 @@ export const InvestmentReadinessScorecard = ({
                                     ariaLabel="Objaśnienie warunków CP"
                                 />
                             </div>
-                            <p className="text-xs text-zinc-400 mt-0.5">
+                            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
                                 Zestawienie wymogów formalno-prawnych i technicznych LMA, których spełnienie warunkuje podpisanie umowy i uruchomienie kredytu.
                             </p>
                         </div>
                     </div>
 
                     <div className="text-right">
-                        <span className="text-xs text-zinc-400 font-semibold">Status CPs: </span>
+                        <span className="text-xs text-zinc-500 dark:text-zinc-400 font-semibold">Status CPs: </span>
                         <Tooltip content={`${conditionsPrecedent.passedCount} z ${conditionsPrecedent.totalCount} kluczowych warunków CP zostało już spełnionych`}>
-                            <span className={`text-sm font-bold cursor-help ${conditionsPrecedent.pendingCount === 0 ? 'text-emerald-400' : 'text-amber-400'}`}>
+                            <span className={`text-sm font-bold cursor-help ${conditionsPrecedent.pendingCount === 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`}>
                                 {conditionsPrecedent.passedCount} z {conditionsPrecedent.totalCount} spełnionych
                             </span>
                         </Tooltip>
@@ -951,24 +951,24 @@ export const InvestmentReadinessScorecard = ({
                             <div
                                 className={`p-2.5 rounded-lg border flex items-center justify-between gap-3 text-xs cursor-help ${
                                     cp.status === 'passed'
-                                        ? 'bg-emerald-950/20 border-emerald-800/40 text-emerald-300'
+                                        ? 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800/40 text-emerald-800 dark:text-emerald-300'
                                         : cp.status === 'in_progress'
-                                        ? 'bg-amber-950/20 border-amber-800/40 text-amber-300'
-                                        : 'bg-rose-950/20 border-rose-800/40 text-rose-300'
+                                        ? 'bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800/40 text-amber-800 dark:text-amber-300'
+                                        : 'bg-rose-50 dark:bg-rose-950/20 border-rose-200 dark:border-rose-800/40 text-rose-800 dark:text-rose-300'
                                 }`}
                             >
                                 <div className="flex items-center gap-2 truncate">
                                     {cp.status === 'passed' ? (
-                                        <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                                        <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                                     ) : cp.status === 'in_progress' ? (
-                                        <Clock className="w-4 h-4 text-amber-400 shrink-0" />
+                                        <Clock className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
                                     ) : (
-                                        <XCircle className="w-4 h-4 text-rose-400 shrink-0" />
+                                        <XCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
                                     )}
                                     <span className="font-semibold truncate">{cp.name}</span>
                                 </div>
 
-                                <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-zinc-950/60 border border-zinc-800 shrink-0">
+                                <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-white/80 dark:bg-zinc-950/60 border border-zinc-200 dark:border-zinc-800 shrink-0">
                                     {cp.status === 'passed' ? 'SPEŁNIONY' : cp.status === 'in_progress' ? 'W TOKU' : 'WYMAGANY'}
                                 </span>
                             </div>

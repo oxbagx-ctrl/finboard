@@ -158,18 +158,18 @@ export const DocumentUploadModal = ({
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-xs font-mono">
-            <div className="bg-zinc-900 border border-zinc-750 rounded-lg shadow-2xl max-w-lg w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-750 rounded-lg shadow-2xl max-w-lg w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
                 {/* Header */}
-                <div className="px-5 py-3.5 bg-zinc-950 border-b border-zinc-800 flex items-center justify-between">
+                <div className="px-5 py-3.5 bg-zinc-50 dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded bg-zinc-850 border border-zinc-750 flex items-center justify-center text-zinc-300">
-                            <UploadCloud className="w-3.5 h-3.5" />
+                        <div className="w-6 h-6 rounded bg-zinc-100 dark:bg-zinc-850 border border-zinc-200 dark:border-zinc-750 flex items-center justify-center text-zinc-700 dark:text-zinc-300">
+                            <UploadCloud className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                         </div>
                         <div>
-                            <h2 className="text-xs font-bold uppercase tracking-wider text-zinc-100">
+                            <h2 className="text-xs font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
                                 Deponowanie Dokumentu w VDR
                             </h2>
-                            <p className="text-[10px] text-zinc-500">
+                            <p className="text-[10px] text-zinc-500 dark:text-zinc-400">
                                 SZYFROWANY ZAPIS Z SUMĄ KONTROLNĄ SHA-256
                             </p>
                         </div>
@@ -179,7 +179,7 @@ export const DocumentUploadModal = ({
                             onClick={onClose}
                             disabled={uploading}
                             aria-label="Zamknij formularz deponowania"
-                            className="p-1 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors disabled:opacity-50"
+                            className="p-1 rounded text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors disabled:opacity-50"
                         >
                             <X className="w-4 h-4" />
                         </button>
@@ -190,7 +190,7 @@ export const DocumentUploadModal = ({
                 <form onSubmit={handleSubmit} className="p-5 space-y-4">
                     {/* File Dropzone / Picker */}
                     <div>
-                        <label className="block text-[10px] uppercase font-semibold text-zinc-400 mb-1 flex items-center gap-1.5">
+                        <label className="block text-[10px] uppercase font-semibold text-zinc-600 dark:text-zinc-400 mb-1 flex items-center gap-1.5">
                             Plik Źródłowy *
                             <InfoTooltip
                                 size="xs"
@@ -204,10 +204,10 @@ export const DocumentUploadModal = ({
                                 onClick={() => fileInputRef.current?.click()}
                                 className={`border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors ${
                                     file
-                                        ? 'border-emerald-600/60 bg-emerald-950/20'
+                                        ? 'border-emerald-600/60 bg-emerald-50 dark:bg-emerald-950/20'
                                         : errors.file
-                                            ? 'border-rose-600/60 bg-rose-950/20'
-                                            : 'border-zinc-800 hover:border-zinc-650 bg-zinc-950/50'
+                                            ? 'border-rose-400 dark:border-rose-600/60 bg-rose-50 dark:bg-rose-950/20'
+                                            : 'border-zinc-300 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-650 bg-zinc-50 dark:bg-zinc-950/50'
                                 }`}
                             >
                                 <input
@@ -220,18 +220,18 @@ export const DocumentUploadModal = ({
                                 />
 
                                 {file ? (
-                                    <div className="flex items-center justify-center gap-2 text-emerald-400 text-xs">
+                                    <div className="flex items-center justify-center gap-2 text-emerald-600 dark:text-emerald-400 text-xs">
                                         <CheckCircle2 className="w-4 h-4 shrink-0" />
                                         <span className="font-bold truncate max-w-xs">{file.name}</span>
-                                        <span className="text-zinc-500 text-[10px]">({formatFileSize(file.size)})</span>
+                                        <span className="text-zinc-500 dark:text-zinc-400 text-[10px]">({formatFileSize(file.size)})</span>
                                     </div>
                                 ) : (
                                     <div className="space-y-1">
-                                        <FileText className="w-6 h-6 mx-auto text-zinc-500" />
-                                        <div className="text-xs text-zinc-300">
+                                        <FileText className="w-6 h-6 mx-auto text-zinc-400 dark:text-zinc-500" />
+                                        <div className="text-xs text-zinc-700 dark:text-zinc-300">
                                             Kliknij, aby wybrać plik lub upuść go tutaj
                                         </div>
-                                        <div className="text-[10px] text-zinc-500">
+                                        <div className="text-[10px] text-zinc-500 dark:text-zinc-400">
                                             PDF, XLSX, DOCX, ZIP (maks. 50 MB)
                                         </div>
                                     </div>
@@ -239,7 +239,7 @@ export const DocumentUploadModal = ({
                             </div>
                         </Tooltip>
                         {errors.file && (
-                            <div className="text-[10px] text-rose-400 mt-1 flex items-center gap-1">
+                            <div className="text-[10px] text-rose-500 dark:text-rose-400 mt-1 flex items-center gap-1">
                                 <AlertCircle className="w-3 h-3" />
                                 {errors.file}
                             </div>
@@ -248,7 +248,7 @@ export const DocumentUploadModal = ({
 
                     {/* Title */}
                     <div>
-                        <label className="block text-[10px] uppercase font-semibold text-zinc-400 mb-1 flex items-center gap-1.5">
+                        <label className="block text-[10px] uppercase font-semibold text-zinc-600 dark:text-zinc-400 mb-1 flex items-center gap-1.5">
                             Tytuł Biznesowy Dokumentu *
                             <InfoTooltip
                                 size="xs"
@@ -264,10 +264,10 @@ export const DocumentUploadModal = ({
                             onChange={(e) => setTitle(e.target.value)}
                             placeholder="np. Sprawozdanie Finansowe 2025 ze stemplem biegłego"
                             aria-label="Tytuł Biznesowy Dokumentu"
-                            className="w-full bg-zinc-950 border border-zinc-750 rounded px-3 py-2 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
+                            className="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-750 rounded px-3 py-2 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
                         />
                         {errors.title && (
-                            <div className="text-[10px] text-rose-400 mt-1 flex items-center gap-1">
+                            <div className="text-[10px] text-rose-500 dark:text-rose-400 mt-1 flex items-center gap-1">
                                 <AlertCircle className="w-3 h-3" />
                                 {errors.title}
                             </div>
@@ -277,7 +277,7 @@ export const DocumentUploadModal = ({
                     {/* Category & Folder */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
-                            <label className="block text-[10px] uppercase font-semibold text-zinc-400 mb-1 flex items-center gap-1.5">
+                            <label className="block text-[10px] uppercase font-semibold text-zinc-600 dark:text-zinc-400 mb-1 flex items-center gap-1.5">
                                 Kategoria Due Diligence *
                                 <InfoTooltip
                                     size="xs"
@@ -290,10 +290,10 @@ export const DocumentUploadModal = ({
                                 value={type}
                                 onChange={(e) => setType(e.target.value)}
                                 aria-label="Kategoria Due Diligence"
-                                className="w-full bg-zinc-950 border border-zinc-750 rounded px-3 py-2 text-xs text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
+                                className="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-750 rounded px-3 py-2 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
                             >
                                 {DOCUMENT_CATEGORIES.map(cat => (
-                                    <option key={cat.value} value={cat.value} className="bg-zinc-950 text-zinc-100">
+                                    <option key={cat.value} value={cat.value}>
                                         {cat.label}
                                     </option>
                                 ))}
@@ -301,8 +301,8 @@ export const DocumentUploadModal = ({
                         </div>
 
                         <div>
-                            <label className="block text-[10px] uppercase font-semibold text-zinc-400 mb-1 flex items-center gap-1.5">
-                                <FolderTree className="w-3 h-3 text-zinc-400" />
+                            <label className="block text-[10px] uppercase font-semibold text-zinc-600 dark:text-zinc-400 mb-1 flex items-center gap-1.5">
+                                <FolderTree className="w-3 h-3 text-zinc-500 dark:text-zinc-400" />
                                 Folder M&A (Dewey)
                                 <InfoTooltip
                                     size="xs"
@@ -315,11 +315,11 @@ export const DocumentUploadModal = ({
                                 value={folderId}
                                 onChange={handleFolderChange}
                                 aria-label="Folder M&A"
-                                className="w-full bg-zinc-950 border border-zinc-750 rounded px-3 py-2 text-xs text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
+                                className="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-750 rounded px-3 py-2 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
                             >
                                 <option value="">— Brak folderu (Nieprzypisany) —</option>
                                 {flattenedFolders.map(f => (
-                                    <option key={f.id} value={f.id} className="bg-zinc-950 text-zinc-100">
+                                    <option key={f.id} value={f.id}>
                                         {'\u00A0'.repeat(f.depth * 2)}[{f.index_code}] {f.name}
                                     </option>
                                 ))}
@@ -330,8 +330,8 @@ export const DocumentUploadModal = ({
                     {/* Dewey Index Code & Watermark */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
                         <div>
-                            <label className="block text-[10px] uppercase font-semibold text-zinc-400 mb-1 flex items-center gap-1.5">
-                                <Hash className="w-3 h-3 text-indigo-400" />
+                            <label className="block text-[10px] uppercase font-semibold text-zinc-600 dark:text-zinc-400 mb-1 flex items-center gap-1.5">
+                                <Hash className="w-3 h-3 text-indigo-600 dark:text-indigo-400" />
                                 Kod Indeksu Dewey
                                 <InfoTooltip
                                     size="xs"
@@ -346,22 +346,22 @@ export const DocumentUploadModal = ({
                                 onChange={(e) => setIndexCode(e.target.value)}
                                 placeholder="np. 01.01.01 (opcjonalny)"
                                 aria-label="Kod Indeksu Dewey"
-                                className="w-full bg-zinc-950 border border-zinc-750 rounded px-3 py-2 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
+                                className="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-750 rounded px-3 py-2 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
                             />
                         </div>
 
                         <div className="pt-4 sm:pt-3">
                             <Tooltip content="Wymuś nanoszenie znaku wodnego z danymi tożsamości i adresem IP przy podglądzie i pobieraniu pliku PDF">
-                                <label className="flex items-center gap-2 cursor-pointer text-xs text-zinc-300 select-none">
+                                <label className="flex items-center gap-2 cursor-pointer text-xs text-zinc-700 dark:text-zinc-300 select-none">
                                     <input
                                         type="checkbox"
                                         checked={watermarkRequired}
                                         onChange={(e) => setWatermarkRequired(e.target.checked)}
                                         aria-label="Wymagaj dynamicznego znaku wodnego"
-                                        className="rounded border-zinc-750 bg-zinc-950 text-zinc-200 focus:ring-0 focus:ring-offset-0"
+                                        className="rounded border-zinc-300 dark:border-zinc-750 bg-white dark:bg-zinc-950 text-emerald-600 focus:ring-0 focus:ring-offset-0"
                                     />
                                     <span className="flex items-center gap-1 text-[11px]">
-                                        <Shield className="w-3.5 h-3.5 text-amber-400" />
+                                        <Shield className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
                                         Znak wodny (Watermark)
                                     </span>
                                 </label>
@@ -371,14 +371,14 @@ export const DocumentUploadModal = ({
 
                     {/* Security notice */}
                     <Tooltip content="Plik zostanie zaszyfrowany kluczem spółki w algorytmie AES-256 GCM z automatycznym wyliczeniem sumy SHA-256">
-                        <div className="text-[10px] text-zinc-500 bg-zinc-950 border border-zinc-800 p-2.5 rounded flex items-center gap-2 cursor-help">
-                            <Shield className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                        <div className="text-[10px] text-zinc-600 dark:text-zinc-500 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded flex items-center gap-2 cursor-help">
+                            <Shield className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                             <span>Plik zostanie zaszyfrowany (AES-256 GCM) i zweryfikowany sumą SHA-256.</span>
                         </div>
                     </Tooltip>
 
                     {/* Actions */}
-                    <div className="pt-2 border-t border-zinc-800 flex items-center justify-end gap-2">
+                    <div className="pt-2 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-end gap-2">
                         <Tooltip content="Anuluj i zamknij okno deponowania">
                             <span>
                                 <Button

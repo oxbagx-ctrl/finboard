@@ -234,10 +234,12 @@ describe('Investment Statements & Valuation Tooltips (Phase 56 Commit 284)', () 
             expect(elementsWithTitle.length).toBe(0);
 
             // Verify InfoTooltips on executive KPI cards
-            expect(screen.getByRole('button', { name: /Objaśnienie Enterprise Value/i })).toBeInTheDocument();
-            expect(screen.getByRole('button', { name: /Objaśnienie Equity Value/i })).toBeInTheDocument();
-            expect(screen.getByRole('button', { name: /Objaśnienie wskaźników MoIC i IRR/i })).toBeInTheDocument();
-            expect(screen.getByRole('button', { name: /Objaśnienie wskaźnika buyer yield/i })).toBeInTheDocument();
+            await waitFor(() => {
+                expect(screen.getByRole('button', { name: /Objaśnienie Enterprise Value/i })).toBeInTheDocument();
+                expect(screen.getByRole('button', { name: /Objaśnienie Equity Value/i })).toBeInTheDocument();
+                expect(screen.getByRole('button', { name: /Objaśnienie wskaźników MoIC i IRR/i })).toBeInTheDocument();
+                expect(screen.getByRole('button', { name: /Objaśnienie wskaźnika buyer yield/i })).toBeInTheDocument();
+            });
 
             // Hover on Enterprise Value InfoTooltip
             const evInfo = screen.getByRole('button', { name: /Objaśnienie Enterprise Value/i });

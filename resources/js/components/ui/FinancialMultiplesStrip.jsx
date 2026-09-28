@@ -28,7 +28,7 @@ export const FinancialMultiplesStrip = ({
         if (!hasData || status === 'UNKNOWN' || status === 'unknown' || status === 'NA' || status === 'N/A') {
             return {
                 label: 'N/A',
-                className: 'text-zinc-500 bg-zinc-800/80 border-zinc-700/60',
+                className: 'text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800/80 border-zinc-200 dark:border-zinc-700/60',
             };
         }
 
@@ -37,24 +37,24 @@ export const FinancialMultiplesStrip = ({
             case 'opt':
                 return {
                     label: 'OPT',
-                    className: 'text-emerald-400 bg-emerald-950/60 border-emerald-800/80',
+                    className: 'text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border-emerald-200 dark:border-emerald-800/80',
                 };
             case 'WARN':
             case 'warn':
                 return {
                     label: 'WARN',
-                    className: 'text-amber-400 bg-amber-950/60 border-amber-800/80',
+                    className: 'text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 border-amber-200 dark:border-amber-800/80',
                 };
             case 'CRIT':
             case 'crit':
                 return {
                     label: 'CRIT',
-                    className: 'text-rose-400 bg-rose-950/60 border-rose-800/80',
+                    className: 'text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/60 border-rose-200 dark:border-rose-800/80',
                 };
             default:
                 return {
                     label: 'STD',
-                    className: 'text-zinc-400 bg-zinc-800 border-zinc-700',
+                    className: 'text-zinc-700 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700',
                 };
         }
     };
@@ -198,41 +198,41 @@ export const FinancialMultiplesStrip = ({
     ];
 
     return (
-        <div className={`bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden shadow-sm ${className}`}>
-            <div className="px-3.5 py-2 bg-zinc-950 border-b border-zinc-800 flex items-center justify-between text-[10px] font-mono text-zinc-400">
-                <span className="font-semibold uppercase text-zinc-300">WSKAŹNIKI PŁYNNOŚCI I RENTOWNOŚCI (MULTIPLE STRIP)</span>
+        <div className={`bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden shadow-sm ${className}`}>
+            <div className="px-3.5 py-2 bg-zinc-50 dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between text-[10px] font-mono text-zinc-500 dark:text-zinc-400">
+                <span className="font-semibold uppercase text-zinc-700 dark:text-zinc-300">WSKAŹNIKI PŁYNNOŚCI I RENTOWNOŚCI (MULTIPLE STRIP)</span>
                 <div className="flex items-center gap-3">
-                    <span className="text-zinc-500">
+                    <span className="text-zinc-500 dark:text-zinc-400">
                         {benchmarks ? 'BENCHMARKI DORADCY & STATUSY KPI' : 'BENCHMARK BRANŻOWY M&A'}
                     </span>
                     {onConfigure && (
                         <button
                             type="button"
                             onClick={onConfigure}
-                            className="text-emerald-400 hover:text-emerald-300 hover:underline font-semibold uppercase text-[10px] flex items-center gap-1 transition-colors"
+                            className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 hover:underline font-semibold uppercase text-[10px] flex items-center gap-1 transition-colors"
                         >
                             Konfiguruj cele
                         </button>
                     )}
                 </div>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 divide-x divide-y sm:divide-y-0 divide-zinc-800 font-mono">
+            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 divide-x divide-y sm:divide-y-0 divide-zinc-200 dark:divide-zinc-800 font-mono">
                 {multiples.map((item, idx) => {
                     const statusConfig = getStatusStyle(item.status, item.hasData);
                     const statusTooltip = getStatusExplanation(item.status, item.hasData, item.target);
 
                     return (
-                        <div key={idx} className="p-3 bg-zinc-900 hover:bg-zinc-850/60 transition-colors">
-                            <div className="flex items-center justify-between gap-1 text-[9px] uppercase tracking-wider text-zinc-500">
+                        <div key={idx} className="p-3 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-850/60 transition-colors">
+                            <div className="flex items-center justify-between gap-1 text-[9px] uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                                 <span className="truncate">{item.label}</span>
                                 <InfoTooltip
                                     title={item.title}
                                     content={
                                         <div className="space-y-1">
-                                            <div className="text-emerald-400 font-mono text-[10px] bg-zinc-900 px-1 py-0.5 rounded border border-zinc-800">
+                                            <div className="text-emerald-600 dark:text-emerald-400 font-mono text-[10px] bg-zinc-100 dark:bg-zinc-900 px-1 py-0.5 rounded border border-zinc-200 dark:border-zinc-800">
                                                 {item.formula}
                                             </div>
-                                            <div className="text-zinc-300 text-xs">
+                                            <div className="text-zinc-700 dark:text-zinc-300 text-xs">
                                                 {item.description}
                                             </div>
                                         </div>
@@ -242,7 +242,7 @@ export const FinancialMultiplesStrip = ({
                                 />
                             </div>
                             <div className="mt-1 flex items-baseline justify-between gap-1">
-                                <span className={`text-base font-bold tracking-tight tabular-nums ${item.hasData ? 'text-zinc-100' : 'text-zinc-500'}`}>
+                                <span className={`text-base font-bold tracking-tight tabular-nums ${item.hasData ? 'text-zinc-900 dark:text-zinc-100' : 'text-zinc-400 dark:text-zinc-500'}`}>
                                     {item.value}
                                 </span>
                                 <Tooltip content={statusTooltip}>
@@ -251,9 +251,9 @@ export const FinancialMultiplesStrip = ({
                                     </span>
                                 </Tooltip>
                             </div>
-                            <div className="mt-1 text-[9px] text-zinc-500 flex items-center justify-between">
+                            <div className="mt-1 text-[9px] text-zinc-500 dark:text-zinc-400 flex items-center justify-between">
                                 <span className="truncate">{item.note}</span>
-                                <span className="text-zinc-600 font-mono text-[8px]">{item.target}</span>
+                                <span className="text-zinc-400 dark:text-zinc-500 font-mono text-[8px]">{item.target}</span>
                             </div>
                         </div>
                     );

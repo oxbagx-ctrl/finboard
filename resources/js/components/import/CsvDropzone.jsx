@@ -55,9 +55,9 @@ export const CsvDropzone = ({
     return (
         <div className="space-y-3 font-mono">
             {/* Template Download Prompt */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 bg-zinc-950 border border-zinc-800 rounded-lg text-xs">
-                <div className="text-zinc-400 flex items-center gap-1.5 flex-wrap">
-                    <span className="font-bold text-zinc-200">Format wejściowy:</span> Kolumny <code className="text-emerald-400 font-bold">kategoria</code>, <code className="text-emerald-400 font-bold">kwota</code>, <code className="text-emerald-400 font-bold">data</code>, <code className="text-emerald-400 font-bold">opis</code>, opcjonalnie <code className="text-emerald-400 font-bold">waluta</code>. Separatory: przecinek (,) lub średnik (;).
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-xs">
+                <div className="text-zinc-600 dark:text-zinc-400 flex items-center gap-1.5 flex-wrap">
+                    <span className="font-bold text-zinc-800 dark:text-zinc-200">Format wejściowy:</span> Kolumny <code className="text-emerald-700 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950/60 px-1 py-0.5 rounded border border-emerald-200 dark:border-emerald-800/80">kategoria</code>, <code className="text-emerald-700 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950/60 px-1 py-0.5 rounded border border-emerald-200 dark:border-emerald-800/80">kwota</code>, <code className="text-emerald-700 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950/60 px-1 py-0.5 rounded border border-emerald-200 dark:border-emerald-800/80">data</code>, <code className="text-emerald-700 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950/60 px-1 py-0.5 rounded border border-emerald-200 dark:border-emerald-800/80">opis</code>, opcjonalnie <code className="text-emerald-700 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950/60 px-1 py-0.5 rounded border border-emerald-200 dark:border-emerald-800/80">waluta</code>. Separatory: przecinek (,) lub średnik (;).
                     <InfoTooltip
                         size="xs"
                         title="Specyfikacja Formatowania Pliku CSV"
@@ -98,8 +98,8 @@ export const CsvDropzone = ({
                         aria-label="Przeciągnij i upuść plik CSV lub kliknij, aby wybrać z dysku"
                         className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-all duration-150 ${
                             isDragOver
-                                ? 'border-emerald-500 bg-emerald-950/20'
-                                : 'border-zinc-750 hover:border-zinc-500 bg-zinc-950/60'
+                                ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/20'
+                                : 'border-zinc-300 dark:border-zinc-750 hover:border-zinc-400 dark:hover:border-zinc-500 bg-zinc-50 dark:bg-zinc-950/60'
                         }`}
                     >
                         <input
@@ -111,39 +111,39 @@ export const CsvDropzone = ({
                             aria-hidden="true"
                         />
 
-                        <div className="w-12 h-12 rounded-lg bg-zinc-900 border border-zinc-750 flex items-center justify-center mx-auto text-zinc-400 mb-3 shadow-inner">
-                            <UploadCloud className="w-6 h-6 text-zinc-300" />
+                        <div className="w-12 h-12 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-750 flex items-center justify-center mx-auto text-zinc-500 dark:text-zinc-400 mb-3 shadow-inner">
+                            <UploadCloud className="w-6 h-6 text-zinc-600 dark:text-zinc-300" />
                         </div>
 
-                        <div className="text-xs font-bold text-zinc-200 uppercase tracking-wider">
+                        <div className="text-xs font-bold text-zinc-800 dark:text-zinc-200 uppercase tracking-wider">
                             Przeciągnij i upuść plik CSV lub kliknij, aby wybrać z dysku
                         </div>
-                        <p className="text-[11px] text-zinc-500 mt-1 max-w-sm mx-auto">
+                        <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1 max-w-sm mx-auto">
                             Maksymalny rozmiar pliku: 10 MB. Obsługiwane kodowanie UTF-8 lub Windows-1250.
                         </p>
                     </div>
                 </Tooltip>
             ) : (
-                <div className="p-4 bg-zinc-950 border border-zinc-750 rounded-lg flex items-center justify-between gap-4">
+                <div className="p-4 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-750 rounded-lg flex items-center justify-between gap-4">
                     <div className="flex items-center gap-3 min-w-0">
                         <Tooltip content="Plik CSV wczytany do pamięci podręcznej i przygotowany do weryfikacji Dry-Run">
-                            <div className="w-10 h-10 rounded bg-emerald-950 border border-emerald-800 flex items-center justify-center text-emerald-400 shrink-0 cursor-help">
+                            <div className="w-10 h-10 rounded bg-emerald-50 dark:bg-emerald-950 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0 cursor-help">
                                 <FileSpreadsheet className="w-5 h-5" />
                             </div>
                         </Tooltip>
                         <div className="min-w-0">
-                            <div className="text-xs font-bold text-zinc-100 truncate flex items-center gap-2">
+                            <div className="text-xs font-bold text-zinc-900 dark:text-zinc-100 truncate flex items-center gap-2">
                                 <Tooltip content={`Wybrany plik: ${selectedFile.name}`}>
                                     <span className="truncate cursor-help">{selectedFile.name}</span>
                                 </Tooltip>
                                 <Tooltip content={`Dokładny rozmiar pliku: ${selectedFile.size} bajtów`}>
-                                    <span className="px-1.5 py-0.5 rounded text-[10px] bg-zinc-850 border border-zinc-750 text-zinc-400 shrink-0 cursor-help">
+                                    <span className="px-1.5 py-0.5 rounded text-[10px] bg-zinc-100 dark:bg-zinc-850 border border-zinc-200 dark:border-zinc-750 text-zinc-600 dark:text-zinc-400 shrink-0 cursor-help">
                                         {formatFileSize(selectedFile.size)}
                                     </span>
                                 </Tooltip>
                             </div>
                             <Tooltip content="Data ostatniej modyfikacji pliku na Twoim dysku">
-                                <div className="text-[10px] text-zinc-500 mt-0.5 cursor-help">
+                                <div className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5 cursor-help">
                                     Ostatnia modyfikacja: {new Date(selectedFile.lastModified).toLocaleString()}
                                 </div>
                             </Tooltip>

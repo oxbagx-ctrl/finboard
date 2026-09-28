@@ -25,27 +25,27 @@ export const CapexStageDeleteModal = ({
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-xs font-mono">
-            <div className="bg-zinc-900 border border-zinc-800 rounded-lg w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
                 <div className="p-6">
                     <div className="flex items-center gap-3 mb-4">
-                        <div className="w-10 h-10 rounded bg-rose-950/60 border border-rose-800/80 flex items-center justify-center text-rose-400 shrink-0">
+                        <div className="w-10 h-10 rounded bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800/80 flex items-center justify-center text-rose-600 dark:text-rose-400 shrink-0">
                             <AlertTriangle className="w-5 h-5" />
                         </div>
                         <div>
-                            <h3 className="text-sm font-bold text-zinc-100 uppercase tracking-wide">
+                            <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wide">
                                 Usunięcie Etapu CAPEX
                             </h3>
-                            <p className="text-[11px] text-zinc-400">
+                            <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
                                 Ta operacja zmieni sumaryczny budżet projektu
                             </p>
                         </div>
                     </div>
 
-                    <p className="text-xs text-zinc-300 leading-relaxed mb-4">
-                        Czy na pewno chcesz usunąć etap <strong className="text-zinc-100 font-semibold">{stage.stage_name}</strong> o wartości netto <strong className="text-emerald-400 font-semibold">{stage.formatted_net_amount || stage.net_amount + ' ' + (stage.currency || 'PLN')}</strong>?
+                    <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed mb-4">
+                        Czy na pewno chcesz usunąć etap <strong className="text-zinc-900 dark:text-zinc-100 font-semibold">{stage.stage_name}</strong> o wartości netto <strong className="text-emerald-600 dark:text-emerald-400 font-semibold">{stage.formatted_net_amount || stage.net_amount + ' ' + (stage.currency || 'PLN')}</strong>?
                     </p>
 
-                    <div className="p-3 bg-zinc-950 border border-zinc-850 rounded text-[11px] text-zinc-400 space-y-1 mb-6">
+                    <div className="p-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 rounded text-[11px] text-zinc-600 dark:text-zinc-400 space-y-1 mb-6">
                         <p>• Suma nakładów inwestycyjnych zostanie pomniejszona.</p>
                         <p>• Harmonogram amortyzacji KŚT zostanie automatycznie przeliczony.</p>
                     </div>

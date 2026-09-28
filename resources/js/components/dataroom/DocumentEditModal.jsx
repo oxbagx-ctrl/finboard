@@ -113,18 +113,18 @@ export const DocumentEditModal = ({
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-xs font-mono">
-            <div className="bg-zinc-900 border border-zinc-750 rounded-lg shadow-2xl max-w-lg w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-750 rounded-lg shadow-2xl max-w-lg w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
                 {/* Header */}
-                <div className="px-5 py-3.5 bg-zinc-950 border-b border-zinc-800 flex items-center justify-between">
+                <div className="px-5 py-3.5 bg-zinc-50 dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded bg-zinc-850 border border-zinc-750 flex items-center justify-center text-zinc-300">
-                            <Edit3 className="w-3.5 h-3.5" />
+                        <div className="w-6 h-6 rounded bg-zinc-100 dark:bg-zinc-850 border border-zinc-200 dark:border-zinc-750 flex items-center justify-center text-zinc-700 dark:text-zinc-300">
+                            <Edit3 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                         </div>
                         <div>
-                            <h2 className="text-xs font-bold uppercase tracking-wider text-zinc-100">
+                            <h2 className="text-xs font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
                                 Edycja Metadanych Dokumentu VDR
                             </h2>
-                            <p className="text-[10px] text-zinc-500">
+                            <p className="text-[10px] text-zinc-500 dark:text-zinc-400">
                                 ID: {document.id}
                             </p>
                         </div>
@@ -134,7 +134,7 @@ export const DocumentEditModal = ({
                             onClick={onClose}
                             disabled={saving}
                             aria-label="Zamknij formularz"
-                            className="p-1 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors disabled:opacity-50"
+                            className="p-1 rounded text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors disabled:opacity-50"
                         >
                             <X className="w-4 h-4" />
                         </button>
@@ -144,24 +144,24 @@ export const DocumentEditModal = ({
                 {/* Form */}
                 <form onSubmit={handleSubmit} className="p-5 space-y-4">
                     {/* Readonly info */}
-                    <div className="bg-zinc-950 border border-zinc-800 rounded p-3 text-[11px] space-y-1.5 text-zinc-400">
+                    <div className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded p-3 text-[11px] space-y-1.5 text-zinc-600 dark:text-zinc-400">
                         <div className="flex items-center gap-2">
-                            <FileText className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
-                            <span className="text-zinc-500">Plik źródłowy:</span>
-                            <span className="text-zinc-200 font-semibold truncate">{document.original_name}</span>
+                            <FileText className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500 shrink-0" />
+                            <span className="text-zinc-500 dark:text-zinc-400">Plik źródłowy:</span>
+                            <span className="text-zinc-900 dark:text-zinc-200 font-semibold truncate">{document.original_name}</span>
                         </div>
                         <Tooltip content={`Pełna suma kontrolna SHA-256: ${document.checksum_sha256}`}>
                             <div className="flex items-center gap-2 cursor-help">
-                                <Hash className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
-                                <span className="text-zinc-500">SHA-256:</span>
-                                <span className="text-zinc-300 font-mono text-[10px] truncate">{document.checksum_sha256}</span>
+                                <Hash className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500 shrink-0" />
+                                <span className="text-zinc-500 dark:text-zinc-400">SHA-256:</span>
+                                <span className="text-zinc-700 dark:text-zinc-300 font-mono text-[10px] truncate">{document.checksum_sha256}</span>
                             </div>
                         </Tooltip>
                     </div>
 
                     {/* Title */}
                     <div>
-                        <label className="block text-[10px] uppercase font-semibold text-zinc-400 mb-1 flex items-center gap-1.5">
+                        <label className="block text-[10px] uppercase font-semibold text-zinc-600 dark:text-zinc-400 mb-1 flex items-center gap-1.5">
                             Tytuł Biznesowy Dokumentu *
                             <InfoTooltip
                                 size="xs"
@@ -176,10 +176,10 @@ export const DocumentEditModal = ({
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                             aria-label="Tytuł Biznesowy Dokumentu"
-                            className="w-full bg-zinc-950 border border-zinc-750 rounded px-3 py-2 text-xs text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
+                            className="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-750 rounded px-3 py-2 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
                         />
                         {errors.title && (
-                            <div className="text-[10px] text-rose-400 mt-1 flex items-center gap-1">
+                            <div className="text-[10px] text-rose-500 dark:text-rose-400 mt-1 flex items-center gap-1">
                                 <AlertCircle className="w-3 h-3" />
                                 {errors.title}
                             </div>
@@ -189,7 +189,7 @@ export const DocumentEditModal = ({
                     {/* Category & Folder Row */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
-                            <label className="block text-[10px] uppercase font-semibold text-zinc-400 mb-1 flex items-center gap-1.5">
+                            <label className="block text-[10px] uppercase font-semibold text-zinc-600 dark:text-zinc-400 mb-1 flex items-center gap-1.5">
                                 Kategoria Dokumentu *
                                 <InfoTooltip
                                     size="xs"
@@ -202,16 +202,16 @@ export const DocumentEditModal = ({
                                 value={type}
                                 onChange={(e) => setType(e.target.value)}
                                 aria-label="Kategoria Dokumentu"
-                                className="w-full bg-zinc-950 border border-zinc-750 rounded px-3 py-2 text-xs text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
+                                className="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-750 rounded px-3 py-2 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
                             >
                                 {DOCUMENT_CATEGORIES.map(cat => (
-                                    <option key={cat.value} value={cat.value} className="bg-zinc-950 text-zinc-100">
+                                    <option key={cat.value} value={cat.value}>
                                         {cat.label}
                                     </option>
                                 ))}
                             </select>
                             {errors.type && (
-                                <div className="text-[10px] text-rose-400 mt-1 flex items-center gap-1">
+                                <div className="text-[10px] text-rose-500 dark:text-rose-400 mt-1 flex items-center gap-1">
                                     <AlertCircle className="w-3 h-3" />
                                     {errors.type}
                                 </div>
@@ -219,7 +219,7 @@ export const DocumentEditModal = ({
                         </div>
 
                         <div>
-                            <label className="block text-[10px] uppercase font-semibold text-zinc-400 mb-1 flex items-center gap-1.5">
+                            <label className="block text-[10px] uppercase font-semibold text-zinc-600 dark:text-zinc-400 mb-1 flex items-center gap-1.5">
                                 Folder M&A (Dewey)
                                 <InfoTooltip
                                     size="xs"
@@ -241,11 +241,11 @@ export const DocumentEditModal = ({
                                     }
                                 }}
                                 aria-label="Folder M&A"
-                                className="w-full bg-zinc-950 border border-zinc-750 rounded px-3 py-2 text-xs text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
+                                className="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-750 rounded px-3 py-2 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
                             >
                                 <option value="">— Brak folderu (Nieprzypisany) —</option>
                                 {flattenedFolders.map(f => (
-                                    <option key={f.id} value={f.id} className="bg-zinc-950 text-zinc-100">
+                                    <option key={f.id} value={f.id}>
                                         {'\u00A0'.repeat(f.depth * 2)}[{f.index_code}] {f.name}
                                     </option>
                                 ))}
@@ -255,7 +255,7 @@ export const DocumentEditModal = ({
 
                     {/* Dewey Index Code */}
                     <div>
-                        <label className="block text-[10px] uppercase font-semibold text-zinc-400 mb-1 flex items-center gap-1.5">
+                        <label className="block text-[10px] uppercase font-semibold text-zinc-600 dark:text-zinc-400 mb-1 flex items-center gap-1.5">
                             Kod Indeksu Dewey (np. 01.01.01)
                             <InfoTooltip
                                 size="xs"
@@ -270,21 +270,21 @@ export const DocumentEditModal = ({
                             onChange={(e) => setIndexCode(e.target.value)}
                             placeholder="np. 01.01.01 (opcjonalny)"
                             aria-label="Kod Indeksu Dewey"
-                            className="w-full bg-zinc-950 border border-zinc-750 rounded px-3 py-2 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
+                            className="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-750 rounded px-3 py-2 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
                         />
                         {errors.index_code && (
-                            <div className="text-[10px] text-rose-400 mt-1 flex items-center gap-1">
+                            <div className="text-[10px] text-rose-500 dark:text-rose-400 mt-1 flex items-center gap-1">
                                 <AlertCircle className="w-3 h-3" />
                                 {errors.index_code}
                             </div>
                         )}
-                        <p className="text-[9px] text-zinc-500 mt-0.5">
+                        <p className="text-[9px] text-zinc-500 dark:text-zinc-400 mt-0.5">
                             Hierarchiczny identyfikator dokumentu w taksonomii Dewey.
                         </p>
                     </div>
 
                     {/* Actions */}
-                    <div className="pt-2 border-t border-zinc-800 flex items-center justify-end gap-2">
+                    <div className="pt-2 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-end gap-2">
                         <Tooltip content="Odrzuć zmiany i zamknij okno edycji">
                             <span>
                                 <Button

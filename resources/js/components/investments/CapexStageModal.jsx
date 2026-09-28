@@ -131,18 +131,18 @@ export const CapexStageModal = ({
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-xs font-mono">
-            <div className="bg-zinc-900 border border-zinc-800 rounded-lg w-full max-w-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg w-full max-w-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
                 {/* Header */}
-                <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800 bg-zinc-950">
+                <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950">
                     <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded bg-zinc-800 border border-zinc-700 flex items-center justify-center text-zinc-100">
-                            <Layers className="w-4 h-4 text-emerald-400" />
+                        <div className="w-8 h-8 rounded bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-zinc-900 dark:text-zinc-100">
+                            <Layers className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                         </div>
                         <div>
-                            <h2 className="text-sm font-bold text-zinc-100 uppercase tracking-wide">
+                            <h2 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wide">
                                 {isEdit ? 'Edycja Etapu CAPEX' : 'Nowy Etap Nakładów CAPEX'}
                             </h2>
-                            <p className="text-[11px] text-zinc-400">
+                            <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
                                 Parametryzacja kosztów, harmonogramu i stawek amortyzacji KŚT
                             </p>
                         </div>
@@ -153,7 +153,7 @@ export const CapexStageModal = ({
                             onClick={onClose}
                             disabled={submitting}
                             aria-label="Zamknij formularz etapu"
-                            className="text-zinc-500 hover:text-zinc-300 transition-colors p-1 rounded focus:outline-none focus:ring-1 focus:ring-zinc-400"
+                            className="text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300 transition-colors p-1 rounded focus:outline-none focus:ring-1 focus:ring-zinc-400"
                         >
                             <X className="w-4 h-4" />
                         </button>
@@ -163,7 +163,7 @@ export const CapexStageModal = ({
                 {/* Form */}
                 <form onSubmit={handleSubmit} className="p-6 space-y-4" noValidate>
                     {errors.general && (
-                        <div className="p-3 bg-rose-950/60 border border-rose-800/80 rounded text-rose-300 text-xs">
+                        <div className="p-3 bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800/80 rounded text-rose-700 dark:text-rose-300 text-xs">
                             {errors.general}
                         </div>
                     )}
@@ -171,7 +171,7 @@ export const CapexStageModal = ({
                     {/* Stage Name */}
                     <div>
                         <div className="flex items-center gap-1.5 mb-1">
-                            <label htmlFor="stage-name" className="text-xs font-semibold text-zinc-300 uppercase">
+                            <label htmlFor="stage-name" className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 uppercase">
                                 Nazwa Etapu CAPEX *
                             </label>
                             <InfoTooltip
@@ -186,18 +186,18 @@ export const CapexStageModal = ({
                             value={formData.stage_name}
                             onChange={(e) => setFormData({ ...formData, stage_name: e.target.value })}
                             placeholder="np. Prace ziemne i fundamenty hali"
-                            className={`w-full px-3 py-2 bg-zinc-950 border rounded text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-400 ${
-                                errors.stage_name ? 'border-rose-600' : 'border-zinc-800'
+                            className={`w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border rounded text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-emerald-500 ${
+                                errors.stage_name ? 'border-rose-600' : 'border-zinc-300 dark:border-zinc-800'
                             }`}
                         />
-                        {errors.stage_name && <p className="text-[10px] text-rose-400 mt-1">{errors.stage_name}</p>}
+                        {errors.stage_name && <p className="text-[10px] text-rose-500 dark:text-rose-400 mt-1">{errors.stage_name}</p>}
                     </div>
 
                     {/* Row: Net Amount & Currency & Order */}
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <div className="sm:col-span-2">
                             <div className="flex items-center gap-1.5 mb-1">
-                                <label htmlFor="stage-net-amount" className="text-xs font-semibold text-zinc-300 uppercase">
+                                <label htmlFor="stage-net-amount" className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 uppercase">
                                     Kwota Netto ({formData.currency}) *
                                 </label>
                                 <InfoTooltip
@@ -214,16 +214,16 @@ export const CapexStageModal = ({
                                 value={formData.net_amount}
                                 onChange={(e) => setFormData({ ...formData, net_amount: e.target.value })}
                                 placeholder="np. 2500000"
-                                className={`w-full px-3 py-2 bg-zinc-950 border rounded text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-400 ${
-                                    errors.net_amount ? 'border-rose-600' : 'border-zinc-800'
+                                className={`w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border rounded text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-emerald-500 ${
+                                    errors.net_amount ? 'border-rose-600' : 'border-zinc-300 dark:border-zinc-800'
                                 }`}
                             />
-                            {errors.net_amount && <p className="text-[10px] text-rose-400 mt-1">{errors.net_amount}</p>}
+                            {errors.net_amount && <p className="text-[10px] text-rose-500 dark:text-rose-400 mt-1">{errors.net_amount}</p>}
                         </div>
 
                         <div>
                             <div className="flex items-center gap-1.5 mb-1">
-                                <label htmlFor="stage-order" className="text-xs font-semibold text-zinc-300 uppercase">
+                                <label htmlFor="stage-order" className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 uppercase">
                                     Kolejność
                                 </label>
                                 <InfoTooltip
@@ -239,7 +239,7 @@ export const CapexStageModal = ({
                                 max="100"
                                 value={formData.stage_order}
                                 onChange={(e) => setFormData({ ...formData, stage_order: e.target.value })}
-                                className="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded text-xs text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400"
+                                className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-emerald-500"
                             />
                         </div>
                     </div>
@@ -248,7 +248,7 @@ export const CapexStageModal = ({
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
                             <div className="flex items-center gap-1.5 mb-1">
-                                <label htmlFor="stage-start-date" className="text-xs font-semibold text-zinc-300 uppercase">
+                                <label htmlFor="stage-start-date" className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 uppercase">
                                     Data Rozpoczęcia *
                                 </label>
                                 <InfoTooltip
@@ -262,16 +262,16 @@ export const CapexStageModal = ({
                                 type="date"
                                 value={formData.start_date}
                                 onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
-                                className={`w-full px-3 py-2 bg-zinc-950 border rounded text-xs text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 ${
-                                    errors.start_date ? 'border-rose-600' : 'border-zinc-800'
+                                className={`w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border rounded text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-emerald-500 ${
+                                    errors.start_date ? 'border-rose-600' : 'border-zinc-300 dark:border-zinc-800'
                                 }`}
                             />
-                            {errors.start_date && <p className="text-[10px] text-rose-400 mt-1">{errors.start_date}</p>}
+                            {errors.start_date && <p className="text-[10px] text-rose-500 dark:text-rose-400 mt-1">{errors.start_date}</p>}
                         </div>
 
                         <div>
                             <div className="flex items-center gap-1.5 mb-1">
-                                <label htmlFor="stage-duration" className="text-xs font-semibold text-zinc-300 uppercase">
+                                <label htmlFor="stage-duration" className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 uppercase">
                                     Czas Trwania (Miesiące) *
                                 </label>
                                 <InfoTooltip
@@ -287,18 +287,18 @@ export const CapexStageModal = ({
                                 max="120"
                                 value={formData.duration_months}
                                 onChange={(e) => setFormData({ ...formData, duration_months: e.target.value })}
-                                className={`w-full px-3 py-2 bg-zinc-950 border rounded text-xs text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 ${
-                                    errors.duration_months ? 'border-rose-600' : 'border-zinc-800'
+                                className={`w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border rounded text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-emerald-500 ${
+                                    errors.duration_months ? 'border-rose-600' : 'border-zinc-300 dark:border-zinc-800'
                                 }`}
                             />
-                            {errors.duration_months && <p className="text-[10px] text-rose-400 mt-1">{errors.duration_months}</p>}
+                            {errors.duration_months && <p className="text-[10px] text-rose-500 dark:text-rose-400 mt-1">{errors.duration_months}</p>}
                         </div>
                     </div>
 
                     {/* KŚT Classification */}
                     <div>
                         <div className="flex items-center gap-1.5 mb-1">
-                            <label htmlFor="stage-kst" className="text-xs font-semibold text-zinc-300 uppercase">
+                            <label htmlFor="stage-kst" className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 uppercase">
                                 Klasyfikacja Środka Trwałego (KŚT) *
                             </label>
                             <InfoTooltip
@@ -311,10 +311,10 @@ export const CapexStageModal = ({
                             id="stage-kst"
                             value={formData.kst_code}
                             onChange={(e) => setFormData({ ...formData, kst_code: e.target.value })}
-                            className="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded text-xs text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400"
+                            className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-emerald-500"
                         >
                             {KST_CLASSIFICATIONS.map((kst) => (
-                                <option key={kst.code} value={kst.code} className="bg-zinc-900 text-zinc-100">
+                                <option key={kst.code} value={kst.code} className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
                                     {kst.code}: {kst.name} ({kst.rate}% rocznie)
                                 </option>
                             ))}
@@ -325,7 +325,7 @@ export const CapexStageModal = ({
                     </div>
 
                     {/* Grant Eligibility Section */}
-                    <div className="p-3 bg-zinc-950 border border-zinc-800 rounded space-y-2">
+                    <div className="p-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded space-y-2">
                         <div className="flex items-center gap-2">
                             <label className="flex items-center gap-2 cursor-pointer">
                                 <input
@@ -338,9 +338,9 @@ export const CapexStageModal = ({
                                             ? formData.net_amount
                                             : formData.grant_eligible_amount,
                                     })}
-                                    className="w-4 h-4 rounded bg-zinc-900 border-zinc-700 text-emerald-500 focus:ring-0 focus:outline-none cursor-pointer"
+                                    className="w-4 h-4 rounded bg-white dark:bg-zinc-900 border-zinc-300 dark:border-zinc-700 text-emerald-600 focus:ring-0 focus:outline-none cursor-pointer"
                                 />
-                                <span className="text-xs font-semibold text-zinc-200 uppercase">
+                                <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 uppercase">
                                     Wydatki Kwalifikowane do Dotacji / Pomocy Publicznej
                                 </span>
                             </label>
@@ -354,7 +354,7 @@ export const CapexStageModal = ({
                         {formData.is_grant_eligible && (
                             <div className="pt-2">
                                 <div className="flex items-center gap-1.5 mb-1">
-                                    <label htmlFor="stage-grant-eligible-amount" className="text-[11px] font-semibold text-zinc-400 uppercase">
+                                    <label htmlFor="stage-grant-eligible-amount" className="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 uppercase">
                                         Kwota Wydatków Kwalifikowanych ({formData.currency})
                                     </label>
                                     <InfoTooltip
@@ -371,19 +371,19 @@ export const CapexStageModal = ({
                                     value={formData.grant_eligible_amount}
                                     onChange={(e) => setFormData({ ...formData, grant_eligible_amount: e.target.value })}
                                     placeholder="Domyślnie pełna kwota netto"
-                                    className={`w-full px-3 py-1.5 bg-zinc-900 border rounded text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-400 ${
-                                        errors.grant_eligible_amount ? 'border-rose-600' : 'border-zinc-800'
+                                    className={`w-full px-3 py-1.5 bg-white dark:bg-zinc-900 border rounded text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-emerald-500 ${
+                                        errors.grant_eligible_amount ? 'border-rose-600' : 'border-zinc-300 dark:border-zinc-800'
                                     }`}
                                 />
                                 {errors.grant_eligible_amount && (
-                                    <p className="text-[10px] text-rose-400 mt-1">{errors.grant_eligible_amount}</p>
+                                    <p className="text-[10px] text-rose-500 dark:text-rose-400 mt-1">{errors.grant_eligible_amount}</p>
                                 )}
                             </div>
                         )}
                     </div>
 
                     {/* Footer buttons */}
-                    <div className="flex items-center justify-end gap-3 pt-3 border-t border-zinc-800">
+                    <div className="flex items-center justify-end gap-3 pt-3 border-t border-zinc-200 dark:border-zinc-800">
                         <Tooltip content="Odrzuć zmiany i zamknij okno dialogowe">
                             <span>
                                 <Button

@@ -153,16 +153,16 @@ export const VdrPermissionMatrixModal = ({
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-zinc-950/85 backdrop-blur-xs font-mono">
-            <div className="bg-zinc-900 border border-zinc-750 rounded-lg shadow-2xl max-w-4xl w-full h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-750 rounded-lg shadow-2xl max-w-4xl w-full h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
                 {/* Header */}
-                <div className="px-5 py-3.5 bg-zinc-950 border-b border-zinc-800 flex items-center justify-between shrink-0">
+                <div className="px-5 py-3.5 bg-zinc-50 dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between shrink-0">
                     <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded bg-zinc-850 border border-zinc-750 flex items-center justify-center text-zinc-300">
-                            <Lock className="w-4 h-4 text-emerald-400" />
+                        <div className="w-8 h-8 rounded bg-zinc-100 dark:bg-zinc-850 border border-zinc-200 dark:border-zinc-750 flex items-center justify-center text-zinc-700 dark:text-zinc-300">
+                            <Lock className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                         </div>
                         <div>
                             <div className="flex items-center gap-1.5">
-                                <h2 className="text-xs font-bold uppercase tracking-wider text-zinc-100">
+                                <h2 className="text-xs font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
                                     Matryca Uprawnień VDR (Virtual Data Room)
                                 </h2>
                                 <InfoTooltip
@@ -172,7 +172,7 @@ export const VdrPermissionMatrixModal = ({
                                     ariaLabel="Więcej informacji o matrycy uprawnień VDR"
                                 />
                             </div>
-                            <p className="text-[10px] text-zinc-500">
+                            <p className="text-[10px] text-zinc-500 dark:text-zinc-400">
                                 RBAC, DYNAMICZNE ZNAKI WODNE I NADPISANIA PLIKÓW M&A
                             </p>
                         </div>
@@ -184,7 +184,7 @@ export const VdrPermissionMatrixModal = ({
                                 disabled={loading}
                                 title="Odśwież matrycę"
                                 aria-label="Odśwież matrycę"
-                                className="p-1.5 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors"
+                                className="p-1.5 rounded text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                             >
                                 <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
                             </button>
@@ -194,7 +194,7 @@ export const VdrPermissionMatrixModal = ({
                                 onClick={onClose}
                                 title="Zamknij"
                                 aria-label="Zamknij"
-                                className="p-1.5 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors"
+                                className="p-1.5 rounded text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                             >
                                 <X className="w-4 h-4" />
                             </button>
@@ -203,7 +203,7 @@ export const VdrPermissionMatrixModal = ({
                 </div>
 
                 {/* Sub-header Navigation Tabs */}
-                <div className="px-5 py-2 bg-zinc-950/60 border-b border-zinc-800 flex items-center gap-2 shrink-0">
+                <div className="px-5 py-2 bg-zinc-100/60 dark:bg-zinc-950/60 border-b border-zinc-200 dark:border-zinc-800 flex items-center gap-2 shrink-0">
                     <Tooltip content="Przeglądaj uprawnienia zdefiniowane na poziomie folderów taksonomii Dewey">
                         <button
                             type="button"
@@ -211,8 +211,8 @@ export const VdrPermissionMatrixModal = ({
                             aria-label="Uprawnienia Folderów M&A"
                             className={`px-3 py-1 rounded text-xs font-semibold flex items-center gap-1.5 transition-colors ${
                                 activeTab === 'folders'
-                                    ? 'bg-zinc-100 text-zinc-900 shadow-sm'
-                                    : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800'
+                                    ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-700 shadow-sm'
+                                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                             }`}
                         >
                             <Folder className="w-3.5 h-3.5" />
@@ -226,8 +226,8 @@ export const VdrPermissionMatrixModal = ({
                             aria-label="Nadpisania Plików"
                             className={`px-3 py-1 rounded text-xs font-semibold flex items-center gap-1.5 transition-colors ${
                                 activeTab === 'documents'
-                                    ? 'bg-zinc-100 text-zinc-900 shadow-sm'
-                                    : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800'
+                                    ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-700 shadow-sm'
+                                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                             }`}
                         >
                             <FileText className="w-3.5 h-3.5" />
@@ -239,10 +239,10 @@ export const VdrPermissionMatrixModal = ({
                 {/* Body split: List of rules on top/left, Add form at bottom */}
                 <div className="flex-1 overflow-y-auto p-5 space-y-4">
                     {/* Permission table view */}
-                    <div className="bg-zinc-950 border border-zinc-800 rounded-lg overflow-hidden">
+                    <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden">
                         <table className="w-full text-left border-collapse text-xs">
                             <thead>
-                                <tr className="bg-zinc-900/80 border-b border-zinc-800 text-[10px] text-zinc-400 uppercase tracking-wider">
+                                <tr className="bg-zinc-50 dark:bg-zinc-900/80 border-b border-zinc-200 dark:border-zinc-800 text-[10px] text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
                                     <th className="py-2.5 px-4 font-semibold">
                                         <Tooltip content="Zasób transakcyjny (katalog Dewey lub plik)">
                                             <span className="cursor-help">Zasób</span>
@@ -270,31 +270,31 @@ export const VdrPermissionMatrixModal = ({
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-zinc-855">
+                            <tbody className="divide-y divide-zinc-200 dark:divide-zinc-855">
                                 {activeTab === 'folders' ? (
                                     matrix.folder_permissions?.length === 0 ? (
                                         <tr>
-                                            <td colSpan="5" className="py-8 text-center text-zinc-500">
+                                            <td colSpan="5" className="py-8 text-center text-zinc-500 dark:text-zinc-400">
                                                 Brak zdefiniowanych uprawnień dla folderów. Wszyscy uprawnieni użytkownicy dziedziczą rolę globalną.
                                             </td>
                                         </tr>
                                     ) : (
                                         matrix.folder_permissions.map((grant) => (
-                                            <tr key={grant.id} className="hover:bg-zinc-900/50">
-                                                <td className="py-2.5 px-4 font-semibold text-zinc-200">
+                                            <tr key={grant.id} className="hover:bg-zinc-50 dark:hover:bg-zinc-900/50">
+                                                <td className="py-2.5 px-4 font-semibold text-zinc-900 dark:text-zinc-200">
                                                     <Tooltip content={`Folder: [${grant.folder_index_code || '00.00'}] ${grant.folder_name || grant.folder_id}`}>
                                                         <div className="flex items-center gap-1.5 cursor-help">
-                                                            <Folder className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-                                                            <span className="text-indigo-400 font-mono text-[10px]">
+                                                            <Folder className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                                                            <span className="text-indigo-600 dark:text-indigo-400 font-mono text-[10px]">
                                                                 [{grant.folder_index_code || '00.00'}]
                                                             </span>
                                                             <span className="truncate">{grant.folder_name || grant.folder_id}</span>
                                                         </div>
                                                     </Tooltip>
                                                 </td>
-                                                <td className="py-2.5 px-3 text-zinc-300">
+                                                <td className="py-2.5 px-3 text-zinc-700 dark:text-zinc-300">
                                                     <span className="inline-flex items-center gap-1">
-                                                        <Users className="w-3 h-3 text-zinc-500" />
+                                                        <Users className="w-3 h-3 text-zinc-400 dark:text-zinc-500" />
                                                         {grant.subject_label || `${grant.subject_type}: ${grant.subject_id}`}
                                                     </span>
                                                 </td>
@@ -311,7 +311,7 @@ export const VdrPermissionMatrixModal = ({
                                                             onClick={() => handleRevoke('folder', grant.id)}
                                                             title="Odwołaj uprawnienie"
                                                             aria-label="Odwołaj uprawnienie"
-                                                            className="p-1 rounded text-zinc-500 hover:text-rose-400 hover:bg-zinc-800 transition-colors"
+                                                            className="p-1 rounded text-zinc-400 dark:text-zinc-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                                                         >
                                                             <Trash2 className="w-3.5 h-3.5" />
                                                         </button>
@@ -323,24 +323,24 @@ export const VdrPermissionMatrixModal = ({
                                 ) : (
                                     matrix.document_permissions?.length === 0 ? (
                                         <tr>
-                                            <td colSpan="5" className="py-8 text-center text-zinc-500">
+                                            <td colSpan="5" className="py-8 text-center text-zinc-500 dark:text-zinc-400">
                                                 Brak jawnych nadpisań dla pojedynczych plików. Wszystkie pliki dziedziczą uprawnienia ze swoich folderów.
                                             </td>
                                         </tr>
                                     ) : (
                                         matrix.document_permissions.map((grant) => (
-                                            <tr key={grant.id} className="hover:bg-zinc-900/50">
-                                                <td className="py-2.5 px-4 font-semibold text-zinc-200">
+                                            <tr key={grant.id} className="hover:bg-zinc-50 dark:hover:bg-zinc-900/50">
+                                                <td className="py-2.5 px-4 font-semibold text-zinc-900 dark:text-zinc-200">
                                                     <Tooltip content={`Dokument: ${grant.document_title || grant.document_id}`}>
                                                         <div className="flex items-center gap-1.5 cursor-help">
-                                                            <FileText className="w-3.5 h-3.5 text-rose-400 shrink-0" />
+                                                            <FileText className="w-3.5 h-3.5 text-rose-500 dark:text-rose-400 shrink-0" />
                                                             <span className="truncate">{grant.document_title || grant.document_id}</span>
                                                         </div>
                                                     </Tooltip>
                                                 </td>
-                                                <td className="py-2.5 px-3 text-zinc-300">
+                                                <td className="py-2.5 px-3 text-zinc-700 dark:text-zinc-300">
                                                     <span className="inline-flex items-center gap-1">
-                                                        <Users className="w-3 h-3 text-zinc-500" />
+                                                        <Users className="w-3 h-3 text-zinc-400 dark:text-zinc-500" />
                                                         {grant.subject_label || `${grant.subject_type}: ${grant.subject_id}`}
                                                     </span>
                                                 </td>
@@ -357,7 +357,7 @@ export const VdrPermissionMatrixModal = ({
                                                             onClick={() => handleRevoke('document', grant.id)}
                                                             title="Odwołaj nadpisanie"
                                                             aria-label="Odwołaj nadpisanie"
-                                                            className="p-1 rounded text-zinc-500 hover:text-rose-400 hover:bg-zinc-800 transition-colors"
+                                                            className="p-1 rounded text-zinc-400 dark:text-zinc-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                                                         >
                                                             <Trash2 className="w-3.5 h-3.5" />
                                                         </button>
@@ -372,9 +372,9 @@ export const VdrPermissionMatrixModal = ({
                     </div>
 
                     {/* Grant New Rule Form */}
-                    <div className="bg-zinc-950 border border-zinc-800 rounded-lg p-4">
-                        <div className="flex items-center gap-2 mb-3 pb-2 border-b border-zinc-855 text-xs font-bold uppercase tracking-wider text-zinc-200">
-                            <Plus className="w-4 h-4 text-emerald-400" />
+                    <div className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg p-4">
+                        <div className="flex items-center gap-2 mb-3 pb-2 border-b border-zinc-200 dark:border-zinc-855 text-xs font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-200">
+                            <Plus className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                             <span>Dodaj / Zaktualizuj Regułę Uprawnień</span>
                         </div>
 
@@ -382,7 +382,7 @@ export const VdrPermissionMatrixModal = ({
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                 {/* Resource Type */}
                                 <div>
-                                    <label className="block text-[10px] uppercase font-semibold text-zinc-400 mb-1 flex items-center gap-1.5">
+                                    <label className="block text-[10px] uppercase font-semibold text-zinc-600 dark:text-zinc-400 mb-1 flex items-center gap-1.5">
                                         Typ Zasobu
                                         <InfoTooltip
                                             size="xs"
@@ -403,7 +403,7 @@ export const VdrPermissionMatrixModal = ({
                                             }
                                         }}
                                         aria-label="Typ Zasobu"
-                                        className="w-full bg-zinc-900 border border-zinc-750 rounded px-2.5 py-1.5 text-xs text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400"
+                                        className="w-full bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-750 rounded px-2.5 py-1.5 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400"
                                     >
                                         <option value="folder">Folder transakcyjny</option>
                                         <option value="document">Pojedynczy dokument (plik)</option>
@@ -412,7 +412,7 @@ export const VdrPermissionMatrixModal = ({
 
                                 {/* Resource Selector */}
                                 <div className="sm:col-span-2">
-                                    <label className="block text-[10px] uppercase font-semibold text-zinc-400 mb-1 flex items-center gap-1.5">
+                                    <label className="block text-[10px] uppercase font-semibold text-zinc-600 dark:text-zinc-400 mb-1 flex items-center gap-1.5">
                                         Wybierz Zasób ({resourceType === 'folder' ? 'Folder' : 'Dokument'})
                                     </label>
                                     {resourceType === 'folder' ? (
@@ -420,7 +420,7 @@ export const VdrPermissionMatrixModal = ({
                                             value={targetId}
                                             onChange={(e) => setTargetId(e.target.value)}
                                             aria-label="Wybierz Folder"
-                                            className="w-full bg-zinc-900 border border-zinc-750 rounded px-2.5 py-1.5 text-xs text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 truncate"
+                                            className="w-full bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-750 rounded px-2.5 py-1.5 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 truncate"
                                         >
                                             {flattenedFolders.map(f => (
                                                 <option key={f.id} value={f.id}>
@@ -433,7 +433,7 @@ export const VdrPermissionMatrixModal = ({
                                             value={targetId}
                                             onChange={(e) => setTargetId(e.target.value)}
                                             aria-label="Wybierz Dokument"
-                                            className="w-full bg-zinc-900 border border-zinc-750 rounded px-2.5 py-1.5 text-xs text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 truncate"
+                                            className="w-full bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-750 rounded px-2.5 py-1.5 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400 truncate"
                                         >
                                             {documents.map(d => (
                                                 <option key={d.id} value={d.id}>
@@ -448,7 +448,7 @@ export const VdrPermissionMatrixModal = ({
                             <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
                                 {/* Subject Type */}
                                 <div>
-                                    <label className="block text-[10px] uppercase font-semibold text-zinc-400 mb-1 flex items-center gap-1.5">
+                                    <label className="block text-[10px] uppercase font-semibold text-zinc-600 dark:text-zinc-400 mb-1 flex items-center gap-1.5">
                                         Typ Podmiotu
                                         <InfoTooltip
                                             size="xs"
@@ -461,7 +461,7 @@ export const VdrPermissionMatrixModal = ({
                                         value={subjectType}
                                         onChange={(e) => setSubjectType(e.target.value)}
                                         aria-label="Typ Podmiotu"
-                                        className="w-full bg-zinc-900 border border-zinc-750 rounded px-2.5 py-1.5 text-xs text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400"
+                                        className="w-full bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-750 rounded px-2.5 py-1.5 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400"
                                     >
                                         <option value="role">Rola systemowa</option>
                                         <option value="user">Użytkownik (ID)</option>
@@ -470,7 +470,7 @@ export const VdrPermissionMatrixModal = ({
 
                                 {/* Subject ID / Role */}
                                 <div>
-                                    <label className="block text-[10px] uppercase font-semibold text-zinc-400 mb-1 flex items-center gap-1.5">
+                                    <label className="block text-[10px] uppercase font-semibold text-zinc-600 dark:text-zinc-400 mb-1 flex items-center gap-1.5">
                                         Podmiot ({subjectType === 'role' ? 'Rola' : 'ID Użytkownika'})
                                     </label>
                                     {subjectType === 'role' ? (
@@ -478,7 +478,7 @@ export const VdrPermissionMatrixModal = ({
                                             value={subjectId}
                                             onChange={(e) => setSubjectId(e.target.value)}
                                             aria-label="Wybierz Rolę"
-                                            className="w-full bg-zinc-900 border border-zinc-750 rounded px-2.5 py-1.5 text-xs text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400"
+                                            className="w-full bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-750 rounded px-2.5 py-1.5 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400"
                                         >
                                             <option value="client">Klient / Kupujący (client)</option>
                                             <option value="advisor">Doradca Transakcyjny (advisor)</option>
@@ -490,14 +490,14 @@ export const VdrPermissionMatrixModal = ({
                                             onChange={(e) => setSubjectId(e.target.value)}
                                             placeholder="np. UUID użytkownika"
                                             aria-label="ID Użytkownika"
-                                            className="w-full bg-zinc-900 border border-zinc-750 rounded px-2.5 py-1.5 text-xs text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400"
+                                            className="w-full bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-750 rounded px-2.5 py-1.5 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400"
                                         />
                                     )}
                                 </div>
 
                                 {/* Permission Level */}
                                 <div>
-                                    <label className="block text-[10px] uppercase font-semibold text-zinc-400 mb-1 flex items-center gap-1.5">
+                                    <label className="block text-[10px] uppercase font-semibold text-zinc-600 dark:text-zinc-400 mb-1 flex items-center gap-1.5">
                                         Poziom Uprawnień
                                         <InfoTooltip
                                             size="xs"
@@ -510,7 +510,7 @@ export const VdrPermissionMatrixModal = ({
                                         value={permissionLevel}
                                         onChange={(e) => setPermissionLevel(e.target.value)}
                                         aria-label="Poziom Uprawnień"
-                                        className="w-full bg-zinc-900 border border-zinc-750 rounded px-2.5 py-1.5 text-xs text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400"
+                                        className="w-full bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-750 rounded px-2.5 py-1.5 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400"
                                     >
                                         <option value="none">Brak dostępu (none)</option>
                                         <option value="view">Tylko podgląd (view)</option>
@@ -522,13 +522,13 @@ export const VdrPermissionMatrixModal = ({
                                 {/* Watermark checkbox & submit button */}
                                 <div className="flex items-center gap-3 pt-5">
                                     <Tooltip content="Nanoszenie znaku wodnego z danymi tożsamości, adresem IP i czasem dostępu na każdą stronę pliku PDF">
-                                        <label className="flex items-center gap-1.5 cursor-pointer text-xs text-zinc-300 select-none">
+                                        <label className="flex items-center gap-1.5 cursor-pointer text-xs text-zinc-700 dark:text-zinc-300 select-none">
                                             <input
                                                 type="checkbox"
                                                 checked={watermarkRequired}
                                                 onChange={(e) => setWatermarkRequired(e.target.checked)}
                                                 aria-label="Wymagaj dynamicznego znaku wodnego"
-                                                className="rounded border-zinc-750 bg-zinc-900 text-zinc-200 focus:ring-0"
+                                                className="rounded border-zinc-300 dark:border-zinc-750 bg-white dark:bg-zinc-900 text-emerald-600 focus:ring-0"
                                             />
                                             <span className="text-[11px]">Znak wodny</span>
                                         </label>
@@ -555,9 +555,9 @@ export const VdrPermissionMatrixModal = ({
                 </div>
 
                 {/* Footer */}
-                <div className="px-5 py-3 bg-zinc-950 border-t border-zinc-800 flex items-center justify-between shrink-0">
+                <div className="px-5 py-3 bg-zinc-50 dark:bg-zinc-950 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between shrink-0">
                     <Tooltip content="Uprawnienia podmiotów są ewaluowane hierarchicznie: najpierw plik, następnie folder, a na końcu rola globalna">
-                        <div className="text-[10px] text-zinc-500 cursor-help">
+                        <div className="text-[10px] text-zinc-500 dark:text-zinc-400 cursor-help">
                             Uprawnienia plików nadpisują uprawnienia folderów (Hierarchiczne RBAC).
                         </div>
                     </Tooltip>

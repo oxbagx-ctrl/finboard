@@ -78,18 +78,18 @@ export const DebtRepaymentModeSwitcher = ({
     const isBankable = minDscr !== null && minDscr >= 1.20;
 
     return (
-        <div className={`bg-zinc-900 border border-zinc-800 rounded-lg p-5 font-mono space-y-4 ${className}`}>
+        <div className={`bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5 font-mono space-y-4 shadow-sm ${className}`}>
             {/* Header & Contract Info */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-800 pb-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-200 dark:border-zinc-800 pb-3">
                 <div className="flex items-center gap-3">
                     <Tooltip content="Inżynieria dłużna i optymalizacja profilu obsługi długu Project Finance">
-                        <div className="w-8 h-8 rounded bg-blue-950/80 border border-blue-800/80 flex items-center justify-center text-blue-400">
+                        <div className="w-8 h-8 rounded bg-blue-50 dark:bg-blue-950/80 border border-blue-200 dark:border-blue-800/80 flex items-center justify-center text-blue-600 dark:text-blue-400">
                             <Landmark className="w-4 h-4" />
                         </div>
                     </Tooltip>
                     <div>
                         <div className="flex items-center gap-2">
-                            <h3 className="text-xs font-bold text-zinc-100 uppercase tracking-wide">
+                            <h3 className="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wide">
                                 Profil Amortyzacji Długu Bankowego (Debt Repayment Structure)
                             </h3>
                             <InfoTooltip
@@ -107,7 +107,7 @@ export const DebtRepaymentModeSwitcher = ({
                                 </Tooltip>
                             )}
                         </div>
-                        <p className="text-[11px] text-zinc-400 mt-0.5">
+                        <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">
                             Porównaj wpływ formuły spłaty kapitału na kowenanty bankowe (DSCR) i łączny koszt odsetkowy w horyzoncie 15 lat.
                         </p>
                     </div>
@@ -153,20 +153,20 @@ export const DebtRepaymentModeSwitcher = ({
                             aria-label={`Wybierz tryb spłaty: ${mode.title}`}
                             className={`p-3.5 rounded-lg border cursor-pointer transition-all flex flex-col justify-between focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${
                                 isSelected
-                                    ? 'bg-zinc-950 border-blue-500/80 shadow-sm ring-1 ring-blue-500/30'
-                                    : 'bg-zinc-950/40 border-zinc-800 hover:border-zinc-700 hover:bg-zinc-950/70'
+                                    ? 'bg-blue-50/50 dark:bg-zinc-950 border-blue-500 shadow-sm ring-1 ring-blue-500/30'
+                                    : 'bg-zinc-50 dark:bg-zinc-950/40 border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-zinc-100/70 dark:hover:bg-zinc-950/70'
                             }`}
                         >
                             <div>
                                 <div className="flex items-center justify-between gap-2 mb-2">
                                     <div className="flex items-center gap-2">
                                         <Tooltip content={mode.summary}>
-                                            <div className={`p-1.5 rounded ${isSelected ? 'bg-blue-500/10 text-blue-400 border border-blue-500/30' : 'bg-zinc-800 text-zinc-400'}`}>
+                                            <div className={`p-1.5 rounded ${isSelected ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/30' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400'}`}>
                                                 <Icon className="w-4 h-4" />
                                             </div>
                                         </Tooltip>
                                         <div>
-                                            <div className="text-xs font-bold text-zinc-100">
+                                            <div className="text-xs font-bold text-zinc-900 dark:text-zinc-100">
                                                 {mode.title}
                                             </div>
                                             {isContract && (
@@ -185,7 +185,7 @@ export const DebtRepaymentModeSwitcher = ({
                                     </Tooltip>
                                 </div>
 
-                                <p className="text-[11px] text-zinc-300 font-sans leading-relaxed mb-2">
+                                <p className="text-[11px] text-zinc-600 dark:text-zinc-300 font-sans leading-relaxed mb-2">
                                     {mode.summary}
                                 </p>
                                 <p className="text-[10px] text-zinc-500 font-sans leading-relaxed">
@@ -193,10 +193,10 @@ export const DebtRepaymentModeSwitcher = ({
                                 </p>
                             </div>
 
-                            <div className="mt-3 pt-2.5 border-t border-zinc-850 flex items-center justify-between text-[10px]">
+                            <div className="mt-3 pt-2.5 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between text-[10px]">
                                 <span className="text-zinc-500">Zastosowanie:</span>
                                 <Tooltip content={`Rekomendowane zastosowanie: ${mode.bestFor}`}>
-                                    <span className="text-zinc-300 font-medium truncate max-w-[160px]">
+                                    <span className="text-zinc-700 dark:text-zinc-300 font-medium truncate max-w-[160px]">
                                         {mode.bestFor}
                                     </span>
                                 </Tooltip>
@@ -207,7 +207,7 @@ export const DebtRepaymentModeSwitcher = ({
             </div>
 
             {/* Live Covenant & Cost Impact Bar */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-zinc-950/60 p-3 rounded-lg border border-zinc-800/80">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-zinc-50 dark:bg-zinc-950/60 p-3 rounded-lg border border-zinc-200 dark:border-zinc-800/80">
                 <div>
                     <div className="flex items-center gap-1">
                         <span className="text-[10px] text-zinc-500 uppercase tracking-wider block font-semibold">
@@ -220,7 +220,7 @@ export const DebtRepaymentModeSwitcher = ({
                         />
                     </div>
                     <div className="flex items-center gap-2 mt-1">
-                        <span className={`text-base font-bold ${minDscr && minDscr >= 1.20 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                        <span className={`text-base font-bold ${minDscr && minDscr >= 1.20 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
                             {minDscr !== null && !isNaN(minDscr) ? `${minDscr.toFixed(2)}x` : '—'}
                         </span>
                         <Tooltip content={isBankable ? 'Projekt spełnia minimalny próg bankowalności (DSCR >= 1.20x)' : 'Projekt generuje ryzyko kredytowe (DSCR < 1.20x)'}>
@@ -242,7 +242,7 @@ export const DebtRepaymentModeSwitcher = ({
                             ariaLabel="Informacje o średnim wskaźniku DSCR"
                         />
                     </div>
-                    <div className="text-base font-bold text-zinc-200 mt-1">
+                    <div className="text-base font-bold text-zinc-900 dark:text-zinc-200 mt-1">
                         {avgDscr !== null && !isNaN(avgDscr) ? `${avgDscr.toFixed(2)}x` : '—'}
                     </div>
                 </div>
@@ -258,7 +258,7 @@ export const DebtRepaymentModeSwitcher = ({
                             ariaLabel="Informacje o łącznym koszcie odsetek"
                         />
                     </div>
-                    <div className="text-base font-bold text-amber-400 mt-1">
+                    <div className="text-base font-bold text-amber-600 dark:text-amber-400 mt-1">
                         {totalInterest !== null ? formatMoney(totalInterest) : '—'}
                     </div>
                 </div>
@@ -276,7 +276,7 @@ export const DebtRepaymentModeSwitcher = ({
                     </div>
                     <div className="text-base font-bold mt-1">
                         {totalInterest !== null && baseInterest !== null && totalInterest !== baseInterest ? (
-                            <span className={totalInterest < baseInterest ? 'text-emerald-400' : 'text-rose-400'}>
+                            <span className={totalInterest < baseInterest ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}>
                                 {totalInterest < baseInterest ? '-' : '+'}{formatMoney(Math.abs(totalInterest - baseInterest))}
                             </span>
                         ) : (

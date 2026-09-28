@@ -159,16 +159,16 @@ export const ReportsView = () => {
     return (
         <div className="space-y-6 font-mono">
             {/* Top Info Banner (Screen only) */}
-            <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm print:hidden">
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs print:hidden">
                 <div className="flex items-center gap-3">
                     <Tooltip content="Podsystem generowania oficjalnych memorandów zarządczych i raportów Due Diligence M&A">
-                        <div className="w-10 h-10 rounded bg-zinc-950 border border-zinc-750 flex items-center justify-center text-zinc-200 shrink-0 cursor-help" tabIndex={0} role="img" aria-label="Generator raportów zarządczych">
-                            <FileText className="w-5 h-5 text-emerald-400" />
+                        <div className="w-10 h-10 rounded bg-zinc-100 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-750 flex items-center justify-center text-zinc-700 dark:text-zinc-200 shrink-0 cursor-help" tabIndex={0} role="img" aria-label="Generator raportów zarządczych">
+                            <FileText className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                         </div>
                     </Tooltip>
                     <div>
                         <div className="flex items-center gap-2">
-                            <h1 className="text-sm font-bold uppercase tracking-wider text-zinc-100 flex items-center gap-1.5">
+                            <h1 className="text-sm font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
                                 Generator Raportów Zarządczych & Podsumowań M&A (PDF)
                                 <InfoTooltip
                                     size="xs"
@@ -178,12 +178,12 @@ export const ReportsView = () => {
                                 />
                             </h1>
                             <Tooltip content={`Aktywny podmiot transakcyjny podlegający analizie i badaniu Due Diligence: ${activeCompany?.name || 'Spółka'}`}>
-                                <span className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-zinc-950 border border-zinc-750 text-zinc-400 cursor-help" tabIndex={0}>
+                                <span className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-zinc-100 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-750 text-zinc-700 dark:text-zinc-400 cursor-help" tabIndex={0}>
                                     {activeCompany?.name || 'Spółka'}
                                 </span>
                             </Tooltip>
                         </div>
-                        <p className="text-[10px] text-zinc-400 mt-0.5">
+                        <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">
                             Przygotuj, skonfiguruj i wyeksportuj oficjalne memorandum finansowe z certyfikatem integralności SHA-256.
                         </p>
                     </div>
@@ -191,8 +191,8 @@ export const ReportsView = () => {
 
                 <div className="flex items-center gap-2 text-xs">
                     <Tooltip content="Wektorowy wydruk A4 dopasowany do standardów komitetów inwestycyjnych i bankowości transakcyjnej">
-                        <span className="flex items-center gap-1.5 text-zinc-400 bg-zinc-950 px-2.5 py-1 rounded border border-zinc-800 text-[11px] cursor-help" tabIndex={0}>
-                            <Shield className="w-3.5 h-3.5 text-emerald-400" />
+                        <span className="flex items-center gap-1.5 text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-950 px-2.5 py-1 rounded border border-zinc-300 dark:border-zinc-800 text-[11px] cursor-help" tabIndex={0}>
+                            <Shield className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                             A4 WEKTOROWY PDF
                         </span>
                     </Tooltip>

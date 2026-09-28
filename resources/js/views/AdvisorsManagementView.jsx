@@ -305,23 +305,23 @@ export const AdvisorsManagementView = () => {
     };
 
     return (
-        <div className="space-y-6 font-mono text-zinc-300">
+        <div className="space-y-6 font-mono text-zinc-800 dark:text-zinc-300">
             {/* Terminal Strip Header */}
-            <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xs">
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xs">
                 <div className="flex items-center gap-3">
                     <Tooltip content="Zarządzanie uprawnieniami wielonajemczymi i doradcami portfela FinBoard">
                         <div
                             tabIndex={0}
                             role="img"
                             aria-label="Doradcy i przypisania portfelowe"
-                            className="w-8 h-8 rounded bg-zinc-850 border border-zinc-750 flex items-center justify-center text-zinc-300 focus:outline-none focus:ring-1 focus:ring-zinc-400"
+                            className="w-8 h-8 rounded bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 flex items-center justify-center text-zinc-700 dark:text-zinc-300 focus:outline-none focus:ring-1 focus:ring-zinc-400"
                         >
                             <Shield className="w-4 h-4 text-brand" />
                         </div>
                     </Tooltip>
                     <div>
                         <div className="flex items-center gap-2 flex-wrap">
-                            <h1 className="text-sm font-bold uppercase tracking-wider text-zinc-100">
+                            <h1 className="text-sm font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
                                 Zarządzanie Doradcami & Uprawnieniami Portfela
                             </h1>
                             <InfoTooltip
@@ -344,7 +344,7 @@ export const AdvisorsManagementView = () => {
                                 </span>
                             </Tooltip>
                         </div>
-                        <p className="text-[11px] text-zinc-500 mt-0.5">
+                        <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">
                             DEAL ADVISORY • PORTFOLIO ACCESS CONTROL • ZERO-TRUST INVITATIONS
                         </p>
                     </div>
@@ -467,7 +467,7 @@ export const AdvisorsManagementView = () => {
             </div>
 
             {/* Tab Switcher */}
-            <div className="flex border-b border-zinc-800 gap-1 overflow-x-auto text-xs">
+            <div className="flex border-b border-zinc-200 dark:border-zinc-800 gap-1 overflow-x-auto text-xs">
                 {!isAdvisor && (
                     <Tooltip content="Wykaz doradców M&A i administratorów wraz z przypisanymi spółkami">
                         <button
@@ -475,8 +475,8 @@ export const AdvisorsManagementView = () => {
                             aria-label="Rejestr Doradców"
                             className={`pb-2.5 px-3 flex items-center gap-2 border-b-2 font-semibold transition-colors cursor-pointer ${
                                 activeTab === 'advisors'
-                                    ? 'border-brand text-zinc-100'
-                                    : 'border-transparent text-zinc-400 hover:text-zinc-200'
+                                    ? 'border-brand text-zinc-900 dark:text-zinc-100'
+                                    : 'border-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200'
                             }`}
                         >
                             <Users className="w-3.5 h-3.5" />
@@ -493,8 +493,8 @@ export const AdvisorsManagementView = () => {
                             aria-label="Matryca Spółek Portfelowych"
                             className={`pb-2.5 px-3 flex items-center gap-2 border-b-2 font-semibold transition-colors cursor-pointer ${
                                 activeTab === 'companies'
-                                    ? 'border-brand text-zinc-100'
-                                    : 'border-transparent text-zinc-400 hover:text-zinc-200'
+                                    ? 'border-brand text-zinc-900 dark:text-zinc-100'
+                                    : 'border-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200'
                             }`}
                         >
                             <Building2 className="w-3.5 h-3.5" />
@@ -510,8 +510,8 @@ export const AdvisorsManagementView = () => {
                         aria-label="Wysłane Zaproszenia"
                         className={`pb-2.5 px-3 flex items-center gap-2 border-b-2 font-semibold transition-colors cursor-pointer ${
                             activeTab === 'invitations'
-                                ? 'border-brand text-zinc-100'
-                                : 'border-transparent text-zinc-400 hover:text-zinc-200'
+                                ? 'border-brand text-zinc-900 dark:text-zinc-100'
+                                : 'border-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200'
                         }`}
                     >
                         <Mail className="w-3.5 h-3.5" />
@@ -529,8 +529,8 @@ export const AdvisorsManagementView = () => {
                             aria-label="Diagnostyka SMTP"
                             className={`pb-2.5 px-3 flex items-center gap-2 border-b-2 font-semibold transition-colors cursor-pointer ${
                                 activeTab === 'mail'
-                                    ? 'border-brand text-zinc-100'
-                                    : 'border-transparent text-zinc-400 hover:text-zinc-200'
+                                    ? 'border-brand text-zinc-900 dark:text-zinc-100'
+                                    : 'border-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200'
                             }`}
                         >
                             <Server className="w-3.5 h-3.5" />
@@ -544,27 +544,27 @@ export const AdvisorsManagementView = () => {
             {activeTab === 'advisors' && !isAdvisor && (
                 <div className="space-y-3">
                     {/* Filters Bar */}
-                    <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                    <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-3 flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-xs">
                         <div className="relative flex-1 max-w-md">
-                            <Search className="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                            <Search className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
                             <input
                                 type="text"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 placeholder="Szukaj po nazwisku lub emailu..."
-                                className="w-full bg-zinc-950 border border-zinc-750 rounded pl-9 pr-3 py-1.5 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
+                                className="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded pl-9 pr-3 py-1.5 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
                             />
                         </div>
 
                         <div className="flex items-center gap-3 flex-wrap text-xs">
                             <div className="flex items-center gap-2">
-                                <span className="text-[11px] text-zinc-500">ROLA:</span>
+                                <span className="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400">ROLA:</span>
                                 <Tooltip content="Filtruj doradców według roli systemowej w modelu RBAC">
                                     <select
                                         value={roleFilter}
                                         onChange={(e) => setRoleFilter(e.target.value)}
                                         aria-label="Filtruj według roli doradcy"
-                                        className="bg-zinc-950 border border-zinc-750 rounded px-2 py-1 text-xs text-zinc-200 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
+                                        className="bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded px-2 py-1 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
                                     >
                                         <option value="all">Wszystkie role</option>
                                         <option value="advisor">Doradca M&A</option>
@@ -574,13 +574,13 @@ export const AdvisorsManagementView = () => {
                             </div>
 
                             <div className="flex items-center gap-2">
-                                <span className="text-[11px] text-zinc-500">STATUS:</span>
+                                <span className="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400">STATUS:</span>
                                 <Tooltip content="Filtruj doradców według statusu aktywności konta">
                                     <select
                                         value={statusFilter}
                                         onChange={(e) => setStatusFilter(e.target.value)}
                                         aria-label="Filtruj według statusu konta"
-                                        className="bg-zinc-950 border border-zinc-750 rounded px-2 py-1 text-xs text-zinc-200 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
+                                        className="bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded px-2 py-1 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
                                     >
                                         <option value="all">Wszystkie statusy</option>
                                         <option value="active">Aktywni</option>
@@ -592,11 +592,11 @@ export const AdvisorsManagementView = () => {
                     </div>
 
                     {/* Advisors Table */}
-                    <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden shadow-sm">
+                    <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden shadow-sm">
                         <div className="overflow-x-auto">
                             <table className="w-full text-left text-xs border-collapse">
                                 <thead>
-                                    <tr className="bg-zinc-950/80 border-b border-zinc-800 text-zinc-400 font-semibold uppercase text-[10px] tracking-wider">
+                                    <tr className="bg-zinc-50 dark:bg-zinc-950/80 border-b border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400 font-semibold uppercase text-[10px] tracking-wider">
                                         <th className="py-2.5 px-4">
                                             <Tooltip content="Imię, nazwisko oraz adres e-mail doradcy lub administratora">
                                                 <span tabIndex={0} className="cursor-help">Doradca / Użytkownik</span>
@@ -629,16 +629,16 @@ export const AdvisorsManagementView = () => {
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-zinc-800/80">
+                                <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800/80">
                                     {loadingAdvisors ? (
                                         <tr>
-                                            <td colSpan={6} className="py-12 text-center text-zinc-500">
+                                            <td colSpan={6} className="py-12 text-center text-zinc-500 dark:text-zinc-400">
                                                 Ładowanie listy doradców...
                                             </td>
                                         </tr>
                                     ) : filteredAdvisors.length === 0 ? (
                                         <tr>
-                                            <td colSpan={6} className="py-12 text-center text-zinc-500">
+                                            <td colSpan={6} className="py-12 text-center text-zinc-500 dark:text-zinc-400">
                                                 Brak doradców spełniających wybrane kryteria filtrowania.
                                             </td>
                                         </tr>
@@ -648,7 +648,7 @@ export const AdvisorsManagementView = () => {
                                             const isPendingAction = actionInProgressId === adv.id;
 
                                             return (
-                                                <tr key={adv.id} className="hover:bg-zinc-850/40 transition-colors">
+                                                <tr key={adv.id} className="hover:bg-zinc-50 dark:hover:bg-zinc-850/40 transition-colors">
                                                     <td className="py-3 px-4">
                                                         <div className="flex items-center gap-3">
                                                             <Tooltip content={`Profil: ${adv.name}`}>
@@ -656,13 +656,13 @@ export const AdvisorsManagementView = () => {
                                                                     tabIndex={0}
                                                                     role="img"
                                                                     aria-label={`Inicjały: ${adv.name}`}
-                                                                    className="w-7 h-7 rounded bg-zinc-850 border border-zinc-700 flex items-center justify-center font-bold text-zinc-200 text-xs shrink-0 cursor-default focus:outline-none focus:ring-1 focus:ring-zinc-400"
+                                                                    className="w-7 h-7 rounded bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 flex items-center justify-center font-bold text-zinc-700 dark:text-zinc-200 text-xs shrink-0 cursor-default focus:outline-none focus:ring-1 focus:ring-zinc-400"
                                                                 >
                                                                     {adv.name.substring(0, 2).toUpperCase()}
                                                                 </div>
                                                             </Tooltip>
                                                             <div className="min-w-0">
-                                                                <div className="font-semibold text-zinc-100 flex items-center gap-1.5 truncate">
+                                                                <div className="font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5 truncate">
                                                                     <span className="truncate">{adv.name}</span>
                                                                     {isSelf && (
                                                                         <Tooltip content="Bieżący zalogowany administrator">
@@ -672,7 +672,7 @@ export const AdvisorsManagementView = () => {
                                                                         </Tooltip>
                                                                     )}
                                                                 </div>
-                                                                <div className="text-[10px] text-zinc-500 truncate font-mono">
+                                                                <div className="text-[10px] text-zinc-500 dark:text-zinc-400 truncate font-mono">
                                                                     {adv.email}
                                                                 </div>
                                                             </div>
@@ -708,14 +708,14 @@ export const AdvisorsManagementView = () => {
                                                     <td className="py-3 px-4">
                                                         {adv.role === 'super_admin' ? (
                                                             <Tooltip content="Super Administrator posiada automatyczny dostęp do wszystkich podmiotów portfela">
-                                                                <span tabIndex={0} className="text-zinc-500 text-[11px] italic flex items-center gap-1 cursor-help">
-                                                                    <Lock className="w-3 h-3 text-zinc-500" />
+                                                                <span tabIndex={0} className="text-zinc-500 dark:text-zinc-400 text-[11px] italic flex items-center gap-1 cursor-help">
+                                                                    <Lock className="w-3 h-3 text-zinc-400 dark:text-zinc-500" />
                                                                     Globalny dostęp (Wszystkie spółki)
                                                                 </span>
                                                             </Tooltip>
                                                         ) : (adv.assigned_companies || []).length === 0 ? (
                                                             <Tooltip content="Brak przypisanych spółek. Doradca nie ma wglądu w dane analityczne żadnego podmiotu.">
-                                                                <span tabIndex={0} className="text-amber-400 text-[11px] italic flex items-center gap-1 cursor-help">
+                                                                <span tabIndex={0} className="text-amber-600 dark:text-amber-400 text-[11px] italic flex items-center gap-1 cursor-help">
                                                                     <AlertCircle className="w-3 h-3" />
                                                                     Brak przypisanych spółek
                                                                 </span>
@@ -738,14 +738,14 @@ export const AdvisorsManagementView = () => {
                                                                         </span>
                                                                     </Tooltip>
                                                                 ))}
-                                                                <span className="text-[10px] text-zinc-500 self-center ml-1">
+                                                                <span className="text-[10px] text-zinc-500 dark:text-zinc-400 self-center ml-1">
                                                                     ({adv.assigned_companies.length})
                                                                 </span>
                                                             </div>
                                                         )}
                                                     </td>
 
-                                                    <td className="py-3 px-3 text-right text-[11px] text-zinc-500 tabular-nums">
+                                                    <td className="py-3 px-3 text-right text-[11px] text-zinc-500 dark:text-zinc-400 tabular-nums">
                                                         {adv.created_at ? adv.created_at.substring(0, 10) : 'N/A'}
                                                     </td>
 
@@ -795,11 +795,11 @@ export const AdvisorsManagementView = () => {
 
             {/* Tab 2: Companies Portfolio Matrix */}
             {activeTab === 'companies' && !isAdvisor && (
-                <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden shadow-sm">
-                    <div className="p-3 bg-zinc-950/80 border-b border-zinc-800 flex items-center justify-between">
+                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden shadow-sm">
+                    <div className="p-3 bg-zinc-50 dark:bg-zinc-950/80 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
                         <div>
                             <div className="flex items-center gap-2">
-                                <h3 className="text-xs font-bold text-zinc-100 uppercase">
+                                <h3 className="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase">
                                     Matryca Pokrycia Spółek Przez Doradców
                                 </h3>
                                 <InfoTooltip
@@ -808,7 +808,7 @@ export const AdvisorsManagementView = () => {
                                     size="xs"
                                 />
                             </div>
-                            <p className="text-[10px] text-zinc-500">
+                            <p className="text-[10px] text-zinc-500 dark:text-zinc-400">
                                 Zestawienie podmiotów portfelowych wraz z obsadą analityczną Deal Advisory
                             </p>
                         </div>
@@ -838,7 +838,7 @@ export const AdvisorsManagementView = () => {
                     <div className="overflow-x-auto">
                         <table className="w-full text-left text-xs border-collapse">
                             <thead>
-                                <tr className="bg-zinc-950/60 border-b border-zinc-800 text-zinc-400 font-semibold uppercase text-[10px] tracking-wider">
+                                <tr className="bg-zinc-50 dark:bg-zinc-950/60 border-b border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400 font-semibold uppercase text-[10px] tracking-wider">
                                     <th className="py-2.5 px-4">
                                         <Tooltip content="Unikalny kod / ticker spółki używany w identyfikacji podmiotu">
                                             <span tabIndex={0} className="cursor-help">Kod</span>
@@ -871,22 +871,22 @@ export const AdvisorsManagementView = () => {
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-zinc-800/80">
+                            <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800/80">
                                 {loadingCompanies ? (
                                     <tr>
-                                        <td colSpan={6} className="py-12 text-center text-zinc-500">
+                                        <td colSpan={6} className="py-12 text-center text-zinc-500 dark:text-zinc-400">
                                             Ładowanie matrycy spółek...
                                         </td>
                                     </tr>
                                 ) : companies.length === 0 ? (
                                     <tr>
-                                        <td colSpan={6} className="py-12 text-center text-zinc-500">
+                                        <td colSpan={6} className="py-12 text-center text-zinc-500 dark:text-zinc-400">
                                             Brak spółek w rejestrze.
                                         </td>
                                     </tr>
                                 ) : (
                                     companies.map((comp) => (
-                                        <tr key={comp.id} className="hover:bg-zinc-850/40 transition-colors">
+                                        <tr key={comp.id} className="hover:bg-zinc-50 dark:hover:bg-zinc-850/40 transition-colors">
                                             <td className="py-3 px-4">
                                                 <Tooltip content={`Kod identyfikacyjny: ${comp.code}`}>
                                                     <span>
@@ -898,22 +898,22 @@ export const AdvisorsManagementView = () => {
                                             </td>
 
                                             <td className="py-3 px-4">
-                                                <div className="font-semibold text-zinc-100">
+                                                <div className="font-semibold text-zinc-900 dark:text-zinc-100">
                                                     {comp.name}
                                                 </div>
-                                                <div className="text-[10px] text-zinc-500">
+                                                <div className="text-[10px] text-zinc-500 dark:text-zinc-400 font-mono">
                                                     ID: {comp.id.substring(0, 8)}...
                                                 </div>
                                             </td>
 
-                                            <td className="py-3 px-3 text-zinc-400 tabular-nums">
+                                            <td className="py-3 px-3 text-zinc-600 dark:text-zinc-400 tabular-nums">
                                                 {comp.tax_id || 'Brak NIP'}
                                             </td>
 
                                             <td className="py-3 px-4">
                                                 {(comp.assigned_advisors || []).length === 0 ? (
                                                     <Tooltip content="Spółka wymaga wyznaczenia doradcy M&A. Obecnie dostęp posiadają wyłącznie Super Administratorzy.">
-                                                        <span tabIndex={0} className="text-[11px] text-rose-400 italic flex items-center gap-1 cursor-help">
+                                                        <span tabIndex={0} className="text-[11px] text-rose-600 dark:text-rose-400 italic flex items-center gap-1 cursor-help">
                                                             <ShieldAlert className="w-3 h-3" />
                                                             Brak dedykowanego doradcy
                                                         </span>
@@ -944,8 +944,8 @@ export const AdvisorsManagementView = () => {
                                                 <Tooltip content={comp.assigned_advisors_count > 0 ? `Liczba doradców: ${comp.assigned_advisors_count}` : 'Brak przypisanych doradców (wymaga obsady)'}>
                                                     <span tabIndex={0} className={`px-2 py-0.5 rounded text-[11px] font-bold cursor-help ${
                                                         comp.assigned_advisors_count > 0
-                                                            ? 'bg-zinc-800 text-zinc-200 border border-zinc-700'
-                                                            : 'bg-rose-950/60 text-rose-400 border border-rose-800'
+                                                            ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-300 dark:border-zinc-700'
+                                                            : 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800'
                                                     }`}>
                                                         {comp.assigned_advisors_count}
                                                     </span>
@@ -954,7 +954,7 @@ export const AdvisorsManagementView = () => {
 
                                             <td className="py-3 px-3 text-center tabular-nums">
                                                 <Tooltip content={`Liczba użytkowników po stronie klienta: ${comp.clients_count}`}>
-                                                    <span tabIndex={0} className="px-2 py-0.5 rounded text-[11px] bg-zinc-800 text-zinc-300 border border-zinc-700 cursor-help">
+                                                    <span tabIndex={0} className="px-2 py-0.5 rounded text-[11px] bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-300 dark:border-zinc-700 cursor-help">
                                                         {comp.clients_count}
                                                     </span>
                                                 </Tooltip>
@@ -979,26 +979,26 @@ export const AdvisorsManagementView = () => {
                     )}
 
                     {/* Filters Bar */}
-                    <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                    <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-3 flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-xs">
                         <div className="relative flex-1 max-w-md">
-                            <Search className="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                            <Search className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
                             <input
                                 type="text"
                                 value={invitationSearch}
                                 onChange={(e) => setInvitationSearch(e.target.value)}
                                 placeholder="Szukaj zaproszenia po adresie email..."
-                                className="w-full bg-zinc-950 border border-zinc-750 rounded pl-9 pr-3 py-1.5 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
+                                className="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded pl-9 pr-3 py-1.5 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
                             />
                         </div>
 
                         <div className="flex items-center gap-2 text-xs">
-                            <span className="text-[11px] text-zinc-500">STATUS:</span>
+                            <span className="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400">STATUS:</span>
                             <Tooltip content="Filtruj zaproszenia według ich aktualnego stanu w cyklu życia konta">
                                 <select
                                     value={invitationStatusFilter}
                                     onChange={(e) => setInvitationStatusFilter(e.target.value)}
                                     aria-label="Filtruj zaproszenia według statusu"
-                                    className="bg-zinc-950 border border-zinc-750 rounded px-2 py-1 text-xs text-zinc-200 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
+                                    className="bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded px-2 py-1 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-mono"
                                 >
                                     <option value="all">Wszystkie statusy</option>
                                     <option value="pending">Oczekujące (Pending)</option>
@@ -1011,11 +1011,11 @@ export const AdvisorsManagementView = () => {
                     </div>
 
                     {/* Invitations Table */}
-                    <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden shadow-sm">
+                    <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden shadow-sm">
                         <div className="overflow-x-auto">
                             <table className="w-full text-left text-xs border-collapse">
                                 <thead>
-                                    <tr className="bg-zinc-950/80 border-b border-zinc-800 text-zinc-400 font-semibold uppercase text-[10px] tracking-wider">
+                                    <tr className="bg-zinc-50 dark:bg-zinc-950/80 border-b border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400 font-semibold uppercase text-[10px] tracking-wider">
                                         <th className="py-2.5 px-4">
                                             <Tooltip content="Adres pocztowy, na który wysłano jednorazowy token aktywacyjny">
                                                 <span tabIndex={0} className="cursor-help">Adres E-mail Odbiorcy</span>
@@ -1053,16 +1053,16 @@ export const AdvisorsManagementView = () => {
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-zinc-800/80">
+                                <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800/80">
                                     {loadingInvitations ? (
                                         <tr>
-                                            <td colSpan={7} className="py-12 text-center text-zinc-500">
+                                            <td colSpan={7} className="py-12 text-center text-zinc-500 dark:text-zinc-400">
                                                 Ładowanie rejestru zaproszeń...
                                             </td>
                                         </tr>
                                     ) : invitations.length === 0 ? (
                                         <tr>
-                                            <td colSpan={7} className="py-12 text-center text-zinc-500">
+                                            <td colSpan={7} className="py-12 text-center text-zinc-500 dark:text-zinc-400">
                                                 Brak zaproszeń spełniających wybrane kryteria.
                                             </td>
                                         </tr>
@@ -1073,13 +1073,13 @@ export const AdvisorsManagementView = () => {
                                             const isActionRunning = actionInProgressId === inv.id;
 
                                             return (
-                                                <tr key={inv.id} className="hover:bg-zinc-850/40 transition-colors">
+                                                <tr key={inv.id} className="hover:bg-zinc-50 dark:hover:bg-zinc-850/40 transition-colors">
                                                     <td className="py-3 px-4">
-                                                        <div className="font-semibold text-zinc-100 flex items-center gap-2">
-                                                            <Mail className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
+                                                        <div className="font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                                                            <Mail className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500 shrink-0" />
                                                             <span>{inv.email}</span>
                                                         </div>
-                                                        <div className="text-[10px] text-zinc-500 mt-0.5">
+                                                        <div className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5 font-mono">
                                                             Utworzono: {inv.created_at ? inv.created_at.substring(0, 10) : 'N/A'}
                                                         </div>
                                                     </td>
@@ -1108,12 +1108,12 @@ export const AdvisorsManagementView = () => {
                                                             <Tooltip content={`Przypisana spółka: ${inv.company.name} (${inv.company.code})`}>
                                                                 <div className="flex items-center gap-1.5 cursor-help" tabIndex={0}>
                                                                     <Badge variant="default" size="sm">{inv.company.code}</Badge>
-                                                                    <span className="text-zinc-300 truncate max-w-[160px]">{inv.company.name}</span>
+                                                                    <span className="text-zinc-700 dark:text-zinc-300 truncate max-w-[160px]">{inv.company.name}</span>
                                                                 </div>
                                                             </Tooltip>
                                                         ) : inv.role === 'advisor' ? (
                                                             <Tooltip content={inv.assigned_companies_count > 0 ? `Liczba spółek w początkowym przypisaniu: ${inv.assigned_companies_count}` : 'Brak przypisanych spółek na etapie zaproszenia'}>
-                                                                <span tabIndex={0} className="text-zinc-400 text-[11px] cursor-help">
+                                                                <span tabIndex={0} className="text-zinc-600 dark:text-zinc-400 text-[11px] cursor-help">
                                                                     {inv.assigned_companies_count > 0
                                                                         ? `Przypisano do ${inv.assigned_companies_count} spółek`
                                                                         : 'Bez początkowych spółek'}
@@ -1121,7 +1121,7 @@ export const AdvisorsManagementView = () => {
                                                             </Tooltip>
                                                         ) : (
                                                             <Tooltip content="Super Administrator posiada automatyczny dostęp do wszystkich podmiotów">
-                                                                <span tabIndex={0} className="text-zinc-500 text-[11px] italic cursor-help">Dostęp globalny</span>
+                                                                <span tabIndex={0} className="text-zinc-500 dark:text-zinc-400 text-[11px] italic cursor-help">Dostęp globalny</span>
                                                             </Tooltip>
                                                         )}
                                                     </td>
@@ -1130,11 +1130,11 @@ export const AdvisorsManagementView = () => {
                                                         {getStatusBadge(inv.status)}
                                                     </td>
 
-                                                    <td className="py-3 px-3 text-[11px] text-zinc-400 tabular-nums">
+                                                    <td className="py-3 px-3 text-[11px] text-zinc-600 dark:text-zinc-400 tabular-nums">
                                                         {inv.expires_at ? (
                                                             <Tooltip content={`Wygasa: ${inv.expires_at.replace('T', ' ')}`}>
                                                                 <div tabIndex={0} className="flex items-center gap-1 cursor-help">
-                                                                    <Clock className="w-3 h-3 text-zinc-500" />
+                                                                    <Clock className="w-3 h-3 text-zinc-400 dark:text-zinc-500" />
                                                                     <span>{inv.expires_at.replace('T', ' ').substring(0, 16)}</span>
                                                                 </div>
                                                             </Tooltip>
@@ -1145,7 +1145,7 @@ export const AdvisorsManagementView = () => {
                                                         )}
                                                     </td>
 
-                                                    <td className="py-3 px-3 text-[11px] text-zinc-400">
+                                                    <td className="py-3 px-3 text-[11px] text-zinc-600 dark:text-zinc-400">
                                                         <Tooltip content={`Zaproszenie zainicjowane przez: ${inv.inviter?.name || 'Administrator'} (${inv.inviter?.email || 'N/A'})`}>
                                                             <span tabIndex={0} className="cursor-help truncate block max-w-[120px]">
                                                                 {inv.inviter?.name || 'Administrator'}
@@ -1163,7 +1163,7 @@ export const AdvisorsManagementView = () => {
                                                                             size="sm"
                                                                             icon={copiedId === inv.id ? Check : Copy}
                                                                             onClick={() => handleCopyActivationUrl(inv)}
-                                                                            className={copiedId === inv.id ? 'text-emerald-400 border-emerald-500/50 bg-emerald-950/20' : ''}
+                                                                            className={copiedId === inv.id ? 'text-emerald-600 dark:text-emerald-400 border-emerald-500/50 bg-emerald-50 dark:bg-emerald-950/20' : ''}
                                                                             title="Kopiuj bezpieczny link aktywacyjny do schowka"
                                                                         >
                                                                             {copiedId === inv.id ? 'Skopiowano' : 'Kopiuj link'}
@@ -1254,18 +1254,18 @@ export const AdvisorsManagementView = () => {
 
             {/* Modal: Activation Link Confirmation */}
             {activationModalInvitation && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-xs font-mono">
-                    <div className="bg-zinc-900 border border-zinc-750 rounded-lg shadow-2xl max-w-lg w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150 flex flex-col">
-                        <div className="px-5 py-3.5 bg-zinc-950 border-b border-zinc-800 flex items-center justify-between shrink-0">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/60 dark:bg-zinc-950/80 backdrop-blur-xs font-mono">
+                    <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-2xl max-w-lg w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150 flex flex-col">
+                        <div className="px-5 py-3.5 bg-zinc-50 dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between shrink-0">
                             <div className="flex items-center gap-2.5">
-                                <div className="w-7 h-7 rounded bg-emerald-950/60 border border-emerald-700/60 flex items-center justify-center text-emerald-400">
+                                <div className="w-7 h-7 rounded bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-700/60 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
                                     <CheckCircle2 className="w-4 h-4" />
                                 </div>
                                 <div>
-                                    <h2 className="text-xs font-bold uppercase tracking-wider text-zinc-100">
+                                    <h2 className="text-xs font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
                                         Zaproszenie Utworzone
                                     </h2>
-                                    <p className="text-[10px] text-zinc-500 mt-0.5">
+                                    <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">
                                         BEZPOŚREDNI LINK AKTYWACYJNY DLA UŻYTKOWNIKA
                                     </p>
                                 </div>
@@ -1275,7 +1275,7 @@ export const AdvisorsManagementView = () => {
                                     type="button"
                                     onClick={() => setActivationModalInvitation(null)}
                                     aria-label="Odrzuć"
-                                    className="p-1 rounded text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors"
+                                    className="p-1 rounded text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                                 >
                                     <X className="w-4 h-4" />
                                 </button>
@@ -1283,15 +1283,15 @@ export const AdvisorsManagementView = () => {
                         </div>
 
                         <div className="p-5 space-y-4">
-                            <div className="p-3 rounded bg-emerald-950/30 border border-emerald-800/60 flex items-start gap-2.5">
-                                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                                <div className="text-[11px] text-zinc-300 leading-relaxed">
-                                    Zaproszenie dla <span className="font-semibold text-emerald-300">{activationModalInvitation.email}</span> zostało wygenerowane. Jeśli serwer pocztowy napotka problem z dostarczeniem, możesz ręcznie przekazać poniższy unikalny link (ważny 48h).
+                            <div className="p-3 rounded bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/60 flex items-start gap-2.5">
+                                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                                <div className="text-[11px] text-zinc-700 dark:text-zinc-300 leading-relaxed">
+                                    Zaproszenie dla <span className="font-semibold text-emerald-700 dark:text-emerald-300">{activationModalInvitation.email}</span> zostało wygenerowane. Jeśli serwer pocztowy napotka problem z dostarczeniem, możesz ręcznie przekazać poniższy unikalny link (ważny 48h).
                                 </div>
                             </div>
 
                             <div>
-                                <label className="block text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mb-1.5">
+                                <label className="block text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider mb-1.5">
                                     Link Rejestracyjny i Aktywacyjny
                                 </label>
                                 <div className="flex items-center gap-2">
@@ -1299,7 +1299,7 @@ export const AdvisorsManagementView = () => {
                                         type="text"
                                         readOnly
                                         value={activationModalInvitation.activation_url}
-                                        className="w-full px-3 py-2 text-xs bg-zinc-950 border border-zinc-750 rounded text-zinc-200 font-mono select-all focus:outline-none focus:border-brand"
+                                        className="w-full px-3 py-2 text-xs bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded text-zinc-800 dark:text-zinc-200 font-mono select-all focus:outline-none focus:border-brand"
                                     />
                                     <Tooltip content="Kopiuj link aktywacyjny do schowka">
                                         <span>
@@ -1308,7 +1308,7 @@ export const AdvisorsManagementView = () => {
                                                 size="sm"
                                                 icon={modalCopied ? Check : Copy}
                                                 onClick={() => handleCopyModalUrl(activationModalInvitation.activation_url)}
-                                                className={modalCopied ? 'text-emerald-400 border-emerald-500/50 bg-emerald-950/20' : ''}
+                                                className={modalCopied ? 'text-emerald-600 dark:text-emerald-400 border-emerald-500/50 bg-emerald-50 dark:bg-emerald-950/20' : ''}
                                             >
                                                 {modalCopied ? 'Skopiowano' : 'Kopiuj'}
                                             </Button>
