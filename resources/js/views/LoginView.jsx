@@ -91,7 +91,7 @@ export const LoginView = () => {
                         FinBoard Terminal
                     </h1>
                     <p className="mt-1 text-xs text-zinc-400">
-                        Autoryzowany dostęp do portfela transakcyjnego Helvest Advisory
+                        Autoryzowany dostęp do portfela transakcyjnego Tryton Advisory
                     </p>
                 </div>
 
