@@ -420,6 +420,8 @@ export const AdvisorsManagementView = () => {
                         <MetricCard
                             title="Doradcy & Partnerzy"
                             value={totalAdvisors}
+                            currency={null}
+                            isCount
                             icon={Users}
                             subtitle={`Aktywni: ${activeAdvisors} / ${totalAdvisors}`}
                             tooltipContent="Łączna liczba doradców M&A oraz super-administratorów w zespole Deal Advisory."
@@ -427,6 +429,8 @@ export const AdvisorsManagementView = () => {
                         <MetricCard
                             title="Spółki w Portfelu"
                             value={totalCompanies}
+                            currency={null}
+                            isCount
                             icon={Building2}
                             subtitle="Podmioty z przypisanym doradcą"
                             tooltipContent="Liczba zarejestrowanych podmiotów gospodarczych podlegających nadzorowi analitycznemu."
@@ -453,6 +457,8 @@ export const AdvisorsManagementView = () => {
                 <MetricCard
                     title="Oczekujące Zaproszenia"
                     value={pendingInvitations}
+                    currency={null}
+                    isCount
                     icon={Mail}
                     subtitle="Tokeny ważne przez 48h"
                     tooltipContent="Liczba aktywnych, niewykorzystanych tokenów zaproszeń oczekujących na rejestrację przez użytkownika."
@@ -460,6 +466,8 @@ export const AdvisorsManagementView = () => {
                 <MetricCard
                     title="Aktywowane Konta"
                     value={acceptedInvitations}
+                    currency={null}
+                    isCount
                     icon={CheckCircle2}
                     subtitle="Zrealizowane procedury onboardingowe"
                     tooltipContent="Liczba użytkowników, którzy pomyślnie zrealizowali procedurę aktywacji konta w systemie."

@@ -30,6 +30,7 @@ export const MetricCard = ({
     subtitle,
     isRatio = false,
     ratioSuffix = 'x',
+    isCount = false,
     className = '',
     tooltipContent = null,
 }) => {
@@ -67,7 +68,7 @@ export const MetricCard = ({
                         {displayValue}
                         <span className="text-xs font-mono font-normal text-zinc-500 ml-1">{ratioSuffix}</span>
                     </div>
-                ) : typeof displayValue === 'number' ? (
+                ) : !isCount && currency && typeof displayValue === 'number' ? (
                     <FinancialValue amount={displayValue} currency={currency} size="2xl" align="left" />
                 ) : (
                     <div className="text-2xl font-bold font-mono tracking-tight text-zinc-900 dark:text-zinc-100 tabular-nums">

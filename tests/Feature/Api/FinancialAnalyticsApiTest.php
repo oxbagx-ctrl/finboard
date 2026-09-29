@@ -729,4 +729,41 @@ final class FinancialAnalyticsApiTest extends TestCase
         $calculatedRevGrowth = round((($totalRevCurrent - $totalRevPrevious) / $totalRevPrevious) * 100, 2);
         $this->assertEqualsWithDelta($dynamicsRevGrowth, $calculatedRevGrowth, 0.05);
     }
+
+    public function test_analytics_endpoints_support_multi_currency_conversion_without_mismatch(): void
+    {
+        Sanctum::actingAs($this->clientUser);
+
+        // 1. Verify metrics endpoint with EUR
+        $metricsResponse = $this->getJson('/api/v1/finance/analytics/metrics?currency=EUR');
+        $metricsResponse->assertStatus(200);
+        $metricsResponse->assertJsonStructure([
+            'status',
+            'company_id',
+            'data' => [
+                'pnl' => [
+                    'revenue' => ['amount', 'formatted'],
+                    'ebitda' => ['amount', 'formatted'],
+                ],
+            ],
+        ]);
+        $eurRevenue = (float) $metricsResponse->json('data.pnl.revenue.amount');
+        $this->assertGreaterThan(0, $eurRevenue);
+        $this->assertStringContainsString('EUR', (string) $metricsResponse->json('data.pnl.revenue.formatted'));
+
+        // 2. Verify trends endpoint with EUR
+        $trendsResponse = $this->getJson('/api/v1/finance/analytics/trends?currency=EUR');
+        $trendsResponse->assertStatus(200);
+        $trendsData = $trendsResponse->json('data');
+        $this->assertNotEmpty($trendsData);
+        $this->assertArrayHasKey('revenue', $trendsData[0]);
+
+        // 3. Verify breakdown endpoint with EUR
+        $breakdownResponse = $this->getJson('/api/v1/finance/analytics/breakdown?category_type=OPEX&currency=EUR');
+        $breakdownResponse->assertStatus(200);
+        $breakdownData = $breakdownResponse->json('data');
+        $this->assertNotEmpty($breakdownData);
+        $this->assertStringContainsString('EUR', (string) $breakdownData[0]['formatted_amount']);
+    }
 }
+

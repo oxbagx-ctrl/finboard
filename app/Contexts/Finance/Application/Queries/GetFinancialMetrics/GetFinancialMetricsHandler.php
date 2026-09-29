@@ -20,7 +20,7 @@ final class GetFinancialMetricsHandler
 
     public function handle(GetFinancialMetricsQuery $query): FinancialMetrics
     {
-        $currency = Currency::from($query->currency);
+        $currency = Currency::tryFrom(strtoupper($query->currency)) ?? Currency::PLN;
 
         $period = null;
         if ($query->startDate !== null && $query->endDate !== null) {

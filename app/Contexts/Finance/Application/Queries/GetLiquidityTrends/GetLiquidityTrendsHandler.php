@@ -38,7 +38,7 @@ final class GetLiquidityTrendsHandler
      */
     public function handle(GetLiquidityTrendsQuery $query): array
     {
-        $currency = Currency::from($query->currency);
+        $currency = Currency::tryFrom(strtoupper($query->currency)) ?? Currency::PLN;
 
         $period = null;
         if ($query->startDate !== null && $query->endDate !== null) {

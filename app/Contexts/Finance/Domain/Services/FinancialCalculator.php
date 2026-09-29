@@ -36,6 +36,11 @@ final class FinancialCalculator
         $currentLiabilities = Money::zero($currency);
         $longTermLiabilities = Money::zero($currency);
 
+        $multiplier = 1.0;
+        if ($currency !== Currency::PLN) {
+            $multiplier = \App\Models\ExchangeRate::getMultiplierFor($currency->value);
+        }
+
         foreach ($records as $record) {
             // If period filter is specified, skip out-of-period records
             if ($period !== null && !$period->contains($record->recordDate())) {
@@ -43,6 +48,11 @@ final class FinancialCalculator
             }
 
             $amount = $record->amount();
+            if ($amount->currency() !== $currency) {
+                $convertedAmount = round($amount->toDecimal() * $multiplier, 4);
+                $amount = new Money($convertedAmount, $currency);
+            }
+
             $categoryType = $record->category()->type();
 
             // P&L classifications

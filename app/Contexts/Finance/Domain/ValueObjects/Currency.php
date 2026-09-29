@@ -10,6 +10,7 @@ enum Currency: string
     case EUR = 'EUR';
     case USD = 'USD';
     case GBP = 'GBP';
+    case CHF = 'CHF';
 
     public function symbol(): string
     {
@@ -18,6 +19,7 @@ enum Currency: string
             self::EUR => '€',
             self::USD => '$',
             self::GBP => '£',
+            self::CHF => 'CHF',
         };
     }
 }

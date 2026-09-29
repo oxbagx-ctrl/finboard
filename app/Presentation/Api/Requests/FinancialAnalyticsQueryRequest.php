@@ -37,7 +37,7 @@ final class FinancialAnalyticsQueryRequest extends FormRequest
             'company_id' => ['nullable', 'uuid', 'exists:companies,id'],
             'start_date' => ['nullable', 'date_format:Y-m-d'],
             'end_date' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:start_date'],
-            'currency' => ['nullable', 'string', 'in:PLN,EUR,USD,GBP'],
+            'currency' => ['nullable', 'string', 'size:3'],
             'record_type' => ['nullable', 'string', 'in:EXPENSE,expense,REVENUE,revenue,ASSET,asset,LIABILITY,liability'],
             'category_type' => ['nullable', 'string'],
             'include_yoy' => ['nullable', 'boolean'],

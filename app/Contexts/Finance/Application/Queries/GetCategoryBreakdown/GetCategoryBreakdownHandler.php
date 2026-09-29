@@ -44,7 +44,7 @@ final class GetCategoryBreakdownHandler
      */
     public function handle(GetCategoryBreakdownQuery $query): array
     {
-        $currency = Currency::from($query->currency);
+        $currency = Currency::tryFrom(strtoupper($query->currency)) ?? Currency::PLN;
         $filterType = RecordType::tryFrom(strtolower(trim((string) $query->recordType)));
 
         $allowedCategoryTypes = [];
@@ -75,6 +75,11 @@ final class GetCategoryBreakdownHandler
         $categoryDetails = [];
         $grandTotal = Money::zero($currency);
 
+        $multiplier = 1.0;
+        if ($currency !== Currency::PLN) {
+            $multiplier = \App\Models\ExchangeRate::getMultiplierFor($currency->value);
+        }
+
         $minDate = null;
         $maxDate = null;
 
@@ -101,8 +106,14 @@ final class GetCategoryBreakdownHandler
                 ];
             }
 
-            $totalsPerCategory[$catId] = $totalsPerCategory[$catId]->add($record->amount());
-            $grandTotal = $grandTotal->add($record->amount());
+            $amount = $record->amount();
+            if ($amount->currency() !== $currency) {
+                $convertedAmount = round($amount->toDecimal() * $multiplier, 4);
+                $amount = new Money($convertedAmount, $currency);
+            }
+
+            $totalsPerCategory[$catId] = $totalsPerCategory[$catId]->add($amount);
+            $grandTotal = $grandTotal->add($amount);
 
             $rDate = $record->recordDate();
             if ($minDate === null || $rDate < $minDate) {
@@ -166,16 +177,23 @@ final class GetCategoryBreakdownHandler
                     if (!isset($prevTotalsPerCategory[$pCatId])) {
                         $prevTotalsPerCategory[$pCatId] = Money::zero($currency);
                     }
-                    $prevTotalsPerCategory[$pCatId] = $prevTotalsPerCategory[$pCatId]->add($prevRecord->amount());
+
+                    $amount = $prevRecord->amount();
+                    if ($amount->currency() !== $currency) {
+                        $convertedAmount = round($amount->toDecimal() * $multiplier, 4);
+                        $amount = new Money($convertedAmount, $currency);
+                    }
+
+                    $prevTotalsPerCategory[$pCatId] = $prevTotalsPerCategory[$pCatId]->add($amount);
 
                     if ($pCode !== '') {
                         if (!isset($prevTotalsByCode[$pCode])) {
                             $prevTotalsByCode[$pCode] = Money::zero($currency);
                         }
-                        $prevTotalsByCode[$pCode] = $prevTotalsByCode[$pCode]->add($prevRecord->amount());
+                        $prevTotalsByCode[$pCode] = $prevTotalsByCode[$pCode]->add($amount);
                     }
 
-                    $prevGrandTotal = $prevGrandTotal->add($prevRecord->amount());
+                    $prevGrandTotal = $prevGrandTotal->add($amount);
                 }
             }
         }

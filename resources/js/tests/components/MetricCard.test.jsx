@@ -92,4 +92,34 @@ describe('MetricCard Component', () => {
         const infoBtn = screen.getByRole('button', { name: 'Informacje o: Wynik EBITDA' });
         expect(infoBtn).toBeInTheDocument();
     });
+
+    it('renders clean integer without currency symbol when isCount is true or currency is null', () => {
+        const { rerender } = render(
+            <MetricCard
+                title="Doradcy & Partnerzy"
+                value={3}
+                isCount={true}
+                currency={null}
+            />
+        );
+
+        expect(screen.getByText('Doradcy & Partnerzy')).toBeInTheDocument();
+        expect(screen.getByText('3')).toBeInTheDocument();
+        expect(screen.queryByText(/zł/)).not.toBeInTheDocument();
+
+        // Rerender with zero count
+        rerender(
+            <MetricCard
+                title="Oczekujące Zaproszenia"
+                value={0}
+                isCount={true}
+                currency={null}
+            />
+        );
+
+        expect(screen.getByText('Oczekujące Zaproszenia')).toBeInTheDocument();
+        expect(screen.getByText('0')).toBeInTheDocument();
+        expect(screen.queryByText(/zł/)).not.toBeInTheDocument();
+    });
 });
+

@@ -29,7 +29,7 @@ final class KpiController
     public function metrics(FinancialAnalyticsQueryRequest $request): JsonResponse
     {
         $companyId = $this->resolveCompanyId($request);
-        $currency = Currency::from((string) $request->query('currency', 'PLN'));
+        $currency = Currency::tryFrom(strtoupper((string) $request->query('currency', 'PLN'))) ?? Currency::PLN;
 
         $startDate = $request->query('start_date');
         $endDate = $request->query('end_date');
