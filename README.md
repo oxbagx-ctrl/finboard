@@ -1113,55 +1113,55 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
         - Weryfikacja testowa: 100% PASS w pełnym zestawie 74 plików Vitest (676 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
 - [x] **Faza 61: Integracja Kursów Walut NBP i Architektura Wielowalutowa (Constant FX)**
-    - [x] Migracja bazy danych PostgreSQL i model Eloquent dla przechowywania kursów walut NBP.
+    - Migracja bazy danych PostgreSQL i model Eloquent dla przechowywania kursów walut NBP.
         - `database/migrations/2026_04_01_100000_create_exchange_rates_table.php`: utworzenie dedykowanej tabeli `exchange_rates` zawierającej klucz główny UUID, kod ISO waluty (`currency` VARCHAR(3) UNIQUE), pełną nazwę urzędową (`currency_name` VARCHAR(100)), kurs średni NBP (`mid_rate` DECIMAL(10,4)), mnożnik przeliczeniowy (`multiplier` DECIMAL(12,8) wyliczany jako `1 / mid_rate`), sygnaturę urzędową tabeli (`table_no` VARCHAR(50)), datę wejścia w życie (`effective_date` DATE), źródło danych (`source` VARCHAR(30) default 'NBP'), znacznik czasu pobrania (`fetched_at` TIMESTAMP WITH TIME ZONE) oraz indeks złożony na `['currency', 'effective_date']`.
         - `app/Models/ExchangeRate.php`: model domenowy Eloquent z obsługą traitów `HasUuids`, rzutowaniem typów zmiennoprzecinkowych i dat, metodami pomocniczymi `findByCurrency` (wyszukiwanie case-insensitive), `getMultiplierFor` (bezpieczny mnożnik z domyślnym 1.0 dla PLN), `convertFromPln` oraz `convertToPln`.
         - `database/seeders/ExchangeRateSeeder.php`: idempotentny seeder inicjalizujący bazowe waluty instytucjonalne (EUR, USD, GBP) zarejestrowany w głównym `database/seeders/DatabaseSeeder.php`.
         - `tests/Unit/Finance/ExchangeRateModelTest.php`: zestaw testów jednostkowych weryfikujących generowanie UUID, rzutowania, wyszukiwanie walut bez względu na wielkość liter, fallback mnożnika dla PLN oraz matematyczną precyzję dwukierunkowej konwersji kwotowej.
-    - [x] Implementacja serwisu NbpExchangeRateService dla pobierania kursów Tabeli A NBP.
+    - Implementacja serwisu NbpExchangeRateService dla pobierania kursów Tabeli A NBP.
         - `app/Domain/Finance/Exceptions/NbpApiException.php`: klasa wyjątku domenowego ze statycznymi metodami fabrycznymi obsługującymi awarie sieciowe, kody błędów HTTP, uszkodzony payload JSON oraz nieznane waluty.
         - `app/Domain/Finance/Services/NbpExchangeRateService.php`: implementacja serwisu integrującego publiczne API NBP (`https://api.nbp.pl/api/exchangerates/tables/A/?format=json`) z timeoutem 10s, walidacją kontraktu JSON tabeli A, atomowym zapisem do PostgreSQL w transakcji (`DB::transaction`) kalkulującym mnożniki $1/\text{mid}$ o precyzji 8 miejsc po przecinku, metodami dwukierunkowej konwersji kwotowej (`convertFromPln`, `convertToPln`) oraz wzorcem Cache-Aside (`getCachedRatesPayload`, `invalidateCache`).
         - `app/Contexts/Finance/Infrastructure/Services/NbpExchangeRateService.php`: adapter zgodności wstecznej dla IoC / kontenera usług.
         - `tests/Unit/Finance/NbpExchangeRateServiceTest.php`: zestaw testów jednostkowych z mockowaniem fasady `Http::fake` weryfikujący pomyślną synchronizację, błędy sieciowe (500), uszkodzony format JSON, puste tablice kursowe, matematyczną precyzję konwersji oraz mechanizm buforowania w Cache.
-    - [x] Komenda konsolowa i konfiguracja harmonogramu dla aktualizacji kursów walut NBP.
+    - Komenda konsolowa i konfiguracja harmonogramu dla aktualizacji kursów walut NBP.
         - `app/Console/Commands/SyncExchangeRatesCommand.php`: implementacja polecenia konsolowego `app:sync-exchange-rates` (oraz aliasu `finance:sync-exchange-rates`) z opcją `--table`, szczegółowym logowaniem instytucjonalnym FinBoard, prezentacją tabeli kursów i mnożników oraz odpornością na błędy zewnętrzne.
         - `routes/console.php`: rejestracja zadania cyklicznego w mechanizmie Laravel Console Scheduler uruchamianego dwa razy na dobę w dni robocze (o godzinie 08:30 i 12:30 czasu `Europe/Warsaw`) z flagami `withoutOverlapping()`, `onOneServer()` i `runInBackground()`.
         - `tests/Feature/Console/SyncExchangeRatesCommandTest.php`: zestaw testów funkcjonalnych sprawdzających poprawne wykonanie polecenia, opcję `--table`, obsługę błędów sieciowych API (kod 1), aliasy oraz właściwą definicję wpisów harmonogramu.
-    - [x] Endpointy REST API i strategia Cache-Aside dla kursów walut NBP.
+    - Endpointy REST API i strategia Cache-Aside dla kursów walut NBP.
         - `app/Models/ExchangeRate.php`: dodanie akcesora `getTableTypeAttribute()` wyznaczającego symbol tabeli kursowej NBP (`'A'`).
         - `app/Presentation/Api/Controllers/ExchangeRateController.php`: kontroler API udostępniający endpointy: `GET /api/v1/finance/exchange-rates` (zwracający strukturę walut i słownik mnożników `multipliers` dla frontendu, flagę `cached: true/false` oraz obsługujący parametr `?refresh=1`), `GET /api/v1/finance/exchange-rates/{currency}` (szczegóły waluty wraz z dwukierunkową próbką przeliczeniową 100 jednostek, tożsamością PLN i obsługą 404) oraz `POST /api/v1/finance/exchange-rates/sync` (synchronizacja on-demand z NBP i invalidacją cache).
         - `routes/api.php`: rejestracja tras API wewnątrz grupy autoryzacyjnej Sanctum pod prefiksem `finance/exchange-rates`.
         - `tests/Feature/Api/ExchangeRateApiTest.php`: zestaw testów integracyjnych weryfikujących autoryzację Sanctum (401), cykl życia bufora Cache-Aside, parametr wymuszonego odświeżenia `?refresh=1`, kalkulację próbki 100 jednostek, błędy 404 dla nieznanych walut oraz kody odpowiedzi 502/200 dla endpointu synchronizacji.
         - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (744 testy, 8888 asercji), Vitest (74 pliki, 676 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
-    - [x] Refaktoryzacja DealContext pod kątem asynchronicznego ładowania kursów walut NBP.
+    - Refaktoryzacja DealContext pod kątem asynchronicznego ładowania kursów walut NBP.
         - `resources/js/context/DealContext.jsx`: dynamiczny stan `currencies` ładowany asynchronicznie z endpointu `/api/v1/finance/exchange-rates` z zachowaniem stałej `CURRENCIES` jako offline fallback, stan metadanych `ratesMetadata` (`source`, `tableNo`, `effectiveDate`, `fetchedAt`, `cached`, `isFallback`), obsługa ładowania i błędów (`loadingRates`, `ratesError`), funkcja `refreshRates(forceRefresh)` oraz dynamiczna funkcja przeliczeniowa `convertAmount` z etykietami formatowanymi do 4 miejsc po przecinku.
         - `resources/js/tests/context/dealContext.test.jsx`: zestaw testów jednostkowych weryfikujących inicjalizację z fallbackiem, asynchroniczne pobieranie danych NBP, wymuszone odświeżenie cache (`?refresh=1`) oraz odporność na awarie sieciowe.
         - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (744 testy, 8888 asercji), Vitest (75 plików, 680 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
-    - [x] Prezentacja kursów NBP, numeru tabeli i daty publikacji w pasku kontekstu DealContextBar.
+    - Prezentacja kursów NBP, numeru tabeli i daty publikacji w pasku kontekstu DealContextBar.
         - `resources/js/components/layout/DealContextBar.jsx`: dodanie badge'a oficjalnej tabeli NBP (`nbp-rate-badge`) z numerem tabeli i datą publikacji kursów, badge'a ostrzegawczego trybu awaryjnego (`nbp-fallback-badge`), wskaźnika aktywnego przelicznika walutowego (`active-fx-rate-badge`) z precyzją 4 miejsc po przecinku oraz przycisku wymuszenia natychmiastowej synchronizacji (`refresh-nbp-rates-button`) z animacją `animate-spin`.
         - `resources/js/tests/components/DealContextBar.test.jsx`: zestaw 6 testów jednostkowych weryfikujących renderowanie badge'y, ostrzeżenia o fallbacku, prezentację kursu dla walut obcych oraz interakcję z przyciskiem wymuszenia odświeżenia.
         - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (744 testy, 8888 asercji), Vitest (75 plików, 683 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
-    - [x] Oficjalna cytacja kursów NBP, klauzula audytowa MSR 21 i znak wodny w raportach zarządczych i eksporcie JSON.
+    - Oficjalna cytacja kursów NBP, klauzula audytowa MSR 21 i znak wodny w raportach zarządczych i eksporcie JSON.
         - `resources/js/components/reports/ExecutivePdfReport.jsx`: implementacja instytucjonalnego znaku wodnego (`executive-report-watermark`), wskaźnika cytowania Tabeli A NBP (`fx-citation-badge`) w sekcji waluty prezentacji oraz formalnej klauzuli prawno-audytowej (`fx-audit-citation`) w Sekcji 6 powołującej się na standard MSR 21, art. 30 ust. 2 Ustawy o rachunkowości (UoR) oraz model Constant FX.
         - `resources/js/views/ReportsView.jsx`: wstrzyknięcie pełnych parametrów kursowych (`exchange_rate_audit`) do skrótu kryptograficznego SHA-256 (`computeReportHash`) gwarantując integralność modelu WORM oraz dołączenie węzła audytowego do eksportu JSON.
         - `resources/js/components/reports/ReportConfigurator.jsx`: dynamiczne etykiety kursów NBP w selektorze walut z precyzją 4 miejsc po przecinku.
         - `resources/js/context/DealContext.jsx`: eksport instancji `DealContext` oraz hooka `useOptionalDeal()` zapewniającego bezbłędne renderowanie komponentów prezentacyjnych w izolacji testowej.
         - `resources/js/tests/components/ExecutiveReports.test.jsx`: rozbudowa zestawu testów jednostkowych o weryfikację znaku wodnego, badge'a cytowania, klauzuli audytowej MSR 21 oraz dynamicznych etykiet NBP (11/11 testów PASS).
         - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (744 testy, 8888 asercji), Vitest (75 plików, 686 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
-    - [x] Wektorowa stopka cytowania kursów NBP w formacie A4 i standaryzacja metadanych eksportu JSON.
+    - Wektorowa stopka cytowania kursów NBP w formacie A4 i standaryzacja metadanych eksportu JSON.
         - `resources/js/components/reports/ExecutivePdfReport.jsx`: dodanie wektorowej stopki audytowej (`fx-footer-citation`) z formułą: *"Przeliczenia walutowe zestawienia sporządzono w oparciu o oficjalną Tabelę A kursów średnich NBP nr [nr] z dnia [data] (1 EUR = [kurs] PLN)"* dla walut obcych oraz waluty bazowej PLN (art. 30 ust. 2 UoR).
         - `resources/js/views/ReportsView.jsx`: standaryzacja węzła `meta.exchange_rate_source` oraz głównego korzenia eksportu JSON z pełnymi metadanymi tabeli NBP, kursem, datą publikacji i normą MSR 21, zsynchronizowanymi z ładunkiem SHA-256 (`computeReportHash`).
         - `resources/js/components/layout/DealContextBar.jsx`: refaktoryzacja selektora walut do formatu kompaktowych pigułek głównych walut (`PLN`, `EUR`, `USD`, `GBP`) z reaktywnym wyniesieniem aktywnej waluty NBP oraz rozwijanym menu `otherCurrencies`.
         - `resources/js/tests/components/ExecutiveReports.test.jsx` & `resources/js/tests/integration/dealAdvisoryE2EWorkflow.test.jsx`: rozbudowa testów o weryfikację stopki wektorowej w memorandum pojedynczym oraz w pełnym przepływie pracy Deal Advisory E2E.
         - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (744 testy, 8888 asercji), Vitest (75 plików, 687 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
-    - [x] Kompleksowe testy jednostkowe i regresyjne frontendu dla synchronizacji wielowalutowej NBP.
+    - Kompleksowe testy jednostkowe i regresyjne frontendu dla synchronizacji wielowalutowej NBP.
         - `resources/js/tests/integration/nbpMultiCurrencySynchronization.test.jsx`: implementacja dedykowanego pakietu testów integracyjnych weryfikujących zintegrowany komponent `IntegratedDealSuite` łączący `DealProvider`, `DealContextBar`, `ReportConfigurator` oraz `ExecutivePdfReport`.
         - Weryfikacja pełnego cyklu życia synchronizacji na żywo: przejście ze stanu domyślnego do oficjalnej Tabeli A NBP (`062/A/NBP/2026`), sprawdzenie etykiet `nbp-rate-badge`, numeru tabeli i daty publikacji, wskaźnika `active-fx-rate-badge`, przeliczeń kwotowych (`convertAmount`) oraz klauzul audytowych w PDF (`fx-citation-badge`, `fx-audit-citation`, `fx-footer-citation`).
         - Weryfikacja reaktywnej elewacji waluty niepodstawowej (CHF) z rozwijanego selektora `other-currencies-select` do aktywnego przycisku oraz formatu kursu średniego (`1 CHF = 4.5820 PLN`).
         - Weryfikacja odporności na błędy serwerowe API NBP (symulacja HTTP 500) z zachowaniem ciągłości działania w oparciu o stałe referencyjne i bezbłędnym wznowieniem synchronizacji po kolejnym zapytaniu.
         - Weryfikacja precyzji matematycznej i spójności przeliczeń przy wielokrotnym przełączaniu walut transakcyjnych (PLN -> EUR -> USD -> GBP -> PLN).
         - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (744 testy, 8888 asercji), Vitest (76 plików, 691 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
-    - [x] Kompleksowa dokumentacja architektoniczna silnika wielowalutowego NBP i rejestr zmian.
+    - Kompleksowa dokumentacja architektoniczna silnika wielowalutowego NBP i rejestr zmian.
         - `docs/architecture/nbp-fx-engine.md`: opracowanie wyczerpującej specyfikacji architektonicznej silnika wymiany walut NBP, obejmującej zgodność prawną z MSR 21 oraz art. 30 ust. 2 UoR, metodologię Constant FX w procesach Due Diligence i wycenach DCF, strategię pobierania Tabeli A z atomowym zapisem do PostgreSQL, wzorzec Cache-Aside (TTL 12h), silnik wielowalutowy agregatorów analitycznych eliminujący błędy `CurrencyMismatchException`, architekturę frontendu (`DealContext`, `DealContextBar` z reaktywną elewacją waluty), wektorowe raporty A4 ze znakiem wodnym, klauzulami prawnymi i stopką cytowania, kryptograficzną pieczęć integralności WORM (SHA-256) oraz standaryzację metadanych JSON (`meta.exchange_rate_source` i `meta.exchange_rate_audit`).
         - `docs/plan/317-implementation-plan-nbp-fx-engine-architecture-documentation.md`: plan wdrożeniowy finalizujący Fazę 61.
         - `changelog/317-docs-nbp-fx-engine-architecture-and-changelogs.md`: wpis rejestru zmian dla Commita 317.
@@ -1169,7 +1169,7 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
         - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (745 testów, 8907 asercji), Vitest (76 plików, 692 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
 - [x] **Faza 62: Fizyczne Szyfrowanie Danych Spoczynkowych VDR (AES-256-GCM)**
-    - [x] Migracja bazy danych dla metadanych kryptograficznych i konfiguracja OCI.
+    - Migracja bazy danych dla metadanych kryptograficznych i konfiguracja OCI.
         - `database/migrations/2026_04_02_100000_add_encryption_metadata_to_documents_table.php`: migracja rozszerzająca tabelę `documents` o kolumny `is_encrypted` (boolean z indeksem, default false), `encryption_algo` (string 32, nullable), `encryption_iv` (text, nullable), `encryption_tag` (text, nullable) oraz `key_id` (string 64, default 'vdr-key-1').
         - `config/vdr.php`: scentralizowany plik konfiguracyjny parametrów szyfrowania (algorytm AES-256-GCM, obsługa klucza głównego i rotacji, info HKDF) oraz bezwzględnej abstrakcji nośnika danych (gotowość pod OCI Object Storage / S3).
         - `.env.example`: uzupełnienie szablonu zmiennych środowiskowych o `VDR_ENCRYPTION_ENABLED`, `VDR_ENCRYPTION_ALGO`, `VDR_ENCRYPTION_KEY` i `VDR_ACTIVE_KEY_ID`.
@@ -1177,7 +1177,7 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
         - `app/Presentation/Api/Resources/DocumentResource.php`: ekspozycja pól `is_encrypted` i `encryption_algo` w odpowiedziach API.
         - `tests/Feature/DocumentManagement/VdrDatabaseMigrationAndConfigTest.php`: zestaw testów weryfikujących integralność schematu bazy danych, stan początkowy dokumentów, zapis metadanych AES-256-GCM oraz konfigurację.
         - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (750 testów, 8935 asercji), Vitest (76 plików, 692 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
-    - [x] Serwis kryptograficzny AES-256-GCM z obsługą HKDF Fallback.
+    - Serwis kryptograficzny AES-256-GCM z obsługą HKDF Fallback.
         - `app/Contexts/DocumentManagement/Domain/Services/VdrEncryptionServiceInterface.php`: interfejs domenowy operacji kryptograficznych (`encrypt`, `decrypt`, `decryptPayload`, `getActiveKeyId`, `isEncryptionEnabled`).
         - `app/Contexts/DocumentManagement/Domain/ValueObjects/EncryptedPayload.php`: Value Object enkapsulujący binarny szyfrogram, 96-bitowy IV, 128-bitowy tag autentyczności, algorytm i identyfikator klucza z metodami Base64.
         - `app/Contexts/DocumentManagement/Domain/Exceptions/DecryptionFailedException.php` & `TamperedPayloadException.php`: dedykowane wyjątki domenowe sygnalizujące błędy formatu lub wykrycie naruszenia integralności danych.
@@ -1185,19 +1185,19 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
         - `app/Contexts/DocumentManagement/Infrastructure/Providers/DocumentManagementServiceProvider.php`: rejestracja serwisu szyfrującego w kontenerze IoC.
         - `tests/Unit/DocumentManagement/OpenSslVdrEncryptionServiceTest.php`: 12 testów jednostkowych weryfikujących szyfrowanie/deszyfrowanie, wykrywanie modyfikacji szyfrogramu (tampering), walidację IV/tagu, rotację kluczy oraz fallback HKDF (28 asercji).
         - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (762 testy, 8963 asercje), Vitest (76 plików, 692 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
-    - [x] Komenda generowania klucza VDR i aktualizacja seedera danych.
+    - Komenda generowania klucza VDR i aktualizacja seedera danych.
         - `app/Console/Commands/GenerateVdrEncryptionKeyCommand.php`: dedykowana komenda `php artisan vdr:key-generate` generująca kryptograficznie bezpieczny klucz 256-bit (base64) z obsługą opcji `--show`, promptu produkcyjnego (`--force`) oraz atomowego zapisu do `.env`.
         - `database/seeders/DocumentDataSeeder.php`: refaktoryzacja seedera pod kątem fizycznego szyfrowania plików demonstracyjnych (PDF/XLSX) z wyliczeniem wektora IV, tagu autentyczności GCM oraz sumy SHA-256 z zachowaniem gotowości pod komendy `db:seed` i `migrate:fresh --seed`.
         - `tests/Feature/Console/GenerateVdrEncryptionKeyCommandTest.php`: testy komendy konsolowej weryfikujące poprawność wyświetlania i modyfikacji `.env`.
         - `tests/Feature/DocumentManagement/DocumentDataSeederEncryptionTest.php`: testy integracyjne potwierdzające obecność szyfrogramów na dysku oraz poprawność ich deszyfrowania z weryfikacją sumy kontrolnej.
         - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (765 testów, 9065 asercji), Vitest (76 plików, 692 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
-    - [x] Implementacja szyfrowania w magazynie fizycznym (Cloud-Ready Storage).
+    - Implementacja szyfrowania w magazynie fizycznym (Cloud-Ready Storage).
         - `app/Contexts/DocumentManagement/Infrastructure/Storage/LocalStorageDocumentStorage.php`: adaptacja do abstrakcji chmurowej `config('vdr.storage.disk')`, zabezpieczenie `fullPath()` przed błędem `BadMethodCallException` przy driverach chmurowych (OCI Object Storage / S3) oraz natychmiastowe zwalnianie buforów binarnych (`unset`).
         - `app/Contexts/DocumentManagement/Infrastructure/Storage/CloudReadyDocumentStorage.php`: nowa klasa implementująca `DocumentStorageInterface` dedykowana dla magazynu chmurowego.
         - `database/seeders/DocumentDataSeeder.php`: gwarancja idempotentności seedera poprzez uprzednie usuwanie starych plików i powiązań.
         - `tests/Feature/DocumentManagement/CloudReadyDocumentStorageIntegrationTest.php`: testy integracyjne weryfikujące zachowanie integralności binarnej szyfrogramów, odporność `fullPath()` oraz transakcyjny rollback osieroconych plików w `TransactionalStorageManager`.
         - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (769 testów, 9028 asercji), Vitest (76 plików, 692 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
-    - [x] Integracja szyfrowania w ścieżce zapisu (Upload Pipeline).
+    - Integracja szyfrowania w ścieżce zapisu (Upload Pipeline).
         - `app/Contexts/DocumentManagement/Application/Commands/UploadDocument/UploadDocumentCommand.php`: obsługa opcjonalnego identyfikatora klucza `$keyId`.
         - `app/Contexts/DocumentManagement/Domain/Model/Document.php`: rozszerzenie modelu o atrybuty i gettery kryptograficzne (`isEncrypted`, `encryptionAlgo`, `encryptionIv`, `encryptionTag`, `keyId`) oraz metodę domenową `markAsEncrypted()`.
         - `app/Contexts/DocumentManagement/Application/Commands/UploadDocument/UploadDocumentHandler.php`: wyliczanie sumy SHA-256 z oryginalnego pliku, szyfrowanie AES-256-GCM, składowanie na nośniku wyłącznie binarnego szyfrogramu oraz atomowy zapis metadanych w PostgreSQL.
@@ -1205,15 +1205,15 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
         - `app/Contexts/DocumentManagement/Infrastructure/Repositories/EloquentDocumentRepository.php`: mapowanie kolumn kryptograficznych w operacjach zapisu i odczytu.
         - `tests/Feature/DocumentManagement/UploadDocumentEncryptionPipelineTest.php`: zestaw testów weryfikujących brak jawnego tekstu na dysku, poprawność wektora IV i tagu GCM w PostgreSQL oraz zgodność deszyfrowania.
         - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (771 testów, 9049 asercji), Vitest (76 plików, 692 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
-    - [x] Deszyfrowanie Dual-Read w ścieżce pobierania, podglądu i znaku wodnego.
+    - Deszyfrowanie Dual-Read w ścieżce pobierania, podglądu i znaku wodnego.
         - `app/Contexts/DocumentManagement/Application/Commands/DownloadDocument/DownloadDocumentHandler.php`: deszyfrowanie w locie z weryfikacją tagu GCM 128-bit, bezstratny odczyt plików legacy (`is_encrypted = false`), dynamiczne przekazanie bajtów do znaku wodnego i czyszczenie buforów pamięci (`unset`).
         - `app/Presentation/Api/Controllers/DocumentController.php`: zabezpieczenie akcji `download` i `preview` przed naruszeniami spójności danych (`TamperedPayloadException` -> HTTP 422, audyt `Log::critical`) oraz awariami deszyfrowania (`DecryptionFailedException` -> HTTP 500), bez tworzenia plików tymczasowych na dysku.
         - `tests/Feature/DocumentManagement/DualReadDownloadAndPreviewPipelineTest.php`: kompleksowy pakiet testów integracyjnych weryfikujący Dual-Read, deszyfrowanie w locie, nakładanie znaku wodnego w podglądzie PDF oraz detekcję manipulacji szyfrogramem i tagiem GCM.
         - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (777 testów, 9073 asercje), Vitest (76 plików, 692 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
-    - [x] Komenda migracji istniejących danych na produkcji (`vdr:encrypt-existing`).
+    - Komenda migracji istniejących danych na produkcji (`vdr:encrypt-existing`).
         - `app/Console/Commands/EncryptExistingVdrDocumentsCommand.php`: komenda Artisan `php artisan vdr:encrypt-existing-documents` (alias `vdr:encrypt-existing`) z obsługą `--dry-run`, paczek `--chunk=50`, rotacji `--key-id`, paskiem postępu, weryfikacją sumy SHA-256 przed i po szyfrowaniu oraz wpisem audytowym w `document_access_logs`.
         - `tests/Feature/Console/EncryptExistingVdrDocumentsCommandTest.php`: zestaw testów weryfikujących tryb symulacji (`--dry-run`), fizyczny zapis szyfrogramu, aktualizację metadanych w PostgreSQL, pomijanie brakujących plików oraz ochronę przed rozbieżnością sumy kontrolnej.
-    - [x] Zestaw testów regresyjnych i bezpieczeństwa (PHPUnit & Vitest).
+    - Zestaw testów regresyjnych i bezpieczeństwa (PHPUnit & Vitest).
         - `tests/Feature/Security/VdrPhysicalEncryptionSecurityRegressionTest.php`: kompleksowe testy bezpieczeństwa backendu weryfikujące pełny cykl szyfrowania/deszyfrowania, wykrywanie modyfikacji szyfrogramu (tampering) i rzucenie `TamperedPayloadException`, odrzucenie sfałszowanego tagu GCM, transparentny fallback HKDF-SHA256 z `APP_KEY` oraz odczyt Dual-Read dla dokumentów legacy.
         - `resources/js/components/dataroom/DocumentTable.jsx`: dodanie badge'a `AES-256` z ikoną kłódki dla zaszyfrowanych dokumentów oraz etykiety `Jawny` dla dokumentów legacy.
         - `resources/js/components/dataroom/DocumentPreviewModal.jsx`: wskaźnik deszyfrowania w locie `AES-256-GCM (RAM)` w nagłówku modala podglądu z objaśnieniem braku składowania na dysku.
@@ -1221,6 +1221,13 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
         - `resources/js/tests/components/VdrEncryptionUiRegression.test.jsx`: pakiet testów jednostkowych frontendu potwierdzający poprawne renderowanie oznaczeń kryptograficznych.
         - `docs/plan/325-implementation-plan-vdr-security-and-regression-tests.md`: plan implementacji dla Commita 325.
         - `changelog/325-test-vdr-security-and-regression-tests.md`: wpis rejestru zmian dla Commita 325.
+        - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (787 testów, 9139 asercji), Vitest (77 plików, 696 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
+    - Dokumentacja wdrożeniowa OCI, architektura i rejestr README.
+        - `docs/architecture/vdr-aes256-gcm-encryption.md`: kompletna specyfikacja techniczna fizycznego szyfrowania danych spoczynkowych VDR (AES-256-GCM), obejmująca kontekst regulacyjny M&A Due Diligence i art. 32 RODO, formalny model zagrożeń (kradzież nośnika OCI Block Volume, ochrona przed manipulacją szyfrogramem i bit-flippingiem przez 128-bitowy tag autentyczności AEAD GCM, zapobieganie błędom wdrożeniowym przez fallback HKDF-SHA256 z `APP_KEY`), diagramy architektury systemu i przepływu danych Dual-Read, bezwzględną abstrakcję magazynu danych przygotowaną pod OCI Object Storage / S3 bez zależności od dysku lokalnego, procedurę wdrożenia i rotacji kluczy (Key Rotation Policy) oraz wytyczne zarządzania pamięcią RAM instancji OCI Compute Ampere A1.
+        - `docs/ORACLE_CLOUD_SETUP.md`: dodanie dedykowanej sekcji 13 opisującej procedurę generowania kluczy VDR (`php artisan vdr:key-generate`), konfigurację środowiska OCI oraz bezprzestojową migrację istniejących zasobów (`php artisan vdr:encrypt-existing-documents`).
+        - `docs/plan/326-implementation-plan-vdr-aes256-encryption-documentation.md`: plan implementacji dla Commita 326.
+        - `changelog/326-docs-vdr-aes256-encryption.md`: wpis rejestru zmian dla Commita 326.
+        - `changelog/README.md`: uaktualnienie pełnego rejestru zmian projektu o kompletny harmonogram 9 commitów Fazy 62 (Commity 318–326).
         - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (787 testów, 9139 asercji), Vitest (77 plików, 696 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
 ---

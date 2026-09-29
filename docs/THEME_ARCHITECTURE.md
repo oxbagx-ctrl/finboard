@@ -1,9 +1,7 @@
 # FinBoard Architecture: Multi-Theme System (Light, Dark & System Theme Architecture)
 
 **Wersja:** 1.0  
-**Data wydania:** 28 września 2026  
-**Kontekst:** Architektura Frontendu Platformy FinBoard (React 19 + Tailwind CSS + Vitest)  
-**Status:** Produkcyjny (Faza 60, Commity 295–302)
+**Kontekst:** Architektura Frontendu Platformy FinBoard (React 19 + Tailwind CSS + Vitest)
 
 ---
 

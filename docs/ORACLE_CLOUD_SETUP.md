@@ -522,3 +522,55 @@ FinBoard posiada wbudowaną komendę diagnostyczną weryfikującą konfigurację
    - Oraz wykonać test wysyłki bezpośrednio z interfejsu lub narzędzia cURL:
      `POST /api/v1/admin/mail/test` z payloadem `{"recipient": "twoj-email@domena.pl"}`.
 
+---
+
+## 13. Fizyczne Szyfrowanie Danych Spoczynkowych VDR (AES-256-GCM) w Oracle Cloud
+
+Wirtualny Pokój Danych (VDR) w FinBoard zabezpiecza poufne dokumenty transakcyjne (Due Diligence, sprawozdania finansowe, rejestry akcjonariuszy) fizycznym szyfrowaniem spoczynkowym (**Encryption at Rest**) przy użyciu algorytmu **AES-256-GCM** (Galois/Counter Mode) z 96-bitowym losowym wektorem IV oraz 128-bitowym tagiem autentyczności AEAD.
+
+### Zasady Bezpieczeństwa na Instancjach OCI:
+1. **Brak składowania tekstu jawnego na dysku:** W magazynie plików (`storage/app/documents` lub OCI Object Storage) zapisywany jest wyłącznie binarny szyfrogram.
+2. **Anti-Tampering:** Jakakolwiek modyfikacja bajtów szyfrogramu na nośniku powoduje natychmiastowe odrzucenie pliku przy weryfikacji tagu autentyczności GCM i odmowę dostępu.
+3. **Odporność na brak konfiguracji (HKDF Fallback):** Jeśli zmienna `VDR_ENCRYPTION_KEY` nie zostanie skonfigurowana, serwis automatycznie wyprowadza klucz 256-bitowy z `APP_KEY` przez HKDF-SHA256, zapobiegając błędom HTTP 500 po deployu.
+
+### Krok 1: Generowanie Klucza VDR w Środowisku Produkcyjnym
+Na serwerze Oracle Cloud wykonaj polecenie generujące klucz 256-bitowy i zapisujące go do pliku `.env`:
+
+```bash
+docker compose -f docker-compose.prod.yml exec app php artisan vdr:key-generate
+```
+
+Upewnij się, że w pliku `.env` na serwerze znajdują się wpisy:
+```ini
+VDR_ENCRYPTION_ENABLED=true
+VDR_ENCRYPTION_ALGO=aes-256-gcm
+VDR_ENCRYPTION_KEY="twoj_wygenerowany_klucz_base64"
+VDR_ACTIVE_KEY_ID=vdr-key-1
+```
+
+### Krok 2: Uruchomienie Migracji Schematu Bazy Danych
+Zastosuj migrację dodającą metadane kryptograficzne do tabeli `documents`:
+
+```bash
+docker compose -f docker-compose.prod.yml exec app php artisan migrate --force
+```
+
+### Krok 3: Szyfrowanie Istniejących Dokumentów Legacy (Zero-Downtime Migration)
+Dzięki architekturze Dual-Read użytkownicy mogą natychmiast odczytywać zarówno pliki legacy, jak i zaszyfrowane. Aby przeszyfrować starsze pliki:
+
+1. **Test próbny (Dry-run – bez modyfikacji nośnika):**
+   ```bash
+   docker compose -f docker-compose.prod.yml exec app php artisan vdr:encrypt-existing-documents --dry-run
+   ```
+
+2. **Właściwa migracja z paczkowaniem (ochrona pamięci RAM instancji Ampere):**
+   ```bash
+   docker compose -f docker-compose.prod.yml exec app php artisan vdr:encrypt-existing-documents --chunk=50 --force
+   ```
+
+3. **Weryfikacja w logach audytowych:**
+   Każdy pomyślnie zmigrowany plik generuje wpis w tabeli `document_access_logs` z akcją `encrypt`.
+
+Szczegółowa specyfikacja architektoniczna, model zagrożeń i polityka rotacji kluczy opisane są w dokumencie:  
+`docs/architecture/vdr-aes256-gcm-encryption.md`.
+

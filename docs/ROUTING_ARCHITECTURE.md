@@ -1,9 +1,7 @@
 # FinBoard Architecture: SPA Routing, URL-Friendly Navigation & Access Control
 
 **Wersja:** 1.0  
-**Data wydania:** 28 września 2026  
-**Kontekst:** Architektura Frontendu Platformy FinBoard (React 19 + React Router v7 + Tailwind CSS)  
-**Status:** Produkcyjny (Fazy 57–59, Commity 286–294)
+**Kontekst:** Architektura Frontendu Platformy FinBoard (React 19 + React Router v7 + Tailwind CSS)
 
 ---
 

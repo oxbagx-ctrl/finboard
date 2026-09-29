@@ -1,9 +1,7 @@
 # FinBoard Architecture: Silnik Kursów Walut NBP i Architektura Wielowalutowa (Constant FX)
 
 **Wersja:** 1.0  
-**Data wydania:** 29 września 2026  
-**Kontekst:** Architektura Wielowalutowa i Raportowanie M&A Deal Advisory (Laravel 11 DDD + PostgreSQL + React 18 + Tailwind CSS)  
-**Status:** Produkcyjny (Faza 61, Commity 308–317)  
+**Kontekst:** Architektura Wielowalutowa i Raportowanie M&A Deal Advisory (Laravel 11 DDD + PostgreSQL + React 18 + Tailwind CSS)
 
 ---
 
