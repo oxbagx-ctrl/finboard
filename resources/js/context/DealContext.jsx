@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useMemo, useCallback, useEf
 import apiClient from '../api/client';
 import { AuthContext } from './AuthContext';
 
-const DealContext = createContext(null);
+export const DealContext = createContext(null);
 
 export const CURRENCIES = [
     { code: 'PLN', symbol: 'zł', name: 'złoty polski', rate: 1.0, midRate: 1.0, label: 'Polski Złoty (PLN)' },
@@ -273,3 +273,8 @@ export const useDeal = () => {
     }
     return context;
 };
+
+export const useOptionalDeal = () => {
+    return useContext(DealContext);
+};
+

@@ -12,7 +12,8 @@ import {
     BarChart3,
     TableProperties,
     Layers,
-    Loader2
+    Loader2,
+    Landmark
 } from 'lucide-react';
 import {
     formatCurrency,
@@ -22,6 +23,7 @@ import {
     formatFinancialDate
 } from '../../utils/formatters';
 import { Tooltip, InfoTooltip } from '../ui/Tooltip';
+import { useOptionalDeal } from '../../context/DealContext';
 
 export const ExecutivePdfReport = ({
     company,
@@ -33,8 +35,13 @@ export const ExecutivePdfReport = ({
     reportHash,
     generatedAt,
     loading = false,
+    ratesMetadata: propRatesMetadata,
 }) => {
+    const deal = useOptionalDeal();
+    const ratesMetadata = propRatesMetadata || config?.ratesMetadata || deal?.ratesMetadata;
+    const currencies = deal?.currencies || [];
     const currency = config.currency || 'PLN';
+    const activeCurrencyObj = currencies.find(c => c.code === currency);
 
     // Helper for safe number retrieval
     const num = (val) => {
@@ -101,6 +108,22 @@ export const ExecutivePdfReport = ({
                     </div>
                 </div>
             )}
+
+            {/* Institutional Background Watermark */}
+            <div
+                data-testid="executive-report-watermark"
+                className="pointer-events-none absolute inset-0 overflow-hidden flex items-center justify-center select-none z-0"
+                aria-hidden="true"
+            >
+                <div className="transform -rotate-45 text-center opacity-[0.03] dark:opacity-[0.04] print:opacity-[0.05] text-zinc-900 dark:text-zinc-100 font-black tracking-widest leading-none">
+                    <div className="text-4xl sm:text-6xl uppercase whitespace-nowrap">
+                        FINBOARD // HELVEST ADVISORY
+                    </div>
+                    <div className="text-lg sm:text-2xl mt-2 uppercase tracking-wider">
+                        M&A DUE DILIGENCE // CONSTANT FX AUDITED
+                    </div>
+                </div>
+            </div>
 
             {/* Header: Institutional Due Diligence Memorandum */}
             <div className="border-b-2 border-zinc-200 dark:border-zinc-700 pb-4 print:border-black">
@@ -190,11 +213,31 @@ export const ExecutivePdfReport = ({
                                 content="Waluta sprawozdawcza z przeliczeniem pozycji według tabeli kursów transakcyjnych FX."
                             />
                         </div>
-                        <div className="font-bold text-zinc-900 dark:text-zinc-100 print:text-black">{currency}</div>
+                        <div className="font-bold text-zinc-900 dark:text-zinc-100 print:text-black flex items-center gap-1.5 flex-wrap">
+                            <span>{currency}</span>
+                            <span
+                                data-testid="fx-citation-badge"
+                                className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 print:border-zinc-400 print:text-black"
+                            >
+                                <Landmark className="w-2.5 h-2.5" />
+                                <span>
+                                    {currency === 'PLN'
+                                        ? 'Waluta Bazowa (PLN)'
+                                        : `Tabela NBP: ${ratesMetadata?.tableNo || 'Bieżąca'}`}
+                                </span>
+                            </span>
+                        </div>
                         <div className="text-[10px] text-zinc-500 dark:text-zinc-400 print:text-zinc-600">
-                            {currency === 'PLN' ? 'Księga źródłowa (PLN)' : `Przeliczone wg kursu`}
+                            {currency === 'PLN' ? (
+                                'Księga źródłowa (PLN)'
+                            ) : (
+                                <span>
+                                    1 {currency} = {activeCurrencyObj?.midRate ? `${Number(activeCurrencyObj.midRate).toFixed(4)} PLN` : (ratesMetadata?.effectiveDate ? `kurs NBP z ${ratesMetadata.effectiveDate}` : 'Przeliczone wg kursu NBP')}
+                                </span>
+                            )}
                         </div>
                     </div>
+
 
                     <div>
                         <div className="text-[10px] uppercase text-zinc-500 dark:text-zinc-400 print:text-zinc-600 font-semibold flex items-center gap-1">
@@ -608,6 +651,29 @@ export const ExecutivePdfReport = ({
             {/* SECTION 6: Certyfikat Integralności i Podpisy */}
             {config.sections.audit && (
                 <div className="border-t border-zinc-200 dark:border-zinc-800 pt-4 print:border-zinc-400 print-avoid-break space-y-4">
+                    {/* Legal audit citation for Constant FX / NBP / MSR 21 */}
+                    <div
+                        data-testid="fx-audit-citation"
+                        className="p-3 rounded bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 text-[10px] text-zinc-600 dark:text-zinc-400 print:bg-zinc-50 print:text-black print:border-zinc-300 space-y-1"
+                    >
+                        <div className="font-bold text-zinc-800 dark:text-zinc-200 print:text-black flex items-center gap-1.5">
+                            <Landmark className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 print:text-black" />
+                            <span>KLAUZULA AUDYTOWA PRZELICZEŃ WALUTOWYCH (CONSTANT FX / MSR 21)</span>
+                        </div>
+                        <p className="leading-relaxed">
+                            Przeliczenia walutowe pozycji bilansowych i wynikowych w memorandum sporządzono zgodnie ze standardem <strong>MSR 21</strong> (Skutki zmian kursów wymiany walut obcych) oraz <strong>art. 30 ust. 2 Ustawy o rachunkowości (UoR)</strong> z zastosowaniem metodologii <strong>Constant FX</strong>. 
+                            {currency !== 'PLN' ? (
+                                <>
+                                    {' '}Zastosowano urzędowy kurs średni Narodowego Banku Polskiego według <strong>Tabeli A nr {ratesMetadata?.tableNo || '062/A/NBP/2026'}</strong> z dnia <strong>{ratesMetadata?.effectiveDate || '2026-03-30'}</strong>{activeCurrencyObj?.midRate ? ` (1 ${currency} = ${Number(activeCurrencyObj.midRate).toFixed(4)} PLN)` : ''}.
+                                </>
+                            ) : (
+                                <>
+                                    {' '}Zestawienie sporządzone w walucie funkcjonalnej PLN (waluta bazowa ksiąg handlowych).
+                                </>
+                            )}
+                        </p>
+                    </div>
+
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-[10px] text-zinc-500 dark:text-zinc-400 print:text-black">
                         <div className="space-y-0.5">
                             <div className="flex items-center gap-1.5 font-bold text-zinc-800 dark:text-zinc-300 print:text-black">

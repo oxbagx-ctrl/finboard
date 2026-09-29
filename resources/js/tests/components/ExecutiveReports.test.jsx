@@ -187,7 +187,33 @@ describe('ReportConfigurator Component', () => {
         const darkConfigurator = screen.getByTestId('report-configurator');
         expect(darkConfigurator.className).toContain('dark:bg-zinc-900');
     });
+
+    it('renders dynamic NBP exchange rate labels in currency selector', () => {
+        const dynamicCurrencies = [
+            { code: 'PLN', symbol: 'zł', label: 'Polski Złoty (PLN)' },
+            { code: 'EUR', symbol: '€', label: 'Euro (EUR, kurs 4.3125)' },
+            { code: 'USD', symbol: '$', label: 'US Dollar (USD, kurs 3.9450)' },
+        ];
+
+        render(
+            <ReportConfigurator
+                config={{ ...mockConfig, currency: 'EUR' }}
+                onChange={vi.fn()}
+                onPrint={vi.fn()}
+                onExportJson={vi.fn()}
+                onRefresh={vi.fn()}
+                loading={false}
+                currencies={dynamicCurrencies}
+            />
+        );
+
+        const select = screen.getByTestId('report-currency-select');
+        expect(select).toBeInTheDocument();
+        expect(screen.getByText('EUR – Euro (EUR, kurs 4.3125)')).toBeInTheDocument();
+        expect(screen.getByText('USD – US Dollar (USD, kurs 3.9450)')).toBeInTheDocument();
+    });
 });
+
 
 describe('ExecutivePdfReport Component', () => {
     it('renders complete executive Due Diligence memorandum with all sections', () => {
@@ -403,4 +429,73 @@ describe('ExecutivePdfReport Component', () => {
         const darkReport = document.getElementById('executive-pdf-report');
         expect(darkReport.className).toContain('dark:bg-zinc-950');
     });
+
+    it('embeds official NBP FX citation, watermark, and MSR 21 legal audit citation', () => {
+        render(
+            <ExecutivePdfReport
+                company={mockCompany}
+                currentUser={mockUser}
+                config={mockConfig}
+                metrics={mockMetrics}
+                trends={[]}
+                breakdown={mockBreakdown}
+                reportHash="abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890"
+                generatedAt="2026-09-18T20:00:00Z"
+            />
+        );
+
+        // Watermark
+        const watermark = screen.getByTestId('executive-report-watermark');
+        expect(watermark).toBeInTheDocument();
+        expect(watermark.textContent).toContain('CONSTANT FX AUDITED');
+
+        // FX citation badge (base currency)
+        const fxBadge = screen.getByTestId('fx-citation-badge');
+        expect(fxBadge).toBeInTheDocument();
+        expect(fxBadge.textContent).toContain('Waluta Bazowa (PLN)');
+
+        // Legal audit citation in Section 6
+        const legalCitation = screen.getByTestId('fx-audit-citation');
+        expect(legalCitation).toBeInTheDocument();
+        expect(legalCitation.textContent).toContain('MSR 21');
+        expect(legalCitation.textContent).toContain('art. 30 ust. 2 Ustawy o rachunkowości (UoR)');
+        expect(legalCitation.textContent).toContain('Constant FX');
+    });
+
+    it('displays dynamic NBP Table A metadata and exchange rate when foreign currency is selected', () => {
+        const ratesMetadata = {
+            source: 'NBP',
+            tableNo: '062/A/NBP/2026',
+            effectiveDate: '2026-03-30',
+            fetchedAt: '2026-03-30T10:30:00Z',
+            cached: true,
+            isFallback: false,
+        };
+
+        render(
+            <ExecutivePdfReport
+                company={mockCompany}
+                currentUser={mockUser}
+                config={{ ...mockConfig, currency: 'EUR' }}
+                metrics={mockMetrics}
+                trends={[]}
+                breakdown={mockBreakdown}
+                reportHash="abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890"
+                generatedAt="2026-09-18T20:00:00Z"
+                ratesMetadata={ratesMetadata}
+            />
+        );
+
+        // Header FX citation badge with NBP Table number
+        const fxBadge = screen.getByTestId('fx-citation-badge');
+        expect(fxBadge).toBeInTheDocument();
+        expect(fxBadge.textContent).toContain('Tabela NBP: 062/A/NBP/2026');
+
+        // Section 6 legal citation with Table A and effective date
+        const legalCitation = screen.getByTestId('fx-audit-citation');
+        expect(legalCitation).toBeInTheDocument();
+        expect(legalCitation.textContent).toContain('Tabeli A nr 062/A/NBP/2026');
+        expect(legalCitation.textContent).toContain('2026-03-30');
+    });
 });
+

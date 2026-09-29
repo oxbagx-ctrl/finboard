@@ -10,7 +10,7 @@ import { Tooltip, InfoTooltip } from '../components/ui/Tooltip';
 
 export const ReportsView = () => {
     const { user, activeCompany } = useAuth();
-    const { currency: dealCurrency } = useDeal();
+    const { currency: dealCurrency, ratesMetadata, currencies } = useDeal();
     const { success, error } = useNotification();
 
     const [config, setConfig] = useState({
@@ -89,11 +89,26 @@ export const ReportsView = () => {
             const timestamp = new Date().toISOString();
             setGeneratedAt(timestamp);
 
+            const activeCurrencyObj = currencies?.find(c => c.code === config.currency);
+            const fxAuditData = {
+                currency: config.currency,
+                source: ratesMetadata?.source || 'NBP',
+                table_no: ratesMetadata?.tableNo || null,
+                effective_date: ratesMetadata?.effectiveDate || null,
+                fetched_at: ratesMetadata?.fetchedAt || null,
+                cached: ratesMetadata?.cached || false,
+                is_fallback: ratesMetadata?.isFallback ?? false,
+                rate: activeCurrencyObj?.rate || (config.currency === 'PLN' ? 1.0 : null),
+                mid_rate: activeCurrencyObj?.midRate || (config.currency === 'PLN' ? 1.0 : null),
+                accounting_standard: 'MSR 21 / art. 30 ust. 2 UoR (Constant FX)',
+            };
+
             const hash = await computeReportHash({
                 companyId: activeCompany?.id,
                 metrics: metricsData,
                 timestamp,
                 config,
+                exchange_rate_audit: fxAuditData,
             });
             setReportHash(hash);
         } catch (err) {
@@ -102,7 +117,7 @@ export const ReportsView = () => {
         } finally {
             setLoading(false);
         }
-    }, [config, activeCompany?.id, error]);
+    }, [config, activeCompany?.id, error, ratesMetadata, currencies]);
 
     useEffect(() => {
         fetchReportData();
@@ -118,6 +133,20 @@ export const ReportsView = () => {
 
     const handleExportJson = () => {
         try {
+            const activeCurrencyObj = currencies?.find(c => c.code === config.currency);
+            const fxAuditData = {
+                currency: config.currency,
+                source: ratesMetadata?.source || 'NBP',
+                table_no: ratesMetadata?.tableNo || null,
+                effective_date: ratesMetadata?.effectiveDate || null,
+                fetched_at: ratesMetadata?.fetchedAt || null,
+                cached: ratesMetadata?.cached || false,
+                is_fallback: ratesMetadata?.isFallback ?? false,
+                rate: activeCurrencyObj?.rate || (config.currency === 'PLN' ? 1.0 : null),
+                mid_rate: activeCurrencyObj?.midRate || (config.currency === 'PLN' ? 1.0 : null),
+                accounting_standard: 'MSR 21 / art. 30 ust. 2 UoR (Constant FX)',
+            };
+
             const exportPayload = {
                 meta: {
                     title: 'FINBOARD EXECUTIVE DUE DILIGENCE SUMMARY',
@@ -127,12 +156,14 @@ export const ReportsView = () => {
                     checksum_sha256: reportHash,
                     confidentiality: config.confidentiality,
                     currency: config.currency,
+                    exchange_rate_audit: fxAuditData,
                     period: {
                         preset: config.periodPreset,
                         start_date: config.startDate || null,
                         end_date: config.endDate || null,
                     },
                 },
+                exchange_rate_audit: fxAuditData,
                 commentary: config.commentary,
                 metrics,
                 opex_breakdown: breakdown,
@@ -220,6 +251,7 @@ export const ReportsView = () => {
                 reportHash={reportHash}
                 generatedAt={generatedAt}
                 loading={loading}
+                ratesMetadata={ratesMetadata}
             />
         </div>
     );

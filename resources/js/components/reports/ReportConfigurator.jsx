@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Tooltip, InfoTooltip } from '../ui/Tooltip';
-import { CURRENCIES } from '../../context/DealContext';
+import { useOptionalDeal, CURRENCIES } from '../../context/DealContext';
 
 export const CONFIDENTIALITY_LEVELS = [
     { id: 'STRICTLY CONFIDENTIAL', label: 'ŚCIŚLE POUFNE (M&A / DUE DILIGENCE)' },
@@ -59,7 +59,11 @@ export const ReportConfigurator = ({
     onExportJson,
     onRefresh,
     loading = false,
+    currencies: propCurrencies,
 }) => {
+    const deal = useOptionalDeal();
+    const currencies = propCurrencies || deal?.currencies || CURRENCIES;
+
     const handlePresetPeriod = (presetId) => {
         let start = '';
         let end = '';
@@ -226,12 +230,13 @@ export const ReportConfigurator = ({
                     </label>
                     <Tooltip content="Wybierz walutę denominacji raportu (PLN, EUR, USD, GBP)">
                         <select
+                            data-testid="report-currency-select"
                             value={config.currency}
                             onChange={(e) => onChange({ ...config, currency: e.target.value })}
                             className="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-750 rounded px-2.5 py-1.5 text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 cursor-pointer"
                             aria-label="Wybierz walutę prezentacji raportu"
                         >
-                            {CURRENCIES.map((c) => (
+                            {currencies.map((c) => (
                                 <option key={c.code} value={c.code} className="bg-white dark:bg-zinc-950 text-zinc-800 dark:text-zinc-200">
                                     {c.code} – {c.label}
                                 </option>

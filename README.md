@@ -1141,8 +1141,16 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
         - `resources/js/components/layout/DealContextBar.jsx`: dodanie badge'a oficjalnej tabeli NBP (`nbp-rate-badge`) z numerem tabeli i datą publikacji kursów, badge'a ostrzegawczego trybu awaryjnego (`nbp-fallback-badge`), wskaźnika aktywnego przelicznika walutowego (`active-fx-rate-badge`) z precyzją 4 miejsc po przecinku oraz przycisku wymuszenia natychmiastowej synchronizacji (`refresh-nbp-rates-button`) z animacją `animate-spin`.
         - `resources/js/tests/components/DealContextBar.test.jsx`: zestaw 6 testów jednostkowych weryfikujących renderowanie badge'y, ostrzeżenia o fallbacku, prezentację kursu dla walut obcych oraz interakcję z przyciskiem wymuszenia odświeżenia.
         - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (744 testy, 8888 asercji), Vitest (75 plików, 683 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
+    - [x] Oficjalna cytacja kursów NBP, klauzula audytowa MSR 21 i znak wodny w raportach zarządczych i eksporcie JSON.
+        - `resources/js/components/reports/ExecutivePdfReport.jsx`: implementacja instytucjonalnego znaku wodnego (`executive-report-watermark`), wskaźnika cytowania Tabeli A NBP (`fx-citation-badge`) w sekcji waluty prezentacji oraz formalnej klauzuli prawno-audytowej (`fx-audit-citation`) w Sekcji 6 powołującej się na standard MSR 21, art. 30 ust. 2 Ustawy o rachunkowości (UoR) oraz model Constant FX.
+        - `resources/js/views/ReportsView.jsx`: wstrzyknięcie pełnych parametrów kursowych (`exchange_rate_audit`) do skrótu kryptograficznego SHA-256 (`computeReportHash`) gwarantując integralność modelu WORM oraz dołączenie węzła audytowego do eksportu JSON.
+        - `resources/js/components/reports/ReportConfigurator.jsx`: dynamiczne etykiety kursów NBP w selektorze walut z precyzją 4 miejsc po przecinku.
+        - `resources/js/context/DealContext.jsx`: eksport instancji `DealContext` oraz hooka `useOptionalDeal()` zapewniającego bezbłędne renderowanie komponentów prezentacyjnych w izolacji testowej.
+        - `resources/js/tests/components/ExecutiveReports.test.jsx`: rozbudowa zestawu testów jednostkowych o weryfikację znaku wodnego, badge'a cytowania, klauzuli audytowej MSR 21 oraz dynamicznych etykiet NBP (11/11 testów PASS).
+        - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (744 testy, 8888 asercji), Vitest (75 plików, 686 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
 ---
+
 
 
 ## 📜 Licencja
