@@ -1127,7 +1127,12 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
         - `app/Console/Commands/SyncExchangeRatesCommand.php`: implementacja polecenia konsolowego `app:sync-exchange-rates` (oraz aliasu `finance:sync-exchange-rates`) z opcją `--table`, szczegółowym logowaniem instytucjonalnym FinBoard, prezentacją tabeli kursów i mnożników oraz odpornością na błędy zewnętrzne.
         - `routes/console.php`: rejestracja zadania cyklicznego w mechanizmie Laravel Console Scheduler uruchamianego dwa razy na dobę w dni robocze (o godzinie 08:30 i 12:30 czasu `Europe/Warsaw`) z flagami `withoutOverlapping()`, `onOneServer()` i `runInBackground()`.
         - `tests/Feature/Console/SyncExchangeRatesCommandTest.php`: zestaw testów funkcjonalnych sprawdzających poprawne wykonanie polecenia, opcję `--table`, obsługę błędów sieciowych API (kod 1), aliasy oraz właściwą definicję wpisów harmonogramu.
-        - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (738 testów, 8854 asercje), Vitest (74 pliki, 676 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
+    - [x] Endpointy REST API i strategia Cache-Aside dla kursów walut NBP.
+        - `app/Models/ExchangeRate.php`: dodanie akcesora `getTableTypeAttribute()` wyznaczającego symbol tabeli kursowej NBP (`'A'`).
+        - `app/Presentation/Api/Controllers/ExchangeRateController.php`: kontroler API udostępniający endpointy: `GET /api/v1/finance/exchange-rates` (zwracający strukturę walut i słownik mnożników `multipliers` dla frontendu, flagę `cached: true/false` oraz obsługujący parametr `?refresh=1`), `GET /api/v1/finance/exchange-rates/{currency}` (szczegóły waluty wraz z dwukierunkową próbką przeliczeniową 100 jednostek, tożsamością PLN i obsługą 404) oraz `POST /api/v1/finance/exchange-rates/sync` (synchronizacja on-demand z NBP i invalidacją cache).
+        - `routes/api.php`: rejestracja tras API wewnątrz grupy autoryzacyjnej Sanctum pod prefiksem `finance/exchange-rates`.
+        - `tests/Feature/Api/ExchangeRateApiTest.php`: zestaw testów integracyjnych weryfikujących autoryzację Sanctum (401), cykl życia bufora Cache-Aside, parametr wymuszonego odświeżenia `?refresh=1`, kalkulację próbki 100 jednostek, błędy 404 dla nieznanych walut oraz kody odpowiedzi 502/200 dla endpointu synchronizacji.
+        - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (744 testy, 8888 asercji), Vitest (74 pliki, 676 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
 ---
 

@@ -6,6 +6,7 @@ use App\Presentation\Api\Controllers\AuditLogController;
 use App\Presentation\Api\Controllers\AuthController;
 use App\Presentation\Api\Controllers\BenchmarkController;
 use App\Presentation\Api\Controllers\DocumentController;
+use App\Presentation\Api\Controllers\ExchangeRateController;
 use App\Presentation\Api\Controllers\FinancialAnalyticsController;
 use App\Presentation\Api\Controllers\FinancialCategoryController;
 use App\Presentation\Api\Controllers\FinancialImportController;
@@ -73,6 +74,13 @@ Route::prefix('v1')->group(function () {
 
         // Finance Module Endpoints
         Route::prefix('finance')->group(function () {
+            // Official NBP Exchange Rates & Multi-Currency Engine
+            Route::prefix('exchange-rates')->group(function () {
+                Route::get('/', [ExchangeRateController::class, 'index'])->name('api.finance.exchange-rates.index');
+                Route::post('/sync', [ExchangeRateController::class, 'sync'])->name('api.finance.exchange-rates.sync');
+                Route::get('/{currency}', [ExchangeRateController::class, 'show'])->name('api.finance.exchange-rates.show');
+            });
+
             // Categories
             Route::get('/categories', [FinancialCategoryController::class, 'index']
                 )->name('api.finance.categories.index');

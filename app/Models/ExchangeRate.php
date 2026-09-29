@@ -75,4 +75,16 @@ final class ExchangeRate extends Model
     {
         return round($amountInForeignCurrency * (float) $this->mid_rate, 4);
     }
+
+    /**
+     * Get table type (e.g. 'A') from table_no.
+     */
+    public function getTableTypeAttribute(): string
+    {
+        if (preg_match('/\/([A-C])\//', (string) $this->table_no, $matches)) {
+            return $matches[1];
+        }
+
+        return 'A';
+    }
 }
