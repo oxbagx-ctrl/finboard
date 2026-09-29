@@ -90,24 +90,33 @@ export const ReportsView = () => {
             setGeneratedAt(timestamp);
 
             const activeCurrencyObj = currencies?.find(c => c.code === config.currency);
-            const fxAuditData = {
-                currency: config.currency,
+            const fxCitationText = config.currency !== 'PLN'
+                ? `Przeliczenia walutowe zestawienia sporządzono w oparciu o oficjalną Tabelę A kursów średnich NBP nr ${ratesMetadata?.tableNo || '062/A/NBP/2026'} z dnia ${ratesMetadata?.effectiveDate || '2026-03-30'} (1 ${config.currency} = ${Number(activeCurrencyObj?.midRate || 0).toFixed(4)} PLN).`
+                : 'Przeliczenia walutowe zestawienia sporządzono w oparciu o walutę funkcjonalną PLN (Księga Główna) zgodnie z art. 30 ust. 2 UoR.';
+
+            const fxSourceData = {
                 source: ratesMetadata?.source || 'NBP',
                 table_no: ratesMetadata?.tableNo || null,
+                table_type: 'A',
                 effective_date: ratesMetadata?.effectiveDate || null,
                 fetched_at: ratesMetadata?.fetchedAt || null,
                 cached: ratesMetadata?.cached || false,
                 is_fallback: ratesMetadata?.isFallback ?? false,
+                currency: config.currency,
                 rate: activeCurrencyObj?.rate || (config.currency === 'PLN' ? 1.0 : null),
                 mid_rate: activeCurrencyObj?.midRate || (config.currency === 'PLN' ? 1.0 : null),
                 accounting_standard: 'MSR 21 / art. 30 ust. 2 UoR (Constant FX)',
+                citation: fxCitationText,
             };
+
+            const fxAuditData = { ...fxSourceData };
 
             const hash = await computeReportHash({
                 companyId: activeCompany?.id,
                 metrics: metricsData,
                 timestamp,
                 config,
+                exchange_rate_source: fxSourceData,
                 exchange_rate_audit: fxAuditData,
             });
             setReportHash(hash);
@@ -134,18 +143,26 @@ export const ReportsView = () => {
     const handleExportJson = () => {
         try {
             const activeCurrencyObj = currencies?.find(c => c.code === config.currency);
-            const fxAuditData = {
-                currency: config.currency,
+            const fxCitationText = config.currency !== 'PLN'
+                ? `Przeliczenia walutowe zestawienia sporządzono w oparciu o oficjalną Tabelę A kursów średnich NBP nr ${ratesMetadata?.tableNo || '062/A/NBP/2026'} z dnia ${ratesMetadata?.effectiveDate || '2026-03-30'} (1 ${config.currency} = ${Number(activeCurrencyObj?.midRate || 0).toFixed(4)} PLN).`
+                : 'Przeliczenia walutowe zestawienia sporządzono w oparciu o walutę funkcjonalną PLN (Księga Główna) zgodnie z art. 30 ust. 2 UoR.';
+
+            const fxSourceData = {
                 source: ratesMetadata?.source || 'NBP',
                 table_no: ratesMetadata?.tableNo || null,
+                table_type: 'A',
                 effective_date: ratesMetadata?.effectiveDate || null,
                 fetched_at: ratesMetadata?.fetchedAt || null,
                 cached: ratesMetadata?.cached || false,
                 is_fallback: ratesMetadata?.isFallback ?? false,
+                currency: config.currency,
                 rate: activeCurrencyObj?.rate || (config.currency === 'PLN' ? 1.0 : null),
                 mid_rate: activeCurrencyObj?.midRate || (config.currency === 'PLN' ? 1.0 : null),
                 accounting_standard: 'MSR 21 / art. 30 ust. 2 UoR (Constant FX)',
+                citation: fxCitationText,
             };
+
+            const fxAuditData = { ...fxSourceData };
 
             const exportPayload = {
                 meta: {
@@ -156,6 +173,7 @@ export const ReportsView = () => {
                     checksum_sha256: reportHash,
                     confidentiality: config.confidentiality,
                     currency: config.currency,
+                    exchange_rate_source: fxSourceData,
                     exchange_rate_audit: fxAuditData,
                     period: {
                         preset: config.periodPreset,
@@ -163,6 +181,7 @@ export const ReportsView = () => {
                         end_date: config.endDate || null,
                     },
                 },
+                exchange_rate_source: fxSourceData,
                 exchange_rate_audit: fxAuditData,
                 commentary: config.commentary,
                 metrics,

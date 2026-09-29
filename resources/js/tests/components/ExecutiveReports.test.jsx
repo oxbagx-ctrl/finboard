@@ -460,6 +460,11 @@ describe('ExecutivePdfReport Component', () => {
         expect(legalCitation.textContent).toContain('MSR 21');
         expect(legalCitation.textContent).toContain('art. 30 ust. 2 Ustawy o rachunkowości (UoR)');
         expect(legalCitation.textContent).toContain('Constant FX');
+
+        // Vector footer citation
+        const footerCitation = screen.getByTestId('fx-footer-citation');
+        expect(footerCitation).toBeInTheDocument();
+        expect(footerCitation.textContent).toContain('walutę funkcjonalną PLN');
     });
 
     it('displays dynamic NBP Table A metadata and exchange rate when foreign currency is selected', () => {
@@ -496,6 +501,13 @@ describe('ExecutivePdfReport Component', () => {
         expect(legalCitation).toBeInTheDocument();
         expect(legalCitation.textContent).toContain('Tabeli A nr 062/A/NBP/2026');
         expect(legalCitation.textContent).toContain('2026-03-30');
+
+        // Vector footer citation with NBP Table A details
+        const footerCitation = screen.getByTestId('fx-footer-citation');
+        expect(footerCitation).toBeInTheDocument();
+        expect(footerCitation.textContent).toContain('oficjalną Tabelę A kursów średnich NBP nr 062/A/NBP/2026');
+        expect(footerCitation.textContent).toContain('2026-03-30');
     });
 });
+
 

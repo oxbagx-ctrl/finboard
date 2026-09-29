@@ -733,6 +733,32 @@ export const ExecutivePdfReport = ({
                     </Tooltip>
                 </div>
             )}
+
+            {/* Official Vector Footer FX Citation */}
+            <div
+                data-testid="fx-footer-citation"
+                className="mt-6 pt-3 border-t border-zinc-200 dark:border-zinc-800 text-[9px] text-zinc-500 dark:text-zinc-400 print:text-zinc-600 print:border-zinc-300 flex flex-col sm:flex-row sm:items-center justify-between gap-2 print-avoid-break"
+            >
+                <div className="flex items-center gap-1.5">
+                    <Landmark className="w-3 h-3 text-emerald-600 dark:text-emerald-400 shrink-0 print:text-black" />
+                    <span>
+                        {currency !== 'PLN' ? (
+                            <>
+                                Przeliczenia walutowe zestawienia sporządzono w oparciu o oficjalną Tabelę A kursów średnich NBP nr{' '}
+                                <strong>{ratesMetadata?.tableNo || '062/A/NBP/2026'}</strong> z dnia{' '}
+                                <strong>{ratesMetadata?.effectiveDate || '2026-03-30'}</strong>
+                                {activeCurrencyObj?.midRate ? ` (1 ${currency} = ${Number(activeCurrencyObj.midRate).toFixed(4)} PLN)` : ''}.
+                            </>
+                        ) : (
+                            'Przeliczenia walutowe zestawienia sporządzono w oparciu o walutę funkcjonalną PLN (Księga Główna) zgodnie z art. 30 ust. 2 UoR.'
+                        )}
+                    </span>
+                </div>
+                <div className="font-mono text-zinc-400 dark:text-zinc-500 print:text-zinc-600 text-right shrink-0">
+                    MSR 21 / CONSTANT FX // HELVEST ADVISORY
+                </div>
+            </div>
         </div>
     );
 };
+

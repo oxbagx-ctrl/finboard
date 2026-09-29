@@ -152,4 +152,43 @@ describe('DealContextBar Component', () => {
 
         expect(apiClient.get).toHaveBeenCalledWith('/finance/exchange-rates', { params: { refresh: 1 } });
     });
+
+    it('allows selecting extended NBP currencies from dropdown and elevates selected currency as active pill', async () => {
+        apiClient.get.mockResolvedValueOnce({
+            data: {
+                source: 'NBP',
+                table_no: '055/A/NBP/2026',
+                effective_date: '2026-03-20',
+                rates: [
+                    { currency: 'EUR', currency_name: 'euro', mid_rate: 4.3125, multiplier: 0.23188406 },
+                    { currency: 'JPY', currency_name: 'jen japoński', mid_rate: 0.0245, multiplier: 40.816326 },
+                ],
+            },
+        });
+
+        render(
+            <DealProvider>
+                <DealContextBar />
+            </DealProvider>
+        );
+
+        const syncButton = screen.getByTestId('refresh-nbp-rates-button');
+        await act(async () => {
+            fireEvent.click(syncButton);
+        });
+
+        await waitFor(() => {
+            expect(screen.getByTestId('other-currencies-select')).toBeInTheDocument();
+        });
+
+        const select = screen.getByTestId('other-currencies-select');
+        await act(async () => {
+            fireEvent.change(select, { target: { value: 'JPY' } });
+        });
+
+        expect(screen.getByRole('button', { name: 'JPY' })).toBeInTheDocument();
+        expect(screen.getByTestId('active-fx-rate-badge')).toBeInTheDocument();
+        expect(screen.getByText('1 JPY =')).toBeInTheDocument();
+    });
 });
+

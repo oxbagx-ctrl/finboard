@@ -1148,8 +1148,15 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
         - `resources/js/context/DealContext.jsx`: eksport instancji `DealContext` oraz hooka `useOptionalDeal()` zapewniającego bezbłędne renderowanie komponentów prezentacyjnych w izolacji testowej.
         - `resources/js/tests/components/ExecutiveReports.test.jsx`: rozbudowa zestawu testów jednostkowych o weryfikację znaku wodnego, badge'a cytowania, klauzuli audytowej MSR 21 oraz dynamicznych etykiet NBP (11/11 testów PASS).
         - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (744 testy, 8888 asercji), Vitest (75 plików, 686 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
+    - [x] Wektorowa stopka cytowania kursów NBP w formacie A4 i standaryzacja metadanych eksportu JSON.
+        - `resources/js/components/reports/ExecutivePdfReport.jsx`: dodanie wektorowej stopki audytowej (`fx-footer-citation`) z formułą: *"Przeliczenia walutowe zestawienia sporządzono w oparciu o oficjalną Tabelę A kursów średnich NBP nr [nr] z dnia [data] (1 EUR = [kurs] PLN)"* dla walut obcych oraz waluty bazowej PLN (art. 30 ust. 2 UoR).
+        - `resources/js/views/ReportsView.jsx`: standaryzacja węzła `meta.exchange_rate_source` oraz głównego korzenia eksportu JSON z pełnymi metadanymi tabeli NBP, kursem, datą publikacji i normą MSR 21, zsynchronizowanymi z ładunkiem SHA-256 (`computeReportHash`).
+        - `resources/js/components/layout/DealContextBar.jsx`: refaktoryzacja selektora walut do formatu kompaktowych pigułek głównych walut (`PLN`, `EUR`, `USD`, `GBP`) z reaktywnym wyniesieniem aktywnej waluty NBP oraz rozwijanym menu `otherCurrencies`.
+        - `resources/js/tests/components/ExecutiveReports.test.jsx` & `resources/js/tests/integration/dealAdvisoryE2EWorkflow.test.jsx`: rozbudowa testów o weryfikację stopki wektorowej w memorandum pojedynczym oraz w pełnym przepływie pracy Deal Advisory E2E.
+        - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (744 testy, 8888 asercji), Vitest (75 plików, 687 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
 ---
+
 
 
 

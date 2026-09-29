@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useDeal, FISCAL_QUARTERS } from '../../context/DealContext';
 import { Lock, Calendar, Coins, RotateCcw, RefreshCw, AlertTriangle } from 'lucide-react';
+
+const PRIMARY_CURRENCY_CODES = ['PLN', 'EUR', 'USD', 'GBP'];
 
 export const DealContextBar = () => {
     const {
@@ -28,6 +30,28 @@ export const DealContextBar = () => {
         : 'HISTORIA';
 
     const activeMidRate = currentCurrencyObj?.midRate;
+
+    // Separate institutional primary currencies (PLN, EUR, USD, GBP) from extended NBP Table A currencies
+    const primaryPills = useMemo(() => {
+        return PRIMARY_CURRENCY_CODES.map((code) => {
+            return currencies.find((c) => c.code === code) || { code, label: code };
+        });
+    }, [currencies]);
+
+    const activeNonPrimary = useMemo(() => {
+        if (!PRIMARY_CURRENCY_CODES.includes(currency)) {
+            return currencies.find((c) => c.code === currency) || { code: currency, label: currency };
+        }
+        return null;
+    }, [currencies, currency]);
+
+    const displayedPillCurrencies = useMemo(() => {
+        return activeNonPrimary ? [...primaryPills, activeNonPrimary] : primaryPills;
+    }, [primaryPills, activeNonPrimary]);
+
+    const otherCurrencies = useMemo(() => {
+        return currencies.filter((c) => !PRIMARY_CURRENCY_CODES.includes(c.code));
+    }, [currencies]);
 
     return (
         <div className="w-full bg-zinc-100/90 dark:bg-zinc-900/60 border-b border-zinc-200 dark:border-zinc-800 backdrop-blur px-4 sm:px-6 py-2 transition-colors duration-150 print:hidden">
@@ -88,16 +112,16 @@ export const DealContextBar = () => {
                         </div>
                     )}
 
-                    {/* Currency selector buttons */}
+                    {/* Currency selector buttons & compact dropdown */}
                     <div className="flex items-center gap-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded p-0.5 shadow-sm dark:shadow-none">
-                        <Coins className="w-3 h-3 text-zinc-400 dark:text-zinc-500 ml-1.5 mr-0.5" />
-                        {currencies.map((c) => {
+                        <Coins className="w-3 h-3 text-zinc-400 dark:text-zinc-500 ml-1.5 mr-0.5 shrink-0" />
+                        {displayedPillCurrencies.map((c) => {
                             const isSelected = currency === c.code;
                             return (
                                 <button
                                     key={c.code}
                                     onClick={() => setCurrency(c.code)}
-                                    title={c.label}
+                                    title={c.label || c.code}
                                     className={`px-2 py-0.5 rounded text-[11px] font-semibold transition-colors cursor-pointer ${
                                         isSelected
                                             ? 'bg-zinc-900 text-zinc-50 dark:bg-zinc-100 dark:text-zinc-950 shadow-sm'
@@ -108,7 +132,32 @@ export const DealContextBar = () => {
                                 </button>
                             );
                         })}
+
+                        {otherCurrencies.length > 0 && (
+                            <select
+                                data-testid="other-currencies-select"
+                                value={PRIMARY_CURRENCY_CODES.includes(currency) ? '' : currency}
+                                onChange={(e) => {
+                                    if (e.target.value) {
+                                        setCurrency(e.target.value);
+                                    }
+                                }}
+                                className="bg-transparent text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 px-1 py-0.5 rounded cursor-pointer focus:outline-none border-l border-zinc-200 dark:border-zinc-800 max-w-[95px] sm:max-w-none"
+                                title="Wybierz inną walutę z oficjalnej Tabeli A NBP"
+                                aria-label="Pozostałe waluty NBP"
+                            >
+                                <option value="" disabled className="bg-white dark:bg-zinc-900 text-zinc-500">
+                                    {PRIMARY_CURRENCY_CODES.includes(currency) ? `Inne (${otherCurrencies.length})...` : `${currency} (NBP)`}
+                                </option>
+                                {otherCurrencies.map((c) => (
+                                    <option key={c.code} value={c.code} className="bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">
+                                        {c.code} – {c.name || c.label || c.code} {c.midRate ? `(${Number(c.midRate).toFixed(4)})` : ''}
+                                    </option>
+                                ))}
+                            </select>
+                        )}
                     </div>
+
 
                     {/* On-demand NBP rates refresh button */}
                     <button

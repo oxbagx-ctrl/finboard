@@ -175,7 +175,13 @@ describe('E2E Deal Advisory & Collaboration Workflow Integration', () => {
         // Verify Partner signatory block
         const advisorMatches = screen.getAllByText(/Marek Wiśniewski/i);
         expect(advisorMatches.length).toBeGreaterThanOrEqual(1);
+
+        // 6. Official Vector Footer FX Citation
+        const footerCitation = screen.getByTestId('fx-footer-citation');
+        expect(footerCitation).toBeInTheDocument();
+        expect(footerCitation.textContent).toContain('MSR 21 / CONSTANT FX');
     });
+
 
     it('allows changing report parameters and recalculating memorandum notes', async () => {
         render(
