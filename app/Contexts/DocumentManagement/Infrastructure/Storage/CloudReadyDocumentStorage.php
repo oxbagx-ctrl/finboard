@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
 use Throwable;
 
-final class LocalStorageDocumentStorage implements DocumentStorageInterface
+final class CloudReadyDocumentStorage implements DocumentStorageInterface
 {
     private Filesystem $disk;
 
@@ -27,7 +27,6 @@ final class LocalStorageDocumentStorage implements DocumentStorageInterface
         $path = trim($directory, '/') . '/' . trim($filename, '/');
         $this->disk->put($path, $content);
 
-        // Memory cleanup of binary payload
         unset($content);
 
         return $path;

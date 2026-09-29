@@ -1191,6 +1191,12 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
         - `tests/Feature/Console/GenerateVdrEncryptionKeyCommandTest.php`: testy komendy konsolowej weryfikujące poprawność wyświetlania i modyfikacji `.env`.
         - `tests/Feature/DocumentManagement/DocumentDataSeederEncryptionTest.php`: testy integracyjne potwierdzające obecność szyfrogramów na dysku oraz poprawność ich deszyfrowania z weryfikacją sumy kontrolnej.
         - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (765 testów, 9065 asercji), Vitest (76 plików, 692 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
+    - [x] Implementacja szyfrowania w magazynie fizycznym (Cloud-Ready Storage).
+        - `app/Contexts/DocumentManagement/Infrastructure/Storage/LocalStorageDocumentStorage.php`: adaptacja do abstrakcji chmurowej `config('vdr.storage.disk')`, zabezpieczenie `fullPath()` przed błędem `BadMethodCallException` przy driverach chmurowych (OCI Object Storage / S3) oraz natychmiastowe zwalnianie buforów binarnych (`unset`).
+        - `app/Contexts/DocumentManagement/Infrastructure/Storage/CloudReadyDocumentStorage.php`: nowa klasa implementująca `DocumentStorageInterface` dedykowana dla magazynu chmurowego.
+        - `database/seeders/DocumentDataSeeder.php`: gwarancja idempotentności seedera poprzez uprzednie usuwanie starych plików i powiązań.
+        - `tests/Feature/DocumentManagement/CloudReadyDocumentStorageIntegrationTest.php`: testy integracyjne weryfikujące zachowanie integralności binarnej szyfrogramów, odporność `fullPath()` oraz transakcyjny rollback osieroconych plików w `TransactionalStorageManager`.
+        - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (769 testów, 9028 asercji), Vitest (76 plików, 692 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
 ---
 

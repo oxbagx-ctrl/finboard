@@ -36,6 +36,14 @@ final class DocumentDataSeeder extends Seeder
             return;
         }
 
+        // Clean up any existing demo documents to ensure seeder idempotency
+        $existingDocs = Document::whereIn('company_id', [$acmeCompany->id, $helvestCompany->id])->get();
+        foreach ($existingDocs as $existingDoc) {
+            Storage::disk($diskName)->delete($existingDoc->storage_path);
+            $existingDoc->accessLogs()->delete();
+            $existingDoc->forceDelete();
+        }
+
         $acmeDocs = [
             [
                 'title' => 'Sprawozdanie Finansowe i Bilans za rok 2025',
