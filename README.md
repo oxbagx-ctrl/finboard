@@ -1137,8 +1137,13 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
         - `resources/js/context/DealContext.jsx`: dynamiczny stan `currencies` ładowany asynchronicznie z endpointu `/api/v1/finance/exchange-rates` z zachowaniem stałej `CURRENCIES` jako offline fallback, stan metadanych `ratesMetadata` (`source`, `tableNo`, `effectiveDate`, `fetchedAt`, `cached`, `isFallback`), obsługa ładowania i błędów (`loadingRates`, `ratesError`), funkcja `refreshRates(forceRefresh)` oraz dynamiczna funkcja przeliczeniowa `convertAmount` z etykietami formatowanymi do 4 miejsc po przecinku.
         - `resources/js/tests/context/dealContext.test.jsx`: zestaw testów jednostkowych weryfikujących inicjalizację z fallbackiem, asynchroniczne pobieranie danych NBP, wymuszone odświeżenie cache (`?refresh=1`) oraz odporność na awarie sieciowe.
         - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (744 testy, 8888 asercji), Vitest (75 plików, 680 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
+    - [x] Prezentacja kursów NBP, numeru tabeli i daty publikacji w pasku kontekstu DealContextBar.
+        - `resources/js/components/layout/DealContextBar.jsx`: dodanie badge'a oficjalnej tabeli NBP (`nbp-rate-badge`) z numerem tabeli i datą publikacji kursów, badge'a ostrzegawczego trybu awaryjnego (`nbp-fallback-badge`), wskaźnika aktywnego przelicznika walutowego (`active-fx-rate-badge`) z precyzją 4 miejsc po przecinku oraz przycisku wymuszenia natychmiastowej synchronizacji (`refresh-nbp-rates-button`) z animacją `animate-spin`.
+        - `resources/js/tests/components/DealContextBar.test.jsx`: zestaw 6 testów jednostkowych weryfikujących renderowanie badge'y, ostrzeżenia o fallbacku, prezentację kursu dla walut obcych oraz interakcję z przyciskiem wymuszenia odświeżenia.
+        - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (744 testy, 8888 asercji), Vitest (75 plików, 683 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
 ---
+
 
 ## 📜 Licencja
 Projekt objęty licencją własną dla platformy FinBoard.
