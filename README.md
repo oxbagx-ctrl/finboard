@@ -1118,7 +1118,12 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
         - `app/Models/ExchangeRate.php`: model domenowy Eloquent z obsługą traitów `HasUuids`, rzutowaniem typów zmiennoprzecinkowych i dat, metodami pomocniczymi `findByCurrency` (wyszukiwanie case-insensitive), `getMultiplierFor` (bezpieczny mnożnik z domyślnym 1.0 dla PLN), `convertFromPln` oraz `convertToPln`.
         - `database/seeders/ExchangeRateSeeder.php`: idempotentny seeder inicjalizujący bazowe waluty instytucjonalne (EUR, USD, GBP) zarejestrowany w głównym `database/seeders/DatabaseSeeder.php`.
         - `tests/Unit/Finance/ExchangeRateModelTest.php`: zestaw testów jednostkowych weryfikujących generowanie UUID, rzutowania, wyszukiwanie walut bez względu na wielkość liter, fallback mnożnika dla PLN oraz matematyczną precyzję dwukierunkowej konwersji kwotowej.
-        - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (727 testów, 8804 asercje), Vitest (74 pliki, 676 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
+    - [x] Implementacja serwisu NbpExchangeRateService dla pobierania kursów Tabeli A NBP.
+        - `app/Domain/Finance/Exceptions/NbpApiException.php`: klasa wyjątku domenowego ze statycznymi metodami fabrycznymi obsługującymi awarie sieciowe, kody błędów HTTP, uszkodzony payload JSON oraz nieznane waluty.
+        - `app/Domain/Finance/Services/NbpExchangeRateService.php`: implementacja serwisu integrującego publiczne API NBP (`https://api.nbp.pl/api/exchangerates/tables/A/?format=json`) z timeoutem 10s, walidacją kontraktu JSON tabeli A, atomowym zapisem do PostgreSQL w transakcji (`DB::transaction`) kalkulującym mnożniki $1/\text{mid}$ o precyzji 8 miejsc po przecinku, metodami dwukierunkowej konwersji kwotowej (`convertFromPln`, `convertToPln`) oraz wzorcem Cache-Aside (`getCachedRatesPayload`, `invalidateCache`).
+        - `app/Contexts/Finance/Infrastructure/Services/NbpExchangeRateService.php`: adapter zgodności wstecznej dla IoC / kontenera usług.
+        - `tests/Unit/Finance/NbpExchangeRateServiceTest.php`: zestaw testów jednostkowych z mockowaniem fasady `Http::fake` weryfikujący pomyślną synchronizację, błędy sieciowe (500), uszkodzony format JSON, puste tablice kursowe, matematyczną precyzję konwersji oraz mechanizm buforowania w Cache.
+        - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (733 testy, 8834 asercje), Vitest (74 pliki, 676 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
 ---
 
