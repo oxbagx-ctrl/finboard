@@ -4,18 +4,28 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Contexts\DocumentManagement\Domain\Services\VdrEncryptionServiceInterface;
 use App\Models\Company;
 use App\Models\Document;
 use App\Models\DocumentAccessLog;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 final class DocumentDataSeeder extends Seeder
 {
+    public function __construct(
+        private readonly ?VdrEncryptionServiceInterface $encryptionService = null
+    ) {
+    }
+
     public function run(): void
     {
+        $encryptionService = $this->encryptionService ?? app(VdrEncryptionServiceInterface::class);
+        $diskName = (string) Config::get('vdr.storage.disk', 'local');
+
         $acmeCompany = Company::where('code', 'ACME')->first();
         $helvestCompany = Company::where('code', 'HELVEST')->first();
 
@@ -94,7 +104,9 @@ final class DocumentDataSeeder extends Seeder
             $checksum = hash('sha256', $item['content']);
             $storagePath = sprintf('dataroom/%s/%s.pdf', $acmeCompany->id, $docId);
 
-            Storage::disk('local')->put($storagePath, $item['content']);
+            $encryptedPayload = $encryptionService->encrypt($item['content']);
+
+            Storage::disk($diskName)->put($storagePath, $encryptedPayload->ciphertext());
 
             $doc = Document::create([
                 'id' => $docId,
@@ -109,6 +121,11 @@ final class DocumentDataSeeder extends Seeder
                 'storage_path' => $storagePath,
                 'download_count' => $item['downloads'],
                 'is_archived' => false,
+                'is_encrypted' => true,
+                'encryption_algo' => $encryptedPayload->algorithm(),
+                'encryption_iv' => $encryptedPayload->ivBase64(),
+                'encryption_tag' => $encryptedPayload->tagBase64(),
+                'key_id' => $encryptedPayload->keyId(),
             ]);
 
             // Seed initial upload log
@@ -165,7 +182,9 @@ final class DocumentDataSeeder extends Seeder
             $checksum = hash('sha256', $item['content']);
             $storagePath = sprintf('dataroom/%s/%s.bin', $helvestCompany->id, $docId);
 
-            Storage::disk('local')->put($storagePath, $item['content']);
+            $encryptedPayload = $encryptionService->encrypt($item['content']);
+
+            Storage::disk($diskName)->put($storagePath, $encryptedPayload->ciphertext());
 
             $doc = Document::create([
                 'id' => $docId,
@@ -180,6 +199,11 @@ final class DocumentDataSeeder extends Seeder
                 'storage_path' => $storagePath,
                 'download_count' => $item['downloads'],
                 'is_archived' => false,
+                'is_encrypted' => true,
+                'encryption_algo' => $encryptedPayload->algorithm(),
+                'encryption_iv' => $encryptedPayload->ivBase64(),
+                'encryption_tag' => $encryptedPayload->tagBase64(),
+                'key_id' => $encryptedPayload->keyId(),
             ]);
 
             DocumentAccessLog::create([

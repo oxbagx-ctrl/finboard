@@ -1185,6 +1185,12 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
         - `app/Contexts/DocumentManagement/Infrastructure/Providers/DocumentManagementServiceProvider.php`: rejestracja serwisu szyfrującego w kontenerze IoC.
         - `tests/Unit/DocumentManagement/OpenSslVdrEncryptionServiceTest.php`: 12 testów jednostkowych weryfikujących szyfrowanie/deszyfrowanie, wykrywanie modyfikacji szyfrogramu (tampering), walidację IV/tagu, rotację kluczy oraz fallback HKDF (28 asercji).
         - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (762 testy, 8963 asercje), Vitest (76 plików, 692 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
+    - [x] Komenda generowania klucza VDR i aktualizacja seedera danych.
+        - `app/Console/Commands/GenerateVdrEncryptionKeyCommand.php`: dedykowana komenda `php artisan vdr:key-generate` generująca kryptograficznie bezpieczny klucz 256-bit (base64) z obsługą opcji `--show`, promptu produkcyjnego (`--force`) oraz atomowego zapisu do `.env`.
+        - `database/seeders/DocumentDataSeeder.php`: refaktoryzacja seedera pod kątem fizycznego szyfrowania plików demonstracyjnych (PDF/XLSX) z wyliczeniem wektora IV, tagu autentyczności GCM oraz sumy SHA-256 z zachowaniem gotowości pod komendy `db:seed` i `migrate:fresh --seed`.
+        - `tests/Feature/Console/GenerateVdrEncryptionKeyCommandTest.php`: testy komendy konsolowej weryfikujące poprawność wyświetlania i modyfikacji `.env`.
+        - `tests/Feature/DocumentManagement/DocumentDataSeederEncryptionTest.php`: testy integracyjne potwierdzające obecność szyfrogramów na dysku oraz poprawność ich deszyfrowania z weryfikacją sumy kontrolnej.
+        - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (765 testów, 9065 asercji), Vitest (76 plików, 692 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
 ---
 
