@@ -1,4 +1,5 @@
 import React from 'react';
+import { twMerge } from 'tailwind-merge';
 
 export const Button = React.forwardRef(({
     children,
@@ -35,7 +36,7 @@ export const Button = React.forwardRef(({
             type={type}
             disabled={disabled || loading}
             onClick={onClick}
-            className={`${baseClasses} ${sizeClasses[size]} ${variantClasses[variant]} ${className}`}
+            className={twMerge(baseClasses, sizeClasses[size], variantClasses[variant], className)}
             {...props}
         >
             {loading ? (

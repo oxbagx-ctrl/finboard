@@ -68,7 +68,7 @@ export const LoginView = () => {
     };
 
     return (
-        <div className="min-h-screen bg-zinc-950 flex flex-col justify-between py-10 px-4 sm:px-6 lg:px-8 font-sans text-zinc-100">
+        <div className="dark min-h-screen bg-zinc-950 flex flex-col justify-between py-10 px-4 sm:px-6 lg:px-8 font-sans text-zinc-100">
             {/* Top institutional header */}
             <div className="w-full max-w-5xl mx-auto flex items-center justify-between pb-6 border-b border-zinc-800/80 text-xs text-zinc-400">
                 <div className="flex items-center gap-2">
@@ -135,7 +135,7 @@ export const LoginView = () => {
                             <Button
                                 type="submit"
                                 loading={loading}
-                                className="w-full py-2.5 text-xs font-semibold uppercase tracking-wider bg-zinc-100 hover:bg-white text-zinc-950 border-0"
+                                className="w-full py-2.5 text-xs font-bold uppercase tracking-wider bg-zinc-100 hover:bg-white text-zinc-950 border border-zinc-200 shadow-md hover:shadow-lg transition-all focus:ring-2 focus:ring-zinc-400 focus:ring-offset-2 focus:ring-offset-zinc-900 cursor-pointer"
                                 variant="primary"
                             >
                                 Uwierzytelnij w portalu
@@ -201,7 +201,7 @@ export const LoginView = () => {
 
             {/* Bottom corporate footer */}
             <div className="w-full max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between pt-6 border-t border-zinc-800/80 text-[11px] text-zinc-500 font-mono gap-2">
-                <div>Helvest Advisory Sp. z o.o. © 2026. Wszelkie prawa zastrzeżone.</div>
+                <div>FinBoard Sp. z o.o. © 2026. Wszelkie prawa zastrzeżone.</div>
                 <div className="flex items-center gap-3">
                     <span>SECURITY POLICY</span>
                     <span>•</span>
