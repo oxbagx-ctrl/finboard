@@ -1161,6 +1161,12 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
         - Weryfikacja odporności na błędy serwerowe API NBP (symulacja HTTP 500) z zachowaniem ciągłości działania w oparciu o stałe referencyjne i bezbłędnym wznowieniem synchronizacji po kolejnym zapytaniu.
         - Weryfikacja precyzji matematycznej i spójności przeliczeń przy wielokrotnym przełączaniu walut transakcyjnych (PLN -> EUR -> USD -> GBP -> PLN).
         - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (744 testy, 8888 asercji), Vitest (76 plików, 691 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
+    - [x] Kompleksowa dokumentacja architektoniczna silnika wielowalutowego NBP i rejestr zmian.
+        - `docs/architecture/nbp-fx-engine.md`: opracowanie wyczerpującej specyfikacji architektonicznej silnika wymiany walut NBP, obejmującej zgodność prawną z MSR 21 oraz art. 30 ust. 2 UoR, metodologię Constant FX w procesach Due Diligence i wycenach DCF, strategię pobierania Tabeli A z atomowym zapisem do PostgreSQL, wzorzec Cache-Aside (TTL 12h), silnik wielowalutowy agregatorów analitycznych eliminujący błędy `CurrencyMismatchException`, architekturę frontendu (`DealContext`, `DealContextBar` z reaktywną elewacją waluty), wektorowe raporty A4 ze znakiem wodnym, klauzulami prawnymi i stopką cytowania, kryptograficzną pieczęć integralności WORM (SHA-256) oraz standaryzację metadanych JSON (`meta.exchange_rate_source` i `meta.exchange_rate_audit`).
+        - `docs/plan/317-implementation-plan-nbp-fx-engine-architecture-documentation.md`: plan wdrożeniowy finalizujący Fazę 61.
+        - `changelog/317-docs-nbp-fx-engine-architecture-and-changelogs.md`: wpis rejestru zmian dla Commita 317.
+        - `changelog/README.md`: aktualizacja rejestru zmian projektu o kompletne 10 commitów Fazy 61.
+        - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (745 testów, 8907 asercji), Vitest (76 plików, 692 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
 ---
 
