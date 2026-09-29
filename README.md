@@ -1205,6 +1205,11 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
         - `app/Contexts/DocumentManagement/Infrastructure/Repositories/EloquentDocumentRepository.php`: mapowanie kolumn kryptograficznych w operacjach zapisu i odczytu.
         - `tests/Feature/DocumentManagement/UploadDocumentEncryptionPipelineTest.php`: zestaw testów weryfikujących brak jawnego tekstu na dysku, poprawność wektora IV i tagu GCM w PostgreSQL oraz zgodność deszyfrowania.
         - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (771 testów, 9049 asercji), Vitest (76 plików, 692 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
+    - [x] Deszyfrowanie Dual-Read w ścieżce pobierania, podglądu i znaku wodnego.
+        - `app/Contexts/DocumentManagement/Application/Commands/DownloadDocument/DownloadDocumentHandler.php`: deszyfrowanie w locie z weryfikacją tagu GCM 128-bit, bezstratny odczyt plików legacy (`is_encrypted = false`), dynamiczne przekazanie bajtów do znaku wodnego i czyszczenie buforów pamięci (`unset`).
+        - `app/Presentation/Api/Controllers/DocumentController.php`: zabezpieczenie akcji `download` i `preview` przed naruszeniami spójności danych (`TamperedPayloadException` -> HTTP 422, audyt `Log::critical`) oraz awariami deszyfrowania (`DecryptionFailedException` -> HTTP 500), bez tworzenia plików tymczasowych na dysku.
+        - `tests/Feature/DocumentManagement/DualReadDownloadAndPreviewPipelineTest.php`: kompleksowy pakiet testów integracyjnych weryfikujący Dual-Read, deszyfrowanie w locie, nakładanie znaku wodnego w podglądzie PDF oraz detekcję manipulacji szyfrogramem i tagiem GCM.
+        - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (777 testów, 9073 asercje), Vitest (76 plików, 692 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
 ---
 

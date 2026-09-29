@@ -22,6 +22,8 @@ use App\Contexts\DocumentManagement\Application\Queries\GetEffectiveVdrPermissio
 use App\Contexts\DocumentManagement\Application\Queries\GetEffectiveVdrPermission\GetEffectiveVdrPermissionQuery;
 use App\Contexts\DocumentManagement\Application\Queries\GetVdrAuditLogs\GetVdrAuditLogsHandler;
 use App\Contexts\DocumentManagement\Application\Queries\GetVdrAuditLogs\GetVdrAuditLogsQuery;
+use App\Contexts\DocumentManagement\Domain\Exceptions\DecryptionFailedException;
+use App\Contexts\DocumentManagement\Domain\Exceptions\TamperedPayloadException;
 use App\Contexts\DocumentManagement\Domain\ValueObjects\WatermarkOptions;
 use App\Models\Document as EloquentDocument;
 use App\Models\User;
@@ -34,10 +36,13 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response as HttpResponse;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 final class DocumentController
 {
@@ -155,13 +160,35 @@ final class DocumentController
             );
         }
 
-        $result = $this->downloadDocumentHandler->handle(new DownloadDocumentCommand(
-            id: $id,
-            userId: (string) $request->user()->id,
-            ipAddress: $request->ip(),
-            userAgent: $request->userAgent(),
-            watermarkOptions: $watermarkOptions
-        ));
+        try {
+            $result = $this->downloadDocumentHandler->handle(new DownloadDocumentCommand(
+                id: $id,
+                userId: (string) $request->user()->id,
+                ipAddress: $request->ip(),
+                userAgent: $request->userAgent(),
+                watermarkOptions: $watermarkOptions
+            ));
+        } catch (TamperedPayloadException $e) {
+            Log::critical("Kryptograficzne naruszenie spójności dokumentu VDR [ID: {$id}]: {$e->getMessage()}", [
+                'document_id' => $id,
+                'user_id' => $request->user()?->id,
+                'ip' => $request->ip(),
+            ]);
+            throw new UnprocessableEntityHttpException(
+                'Błąd weryfikacji integralności kryptograficznej dokumentu (wykryto modyfikację danych).',
+                $e
+            );
+        } catch (DecryptionFailedException $e) {
+            Log::error("Błąd deszyfrowania dokumentu VDR [ID: {$id}]: {$e->getMessage()}", [
+                'document_id' => $id,
+                'user_id' => $request->user()?->id,
+            ]);
+            throw new HttpException(
+                Response::HTTP_INTERNAL_SERVER_ERROR,
+                'Błąd odszyfrowywania dokumentu w magazynie VDR: ' . $e->getMessage(),
+                $e
+            );
+        }
 
         $inline = $request->boolean('inline', false);
         $dispositionType = $inline ? HeaderUtils::DISPOSITION_INLINE : HeaderUtils::DISPOSITION_ATTACHMENT;
@@ -215,13 +242,35 @@ final class DocumentController
             );
         }
 
-        $result = $this->downloadDocumentHandler->handle(new DownloadDocumentCommand(
-            id: $id,
-            userId: (string) $request->user()->id,
-            ipAddress: $request->ip(),
-            userAgent: $request->userAgent(),
-            watermarkOptions: $watermarkOptions
-        ));
+        try {
+            $result = $this->downloadDocumentHandler->handle(new DownloadDocumentCommand(
+                id: $id,
+                userId: (string) $request->user()->id,
+                ipAddress: $request->ip(),
+                userAgent: $request->userAgent(),
+                watermarkOptions: $watermarkOptions
+            ));
+        } catch (TamperedPayloadException $e) {
+            Log::critical("Kryptograficzne naruszenie spójności dokumentu VDR podczas podglądu [ID: {$id}]: {$e->getMessage()}", [
+                'document_id' => $id,
+                'user_id' => $request->user()?->id,
+                'ip' => $request->ip(),
+            ]);
+            throw new UnprocessableEntityHttpException(
+                'Błąd weryfikacji integralności kryptograficznej dokumentu (wykryto modyfikację danych).',
+                $e
+            );
+        } catch (DecryptionFailedException $e) {
+            Log::error("Błąd deszyfrowania dokumentu VDR podczas podglądu [ID: {$id}]: {$e->getMessage()}", [
+                'document_id' => $id,
+                'user_id' => $request->user()?->id,
+            ]);
+            throw new HttpException(
+                Response::HTTP_INTERNAL_SERVER_ERROR,
+                'Błąd odszyfrowywania dokumentu w magazynie VDR: ' . $e->getMessage(),
+                $e
+            );
+        }
 
         $originalName = $result->originalName;
         $fallbackName = Str::ascii($originalName);

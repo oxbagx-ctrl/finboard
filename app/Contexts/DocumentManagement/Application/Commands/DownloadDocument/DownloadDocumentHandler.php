@@ -40,13 +40,16 @@ final class DownloadDocumentHandler
         }
 
         if ($domainDoc->isEncrypted()) {
-            $fileContent = $this->encryptionService->decrypt(
+            $decryptedContent = $this->encryptionService->decrypt(
                 cipherContent: $fileContent,
                 iv: (string) $domainDoc->encryptionIv(),
                 tag: (string) $domainDoc->encryptionTag(),
                 keyId: $domainDoc->keyId(),
                 algorithm: $domainDoc->encryptionAlgo() ?? 'aes-256-gcm'
             );
+            unset($fileContent);
+            $fileContent = $decryptedContent;
+            unset($decryptedContent);
         }
 
         $domainDoc->recordDownload($command->userId);
@@ -69,7 +72,10 @@ final class DownloadDocumentHandler
                 $domainDoc->fileMetadata()->originalName()
             )
         ) {
-            $fileContent = $this->watermarkService->applyWatermark($fileContent, $command->watermarkOptions);
+            $watermarkedContent = $this->watermarkService->applyWatermark($fileContent, $command->watermarkOptions);
+            unset($fileContent);
+            $fileContent = $watermarkedContent;
+            unset($watermarkedContent);
         }
 
         return new DownloadDocumentResult(
