@@ -5,10 +5,19 @@ import { AuthContext } from './AuthContext';
 const DealContext = createContext(null);
 
 export const CURRENCIES = [
-    { code: 'PLN', symbol: 'zł', rate: 1.0, label: 'Polski Złoty (PLN)' },
-    { code: 'EUR', symbol: '€', rate: 0.2325, label: 'Euro (EUR, kurs 4.30)' },
-    { code: 'USD', symbol: '$', rate: 0.2564, label: 'US Dollar (USD, kurs 3.90)' },
+    { code: 'PLN', symbol: 'zł', name: 'złoty polski', rate: 1.0, midRate: 1.0, label: 'Polski Złoty (PLN)' },
+    { code: 'EUR', symbol: '€', name: 'euro', rate: 0.2325, midRate: 4.30, label: 'Euro (EUR, kurs 4.3000)' },
+    { code: 'USD', symbol: '$', name: 'dolar amerykański', rate: 0.2564, midRate: 3.90, label: 'US Dollar (USD, kurs 3.9000)' },
+    { code: 'GBP', symbol: '£', name: 'funt szterling', rate: 0.1961, midRate: 5.10, label: 'Funt Szterling (GBP, kurs 5.1000)' },
 ];
+
+export const CURRENCY_SYMBOLS = {
+    PLN: 'zł',
+    EUR: '€',
+    USD: '$',
+    GBP: '£',
+    CHF: 'CHF',
+};
 
 export const FISCAL_YEARS = ['all', '2026', '2025'];
 export const FISCAL_QUARTERS = [
@@ -28,12 +37,77 @@ export const DealProvider = ({ children, initialYears = ['2026', '2025'] }) => {
     const [selectedYear, setSelectedYear] = useState('all');
     const [selectedQuarter, setSelectedQuarter] = useState('all');
     const [currency, setCurrency] = useState('PLN');
+    const [currencies, setCurrencies] = useState(CURRENCIES);
+    const [ratesMetadata, setRatesMetadata] = useState({
+        source: 'NBP',
+        tableNo: null,
+        effectiveDate: null,
+        fetchedAt: null,
+        cached: false,
+        isFallback: true,
+    });
+    const [loadingRates, setLoadingRates] = useState(false);
+    const [ratesError, setRatesError] = useState(null);
+
     const [dealMetadata, setDealMetadata] = useState({
         code: 'PROJECT-APEX',
         phase: 'Due Diligence (Faza II)',
         accessLevel: 'STRICTLY CONFIDENTIAL',
         confidentialityClause: 'M&A Advisory Privilege // NDA Enforced',
     });
+
+    const refreshRates = useCallback(async (forceRefresh = false) => {
+        try {
+            setLoadingRates(true);
+            setRatesError(null);
+            const params = forceRefresh ? { refresh: 1 } : {};
+            const res = await apiClient.get('/finance/exchange-rates', { params });
+
+            if (res.data && res.data.rates && Array.isArray(res.data.rates)) {
+                const dynamicCurrencies = [
+                    {
+                        code: 'PLN',
+                        symbol: 'zł',
+                        name: 'złoty polski',
+                        rate: 1.0,
+                        midRate: 1.0,
+                        label: 'Polski Złoty (PLN)',
+                    },
+                    ...res.data.rates.map(r => {
+                        const mid = Number(r.mid_rate ?? (1 / r.multiplier));
+                        const mult = Number(r.multiplier ?? (1 / mid));
+                        const sym = CURRENCY_SYMBOLS[r.currency] || r.currency;
+                        const name = r.currency_name || r.currency;
+                        return {
+                            code: r.currency,
+                            symbol: sym,
+                            name: name,
+                            rate: mult,
+                            midRate: mid,
+                            label: `${name} (${r.currency}, kurs ${mid.toFixed(4)})`,
+                            tableNo: r.table_no,
+                            effectiveDate: r.effective_date,
+                        };
+                    }),
+                ];
+
+                setCurrencies(dynamicCurrencies);
+                setRatesMetadata({
+                    source: res.data.source || 'NBP',
+                    tableNo: res.data.table_no || null,
+                    effectiveDate: res.data.effective_date || null,
+                    fetchedAt: res.data.fetched_at || null,
+                    cached: Boolean(res.data.cached),
+                    isFallback: false,
+                });
+            }
+        } catch (err) {
+            setRatesError(err?.message || 'Błąd pobierania kursów NBP');
+            setRatesMetadata(prev => ({ ...prev, isFallback: true }));
+        } finally {
+            setLoadingRates(false);
+        }
+    }, []);
 
     const fetchAvailableYears = useCallback(async () => {
         try {
@@ -58,12 +132,14 @@ export const DealProvider = ({ children, initialYears = ['2026', '2025'] }) => {
         const hasToken = auth?.token || (typeof localStorage !== 'undefined' && localStorage.getItem('finboard_token'));
         if (hasToken) {
             fetchAvailableYears();
+            refreshRates();
         }
-    }, [activeCompanyId, fetchAvailableYears, auth?.token]);
+    }, [activeCompanyId, fetchAvailableYears, refreshRates, auth?.token]);
 
     useEffect(() => {
         const handleCompanyChange = (e) => {
             fetchAvailableYears();
+            refreshRates();
             if (e?.detail?.code) {
                 setDealMetadata(prev => ({
                     ...prev,
@@ -73,7 +149,7 @@ export const DealProvider = ({ children, initialYears = ['2026', '2025'] }) => {
         };
         window.addEventListener('finboard:company-changed', handleCompanyChange);
         return () => window.removeEventListener('finboard:company-changed', handleCompanyChange);
-    }, [fetchAvailableYears]);
+    }, [fetchAvailableYears, refreshRates]);
 
     // If selectedYear is not 'all' and no longer present in availableYears, reset to 'all'
     useEffect(() => {
@@ -84,8 +160,8 @@ export const DealProvider = ({ children, initialYears = ['2026', '2025'] }) => {
     }, [availableYears, selectedYear]);
 
     const currentCurrencyObj = useMemo(() => {
-        return CURRENCIES.find(c => c.code === currency) || CURRENCIES[0];
-    }, [currency]);
+        return currencies.find(c => c.code === currency) || currencies[0] || CURRENCIES[0];
+    }, [currencies, currency]);
 
     // Calculate start_date and end_date based on year and quarter selection
     const dateRange = useMemo(() => {
@@ -151,8 +227,13 @@ export const DealProvider = ({ children, initialYears = ['2026', '2025'] }) => {
         setSelectedQuarter,
         currency,
         setCurrency,
+        currencies,
         currentCurrencyObj,
         convertAmount,
+        ratesMetadata,
+        loadingRates,
+        ratesError,
+        refreshRates,
         dateRange,
         dealMetadata,
         setDealMetadata,
@@ -166,8 +247,13 @@ export const DealProvider = ({ children, initialYears = ['2026', '2025'] }) => {
         selectedYear,
         selectedQuarter,
         currency,
+        currencies,
         currentCurrencyObj,
         convertAmount,
+        ratesMetadata,
+        loadingRates,
+        ratesError,
+        refreshRates,
         dateRange,
         dealMetadata,
         resetFilters,

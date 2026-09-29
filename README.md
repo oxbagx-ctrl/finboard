@@ -1133,6 +1133,10 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
         - `routes/api.php`: rejestracja tras API wewnątrz grupy autoryzacyjnej Sanctum pod prefiksem `finance/exchange-rates`.
         - `tests/Feature/Api/ExchangeRateApiTest.php`: zestaw testów integracyjnych weryfikujących autoryzację Sanctum (401), cykl życia bufora Cache-Aside, parametr wymuszonego odświeżenia `?refresh=1`, kalkulację próbki 100 jednostek, błędy 404 dla nieznanych walut oraz kody odpowiedzi 502/200 dla endpointu synchronizacji.
         - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (744 testy, 8888 asercji), Vitest (74 pliki, 676 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
+    - [x] Refaktoryzacja DealContext pod kątem asynchronicznego ładowania kursów walut NBP.
+        - `resources/js/context/DealContext.jsx`: dynamiczny stan `currencies` ładowany asynchronicznie z endpointu `/api/v1/finance/exchange-rates` z zachowaniem stałej `CURRENCIES` jako offline fallback, stan metadanych `ratesMetadata` (`source`, `tableNo`, `effectiveDate`, `fetchedAt`, `cached`, `isFallback`), obsługa ładowania i błędów (`loadingRates`, `ratesError`), funkcja `refreshRates(forceRefresh)` oraz dynamiczna funkcja przeliczeniowa `convertAmount` z etykietami formatowanymi do 4 miejsc po przecinku.
+        - `resources/js/tests/context/dealContext.test.jsx`: zestaw testów jednostkowych weryfikujących inicjalizację z fallbackiem, asynchroniczne pobieranie danych NBP, wymuszone odświeżenie cache (`?refresh=1`) oraz odporność na awarie sieciowe.
+        - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (744 testy, 8888 asercji), Vitest (75 plików, 680 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
 ---
 
