@@ -1213,7 +1213,15 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - [x] Komenda migracji istniejących danych na produkcji (`vdr:encrypt-existing`).
         - `app/Console/Commands/EncryptExistingVdrDocumentsCommand.php`: komenda Artisan `php artisan vdr:encrypt-existing-documents` (alias `vdr:encrypt-existing`) z obsługą `--dry-run`, paczek `--chunk=50`, rotacji `--key-id`, paskiem postępu, weryfikacją sumy SHA-256 przed i po szyfrowaniu oraz wpisem audytowym w `document_access_logs`.
         - `tests/Feature/Console/EncryptExistingVdrDocumentsCommandTest.php`: zestaw testów weryfikujących tryb symulacji (`--dry-run`), fizyczny zapis szyfrogramu, aktualizację metadanych w PostgreSQL, pomijanie brakujących plików oraz ochronę przed rozbieżnością sumy kontrolnej.
-        - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (782 testy, 9102 asercje), Vitest (76 plików, 692 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
+    - [x] Zestaw testów regresyjnych i bezpieczeństwa (PHPUnit & Vitest).
+        - `tests/Feature/Security/VdrPhysicalEncryptionSecurityRegressionTest.php`: kompleksowe testy bezpieczeństwa backendu weryfikujące pełny cykl szyfrowania/deszyfrowania, wykrywanie modyfikacji szyfrogramu (tampering) i rzucenie `TamperedPayloadException`, odrzucenie sfałszowanego tagu GCM, transparentny fallback HKDF-SHA256 z `APP_KEY` oraz odczyt Dual-Read dla dokumentów legacy.
+        - `resources/js/components/dataroom/DocumentTable.jsx`: dodanie badge'a `AES-256` z ikoną kłódki dla zaszyfrowanych dokumentów oraz etykiety `Jawny` dla dokumentów legacy.
+        - `resources/js/components/dataroom/DocumentPreviewModal.jsx`: wskaźnik deszyfrowania w locie `AES-256-GCM (RAM)` w nagłówku modala podglądu z objaśnieniem braku składowania na dysku.
+        - `resources/js/components/dataroom/DataRoomStats.jsx`: wyliczanie liczby zaszyfrowanych dokumentów (`encryptedCount`) i prezentacja statystyki `Szyfrowanie AES-256: X z Y dok.` w kafelku wolumenu danych.
+        - `resources/js/tests/components/VdrEncryptionUiRegression.test.jsx`: pakiet testów jednostkowych frontendu potwierdzający poprawne renderowanie oznaczeń kryptograficznych.
+        - `docs/plan/325-implementation-plan-vdr-security-and-regression-tests.md`: plan implementacji dla Commita 325.
+        - `changelog/325-test-vdr-security-and-regression-tests.md`: wpis rejestru zmian dla Commita 325.
+        - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (787 testów, 9139 asercji), Vitest (77 plików, 696 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
 ---
 

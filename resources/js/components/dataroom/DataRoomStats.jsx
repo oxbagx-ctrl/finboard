@@ -9,6 +9,8 @@ export const DataRoomStats = ({ documents = [], totalCount = 0 }) => {
     const activeDocsCount = documents.filter(d => !d.is_archived).length;
     const archivedCount = documents.filter(d => d.is_archived).length;
     const uniqueCategories = new Set(documents.map(d => d.type)).size;
+    const encryptedCount = documents.filter(d => Boolean(d.is_encrypted)).length;
+    const unencryptedCount = documents.length - encryptedCount;
 
     return (
         <div className="space-y-3 font-mono">
@@ -53,7 +55,7 @@ export const DataRoomStats = ({ documents = [], totalCount = 0 }) => {
                             {formatFileSize(totalBytes)}
                         </div>
                         <div className="mt-0.5 text-[10px] text-zinc-500 dark:text-zinc-400">
-                            Przestrzeń partycji: <strong className="text-zinc-700 dark:text-zinc-300 font-bold">Zaszyfrowana</strong>
+                            Szyfrowanie AES-256: <strong data-testid="stats-encrypted-count" className="text-emerald-600 dark:text-emerald-400 font-bold">{encryptedCount}</strong> z {documents.length} dok.
                         </div>
                     </div>
                 </div>

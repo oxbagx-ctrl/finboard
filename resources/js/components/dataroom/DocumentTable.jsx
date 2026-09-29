@@ -13,7 +13,8 @@ import {
     Copy,
     Check,
     FolderLock,
-    Eye
+    Eye,
+    Lock
 } from 'lucide-react';
 import { formatFileSize, formatFinancialDate } from '../../utils/formatters';
 import { WatermarkBadge } from './VdrPermissionBadge';
@@ -169,6 +170,20 @@ export const DocumentTable = ({
                                                 </Tooltip>
                                                 {(doc.watermark_required || doc.mime_type?.includes('pdf') || doc.original_name?.toLowerCase().endsWith('.pdf')) && (
                                                     <WatermarkBadge required={true} size="xs" />
+                                                )}
+                                                {doc.is_encrypted ? (
+                                                    <Tooltip content={`Szyfrowanie fizyczne: ${doc.encryption_algo?.toUpperCase() || 'AES-256-GCM'} (Klucz: ${doc.key_id || 'vdr-key-1'})`}>
+                                                        <span data-testid={`encryption-badge-${doc.id}`} className="px-1.5 py-0.2 rounded text-[9px] font-bold uppercase bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-200 dark:border-emerald-700/80 text-emerald-700 dark:text-emerald-300 flex items-center gap-1 cursor-help shrink-0">
+                                                            <Lock className="w-2.5 h-2.5 text-emerald-600 dark:text-emerald-400" />
+                                                            AES-256
+                                                        </span>
+                                                    </Tooltip>
+                                                ) : (
+                                                    <Tooltip content="Plik nieszyfrowany (legacy plain-text)">
+                                                        <span data-testid={`encryption-badge-${doc.id}`} className="px-1.5 py-0.2 rounded text-[9px] font-bold uppercase bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 cursor-help shrink-0">
+                                                            Jawny
+                                                        </span>
+                                                    </Tooltip>
                                                 )}
                                                 {doc.is_archived && (
                                                     <Tooltip content="Dokument zarchiwizowany — wyłączony ze standardowych audytów">
