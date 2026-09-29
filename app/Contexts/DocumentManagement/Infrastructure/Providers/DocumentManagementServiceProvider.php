@@ -45,6 +45,11 @@ final class DocumentManagementServiceProvider extends ServiceProvider
             \App\Contexts\DocumentManagement\Domain\Services\PdfWatermarkServiceInterface::class,
             \App\Contexts\DocumentManagement\Infrastructure\Services\FpdiPdfWatermarkService::class
         );
+
+        $this->app->singleton(
+            \App\Contexts\DocumentManagement\Domain\Services\VdrEncryptionServiceInterface::class,
+            \App\Contexts\DocumentManagement\Infrastructure\Services\OpenSslVdrEncryptionService::class
+        );
     }
 
     public function boot(): void

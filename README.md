@@ -1177,6 +1177,14 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
         - `app/Presentation/Api/Resources/DocumentResource.php`: ekspozycja pól `is_encrypted` i `encryption_algo` w odpowiedziach API.
         - `tests/Feature/DocumentManagement/VdrDatabaseMigrationAndConfigTest.php`: zestaw testów weryfikujących integralność schematu bazy danych, stan początkowy dokumentów, zapis metadanych AES-256-GCM oraz konfigurację.
         - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (750 testów, 8935 asercji), Vitest (76 plików, 692 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
+    - [x] Serwis kryptograficzny AES-256-GCM z obsługą HKDF Fallback.
+        - `app/Contexts/DocumentManagement/Domain/Services/VdrEncryptionServiceInterface.php`: interfejs domenowy operacji kryptograficznych (`encrypt`, `decrypt`, `decryptPayload`, `getActiveKeyId`, `isEncryptionEnabled`).
+        - `app/Contexts/DocumentManagement/Domain/ValueObjects/EncryptedPayload.php`: Value Object enkapsulujący binarny szyfrogram, 96-bitowy IV, 128-bitowy tag autentyczności, algorytm i identyfikator klucza z metodami Base64.
+        - `app/Contexts/DocumentManagement/Domain/Exceptions/DecryptionFailedException.php` & `TamperedPayloadException.php`: dedykowane wyjątki domenowe sygnalizujące błędy formatu lub wykrycie naruszenia integralności danych.
+        - `app/Contexts/DocumentManagement/Infrastructure/Services/OpenSslVdrEncryptionService.php`: implementacja produkcyjna oparta o OpenSSL AEAD z 96-bitowym losowym wektorem IV, obsługą rotacji wielu kluczy oraz automatycznym, bezpiecznym fallbackiem do HKDF-SHA256 z `APP_KEY` dla ochrony środowisk chmurowych (OCI).
+        - `app/Contexts/DocumentManagement/Infrastructure/Providers/DocumentManagementServiceProvider.php`: rejestracja serwisu szyfrującego w kontenerze IoC.
+        - `tests/Unit/DocumentManagement/OpenSslVdrEncryptionServiceTest.php`: 12 testów jednostkowych weryfikujących szyfrowanie/deszyfrowanie, wykrywanie modyfikacji szyfrogramu (tampering), walidację IV/tagu, rotację kluczy oraz fallback HKDF (28 asercji).
+        - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (762 testy, 8963 asercje), Vitest (76 plików, 692 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
 ---
 
