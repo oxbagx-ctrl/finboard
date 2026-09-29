@@ -15,10 +15,6 @@ final readonly class EncryptedPayload
         private string $keyId,
         private string $algorithm = 'aes-256-gcm'
     ) {
-        if ($this->ciphertext === '') {
-            throw new InvalidArgumentException('Ciphertext cannot be empty.');
-        }
-
         if (strlen($this->iv) !== 12) {
             throw new InvalidArgumentException(
                 sprintf('IV must be exactly 12 bytes (96 bits), %d bytes given.', strlen($this->iv))

@@ -1197,6 +1197,14 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
         - `database/seeders/DocumentDataSeeder.php`: gwarancja idempotentności seedera poprzez uprzednie usuwanie starych plików i powiązań.
         - `tests/Feature/DocumentManagement/CloudReadyDocumentStorageIntegrationTest.php`: testy integracyjne weryfikujące zachowanie integralności binarnej szyfrogramów, odporność `fullPath()` oraz transakcyjny rollback osieroconych plików w `TransactionalStorageManager`.
         - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (769 testów, 9028 asercji), Vitest (76 plików, 692 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
+    - [x] Integracja szyfrowania w ścieżce zapisu (Upload Pipeline).
+        - `app/Contexts/DocumentManagement/Application/Commands/UploadDocument/UploadDocumentCommand.php`: obsługa opcjonalnego identyfikatora klucza `$keyId`.
+        - `app/Contexts/DocumentManagement/Domain/Model/Document.php`: rozszerzenie modelu o atrybuty i gettery kryptograficzne (`isEncrypted`, `encryptionAlgo`, `encryptionIv`, `encryptionTag`, `keyId`) oraz metodę domenową `markAsEncrypted()`.
+        - `app/Contexts/DocumentManagement/Application/Commands/UploadDocument/UploadDocumentHandler.php`: wyliczanie sumy SHA-256 z oryginalnego pliku, szyfrowanie AES-256-GCM, składowanie na nośniku wyłącznie binarnego szyfrogramu oraz atomowy zapis metadanych w PostgreSQL.
+        - `app/Contexts/DocumentManagement/Application/Commands/DownloadDocument/DownloadDocumentHandler.php`: integracja Dual-Read deszyfrująca pliki `is_encrypted = true` w locie oraz serwująca pliki `is_encrypted = false` wprost z dysku.
+        - `app/Contexts/DocumentManagement/Infrastructure/Repositories/EloquentDocumentRepository.php`: mapowanie kolumn kryptograficznych w operacjach zapisu i odczytu.
+        - `tests/Feature/DocumentManagement/UploadDocumentEncryptionPipelineTest.php`: zestaw testów weryfikujących brak jawnego tekstu na dysku, poprawność wektora IV i tagu GCM w PostgreSQL oraz zgodność deszyfrowania.
+        - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (771 testów, 9049 asercji), Vitest (76 plików, 692 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
 ---
 

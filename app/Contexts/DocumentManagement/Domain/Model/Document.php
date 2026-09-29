@@ -29,7 +29,12 @@ final class Document extends AggregateRoot
         private int $downloadCount = 0,
         private bool $isArchived = false,
         private readonly DateTimeImmutable $createdAt = new DateTimeImmutable(),
-        private ?DateTimeImmutable $updatedAt = null
+        private ?DateTimeImmutable $updatedAt = null,
+        private bool $isEncrypted = false,
+        private ?string $encryptionAlgo = null,
+        private ?string $encryptionIv = null,
+        private ?string $encryptionTag = null,
+        private string $keyId = 'vdr-key-1'
     ) {
         if (trim($this->title) === '') {
             throw new InvalidArgumentException('Document title cannot be empty.');
@@ -53,7 +58,12 @@ final class Document extends AggregateRoot
         FileMetadata $fileMetadata,
         string $storagePath,
         ?\App\Contexts\DocumentManagement\Domain\ValueObjects\FolderId $folderId = null,
-        ?\App\Contexts\DocumentManagement\Domain\ValueObjects\DeweyIndexCode $indexCode = null
+        ?\App\Contexts\DocumentManagement\Domain\ValueObjects\DeweyIndexCode $indexCode = null,
+        bool $isEncrypted = false,
+        ?string $encryptionAlgo = null,
+        ?string $encryptionIv = null,
+        ?string $encryptionTag = null,
+        string $keyId = 'vdr-key-1'
     ): self {
         $document = new self(
             id: $id,
@@ -67,7 +77,13 @@ final class Document extends AggregateRoot
             indexCode: $indexCode,
             downloadCount: 0,
             isArchived: false,
-            createdAt: new DateTimeImmutable()
+            createdAt: new DateTimeImmutable(),
+            updatedAt: null,
+            isEncrypted: $isEncrypted,
+            encryptionAlgo: $encryptionAlgo,
+            encryptionIv: $encryptionIv,
+            encryptionTag: $encryptionTag,
+            keyId: $keyId
         );
 
         $document->recordThat(new DocumentUploaded(
@@ -219,6 +235,45 @@ final class Document extends AggregateRoot
     public function updateIndexCode(?\App\Contexts\DocumentManagement\Domain\ValueObjects\DeweyIndexCode $indexCode): void
     {
         $this->indexCode = $indexCode;
+        $this->updatedAt = new DateTimeImmutable();
+    }
+
+    public function isEncrypted(): bool
+    {
+        return $this->isEncrypted;
+    }
+
+    public function encryptionAlgo(): ?string
+    {
+        return $this->encryptionAlgo;
+    }
+
+    public function encryptionIv(): ?string
+    {
+        return $this->encryptionIv;
+    }
+
+    public function encryptionTag(): ?string
+    {
+        return $this->encryptionTag;
+    }
+
+    public function keyId(): string
+    {
+        return $this->keyId;
+    }
+
+    public function markAsEncrypted(
+        string $encryptionAlgo,
+        string $encryptionIv,
+        string $encryptionTag,
+        string $keyId
+    ): void {
+        $this->isEncrypted = true;
+        $this->encryptionAlgo = $encryptionAlgo;
+        $this->encryptionIv = $encryptionIv;
+        $this->encryptionTag = $encryptionTag;
+        $this->keyId = $keyId;
         $this->updatedAt = new DateTimeImmutable();
     }
 }

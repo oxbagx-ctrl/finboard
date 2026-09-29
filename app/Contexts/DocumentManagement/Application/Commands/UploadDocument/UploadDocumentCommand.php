@@ -19,7 +19,8 @@ final readonly class UploadDocumentCommand
         public ?string $folderId = null,
         public ?string $indexCode = null,
         public ?string $ipAddress = null,
-        public ?string $userAgent = null
+        public ?string $userAgent = null,
+        public ?string $keyId = null
     ) {
     }
 }

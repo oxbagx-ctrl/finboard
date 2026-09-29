@@ -70,6 +70,11 @@ final class EloquentDocumentRepository implements DocumentRepositoryInterface
                 'index_code' => $document->indexCode()?->value(),
                 'download_count' => $document->downloadCount(),
                 'is_archived' => $document->isArchived(),
+                'is_encrypted' => $document->isEncrypted(),
+                'encryption_algo' => $document->encryptionAlgo(),
+                'encryption_iv' => $document->encryptionIv(),
+                'encryption_tag' => $document->encryptionTag(),
+                'key_id' => $document->keyId(),
             ]
         );
 
@@ -136,7 +141,12 @@ final class EloquentDocumentRepository implements DocumentRepositoryInterface
             downloadCount: (int) $eloquent->download_count,
             isArchived: (bool) $eloquent->is_archived,
             createdAt: $createdAt,
-            updatedAt: $updatedAt
+            updatedAt: $updatedAt,
+            isEncrypted: (bool) ($eloquent->is_encrypted ?? false),
+            encryptionAlgo: $eloquent->encryption_algo,
+            encryptionIv: $eloquent->encryption_iv,
+            encryptionTag: $eloquent->encryption_tag,
+            keyId: (string) ($eloquent->key_id ?? 'vdr-key-1')
         );
     }
 }

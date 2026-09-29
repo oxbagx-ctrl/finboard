@@ -9,15 +9,20 @@ use App\Contexts\DocumentManagement\Application\Exceptions\FileNotFoundInStorage
 use App\Contexts\DocumentManagement\Domain\Repositories\DocumentRepositoryInterface;
 use App\Contexts\DocumentManagement\Domain\Services\DocumentStorageInterface;
 use App\Contexts\DocumentManagement\Domain\Services\PdfWatermarkServiceInterface;
+use App\Contexts\DocumentManagement\Domain\Services\VdrEncryptionServiceInterface;
 use App\Contexts\DocumentManagement\Domain\ValueObjects\DocumentId;
 
 final class DownloadDocumentHandler
 {
+    private readonly VdrEncryptionServiceInterface $encryptionService;
+
     public function __construct(
         private readonly DocumentRepositoryInterface $repository,
         private readonly DocumentStorageInterface $storage,
-        private readonly PdfWatermarkServiceInterface $watermarkService
+        private readonly PdfWatermarkServiceInterface $watermarkService,
+        ?VdrEncryptionServiceInterface $encryptionService = null
     ) {
+        $this->encryptionService = $encryptionService ?? app(VdrEncryptionServiceInterface::class);
     }
 
     public function handle(DownloadDocumentCommand $command): DownloadDocumentResult
@@ -32,6 +37,16 @@ final class DownloadDocumentHandler
 
         if ($fileContent === null) {
             throw FileNotFoundInStorageException::defaultMessage();
+        }
+
+        if ($domainDoc->isEncrypted()) {
+            $fileContent = $this->encryptionService->decrypt(
+                cipherContent: $fileContent,
+                iv: (string) $domainDoc->encryptionIv(),
+                tag: (string) $domainDoc->encryptionTag(),
+                keyId: $domainDoc->keyId(),
+                algorithm: $domainDoc->encryptionAlgo() ?? 'aes-256-gcm'
+            );
         }
 
         $domainDoc->recordDownload($command->userId);
