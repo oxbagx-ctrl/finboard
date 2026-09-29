@@ -106,7 +106,7 @@ export const Sidebar = ({ currentRoute, onRouteChange, isOpen, onClose }) => {
                             <div className="font-bold text-xs tracking-wider uppercase text-zinc-900 dark:text-zinc-100 font-mono">
                                 FinBoard
                             </div>
-                            <div className="text-[10px] text-zinc-500 font-mono">TRYTON ADVISORY</div>
+                            <div className="text-[10px] text-zinc-500 font-mono">TRITON ADVISORY</div>
                         </div>
                     </div>
                     <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400">
