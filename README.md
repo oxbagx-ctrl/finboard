@@ -1112,9 +1112,15 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
         - `resources/js/tests/unit/ThemeContext.test.jsx`: aktualizacja asercji weryfikujących poprawność ustawiania właściwości `style.colorScheme` na `document.documentElement`.
         - Weryfikacja testowa: 100% PASS w pełnym zestawie 74 plików Vitest (676 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
+- [x] **Faza 61: Integracja Kursów Walut NBP i Architektura Wielowalutowa (Constant FX)**
+    - [x] Migracja bazy danych PostgreSQL i model Eloquent dla przechowywania kursów walut NBP.
+        - `database/migrations/2026_04_01_100000_create_exchange_rates_table.php`: utworzenie dedykowanej tabeli `exchange_rates` zawierającej klucz główny UUID, kod ISO waluty (`currency` VARCHAR(3) UNIQUE), pełną nazwę urzędową (`currency_name` VARCHAR(100)), kurs średni NBP (`mid_rate` DECIMAL(10,4)), mnożnik przeliczeniowy (`multiplier` DECIMAL(12,8) wyliczany jako `1 / mid_rate`), sygnaturę urzędową tabeli (`table_no` VARCHAR(50)), datę wejścia w życie (`effective_date` DATE), źródło danych (`source` VARCHAR(30) default 'NBP'), znacznik czasu pobrania (`fetched_at` TIMESTAMP WITH TIME ZONE) oraz indeks złożony na `['currency', 'effective_date']`.
+        - `app/Models/ExchangeRate.php`: model domenowy Eloquent z obsługą traitów `HasUuids`, rzutowaniem typów zmiennoprzecinkowych i dat, metodami pomocniczymi `findByCurrency` (wyszukiwanie case-insensitive), `getMultiplierFor` (bezpieczny mnożnik z domyślnym 1.0 dla PLN), `convertFromPln` oraz `convertToPln`.
+        - `database/seeders/ExchangeRateSeeder.php`: idempotentny seeder inicjalizujący bazowe waluty instytucjonalne (EUR, USD, GBP) zarejestrowany w głównym `database/seeders/DatabaseSeeder.php`.
+        - `tests/Unit/Finance/ExchangeRateModelTest.php`: zestaw testów jednostkowych weryfikujących generowanie UUID, rzutowania, wyszukiwanie walut bez względu na wielkość liter, fallback mnożnika dla PLN oraz matematyczną precyzję dwukierunkowej konwersji kwotowej.
+        - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (727 testów, 8804 asercje), Vitest (74 pliki, 676 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
+
 ---
-
-
 
 ## 📜 Licencja
 Projekt objęty licencją własną dla platformy FinBoard.

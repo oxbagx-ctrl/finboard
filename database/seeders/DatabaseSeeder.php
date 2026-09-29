@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             FinancialDataSeeder::class,
             DocumentDataSeeder::class,
             InvestmentProjectSeeder::class,
+            ExchangeRateSeeder::class,
         ]);
     }
 }
