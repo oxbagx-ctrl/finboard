@@ -36,12 +36,26 @@ final class Document extends Model
         'index_code',
         'download_count',
         'is_archived',
+        'is_encrypted',
+        'encryption_algo',
+        'encryption_iv',
+        'encryption_tag',
+        'key_id',
     ];
 
     protected $casts = [
         'size_bytes' => 'integer',
         'download_count' => 'integer',
         'is_archived' => 'boolean',
+        'is_encrypted' => 'boolean',
+    ];
+
+    /** @var array<string, mixed> */
+    protected $attributes = [
+        'download_count' => 0,
+        'is_archived' => false,
+        'is_encrypted' => false,
+        'key_id' => 'vdr-key-1',
     ];
 
     /**

@@ -1168,6 +1168,16 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
         - `changelog/README.md`: aktualizacja rejestru zmian projektu o kompletne 10 commitów Fazy 61.
         - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (745 testów, 8907 asercji), Vitest (76 plików, 692 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
+- [x] **Faza 62: Fizyczne Szyfrowanie Danych Spoczynkowych VDR (AES-256-GCM)**
+    - [x] Migracja bazy danych dla metadanych kryptograficznych i konfiguracja OCI.
+        - `database/migrations/2026_04_02_100000_add_encryption_metadata_to_documents_table.php`: migracja rozszerzająca tabelę `documents` o kolumny `is_encrypted` (boolean z indeksem, default false), `encryption_algo` (string 32, nullable), `encryption_iv` (text, nullable), `encryption_tag` (text, nullable) oraz `key_id` (string 64, default 'vdr-key-1').
+        - `config/vdr.php`: scentralizowany plik konfiguracyjny parametrów szyfrowania (algorytm AES-256-GCM, obsługa klucza głównego i rotacji, info HKDF) oraz bezwzględnej abstrakcji nośnika danych (gotowość pod OCI Object Storage / S3).
+        - `.env.example`: uzupełnienie szablonu zmiennych środowiskowych o `VDR_ENCRYPTION_ENABLED`, `VDR_ENCRYPTION_ALGO`, `VDR_ENCRYPTION_KEY` i `VDR_ACTIVE_KEY_ID`.
+        - `app/Models/Document.php`: rozszerzenie atrybutów `$fillable`, rzutowania `$casts` oraz domyślnych `$attributes` dla modelu Eloquent.
+        - `app/Presentation/Api/Resources/DocumentResource.php`: ekspozycja pól `is_encrypted` i `encryption_algo` w odpowiedziach API.
+        - `tests/Feature/DocumentManagement/VdrDatabaseMigrationAndConfigTest.php`: zestaw testów weryfikujących integralność schematu bazy danych, stan początkowy dokumentów, zapis metadanych AES-256-GCM oraz konfigurację.
+        - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (750 testów, 8935 asercji), Vitest (76 plików, 692 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
+
 ---
 
 

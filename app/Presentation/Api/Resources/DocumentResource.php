@@ -46,6 +46,8 @@ final class DocumentResource extends JsonResource
             'checksum_sha256' => $this->checksum_sha256,
             'download_count' => (int) $this->download_count,
             'is_archived' => (bool) $this->is_archived,
+            'is_encrypted' => (bool) ($this->is_encrypted ?? false),
+            'encryption_algo' => $this->encryption_algo,
             'folder_id' => $this->folder_id,
             'index_code' => $this->index_code,
             'folder' => $this->whenLoaded('folder', fn () => $this->folder ? [
