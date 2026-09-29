@@ -1154,6 +1154,13 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
         - `resources/js/components/layout/DealContextBar.jsx`: refaktoryzacja selektora walut do formatu kompaktowych pigułek głównych walut (`PLN`, `EUR`, `USD`, `GBP`) z reaktywnym wyniesieniem aktywnej waluty NBP oraz rozwijanym menu `otherCurrencies`.
         - `resources/js/tests/components/ExecutiveReports.test.jsx` & `resources/js/tests/integration/dealAdvisoryE2EWorkflow.test.jsx`: rozbudowa testów o weryfikację stopki wektorowej w memorandum pojedynczym oraz w pełnym przepływie pracy Deal Advisory E2E.
         - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (744 testy, 8888 asercji), Vitest (75 plików, 687 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
+    - [x] Kompleksowe testy jednostkowe i regresyjne frontendu dla synchronizacji wielowalutowej NBP.
+        - `resources/js/tests/integration/nbpMultiCurrencySynchronization.test.jsx`: implementacja dedykowanego pakietu testów integracyjnych weryfikujących zintegrowany komponent `IntegratedDealSuite` łączący `DealProvider`, `DealContextBar`, `ReportConfigurator` oraz `ExecutivePdfReport`.
+        - Weryfikacja pełnego cyklu życia synchronizacji na żywo: przejście ze stanu domyślnego do oficjalnej Tabeli A NBP (`062/A/NBP/2026`), sprawdzenie etykiet `nbp-rate-badge`, numeru tabeli i daty publikacji, wskaźnika `active-fx-rate-badge`, przeliczeń kwotowych (`convertAmount`) oraz klauzul audytowych w PDF (`fx-citation-badge`, `fx-audit-citation`, `fx-footer-citation`).
+        - Weryfikacja reaktywnej elewacji waluty niepodstawowej (CHF) z rozwijanego selektora `other-currencies-select` do aktywnego przycisku oraz formatu kursu średniego (`1 CHF = 4.5820 PLN`).
+        - Weryfikacja odporności na błędy serwerowe API NBP (symulacja HTTP 500) z zachowaniem ciągłości działania w oparciu o stałe referencyjne i bezbłędnym wznowieniem synchronizacji po kolejnym zapytaniu.
+        - Weryfikacja precyzji matematycznej i spójności przeliczeń przy wielokrotnym przełączaniu walut transakcyjnych (PLN -> EUR -> USD -> GBP -> PLN).
+        - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (744 testy, 8888 asercji), Vitest (76 plików, 691 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
 ---
 
