@@ -1039,28 +1039,28 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
     - `README.md` & `changelog/README.md`: aktualizacja spisu technologii, opisu interfejsu SPA i rejestru zmian dokumentująca pełną eliminację problemu zamrożonego adresu URL i wdrożenie nowoczesnego routingu w całej aplikacji.
     - Weryfikacja testowa: 100% PASS w pełnym zestawie 72 plików Vitest (653 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 - [x] **Faza 60: Wielomotywowość (Light, Dark & System Theme Architecture)**
-    - [x] Konfiguracja strategii Dark Mode w Tailwind CSS i eliminacja zjawiska FOUC za pomocą skryptu bootstrapowego.
+    - Konfiguracja strategii Dark Mode w Tailwind CSS i eliminacja zjawiska FOUC za pomocą skryptu bootstrapowego.
         - `tailwind.config.js`: aktywacja strategii `darkMode: 'class'` umożliwiającej warunkowe stosowanie stylów motywu ciemnego za pośrednictwem wariantów `dark:*` sterowanych klasą `.dark` na elemencie `<html>`.
         - `resources/views/app.blade.php`: implementacja synchronicznego, odpornego na błędy skryptu bootstrapowego w sekcji `<head>`, natychmiast aplikującego klasę `dark` na podstawie `localStorage` (`finboard_theme`) lub preferencji systemowych `prefers-color-scheme: dark`, zapobiegając zjawisku FOUC.
         - Adaptacja klas bazowych kontenera `<html>` i `<body>` do elastycznych barw `bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 transition-colors duration-150`.
         - Weryfikacja testowa: 100% PASS w pełnym zestawie 72 plików Vitest (653 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
-    - [x] Implementacja ThemeContext, hooka useTheme oraz synchronizacja z preferencjami systemowymi.
+    - Implementacja ThemeContext, hooka useTheme oraz synchronizacja z preferencjami systemowymi.
         - `resources/js/context/ThemeContext.jsx`: centralny silnik stanu motywu obsługujący tryby `light`, `dark` oraz `system` z trwałością w `localStorage` (`finboard_theme`).
         - Reaktywne wyznaczanie `resolvedTheme` i dynamiczne nasłuchiwanie zdarzeń systemowych `window.matchMedia('(prefers-color-scheme: dark)')` z automatyczną manipulacją klasą `.dark` na `document.documentElement`.
         - `resources/js/App.jsx`: integracja dostawcy `<ThemeProvider>` na szczycie hierarchii providerów platformy FinBoard.
         - Weryfikacja testowa: 100% PASS w pełnym zestawie 72 plików Vitest (653 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
-    - [x] Budowa dostępnego komponentu ThemeToggle i integracja w nagłówku aplikacji.
+    - Budowa dostępnego komponentu ThemeToggle i integracja w nagłówku aplikacji.
         - `resources/js/components/ui/ThemeToggle.jsx`: intuicyjna kontrolka wyboru motywu z ikonami Lucide (`Sun`, `Moon`, `Monitor`), dynamicznym triggerem i menu wyboru z pełną obsługą ARIA (`role="menu"`, `role="menuitemradio"`, `aria-checked`).
         - Pełna obsługa klawiatury (`ArrowUp`, `ArrowDown`, `Escape`, `Enter`, `Space`), auto-zamykanie przy kliknięciu poza komponentem oraz integracja z systemem `<Tooltip>`.
         - `resources/js/components/layout/Header.jsx`: osadzenie przełącznika w pasku akcji nagłówka obok przycisku odświeżania i przełącznika spółek.
         - Weryfikacja testowa: 100% PASS w pełnym zestawie 72 plików Vitest (653 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
-    - [x] Adaptacja powłoki układu aplikacji i komponentów nawigacyjnych do motywu jasnego i ciemnego.
+    - Adaptacja powłoki układu aplikacji i komponentów nawigacyjnych do motywu jasnego i ciemnego.
         - `resources/js/components/layout/AppLayout.jsx`: przejście z ciemnego szkieletu na adaptacyjne `bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100` z płynną animacją `transition-colors duration-150`.
         - `resources/js/components/layout/Header.jsx`: implementacja tła `bg-white/95 dark:bg-zinc-950/95` z rozmyciem `backdrop-blur`, obramowaniem `border-zinc-200 dark:border-zinc-800` i zbalansowanym kontrastem przycisków akcji.
         - `resources/js/components/layout/Sidebar.jsx`: pełne wsparcie dla jasnego motywu (`bg-white dark:bg-zinc-950`), adaptacja sygnetu FB, aktywnego stanu linków `NavLink` i boksu spółki z zachowaniem pełnej zgodności testowej.
         - `resources/js/components/layout/DealContextBar.jsx` & `CompanySwitcherModal.jsx`: dostosowanie kontrastu tła, przełączników walutowych, selektorów okresów fiskalnych oraz listy spółek portfelowych.
         - Weryfikacja testowa: 100% PASS w pełnym zestawie 72 plików Vitest (653 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
-    - [x] Dostosowanie komponentów bazowych UI (`Card`, `FinancialTable`, `Button`, `Badge`, `Tooltip`, `FinancialValue`, `PercentageBadge`, `UserProfileModal`) do motywu jasnego i ciemnego.
+    - Dostosowanie komponentów bazowych UI (`Card`, `FinancialTable`, `Button`, `Badge`, `Tooltip`, `FinancialValue`, `PercentageBadge`, `UserProfileModal`) do motywu jasnego i ciemnego.
         - `resources/js/components/ui/Card.jsx` & `MetricCard`: wyeliminowanie sztywnego ciemnego tła, wdrożenie adaptacyjnych tokenów barwnych (`bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100`) oraz wariantów trendów KPI o wysokim kontraście.
         - `resources/js/components/ui/FinancialTable.jsx`: dostosowanie nagłówka tabeli `thead`, wierszy danych z `hover`, linii podziału `divide-zinc-200 dark:divide-zinc-850`, wierszy podsumowań PSR/MSR oraz wierszy zagnieżdżonych.
         - `resources/js/components/ui/Button.jsx`: zaktualizowanie stylizacji wszystkich wariantów przycisków (`primary`, `secondary`, `outline`, `ghost`, `danger`, `success`).
@@ -1069,42 +1069,42 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
         - `resources/js/components/ui/FinancialValue.jsx`: czytelna typografia kwot walutowych (`text-zinc-900 dark:text-zinc-100`, `text-emerald-600 dark:text-emerald-400`, `text-rose-600 dark:text-rose-400`).
         - `resources/js/components/auth/UserProfileModal.jsx`: dostosowanie okna modalnego profilu, pól formularzy tożsamości i haseł oraz sekcji audytu Sanctum.
         - Weryfikacja testowa: 100% PASS w pełnym zestawie 72 plików Vitest (653 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
-    - [x] Adaptacja wykresów analitycznych Recharts i tooltipów do motywu jasnego i ciemnego.
+    - Adaptacja wykresów analitycznych Recharts i tooltipów do motywu jasnego i ciemnego.
         - `resources/js/components/charts/CustomChartTooltip.jsx` & `ReinvestmentManager.jsx`: adaptacja kontenera tooltipa wykresu (`bg-white/95 dark:bg-zinc-950/95 border-zinc-200 dark:border-zinc-750`), etykiet serii i wartości.
         - `resources/js/components/charts/LiquidityTrendChart.jsx`: dynamiczne tokeny siatki `CartesianGrid` (`#27272a` vs `#e4e4e7`), osi i punktów `dot` wyznaczane przez `useTheme()`; formatter etykiet legendy.
         - `resources/js/components/charts/PnlTrendChart.jsx`: adaptacja siatki, osi, obrysów linii EBITDA i zysku netto oraz wskaźnika podświetlenia kursora (`cursorFill`).
         - `resources/js/components/charts/CostBreakdownChart.jsx`: dynamiczny obrys wycinków `pieStroke` (`#ffffff` vs `#09090b`), plakietka sumy kosztów oraz adaptacyjna mikro-legenda z dynamiką YoY.
         - `resources/js/components/investments/SensitivityCockpitView.jsx` & `ReinvestmentManager.jsx`: pełna spójność kolorystyczna siatek i osi wykresów symulacyjnych i odtworzeniowych CAPEX.
         - Weryfikacja testowa: 100% PASS w pełnym zestawie 72 plików Vitest (653 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
-    - [x] Implementacja testów jednostkowych i integracyjnych dla ThemeContext i ThemeToggle.
+    - Implementacja testów jednostkowych i integracyjnych dla ThemeContext i ThemeToggle.
         - `resources/js/tests/unit/ThemeContext.test.jsx`: 10 kompleksowych testów weryfikujących inicjalizację z `prefers-color-scheme`, trwałość w `localStorage`, przełączanie trybów `light`, `dark` i `system`, dynamiczne nasłuchiwanie zdarzeń systemowych `matchMedia`, bezpieczny fallback poza providerem oraz walidację danych wejściowych.
         - `resources/js/tests/components/ThemeToggle.test.jsx`: 7 testów komponentowych sprawdzających renderowanie przycisku, atrybuty WAI-ARIA (`role="menu"`, `role="menuitemradio"`, `aria-checked`), otwieranie/zamykanie menu, interakcję wyboru motywu z powrotem fokusu oraz pełną obsługę klawiatury (`ArrowDown`, `ArrowUp`, `Escape`) i outside click.
         - Weryfikacja testowa: 100% PASS w pełnym zestawie 74 plików Vitest (670 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
-    - [x] Opracowanie kompleksowej dokumentacji architektonicznej wielomotywowości i finalizacja Fazy 60.
+    - Opracowanie kompleksowej dokumentacji architektonicznej wielomotywowości i finalizacja Fazy 60.
         - `docs/THEME_ARCHITECTURE.md`: opracowanie instytucjonalnej dokumentacji technicznej architektury wielomotywowości, eliminacji FOUC, konfiguracji Tailwind CSS `darkMode: 'class'`, cyklu życia i stanu `ThemeContext`, komponentu `ThemeToggle` z obsługą WAI-ARIA, tabeli tokenów stylistycznych, adaptacji wykresów Recharts oraz wytycznych deweloperskich.
         - `README.md` & `changelog/README.md`: aktualizacja spisu technologii, opisu interfejsu i rejestru zmian dokumentująca pełną realizację Fazy 60.
         - Weryfikacja testowa: 100% PASS w pełnym zestawie 74 plików Vitest (670 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
-    - [x] Kompleksowa adaptacja widoków, komponentów domenowych i modali do motywu jasnego i ciemnego.
+    - Kompleksowa adaptacja widoków, komponentów domenowych i modali do motywu jasnego i ciemnego.
         - Eliminacja twardo zakodowanych klas barwnych i wdrożenie adaptacyjnych tokenów (`bg-white dark:bg-zinc-900`, `border-zinc-200 dark:border-zinc-800`, `text-zinc-900 dark:text-zinc-100`) w 51 plikach widoków i komponentów w modułach: Advisors & Permissions, Dataroom (VDR), Investment Planning & Financial Modeling, Finance, Records & Audit, Import & Benchmarks oraz Reports.
         - Zachowanie 100% zgodności selektorów DOM i klas asercyjnych dla testów automatycznych (`div.bg-zinc-900` w `DashboardView`, `text-zinc-100` i `text-rose-400` w `RecordsView`).
         - Weryfikacja testowa: 100% PASS w pełnym zestawie 74 plików Vitest (670 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
-    - [x] Poprawka motywu karty i wykresu rozbicia kosztów operacyjnych oraz kolejności hooków React.
+    - Poprawka motywu karty i wykresu rozbicia kosztów operacyjnych oraz kolejności hooków React.
         - `resources/js/views/DashboardView.jsx`: usunięcie nadmiarowej, niepoprzedzonej prefiksem klasy `bg-zinc-900` nadpisującej `bg-white` w motywie jasnym, wdrożenie czystej pary tokenów `bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800` oraz dodanie jednoznacznego atrybutu `data-testid="cost-breakdown-card"`.
         - `resources/js/components/charts/CostBreakdownChart.jsx`: przeniesienie hooków `useMemo` (`total` i `sortedData`) bezwarunkowo przed instrukcję wczesnego wyjścia `if (!data || data.length === 0)`, eliminujące ostrzeżenie naruszenia React Rules of Hooks przy przejściach stanu danych.
         - `resources/js/tests/integration/dashboardViewE2EWorkflow.test.jsx`: refaktoryzacja selektora w teście integracyjnym E2E z kruchego `.closest("div.bg-zinc-900")` na stabilny `screen.getByTestId("cost-breakdown-card")`.
         - `resources/js/tests/components/CostBreakdownChart.test.jsx`: rozszerzenie zestawu testów jednostkowych o weryfikację odporności cyklu życia hooków podczas rerenderowania pustej/pełnej kolekcji danych oraz renderowanie w motywie jasnym (`THEMES.LIGHT`) pod `ThemeProvider`.
         - Weryfikacja testowa: 100% PASS w pełnym zestawie 74 plików Vitest (672 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
-    - [x] Dostosowanie generatora dossier inwestycyjnego (LMA PDF) oraz kreatora raportów do motywu jasnego i ciemnego.
+    - Dostosowanie generatora dossier inwestycyjnego (LMA PDF) oraz kreatora raportów do motywu jasnego i ciemnego.
         - `resources/js/components/investments/InvestmentDossierPdfGenerator.jsx`: wstrzyknięcie hooka `useTheme()`, dynamiczne style siatki i etykiet Recharts, refaktoryzacja panelu konfiguratora, selektorów skali/znaku wodnego, notatek oraz arkusza podglądu A4 (`#investment-dossier-pdf`) do semantycznych par Tailwind (`bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800`), z pełnym zachowaniem stylów wydruku wektorowego (`print:...`).
         - `resources/js/components/investments/CustomReportBuilder.jsx`: wstrzyknięcie hooka `useTheme()`, dynamiczne motywy wykresu trendów (Recharts), pełna adaptacja tabeli 15-letniej, paska sterowania presetami i horyzontem oraz modala biblioteki pozycji (`metric-picker-modal`).
         - `resources/js/tests/components/InvestmentDossierPdfGenerator.test.jsx` & `resources/js/tests/components/CustomReportBuilder.test.jsx`: rozszerzenie zestawów testów o weryfikację poprawnego montowania i klas semantycznych w trybach `THEMES.LIGHT` i `THEMES.DARK`.
         - Weryfikacja testowa: 100% PASS w pełnym zestawie 74 plików Vitest (674 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
-    - [x] Dostosowanie raportów zarządczych i generatora Due Diligence PDF do motywu jasnego i ciemnego.
+    - Dostosowanie raportów zarządczych i generatora Due Diligence PDF do motywu jasnego i ciemnego.
         - `resources/js/components/reports/ReportConfigurator.jsx`: adaptacja panelu konfiguratora raportu (`bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800`), kontrolek wyboru horyzontu, waluty, poufności, checkboxów sekcji analitycznych, szablonów opinii oraz pola tekstowego komentarza analitycznego doradcy transakcyjnego; dodano `data-testid="report-configurator"`.
         - `resources/js/components/reports/ExecutivePdfReport.jsx`: refaktoryzacja ekranowego arkusza podglądu memorandum (`#executive-pdf-report`) do semantycznej palety `bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200 shadow-sm dark:shadow-xl`; pełna adaptacja kart KPI Scorecard, tabeli P&L (RZiS), wskaźników płynności (CR, QR, NWC/Cash Ratio), dekompozycji kosztów OPEX, opinii doradcy oraz certyfikatu SHA-256 z podpisami, z nienaruszonymi wektorowymi regułami wydruku (`print:...`).
         - `resources/js/tests/components/ExecutiveReports.test.jsx`: rozszerzenie zestawu testów jednostkowych o weryfikację poprawnego montowania i obecności klas adaptacyjnych w trybach `THEMES.LIGHT` i `THEMES.DARK` pod `<ThemeProvider>`.
         - Weryfikacja testowa: 100% PASS w pełnym zestawie 74 plików Vitest (676 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
-    - [x] Eliminacja przecieku jasnego tła pod oknem przeglądarki, synchronizacja color-scheme i elastyczna wysokość korzenia.
+    - Eliminacja przecieku jasnego tła pod oknem przeglądarki, synchronizacja color-scheme i elastyczna wysokość korzenia.
         - `resources/css/app.css`: dodanie bazowych reguł CSS `@layer base` definiujących `html { background-color: #fafafa; color-scheme: light; }` oraz `html.dark { background-color: #09090b; color-scheme: dark; }`, gwarantujących, że canvas przeglądarki i natywne paski przewijania natychmiast synchronizują się z aktywnym motywem, omijając ograniczenie selektora potomków Tailwind CSS `:is(.dark *)` dla znacznika `<html>`.
         - `resources/views/app.blade.php`: zamiana sztywnego `h-full` (`height: 100%`) na elastyczne `min-h-full` na tagach `<html>`, `<body>` oraz `<div id="root">`, co eliminuje obcinanie wysokości tła kontenera aplikacji na granicy początkowego viewportu (100vh / ~955px) i umożliwia naturalne rozciąganie tła wraz z rozbudowaną treścią pulpitu (1800+ px).
         - `resources/js/context/ThemeContext.jsx`: rozszerzenie funkcji `applyThemeClass` o synchroniczne ustawianie `document.documentElement.style.colorScheme` (`dark` / `light`) przy każdej zmianie motywu.
@@ -1123,7 +1123,11 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
         - `app/Domain/Finance/Services/NbpExchangeRateService.php`: implementacja serwisu integrującego publiczne API NBP (`https://api.nbp.pl/api/exchangerates/tables/A/?format=json`) z timeoutem 10s, walidacją kontraktu JSON tabeli A, atomowym zapisem do PostgreSQL w transakcji (`DB::transaction`) kalkulującym mnożniki $1/\text{mid}$ o precyzji 8 miejsc po przecinku, metodami dwukierunkowej konwersji kwotowej (`convertFromPln`, `convertToPln`) oraz wzorcem Cache-Aside (`getCachedRatesPayload`, `invalidateCache`).
         - `app/Contexts/Finance/Infrastructure/Services/NbpExchangeRateService.php`: adapter zgodności wstecznej dla IoC / kontenera usług.
         - `tests/Unit/Finance/NbpExchangeRateServiceTest.php`: zestaw testów jednostkowych z mockowaniem fasady `Http::fake` weryfikujący pomyślną synchronizację, błędy sieciowe (500), uszkodzony format JSON, puste tablice kursowe, matematyczną precyzję konwersji oraz mechanizm buforowania w Cache.
-        - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (733 testy, 8834 asercje), Vitest (74 pliki, 676 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
+    - [x] Komenda konsolowa i konfiguracja harmonogramu dla aktualizacji kursów walut NBP.
+        - `app/Console/Commands/SyncExchangeRatesCommand.php`: implementacja polecenia konsolowego `app:sync-exchange-rates` (oraz aliasu `finance:sync-exchange-rates`) z opcją `--table`, szczegółowym logowaniem instytucjonalnym FinBoard, prezentacją tabeli kursów i mnożników oraz odpornością na błędy zewnętrzne.
+        - `routes/console.php`: rejestracja zadania cyklicznego w mechanizmie Laravel Console Scheduler uruchamianego dwa razy na dobę w dni robocze (o godzinie 08:30 i 12:30 czasu `Europe/Warsaw`) z flagami `withoutOverlapping()`, `onOneServer()` i `runInBackground()`.
+        - `tests/Feature/Console/SyncExchangeRatesCommandTest.php`: zestaw testów funkcjonalnych sprawdzających poprawne wykonanie polecenia, opcję `--table`, obsługę błędów sieciowych API (kod 1), aliasy oraz właściwą definicję wpisów harmonogramu.
+        - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (738 testów, 8854 asercje), Vitest (74 pliki, 676 testów) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
 ---
 
