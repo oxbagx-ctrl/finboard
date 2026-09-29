@@ -1210,6 +1210,10 @@ Moduł **Deal Advisory, Project Finance & Investment Valuation** (Fazy 38–45) 
         - `app/Presentation/Api/Controllers/DocumentController.php`: zabezpieczenie akcji `download` i `preview` przed naruszeniami spójności danych (`TamperedPayloadException` -> HTTP 422, audyt `Log::critical`) oraz awariami deszyfrowania (`DecryptionFailedException` -> HTTP 500), bez tworzenia plików tymczasowych na dysku.
         - `tests/Feature/DocumentManagement/DualReadDownloadAndPreviewPipelineTest.php`: kompleksowy pakiet testów integracyjnych weryfikujący Dual-Read, deszyfrowanie w locie, nakładanie znaku wodnego w podglądzie PDF oraz detekcję manipulacji szyfrogramem i tagiem GCM.
         - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (777 testów, 9073 asercje), Vitest (76 plików, 692 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
+    - [x] Komenda migracji istniejących danych na produkcji (`vdr:encrypt-existing`).
+        - `app/Console/Commands/EncryptExistingVdrDocumentsCommand.php`: komenda Artisan `php artisan vdr:encrypt-existing-documents` (alias `vdr:encrypt-existing`) z obsługą `--dry-run`, paczek `--chunk=50`, rotacji `--key-id`, paskiem postępu, weryfikacją sumy SHA-256 przed i po szyfrowaniu oraz wpisem audytowym w `document_access_logs`.
+        - `tests/Feature/Console/EncryptExistingVdrDocumentsCommandTest.php`: zestaw testów weryfikujących tryb symulacji (`--dry-run`), fizyczny zapis szyfrogramu, aktualizację metadanych w PostgreSQL, pomijanie brakujących plików oraz ochronę przed rozbieżnością sumy kontrolnej.
+        - Weryfikacja testowa: 100% PASS w pełnym zestawie testów PHPUnit (782 testy, 9102 asercje), Vitest (76 plików, 692 testy) oraz bezbłędna kompilacja produkcyjna (`npm run build`).
 
 ---
 
